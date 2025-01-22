@@ -7,6 +7,7 @@ import type {
   JetPluginExecutorInitParams,
   methods,
 } from "./types.js";
+import { BunFile } from "bun";
 
 export class JetPlugin {
   name?: string;
@@ -227,17 +228,15 @@ export class Context {
     throw _OFF;
   }
 
-  sendStream(stream: Stream | string, ContentType: string) {
+  sendStream(stream: Stream | string | BunFile, ContentType: string) {
     if (!this._2) {
       this._2 = {};
     }
-
     if (typeof stream === "string") {
       this._2["Content-Disposition"] = `inline; filename="${
         stream.split("/").at(-1) || "unnamed.bin"
       }"`;
       if (UTILS.runtime["bun"]) {
-        // @ts-expect-error
         stream = Bun.file(stream);
       } else {
         stream = createReadStream(stream as string, { autoClose: true });
@@ -252,7 +251,6 @@ export class Context {
   }
 
   async json<Type extends any = Record<string, any>>(): Promise<Type> {
-    // Check if the body has already been parsed to avoid request hang in Node.js
     if (this.body) {
       return this.body as Promise<Type>;
     }

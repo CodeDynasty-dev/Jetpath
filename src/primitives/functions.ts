@@ -227,7 +227,6 @@ class JetPathErrors extends Error {
 
 export const _DONE = new JetPathErrors("done");
 export const _OFF = new JetPathErrors("off");
-// const _RES = new JetPathErrors("respond");
 
 const createCTX = (
   req: IncomingMessage | Request,
@@ -317,10 +316,8 @@ const JetPath = async (
         //? report error to error hook
         try {
           await _JetPath_hooks["ERROR"]?.(ctx, error);
-          //! if expose headers on error is set
-          //! false remove this line so the last return will take effect;
-          return createResponse(res, ctx);
         } catch (error) {
+        } finally {
           return createResponse(res, ctx);
         }
       }
@@ -419,26 +416,22 @@ export async function getHandlers(
           }
         } else {
           // record errors
-          if (dirent.name.endsWith(".jet.")) {
-            if (!errorsCount) {
-              errorsCount = [];
-            }
-            errorsCount.push({
-              file: dirent.path + "/" + dirent.name,
-              error: module,
-            });
-          }
-        }
-      } catch (error) {
-        if (dirent.name.includes(".jet.")) {
           if (!errorsCount) {
             errorsCount = [];
           }
           errorsCount.push({
             file: dirent.path + "/" + dirent.name,
-            error: String(error),
+            error: module,
           });
         }
+      } catch (error) {
+        if (!errorsCount) {
+          errorsCount = [];
+        }
+        errorsCount.push({
+          file: dirent.path + "/" + dirent.name,
+          error: String(error),
+        });
       }
     }
     if (

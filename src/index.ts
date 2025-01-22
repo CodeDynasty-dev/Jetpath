@@ -12,6 +12,7 @@ import {
 } from "./primitives/functions.js";
 import { type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
+
 export class JetPath {
   public server: any;
   private listening: boolean = false;
@@ -95,6 +96,11 @@ export class JetPath {
       // ? render API in a .HTTP file
       if (this.options?.APIdisplay === "HTTP") {
         await writeFile("api-doc.http", compiledAPI);
+        Log.info(
+          `✅ Processed routes ${handlersCount} handlers in ${Math.round(
+            endTime - startTime
+          )}ms`
+        );
         Log.success(
           `Check http file ./api-doc.http to test the routes Visual Studio rest client extension`
         );
