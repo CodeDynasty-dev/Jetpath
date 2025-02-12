@@ -473,13 +473,13 @@ export function validator<T extends Record<string, any>>(
     const value = data[key];
 
     // Required check
-    if (required && (value === undefined || value === null)) {
+    if (required && value == null) {
       errors.push(`${key} is required`);
       continue;
     }
 
     // Skip if optional and undefined
-    if (!required && value === undefined) {
+    if (!required && value == null) {
       continue;
     }
 
