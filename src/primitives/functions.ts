@@ -632,7 +632,7 @@ const URL_PARSER = (
     }
   }
   //? check for search in the route
-  const uio = url.indexOf("/?");
+  const uio = url.indexOf("?");
   if (uio > -1) {
     path = url.slice(0, uio);
     if (url.includes("=")) {
