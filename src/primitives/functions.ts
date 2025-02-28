@@ -42,8 +42,8 @@ export function corsHook(options: {
   privateNetworkAccess?: any;
   origin?: string[];
 }): (ctx: Context) => void {
-  options.keepHeadersOnError =
-    options.keepHeadersOnError === undefined || !!options.keepHeadersOnError;
+  options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
+    !!options.keepHeadersOnError;
   return function cors(ctx: Context) {
     //? Add Vary header to indicate response varies based on the Origin header
     ctx.set("Vary", "Origin");
@@ -57,11 +57,11 @@ export function corsHook(options: {
       if (options.secureContext) {
         ctx.set(
           "Cross-Origin-Opener-Policy",
-          options.secureContext["Cross-Origin-Embedder-Policy"]
+          options.secureContext["Cross-Origin-Embedder-Policy"],
         );
         ctx.set(
           "Cross-Origin-Embedder-Policy",
-          options.secureContext["Cross-Origin-Embedder-Policy"]
+          options.secureContext["Cross-Origin-Embedder-Policy"],
         );
       }
     } else {
@@ -73,23 +73,23 @@ export function corsHook(options: {
         if (options.allowMethods) {
           ctx.set(
             "Access-Control-Allow-Methods",
-            options.allowMethods.join(",")
+            options.allowMethods.join(","),
           );
         }
         if (options.secureContext) {
           ctx.set(
             "Cross-Origin-Opener-Policy",
-            options.secureContext["Cross-Origin-Embedder-Policy"]
+            options.secureContext["Cross-Origin-Embedder-Policy"],
           );
           ctx.set(
             "Cross-Origin-Embedder-Policy",
-            options.secureContext["Cross-Origin-Embedder-Policy"]
+            options.secureContext["Cross-Origin-Embedder-Policy"],
           );
         }
         if (options.allowHeaders) {
           ctx.set(
             "Access-Control-Allow-Headers",
-            options.allowHeaders.join(",")
+            options.allowHeaders.join(","),
           );
         }
         if (!ctx.code) {
@@ -193,7 +193,7 @@ export const UTILS = {
     }
     if (!server) {
       const edge_server = plugs.find(
-        (plug) => plug.JetPathServer
+        (plug) => plug.JetPathServer,
       )?.JetPathServer;
       if (edge_server !== undefined) {
         server = edge_server;
@@ -232,7 +232,7 @@ const createCTX = (
   req: IncomingMessage | Request,
   path: string,
   params?: Record<string, any>,
-  search?: Record<string, any>
+  search?: Record<string, any>,
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
@@ -251,7 +251,7 @@ const createResponse = (
     req: IncomingMessage;
   },
   ctx: Context,
-  four04?: boolean
+  four04?: boolean,
 ) => {
   //? add cors headers
   _JetPath_hooks["cors"]?.(ctx);
@@ -282,7 +282,7 @@ const createResponse = (
   }
   res.writeHead(
     (four04 && 404) || ctx.code,
-    ctx?._2 || { "Content-Type": "text/plain" }
+    ctx?._2 || { "Content-Type": "text/plain" },
   );
   res.end(ctx?._1 || (four04 ? "Not found" : undefined));
 };
@@ -291,7 +291,7 @@ const JetPath = async (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
-  }
+  },
 ) => {
   const parsedR = URL_PARSER(req.method as methods, req.url!);
   let off = false;
@@ -375,7 +375,7 @@ const getModule = async (src: string, name: string) => {
 export async function getHandlers(
   source: string,
   print: boolean,
-  errorsCount: { file: string; error: string }[] | undefined = undefined
+  errorsCount: { file: string; error: string }[] | undefined = undefined,
 ) {
   source = source || cwd();
   source = path.resolve(cwd(), source);
@@ -442,7 +442,7 @@ export async function getHandlers(
       errorsCount = await getHandlers(
         source + "/" + dirent.name,
         print,
-        errorsCount
+        errorsCount,
       );
     }
   }
@@ -451,7 +451,7 @@ export async function getHandlers(
 
 export function validator<T extends Record<string, any>>(
   schema: HTTPBody<T> | undefined,
-  data: any
+  data: any,
 ): T {
   if (!schema || typeof data !== "object") {
     throw new Error("Invalid schema or data");
@@ -542,7 +542,7 @@ export function validator<T extends Record<string, any>>(
         errors.push(
           typeof result === "string"
             ? result
-            : err || `${key} validation failed`
+            : err || `${key} validation failed`,
         );
         continue;
       }
@@ -568,7 +568,7 @@ export function validator<T extends Record<string, any>>(
 
 const URL_PARSER = (
   method: methods,
-  url: string
+  url: string,
 ): [JetFunc, Record<string, any>, Record<string, any>, string] | undefined => {
   const routes = _JetPath_paths[method];
   if (!UTILS.runtime["node"]) {
@@ -633,20 +633,20 @@ const URL_PARSER = (
   }
   //? check for search in the route
   const uio = url.indexOf("/?");
-
   if (uio > -1) {
-    path = url.slice(0, uio + 2);
+    path = url.slice(0, uio);
     if (url.includes("=")) {
-      const s_raw = url.slice(path.length).split("=");
-      for (let s = 0; s < s_raw.length; s = s + 2) {
-        search[s_raw[s]] = s_raw[s + 1];
+      const s_raw = Array.from(
+        new URLSearchParams(url.slice(path.length)).entries(),
+      );
+      for (let s = 0; s < s_raw.length; s++) {
+        search[s_raw[s][0]] = s_raw[s][1];
       }
     }
     if (routes[path]) {
       handler = routes[path];
     }
   }
-
   if (handler!) {
     return [handler, params, search, path!];
   }
@@ -657,7 +657,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   const globalHeaders = JSON.stringify(
     options?.globalHeaders || {
       Authorization: "Bearer ****",
-    }
+    },
   );
 
   return UI.replace("{ JETPATH }", `\`${api}\``)
@@ -667,11 +667,11 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     .replaceAll(
       "{LOGO}",
       options?.apiDoc?.logo ||
-        "https://raw.githubusercontent.com/Uiedbook/JetPath/main/icon-transparent.webp"
+        "https://raw.githubusercontent.com/Uiedbook/JetPath/main/icon-transparent.webp",
     )
     .replaceAll(
       "{INFO}",
-      options?.apiDoc?.info || "This is a JetPath api preview."
+      options?.apiDoc?.info || "This is a JetPath api preview.",
     );
 };
 
@@ -699,7 +699,7 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         // ? parse headers
         for (const name in initialHeader) {
           headers.push(
-            name + ":" + initialHeader[name as keyof typeof initialHeader]
+            name + ":" + initialHeader[name as keyof typeof initialHeader],
           );
         }
         // ? parse body
@@ -720,8 +720,8 @@ export const compileAPI = (options: jetOptions): [number, string] => {
                   target[key] = [field.arrayType || "text"];
                 }
               } else {
-                target[key] =
-                  field?.inputDefaultValue || field?.inputType || "text";
+                target[key] = field?.inputDefaultValue || field?.inputType ||
+                  "text";
               }
             }
           };
@@ -758,7 +758,7 @@ ${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${
 const sorted_insert = (paths: string[], path: string): number => {
   let low = 0;
   let high = paths.length - 1;
-  for (; low <= high; ) {
+  for (; low <= high;) {
     const mid = Math.floor((low + high) / 2);
     const current = paths[mid];
     if (current < path) {

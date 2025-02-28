@@ -111,7 +111,7 @@ export const GET_pets_search$$: JetFunc<{ search: { name: string } }> =
       message: "Pets searched successfully",
       pets: pets.filter(
         (pet) =>
-          pet.name === ctx.search.name || pet.name.includes(ctx.search.name)
+          pet.name === ctx.search.name || pet.name.includes(ctx.search.name),
       ),
     });
   };
@@ -148,7 +148,7 @@ PUT_petBy$id.info = "This api allows you to update a pet with it's ID";
 // ? /petBy/8766
 // Delete a Pet: Remove a pet from the inventory
 export const DELETE_petBy$id: JetFunc<{ params: { id: string } }> = function (
-  ctx
+  ctx,
 ) {
   const petId = ctx.params.id;
   const index = pets.findIndex((p) => p.id === petId);
@@ -215,7 +215,7 @@ export const POST_: JetFunc<
         textfield: string;
       }>;
     },
-    { formData2: (ctx: any) => "lol" }
+    { formData2: (ctx: any) => "lol" },
   ]
 > = async function (ctx) {
   const form = await ctx.app.formData(ctx);

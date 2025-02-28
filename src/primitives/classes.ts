@@ -100,7 +100,7 @@ export class Context {
     req: Request,
     path: string,
     params?: Record<string, any>,
-    search?: Record<string, any>
+    search?: Record<string, any>,
   ) {
     this.request = req;
     this.method = req.method as "GET";

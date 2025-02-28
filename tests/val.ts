@@ -31,7 +31,7 @@ type HTTPBody<Obj extends Record<string, any>> = {
 
 export function validator<T extends Record<string, any>>(
   schema: HTTPBody<T> | undefined,
-  data: any
+  data: any,
 ): T {
   if (!schema || typeof data !== "object") {
     throw new Error("Invalid schema or data");
@@ -89,7 +89,7 @@ export function validator<T extends Record<string, any>>(
           try {
             out[key as keyof T] = validator(
               def.objectSchema,
-              value
+              value,
             ) as T[keyof T];
             continue;
           } catch (e) {
@@ -116,7 +116,7 @@ export function validator<T extends Record<string, any>>(
         errors.push(
           typeof result === "string"
             ? result
-            : def.err || `${key} validation failed`
+            : def.err || `${key} validation failed`,
         );
         continue;
       }
@@ -148,7 +148,8 @@ const userSchema: HTTPBody<{
     type: "string",
     required: true,
     RegExp: /^[a-zA-Z0-9_]{3,20}$/,
-    err: "Username must be 3-20 characters and contain only letters, numbers, and underscores",
+    err:
+      "Username must be 3-20 characters and contain only letters, numbers, and underscores",
   },
   email: {
     type: "string",
@@ -168,7 +169,8 @@ const userSchema: HTTPBody<{
     required: true,
     inputType: "password",
     RegExp: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-    err: "Password must be at least 8 characters with at least one letter and one number",
+    err:
+      "Password must be at least 8 characters with at least one letter and one number",
   },
   profilePicture: {
     type: "file",

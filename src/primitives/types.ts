@@ -3,9 +3,8 @@ import type { _JetPath_paths } from "./functions.js";
 import type { JetPlugin } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
-  x: infer I
-) => void
-  ? I
+  x: infer I,
+) => void ? I
   : never;
 
 export type Context<
@@ -14,7 +13,7 @@ export type Context<
     params?: Record<string, any>;
     search?: Record<string, any>;
   },
-  JetPluginTypes extends Record<string, unknown>[]
+  JetPluginTypes extends Record<string, unknown>[],
 > = {
   /**
    * an object you can set values to per request
@@ -62,7 +61,7 @@ export type Context<
    */
   throw(
     code?: number | string | Record<string, any> | unknown,
-    message?: string | Record<string, any>
+    message?: string | Record<string, any>,
   ): never;
   /**
    * redirect the request
@@ -105,7 +104,7 @@ export type JetPluginExecutorInitParams = {
 };
 export type JetPluginExecutor = (
   this: JetPlugin,
-  init: JetPluginExecutorInitParams
+  init: JetPluginExecutorInitParams,
 ) => Record<string, any>;
 
 export type contentType =
@@ -143,27 +142,27 @@ export type jetOptions = {
   static?: { route: string; dir: string };
   cors?:
     | {
-        allowMethods?: allowedMethods;
-        secureContext?: {
-          "Cross-Origin-Opener-Policy":
-            | "same-origin"
-            | "unsafe-none"
-            | "same-origin-allow-popups";
-          "Cross-Origin-Embedder-Policy": "require-corp" | "unsafe-none";
-        };
-        allowHeaders?: string[];
-        exposeHeaders?: string[];
-        keepHeadersOnError?: boolean;
-        maxAge?: string;
-        credentials?: boolean;
-        privateNetworkAccess?: any;
-        origin?: string[];
-      }
+      allowMethods?: allowedMethods;
+      secureContext?: {
+        "Cross-Origin-Opener-Policy":
+          | "same-origin"
+          | "unsafe-none"
+          | "same-origin-allow-popups";
+        "Cross-Origin-Embedder-Policy": "require-corp" | "unsafe-none";
+      };
+      allowHeaders?: string[];
+      exposeHeaders?: string[];
+      keepHeadersOnError?: boolean;
+      maxAge?: string;
+      credentials?: boolean;
+      privateNetworkAccess?: any;
+      origin?: string[];
+    }
     | boolean;
   websocket?:
     | {
-        idleTimeout?: number;
-      }
+      idleTimeout?: number;
+    }
     | boolean;
 };
 
@@ -204,7 +203,7 @@ export type JetFunc<
     params?: Record<string, any>;
     search?: Record<string, any>;
   } = { body: {}; params: {}; search: {} },
-  JetPluginTypes extends Record<string, unknown>[] = []
+  JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
   (ctx: Context<JetData, JetPluginTypes>): Promise<void> | void;
   body?: HTTPBody<JetData["body"] & Record<string, any>>;
