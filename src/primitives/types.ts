@@ -199,7 +199,7 @@ export type HTTPBody<Obj extends Record<string, any>> = {
 
 export type JetMiddleware = (
   ctx: Context,
-) => (Promise<(ctx: Context, error: unknown) => Promise<any>|any> | ((ctx: Context, error: unknown) => Promise<any>|any));
+) => (Promise<(ctx: Context, error: unknown) => void | Promise<any>|any> | ((ctx: Context, error: unknown) => Promise<any>|any));
 
 export type JetFunc<
   JetData extends {
