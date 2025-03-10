@@ -54,5 +54,10 @@
   },
   "dependencies": {
     "mime": "^4.0.1"
+  },
+  "credence": {
+    "docs-directory": ".",
+    "build-directory": "docs",
+    "assets-folder": "./doc-assets"
   }
 }

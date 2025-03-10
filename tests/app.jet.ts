@@ -1,4 +1,5 @@
 import { type JetFunc, JetPath, JetPlugin } from "../dist/index.js";
+import { JetMiddleware } from "../dist/primitives/types.js";
 
 const app = new JetPath({
   apiDoc: {
@@ -197,12 +198,16 @@ POST_petImage$id.body = {
 };
 
 // ? error hook
-export function hook__ERROR(ctx: any, err: unknown) {
-  ctx.throw(String(err));
-}
+export const MIDDLEWARE_$0: JetMiddleware = () => {
+  return (ctx, err) => {
+    console.log("boohoo");
+    ctx.throw();
+  };
+};
 
 export const GET_error: JetFunc = async function (ctx) {
-  ctx.throw("Edwinger loves jetpath");
+  throw new Error("boohoo");
+  // ctx.throw("Edwinger loves jetpath");
 };
 
 export const POST_: JetFunc<

@@ -1,20 +1,20 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths } from "./functions.js";
-import type { JetPlugin } from "./classes.js";
+import type { Context, JetPlugin } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,
 ) => void ? I
   : never;
 
-export type Context<
+export interface ContextType<
   JetData extends {
     body?: Record<string, any>;
     params?: Record<string, any>;
     search?: Record<string, any>;
   },
   JetPluginTypes extends Record<string, unknown>[],
-> = {
+> {
   /**
    * an object you can set values to per request
    */
@@ -90,7 +90,7 @@ export type Context<
   _3?: any; //Stream | undefined; // Stream
   _4?: boolean | undefined;
   _5?: (() => never) | undefined;
-};
+}
 
 export type JetPluginExecutorInitParams = {
   runtime: {
@@ -197,6 +197,10 @@ export type HTTPBody<Obj extends Record<string, any>> = {
   };
 };
 
+export type JetMiddleware = (
+  ctx: Context,
+) => (ctx: Context, error: unknown) => void;
+
 export type JetFunc<
   JetData extends {
     body?: Record<string, any>;
@@ -205,9 +209,10 @@ export type JetFunc<
   } = { body: {}; params: {}; search: {} },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
-  (ctx: Context<JetData, JetPluginTypes>): Promise<void> | void;
+  (ctx: ContextType<JetData, JetPluginTypes>): Promise<void> | void;
   body?: HTTPBody<JetData["body"] & Record<string, any>>;
   headers?: Record<string, string>;
   info?: string;
   method?: string;
+  jet_middleware?: JetMiddleware;
 };

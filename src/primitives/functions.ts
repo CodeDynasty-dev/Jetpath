@@ -25,6 +25,8 @@ import { Context, type JetPlugin, Log } from "./classes.js";
  * @public
  */
 
+let cors: (ctx: Context) => void;
+
 export function corsHook(options: {
   exposeHeaders?: string[];
   allowMethods?: allowedMethods;
@@ -41,10 +43,12 @@ export function corsHook(options: {
   };
   privateNetworkAccess?: any;
   origin?: string[];
-}): (ctx: Context) => void {
+}) {
+  //
   options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
     !!options.keepHeadersOnError;
-  return function cors(ctx: Context) {
+  //
+  cors = (ctx: Context) => {
     //? Add Vary header to indicate response varies based on the Origin header
     ctx.set("Vary", "Origin");
     if (options.credentials === true) {
@@ -214,7 +218,8 @@ export let _JetPath_paths: Record<methods, Record<string, JetFunc>> = {
   DELETE: {},
   OPTIONS: {},
 };
-export const _JetPath_hooks: Record<
+
+export const _jet_middleware: Record<
   string,
   (ctx: Context, err?: unknown) => void | Promise<void>
 > = {};
@@ -254,7 +259,7 @@ const createResponse = (
   four04?: boolean,
 ) => {
   //? add cors headers
-  _JetPath_hooks["cors"]?.(ctx);
+  cors?.(ctx);
   UTILS.ctxPool.push(ctx);
   // ? prepare response
   if (!UTILS.runtime["node"]) {
@@ -296,12 +301,15 @@ const JetPath = async (
   const parsedR = URL_PARSER(req.method as methods, req.url!);
   let off = false;
   let ctx: Context;
+  let returned:
+    | ((ctx: Context, error: unknown) => void)
+    | undefined = undefined;
   if (parsedR) {
     const r = parsedR[0];
     ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
     try {
       //? pre-request hooks here
-      await _JetPath_hooks["PRE"]?.(ctx);
+      returned = await r.jet_middleware?.(ctx);
       //? route handler call
       await r(ctx as any);
       return createResponse(res, ctx);
@@ -313,9 +321,9 @@ const JetPath = async (
           off = true;
         }
       } else {
-        //? report error to error hook
         try {
-          await _JetPath_hooks["ERROR"]?.(ctx, error);
+          //? report error to error middleware
+          await returned?.(ctx, error);
         } catch (error) {
         } finally {
           return createResponse(res, ctx);
@@ -337,29 +345,16 @@ const JetPath = async (
   }
 };
 
-const handlersPath = (path: any) => {
-  if ((path as string).includes("hook__")) {
-    //? hooks in place
-    return (path as string).split("hook__")[1];
-  }
-  //? adding /(s) in place
-  path = path.split("_");
-  const method = path.shift();
-  path = "/" + path.join("/");
-  //? adding ?(s) in place
-  path = path.split("$$");
-  path = path.join("/?");
-  //? adding * in place
-  path = path.split("$0");
-  path = path.join("/*");
-  //? adding :(s) in place
-  path = path.split("$");
-  path = path.join("/:");
-  if (/(GET|POST|PUT|PATCH|DELETE|OPTIONS)/.test(method)) {
-    //? adding methods in place
-    return [method, path] as [methods, string];
-  }
-  return;
+const handlersPath = (path: string) => {
+  let [method, ...segments] = path.split("_");
+  let route = "/" + segments.join("/");
+  route = route.replace(/\$\$/g, "/?") // Convert optional segments
+    .replace(/\$0/g, "/*") // Convert wildcard
+    .replace(/\$/g, "/:") // Convert params
+    .replaceAll(/\/\//g, "/"); // change normalize akk extra / to /
+  return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE)$/.test(method)
+    ? [method, route] as [string, string]
+    : undefined;
 };
 
 const getModule = async (src: string, name: string) => {
@@ -394,22 +389,22 @@ export async function getHandlers(
           for (const p in module) {
             const params = handlersPath(p);
             if (params) {
-              // ! HTTP handler
-              if (
-                typeof params !== "string"
-                // &&
-                // _JetPath_paths[params[0] as methods]
-              ) {
-                // ? set the method
-                module[p]!.method = params[0];
-                // ? set the path
-                module[p]!.path = params[1];
-                _JetPath_paths[params[0] as methods][params[1]] = module[
-                  p
-                ] as JetFunc;
+              if (p.startsWith("MIDDLEWARE")) {
+                _jet_middleware[params[1].slice(0, -1)] = module[p];
               } else {
-                if ("PRE-ERROR".includes(params as string)) {
-                  _JetPath_hooks[params as string] = module[p];
+                // ! HTTP handler
+                if (
+                  typeof params !== "string"
+                  // &&
+                  // _JetPath_paths[params[0] as methods]
+                ) {
+                  // ? set the method
+                  module[p]!.method = params[0];
+                  // ? set the path
+                  module[p]!.path = params[1];
+                  _JetPath_paths[params[0] as methods][params[1]] = module[
+                    p
+                  ] as JetFunc;
                 }
               }
             }
@@ -769,3 +764,44 @@ const sorted_insert = (paths: string[], path: string): number => {
   }
   return low;
 };
+
+/**
+ * Assigns middleware functions to routes while ensuring that each route gets exactly one middleware function.
+ * A middleware function can be shared across multiple routes.
+ *
+ * @param _JetPath_paths - An object mapping HTTP methods to route-handler maps.
+ * @param _jet_middleware - An object mapping route paths to an array of middleware functions.
+ */
+export function assignMiddleware(
+  _JetPath_paths: { [method: string]: { [route: string]: any } },
+  _jet_middleware: {
+    [route: string]: (
+      ctx: any,
+      next: () => Promise<void>,
+    ) => Promise<void> | void;
+  },
+): void {
+  // Iterate over each HTTP method's routes.
+  for (const method in _JetPath_paths) {
+    const routes = _JetPath_paths[method];
+    for (const route in routes) {
+      // If middleware is defined for the route, ensure it has exactly one middleware function.
+      for (const key in _jet_middleware) {
+        if (route.startsWith(key)) {
+          const middleware = _jet_middleware[key];
+          // console.log({ route, key, middleware });
+          if (routes[route].jet_middleware) {
+            throw new Error(
+              `Route "${route}" (Method: ${method}) must have exactly one middleware. 
+            Found an additional middleware ${key}.
+            
+            🔧 Fix: Please Ensure the route "${route}" has exactly one middleware.`,
+            );
+          }
+          // Assign the middleware function to the route handler.
+          routes[route].jet_middleware = middleware;
+        }
+      }
+    }
+  }
+}

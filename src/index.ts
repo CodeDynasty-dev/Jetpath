@@ -2,8 +2,9 @@ import mime from "mime/lite";
 
 import { writeFile } from "node:fs/promises";
 import {
-  _JetPath_hooks,
+  _jet_middleware,
   _JetPath_paths,
+  assignMiddleware,
   compileAPI,
   compileUI,
   corsHook,
@@ -23,7 +24,7 @@ export class JetPath {
     if (!this.options.port) this.options.port = 8080;
     // ? setting up app configs
     if (this.options.cors !== false) {
-      _JetPath_hooks["cors"] = corsHook({
+      corsHook({
         exposeHeaders: [],
         allowMethods: ["DELETE", "GET", "HEAD", "PATCH", "POST", "PUT"],
         origin: ["*"],
@@ -132,6 +133,8 @@ export class JetPath {
         }
       }
     }
+    assignMiddleware(_JetPath_paths, _jet_middleware);
+
     Log.success(`Listening on http://localhost:${this.options.port}`);
     // ? start server
     this.listening = true;
@@ -140,5 +143,5 @@ export class JetPath {
 }
 
 //? exports
-export type { Context, JetFunc } from "./primitives/types.js";
+export type { ContextType, JetFunc } from "./primitives/types.js";
 export { JetPlugin } from "./primitives/classes.js";
