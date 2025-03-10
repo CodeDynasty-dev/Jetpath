@@ -52,7 +52,6 @@ export const GET_greet: JetFunc = function (ctx) {
   setTimeout(() => {
     ctx.send("Welcome to Petshop!");
   }, 1000);
-
   ctx.eject();
 };
 
