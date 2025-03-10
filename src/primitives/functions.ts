@@ -301,7 +301,7 @@ const JetPath = async (
   const parsedR = URL_PARSER(req.method as methods, req.url!);
   let off = false;
   let ctx: Context;
-  let returned: ((ctx: Context, error: unknown) => Promise<void>)[]  = [];
+  let returned: (((ctx: Context, error: unknown) => Promise<void>)|undefined)[]  = [];
 
   if (parsedR) {
     const r = parsedR[0];
@@ -322,7 +322,7 @@ const JetPath = async (
       } else {
         try {
           //? report error to error middleware
-          await Promise.all(returned.map(m=> m(ctx, error)));
+          await Promise.all(returned.map(m=> m?.(ctx, error)));
         } catch (error) {
         } finally {
           return createResponse(res, ctx);
