@@ -389,7 +389,7 @@ export async function getHandlers(
             const params = handlersPath(p);
             if (params) {
               if (p.startsWith("MIDDLEWARE")) {
-                _jet_middleware[params[1].slice(0, -1)] = module[p];
+                _jet_middleware[params[1]] = module[p];
               } else {
                 // ! HTTP handler
                 if (
