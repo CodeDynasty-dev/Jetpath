@@ -264,10 +264,11 @@ const createResponse = (
   // ? prepare response
   if (!UTILS.runtime["node"]) {
     if (ctx?.code === 301 && ctx._2?.["Location"]) {
+      // @ts-ignore
       return Response.redirect(ctx._2?.["Location"]);
     }
     if (ctx?._3) {
-      return new Response(ctx?._3 as unknown as BodyInit, {
+      return new Response(ctx?._3 as unknown as undefined, {
         status: 200,
         headers: ctx?._2,
       });
@@ -290,6 +291,7 @@ const createResponse = (
     ctx?._2 || { "Content-Type": "text/plain" },
   );
   res.end(ctx?._1 || (four04 ? "Not found" : undefined));
+  return undefined;
 };
 
 const JetPath = async (
@@ -298,11 +300,11 @@ const JetPath = async (
     req: IncomingMessage;
   },
 ) => {
+  console.log(req);
   const parsedR = URL_PARSER(req.method as methods, req.url!);
   let off = false;
   let ctx: Context;
-  let returned: (((ctx: Context, error: unknown) => Promise<void>)|undefined)[]  = [];
-
+  let returned: (Function|void)[]  = [];
   if (parsedR) {
     const r = parsedR[0];
     ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
@@ -616,7 +618,7 @@ const URL_PARSER = (
     // ? /* check
     if (pathR.includes("*")) {
       const Ried = pathR.slice(0, pathR.length - 1);
-      if (url.includes(Ried)) {
+      if (url.startsWith(Ried)) { 
         (params as any).extraPath = url.slice(Ried.length);
         path = pathR;
         //? set path and handler
@@ -644,6 +646,7 @@ const URL_PARSER = (
   if (handler!) {
     return [handler, params, search, path!];
   }
+  return undefined;
 };
 
 export const compileUI = (UI: string, options: jetOptions, api: string) => {

@@ -1,5 +1,5 @@
-import { type JetFunc, JetPath, JetPlugin } from "../dist/index.js";
-import { JetMiddleware } from "../dist/primitives/types.js";
+import { type JetFunc, type JetMiddleware , JetPath, JetPlugin } from "../dist/index.js";
+
 
 const app = new JetPath({
   apiDoc: {
@@ -12,7 +12,7 @@ const app = new JetPath({
   source: "tests",
   // APIdisplay: "UI",
   APIdisplay: "HTTP",
-  static: { dir: "./tests", route: "/assets" },
+  static: { dir: "./tests", route: "/" },
   port: 9000,
   globalHeaders: {
     "X-PET-TOKEN": " xxxxxxxxxxxxxxx",

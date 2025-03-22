@@ -6,6 +6,6 @@
 echo "" 
 echo "" 
 echo  "  Packing ...."
-tsc # --emitDeclarationOnly 
+tsc --emitDeclarationOnly 
 npm pack
-mv **.tgz ~/ 
+mv **.tgz ~/zips 

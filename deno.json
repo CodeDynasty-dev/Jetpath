@@ -1,6 +1,8 @@
 {
-  "name": "@uiedbook/jetpath",
+  "name": "@codedynasty/jetpath",
   "version": "1.4.17",
   "exports": "./dist/index.js",
-  "ustable": ["byonm"]
+  "ustable": [
+    "byonm"
+  ]
 }
