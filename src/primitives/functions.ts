@@ -299,18 +299,17 @@ const JetPath = async (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
-) => {
-  console.log(req);
+) => { 
   const parsedR = URL_PARSER(req.method as methods, req.url!);
   let off = false;
   let ctx: Context;
-  let returned: (Function|void)[]  = [];
+  let returned: (Function | void)[] = [];
   if (parsedR) {
     const r = parsedR[0];
     ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
     try {
       //? pre-request hooks here
-      returned = await Promise.all(r.jet_middleware!.map(m=>m(ctx)));
+      returned = await Promise.all(r.jet_middleware!.map((m) => m(ctx)));
       //? route handler call
       await r(ctx as any);
       return createResponse(res, ctx);
@@ -324,7 +323,7 @@ const JetPath = async (
       } else {
         try {
           //? report error to error middleware
-          await Promise.all(returned.map(m=> m?.(ctx, error)));
+          await Promise.all(returned.map((m) => m?.(ctx, error)));
         } catch (error) {
         } finally {
           return createResponse(res, ctx);
@@ -372,9 +371,20 @@ export async function getHandlers(
   source: string,
   print: boolean,
   errorsCount: { file: string; error: string }[] | undefined = undefined,
+  again = false
 ) {
+  let error_source = source;
   source = source || cwd();
-  source = path.resolve(cwd(), source);
+  if (!again) {
+    source = path.resolve(path.join(cwd(), source)); 
+    if (!source.includes(cwd())) {
+      Log.warn('source: "' + error_source + '" is invalid');
+      Log.error("Jetpath source must be within the project directory");
+      process.exit(1);
+    }
+  } else {
+    source = path.resolve(cwd(), source);
+  } 
   const dir = await opendir(source);
   for await (const dirent of dir) {
     if (
@@ -439,6 +449,7 @@ export async function getHandlers(
         source + "/" + dirent.name,
         print,
         errorsCount,
+        true
       );
     }
   }
@@ -618,7 +629,7 @@ const URL_PARSER = (
     // ? /* check
     if (pathR.includes("*")) {
       const Ried = pathR.slice(0, pathR.length - 1);
-      if (url.startsWith(Ried)) { 
+      if (url.startsWith(Ried)) {
         (params as any).extraPath = url.slice(Ried.length);
         path = pathR;
         //? set path and handler
@@ -789,12 +800,11 @@ export function assignMiddleware(
     for (const route in routes) {
       if (!Array.isArray(routes[route].jet_middleware)) {
         routes[route].jet_middleware = [];
-      } 
+      }
       // If middleware is defined for the route, ensure it has exactly one middleware function.
       for (const key in _jet_middleware) {
         if (route.startsWith(key)) {
-          const middleware = _jet_middleware[key];
-          // console.log({ route, key, middleware });
+          const middleware = _jet_middleware[key]; 
           // Assign the middleware function to the route handler.
           routes[route].jet_middleware.push(middleware);
         }

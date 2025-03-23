@@ -1,13 +1,32 @@
 {
-  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "dist",
-    "esModuleInterop":true,
-    "module": "nodenext"
+    // enable latest features
+    "lib": ["es2022", "esnext", "dom", "dom.iterable"],
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "allowJs": true,
+    "removeComments": true,
+
+    // Bundler mode
+    // "moduleResolution": "nodenext",
+    // "verbatimModuleSyntax": true,
+    // "noEmit": true,
+    "declaration": true,
+    // "allowSyntheticDefaultImports": true,
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Some stricter flags
+    "useUnknownInCatchVariables": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "outDir": "./dist"
   },
-  "include": [
-    "src/**/*.ts",
-    "tests/**/*.ts","bundle.ts"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "tests/app.jet.tsn"]
 }

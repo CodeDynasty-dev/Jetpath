@@ -1,5 +1,9 @@
-import { type JetFunc, type JetMiddleware , JetPath, JetPlugin } from "../dist/index.js";
-
+import {
+  type JetFunc,
+  type JetMiddleware,
+  JetPath,
+  JetPlugin,
+} from "../dist/index.js";
 
 const app = new JetPath({
   apiDoc: {
@@ -9,7 +13,7 @@ const app = new JetPath({
     This doc provides you with a simple read and write Api to The PetShop API
     `,
   },
-  source: "tests",
+  source: "../../../",
   // APIdisplay: "UI",
   APIdisplay: "HTTP",
   static: { dir: "./tests", route: "/" },

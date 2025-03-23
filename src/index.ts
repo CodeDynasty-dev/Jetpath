@@ -143,5 +143,9 @@ export class JetPath {
 }
 
 //? exports
-export type { ContextType, JetFunc, JetMiddleware } from "./primitives/types.js";
+export type {
+  ContextType,
+  JetFunc,
+  JetMiddleware,
+} from "./primitives/types.js";
 export { JetPlugin } from "./primitives/classes.js";

@@ -289,7 +289,10 @@ export class Context {
     }
     if (!UTILS.runtime["node"]) {
       try {
-        this.body = await (this.request as unknown as Request).json() as Record<string, any>;
+        this.body = await (this.request as unknown as Request).json() as Record<
+          string,
+          any
+        >;
         return this.body as Promise<Type>;
       } catch (error) {
         return Promise.reject(error);
