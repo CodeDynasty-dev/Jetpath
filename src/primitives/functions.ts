@@ -374,7 +374,7 @@ export async function getHandlers(
   again = false
 ) {
   let error_source = source;
-  source = source || cwd();
+  source = source || "";
   if (!again) {
     source = path.resolve(path.join(cwd(), source)); 
     if (!source.includes(cwd())) {
