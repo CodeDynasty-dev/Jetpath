@@ -7,7 +7,7 @@ import {
   assignMiddleware,
   compileAPI,
   compileUI,
-  corsHook,
+  corsMiddleware,
   getHandlers,
   UTILS,
 } from "./primitives/functions.js";
@@ -24,7 +24,7 @@ export class JetPath {
     if (!this.options.port) this.options.port = 8080;
     // ? setting up app configs
     if (this.options.cors !== false) {
-      corsHook({
+      corsMiddleware({
         exposeHeaders: [],
         allowMethods: ["DELETE", "GET", "HEAD", "PATCH", "POST", "PUT"],
         origin: ["*"],

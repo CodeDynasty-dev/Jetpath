@@ -27,7 +27,7 @@ import { Context, type JetPlugin, Log } from "./classes.js";
 
 let cors: (ctx: Context) => void;
 
-export function corsmiddleware(options: {
+export function corsMiddleware(options: {
   exposeHeaders?: string[];
   allowMethods?: allowedMethods;
   allowHeaders?: string[];
