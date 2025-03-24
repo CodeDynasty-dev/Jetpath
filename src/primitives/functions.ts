@@ -15,19 +15,19 @@ import {
 import { Context, type JetPlugin, Log } from "./classes.js";
 
 /**
- * an inbuilt CORS post hook
+ * an inbuilt CORS post middleware
  *
  * @param {Object} [options] cors options
  *    @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer/Planned_changes
  *  - {Boolean} privateNetworkAccess handle `Access-Control-Request-Private-Network` request by return `Access-Control-Allow-Private-Network`, default to false
  *    @see https://wicg.github.io/private-network-access/
- * @return {Function} cors post hook
+ * @return {Function} cors post middleware
  * @public
  */
 
 let cors: (ctx: Context) => void;
 
-export function corsHook(options: {
+export function corsmiddleware(options: {
   exposeHeaders?: string[];
   allowMethods?: allowedMethods;
   allowHeaders?: string[];
@@ -107,7 +107,7 @@ export function corsHook(options: {
 export const UTILS = {
   // wsFuncs: [],
   ctxPool: [] as Context[],
-  hooks: {},
+  middlewares: {},
   ae(cb: { (): any; (): any; (): void }) {
     try {
       cb();
@@ -191,8 +191,8 @@ export const UTILS = {
     }
     // ? adding ctx plugin bindings
     for (const key in decorations) {
-      if (!(UTILS.hooks as any)[key]) {
-        (UTILS.hooks as any)[key] = decorations[key];
+      if (!(UTILS.middlewares as any)[key]) {
+        (UTILS.middlewares as any)[key] = decorations[key];
       }
     }
     if (!server) {
@@ -245,8 +245,8 @@ const createCTX = (
     return ctx;
   }
   const ctx = new Context();
-  // ? add hooks to the app object
-  Object.assign(ctx.app, UTILS.hooks);
+  // ? add middlewares to the app object
+  Object.assign(ctx.app, UTILS.middlewares);
   ctx._7(req as Request, path, params, search);
   return ctx;
 };
@@ -308,10 +308,12 @@ const JetPath = async (
     const r = parsedR[0];
     ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
     try {
-      //? pre-request hooks here
+      //? pre-request middlewares here
       returned = await Promise.all(r.jet_middleware!.map((m) => m(ctx)));
       //? route handler call
       await r(ctx as any);
+      //? post-request middlewares here
+      await Promise.all(returned.map((m) => m?.(ctx, null)));
       return createResponse(res, ctx);
     } catch (error) {
       if (error instanceof JetPathErrors) {
