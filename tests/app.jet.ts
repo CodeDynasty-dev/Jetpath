@@ -13,9 +13,9 @@ const app = new JetPath({
     This doc provides you with a simple read and write Api to The PetShop API
     `,
   },
-  source: "../../../",
-  // APIdisplay: "UI",
-  APIdisplay: "HTTP",
+  source: ".",
+  APIdisplay: "UI",
+  // APIdisplay: "HTTP",
   static: { dir: "./tests", route: "/" },
   port: 9000,
   globalHeaders: {
@@ -202,13 +202,13 @@ POST_petImage$id.body = {
 
 // ? error hook
 export const MIDDLEWARE_$0: JetMiddleware = () => {
-  return (ctx, err) => {
+  return (ctx, _err) => {
     console.log("boohoo");
     ctx.throw();
   };
 };
 
-export const GET_error: JetFunc = async function (ctx) {
+export const GET_error: JetFunc = async function (_ctx) {
   throw new Error("boohoo");
   // ctx.throw("Edwinger loves jetpath");
 };

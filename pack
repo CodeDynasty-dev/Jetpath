@@ -1,11 +1,7 @@
 #!/usr/bin/env sh
 #!/bin/bash
- 
 
-
-echo "" 
-echo "" 
 echo  "  Packing ...."
-tsc --emitDeclarationOnly 
+tsc 
 npm pack
 mv **.tgz ~/zips 
