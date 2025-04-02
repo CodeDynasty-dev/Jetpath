@@ -572,42 +572,58 @@
       // Retrieve the child nodes of the input div (assuming each child is a div)
       const divs = Array.from(packer.querySelectorAll(".data-input"));
       divs.forEach((div) => {
-        const input = div.querySelector("input");
         isSet = true;
-        const keySpan = div.querySelector("span");
-        const key = keySpan.textContent.replace(":", "").trim();
-        const subordinate = div.classList.contains("subordinate") ? div : null;
-        const isArray = keySpan.getAttribute("data-arr"), isObject = keySpan.getAttribute("data-obj"), subOrdinate = keySpan.getAttribute("data-holder");
-        if (input.type === "file") {
-          result[key] = input.files[0];
-          return;
-        }
-        // Attempt to parse the value as JSON
-        let value;
-        try {
-          // TODO: there's no way we know if the value is a specific type due to dependency on json.parse()
-          value = JSON.parse(input.value);
-        } catch (error) {
-          // If parsing as JSON fails, treat it as a string
-          value = input.value;
-        }
-        if (isObject === 'true') {
-          if ((result[subOrdinate])) {
-            result[subOrdinate][key] = value;
-          } else {
-            result[subOrdinate] = { [key]: value };
+        const keySpans = Array.from(div.querySelectorAll("span"));
+        const data = keySpans.map((k) => {
+          const input = k.nextElementSibling;
+          return { key: k.textContent.replace(":", "").trim(), input, pos: k.parentElement.parentElement.dataset.pos }
+        });
+        const isArray = div.getAttribute("data-arr"), isObject = div.getAttribute("data-obj"), subOrdinate = div.getAttribute("data-holder");
+
+        for (let k = 0; k < data.length; k++) {
+          const { key, input, pos } = data[k]
+          // ADD FIXES FROM BELOW
+          if (input.type === "file") {
+            result[key] = input.files[0];
+            return;
           }
-        }
-        if (isArray === "true") {
-          console.log(keySpan, div, subordinate);
-          if (Array.isArray(result[subOrdinate])) {
-            result[subOrdinate].push({ [key]: value })
-          } else {
-            result[subOrdinate] = [{ [key]: value }];
+          let value;
+          try {
+            // TODO: there's no way we know if the value is a specific type due to dependency on json.parse()
+            value = JSON.parse(input.value);
+          } catch (error) {
+            // If parsing as JSON fails, treat it as a string
+            value = input.value;
           }
-        }
-        if (isArray === null && isObject === null) {
-          result[key] = value;
+          // key to object
+          if (isObject === 'true') {
+            if ((result[subOrdinate])) {
+              result[subOrdinate][key] = value;
+            } else {
+              result[subOrdinate] = { [key]: value };
+            }
+          }
+          //  key to array
+          if (isArray === "true") { 
+            const position = typeof pos === "string" ? Number(pos) : null;
+            if (!Array.isArray(result[subOrdinate])) {
+              result[subOrdinate] = []
+            }
+            if (typeof position === "number") {
+              if (Array.isArray(result[subOrdinate])) {
+                if (result[subOrdinate][position]) {
+                  result[subOrdinate][position][key]= value;
+                } else {
+                  result[subOrdinate][position] = { [key]: value };
+                }
+                // result[subOrdinate].push({ [key]: value })
+              }
+            }
+          }
+          // key to value type
+          if (isArray === null && isObject === null) {
+            result[key] = value;
+          }
         }
       });
       if (!isSet) return;
@@ -620,6 +636,11 @@
         if (typeof value === 'object' && !Array.isArray(value)) {
           // Handle nested objects
           const nestedDiv = div(
+            {
+              style: { display: "flex", flexDirection: "column" }, className: "data-input",
+              "data-obj": "true",
+              "data-holder": key,
+            },
             h4(key + ": ")
           );
           Object.entries(value).forEach(([nestedKey, nestedValue]) => {
@@ -629,19 +650,26 @@
         } else if (Array.isArray(value)) {
           // Handle arrays
           const arrayDiv = div(
-            { style: { display: "flex", flexDirection: "column" }, className: "data-input subordinate" }, typeof value[0] === 'object' ? h4(key + ": ", { className: "subordinate-text" }) : span(key + ": ")
+            {
+              style: { display: "flex", flexDirection: "column" }, className: "data-input",
+              "data-arr": "true",
+              "data-holder": key,
+            }, typeof value[0] === 'object' ? h4(key + ": ") : span(key + ": "
+            )
           );
           if (value.length > 0) {
             if (typeof value[0] === 'object') {
               // Handle array of objects
               const arrayContainer = div({ className: 'array-cont' });
               arrayDiv.appendChild(arrayContainer);
+              let pos = 0;
               const addItem = () => {
-                const itemDiv = div({ className: 'array-item' });
+                const itemDiv = div({ className: 'array-item', "data-pos": pos });
                 Object.entries(value[0]).forEach(([arrayKey, arrayValue]) => {
                   itemDiv.appendChild(createInputField(arrayKey, arrayValue, "arr", key));
                 });
                 arrayContainer.appendChild(itemDiv);
+                pos += 1;
               };
 
               // Add initial item

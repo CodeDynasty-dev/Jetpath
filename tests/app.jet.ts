@@ -16,7 +16,7 @@ const app = new JetPath({
   source: ".",
   APIdisplay: "UI",
   // APIdisplay: "HTTP",
-  static: { dir: "./tests", route: "/" },
+  // static: { dir: "./tests", route: "/" },
   port: 9000,
   globalHeaders: {
     "X-PET-TOKEN": " xxxxxxxxxxxxxxx",
@@ -213,24 +213,10 @@ export const GET_error: JetFunc = async function (_ctx) {
   // ctx.throw("Edwinger loves jetpath");
 };
 
-export const POST_: JetFunc<
-  {},
-  [
-    {
-      formData: (ctx: any) => Promise<{
-        image: any;
-        video: string;
-        textfield: string;
-      }>;
-    },
-    { formData2: (ctx: any) => "lol" },
-  ]
-> = async function (ctx) {
-  const form = await ctx.app.formData(ctx);
+export const POST_: JetFunc = async function (ctx) { 
+  await ctx.json(); 
+  const form = await ctx.validate();
   console.log(form);
-  if (form.image) {
-    await form.image.saveTo(form.image.filename);
-  }
   ctx.send(form);
 };
 
