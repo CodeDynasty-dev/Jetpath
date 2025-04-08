@@ -209,12 +209,12 @@ export const MIDDLEWARE_: JetMiddleware = (ctx) => {
 };
 
 export const GET_error: JetFunc = async function (_ctx) {
-  throw new Error("boohoo"); 
+  throw new Error("boohoo");
 };
 
 export const POST_: JetFunc = async function (ctx) {
   await ctx.json();
-  const form = await ctx.validate(); 
+  const form = await ctx.validate();
   ctx.send(form);
 };
 
@@ -237,5 +237,5 @@ POST_.body = {
   },
 };
 
-
-export const GET_app$id: JetFunc<{params: {id: string}}> = (ctx)=> ctx.redirect("uplify://audio?id="+ctx.params.id);
+export const GET_app$id: JetFunc<{ params: { id: string } }> = (ctx) =>
+  ctx.redirect("uplify://audio?id=" + ctx.params.id);

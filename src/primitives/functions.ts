@@ -344,17 +344,18 @@ const JetPath = async (
   const parsedR = URL_PARSER(req.method as methods, req.url!);
   let off = false;
   let ctx: Context;
-  let returned: (Function | void)[]|undefined;
+  let returned: (Function | void)[] | undefined;
   if (parsedR) {
     const r = parsedR[0];
     ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
     try {
       //? pre-request middlewares here
-      returned = r.jet_middleware && await Promise.all(r.jet_middleware.map((m) => m(ctx)));
+      returned = r.jet_middleware &&
+        await Promise.all(r.jet_middleware.map((m) => m(ctx)));
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
-     returned &&  await Promise.all(returned.map((m) => m?.(ctx, null)));
+      returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
       return createResponse(res, ctx);
     } catch (error) {
       if (error instanceof JetPathErrors) {
@@ -366,7 +367,7 @@ const JetPath = async (
       } else {
         try {
           //? report error to error middleware
-      returned &&    await Promise.all(returned.map((m) => m?.(ctx, error)));
+          returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
         } catch (error) {
         } finally {
           return createResponse(res, ctx);
@@ -458,7 +459,6 @@ export async function getHandlers(
             const params = handlersPath(p);
             if (params) {
               if (p.startsWith("MIDDLEWARE")) {
-                console.log("middleware");
                 _jet_middleware[params[1]] = module[p];
               } else {
                 // ! HTTP handler
@@ -651,8 +651,8 @@ const URL_PARSER = (
   const routes = _JetPath_paths[method];
   if (!UTILS.runtime["node"]) {
     url = url.slice(url.indexOf("/", 7));
-  } 
-  
+  }
+
   if (routes.direct[url]) {
     return [routes.direct[url], {}, {}, url];
   }
@@ -707,7 +707,7 @@ const URL_PARSER = (
         path = pathR;
         //? set path and handler
         handler = routes.wildcard[path];
-      return [handler, params, {}, path];
+        return [handler, params, {}, path];
       }
     }
   }
@@ -764,7 +764,9 @@ export const compileAPI = (options: jetOptions): [number, string] => {
   // ? loop through apis
   for (const method in _JetPath_paths) {
     // ? get all api paths from router for each method;
-    const routesOfMethod = Object.values(_JetPath_paths[method as methods]).map(
+    const routesOfMethod: JetFunc[] = Object.values(
+      _JetPath_paths[method as methods],
+    ).map(
       (value) => Object.keys(value).map((key) => (value[key])),
     ).flat(2).filter((value) => value.length > 0);
 
@@ -870,17 +872,21 @@ export function assignMiddleware(
 ): void {
   // Iterate over each HTTP method's routes.
   for (const method in _JetPath_paths) {
-    const routes = _JetPath_paths[method];
-    for (const route in routes) {
-      if (!Array.isArray(routes[route].jet_middleware)) {
-        routes[route].jet_middleware = [];
+    const routes: JetFunc[] = Object.values(_JetPath_paths[method as methods])
+      .map(
+        (value) => Object.keys(value).map((key) => (value[key])),
+      ).flat(2).filter((value) => value.length > 0);
+
+    for (const route of routes) {
+      if (!Array.isArray(route.jet_middleware)) {
+        route.jet_middleware = [];
       }
       // If middleware is defined for the route, ensure it has exactly one middleware function.
       for (const key in _jet_middleware) {
-        if (route.startsWith(key)) {
-          const middleware = _jet_middleware[key];
+        if (route.path!.startsWith(key)) {
+          const middleware: any = _jet_middleware[key];
           // Assign the middleware function to the route handler.
-          routes[route].jet_middleware.push(middleware);
+          route.jet_middleware!.push(middleware);
         }
       }
     }

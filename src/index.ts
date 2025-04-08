@@ -53,10 +53,10 @@ export class JetPath {
     let UI = `{{view}}`; //! could be loaded only when needed
     // ? setting up static server
     if (this.options?.static?.route && this.options?.static?.dir) {
-      _JetPath_paths["GET"].wildcard[
+      const name =
         (this.options.static.route === "/" ? "" : this.options.static.route) +
-        "/*"
-      ] = async (ctx) => {
+        "/*";
+      _JetPath_paths["GET"].wildcard[name] = async (ctx) => {
         const extraPathRaw =
           decodeURI((ctx.params as any)?.["extraPath"] || "").split("?")[0];
         const safeExtraPath = path.normalize(extraPathRaw).replace(
@@ -78,6 +78,8 @@ export class JetPath {
         const contentType = mime.getType(ext) || "application/octet-stream";
         ctx.sendStream(filePath, contentType);
       };
+      _JetPath_paths["GET"].wildcard[name].method = "GET";
+      _JetPath_paths["GET"].wildcard[name].path = name;
     }
 
     //? setting up api viewer
@@ -92,12 +94,14 @@ export class JetPath {
       // ? render API in UI
       if (this.options?.APIdisplay === "UI") {
         UI = compileUI(UI, this.options, compiledAPI);
-        _JetPath_paths["GET"].direct[this.options?.apiDoc?.path || "/api-doc"] =
-          (
-            ctx,
-          ) => { 
-            ctx.send(UI, "text/html");
-          };
+        const name = this.options?.apiDoc?.path || "/api-doc";
+        _JetPath_paths["GET"].direct[name] = (
+          ctx,
+        ) => {
+          ctx.send(UI, "text/html");
+        };
+        _JetPath_paths["GET"].direct[name].method = "GET";
+        _JetPath_paths["GET"].direct[name].path = name;
         Log.info(
           `✅ Processed routes ${handlersCount} handlers in ${
             Math.round(
