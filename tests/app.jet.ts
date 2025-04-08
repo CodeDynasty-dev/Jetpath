@@ -49,7 +49,6 @@ const pets: PetType[] = [];
 // ? Routes
 
 export const GET_: JetFunc = function (ctx) {
-  console.log(ctx.app);
   ctx.send("hello world");
 };
 export const GET_greet: JetFunc = function (ctx) {
@@ -201,7 +200,9 @@ POST_petImage$id.body = {
 };
 
 // ? error hook
-export const MIDDLEWARE_$0: JetMiddleware = () => {
+export const MIDDLEWARE_$0: JetMiddleware = (ctx) => {
+  console.log("middleware", ctx);
+
   return (ctx, _err) => {
     console.log("boohoo");
     ctx.throw();
@@ -213,8 +214,8 @@ export const GET_error: JetFunc = async function (_ctx) {
   // ctx.throw("Edwinger loves jetpath");
 };
 
-export const POST_: JetFunc = async function (ctx) { 
-  await ctx.json(); 
+export const POST_: JetFunc = async function (ctx) {
+  await ctx.json();
   const form = await ctx.validate();
   console.log(form);
   ctx.send(form);

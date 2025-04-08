@@ -13,6 +13,7 @@ import {
 } from "./primitives/functions.js";
 import { type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
+import path from "node:path";
 
 export class JetPath {
   public server: any;
@@ -52,16 +53,30 @@ export class JetPath {
     let UI = `{{view}}`; //! could be loaded only when needed
     // ? setting up static server
     if (this.options?.static?.route && this.options?.static?.dir) {
-      _JetPath_paths["GET"][
+      _JetPath_paths["GET"].wildcard[
         (this.options.static.route === "/" ? "" : this.options.static.route) +
         "/*"
       ] = async (ctx) => {
-        const fileName = this.options?.static?.dir +
-          "/" +
-          // @ts-expect-error
-          decodeURI(ctx.params?.["extraPath"] || "").split("?")[0];
-        const contentType = mime.getType(fileName.split(".").at(-1) || "");
-        ctx.sendStream(fileName, contentType || "application/octet-stream");
+        const extraPathRaw =
+          decodeURI((ctx.params as any)?.["extraPath"] || "").split("?")[0];
+        const safeExtraPath = path.normalize(extraPathRaw).replace(
+          /^(\.\.(\/|\\|$))+/,
+          "",
+        );
+        const filePath = path.join(
+          this.options?.static?.dir || ".",
+          safeExtraPath,
+        );
+        // check if the resolved filePath is within the static directory
+        if (
+          !filePath.startsWith(path.resolve(this.options?.static?.dir || "."))
+        ) {
+          ctx.throw(404, "File not found");
+          return;
+        }
+        const ext = path.extname(filePath).slice(1);
+        const contentType = mime.getType(ext) || "application/octet-stream";
+        ctx.sendStream(filePath, contentType);
       };
     }
 
@@ -77,11 +92,13 @@ export class JetPath {
       // ? render API in UI
       if (this.options?.APIdisplay === "UI") {
         UI = compileUI(UI, this.options, compiledAPI);
-        _JetPath_paths["GET"][this.options?.apiDoc?.path || "/api-doc"] = (
-          ctx,
-        ) => {
-          ctx.send(UI, "text/html");
-        };
+        _JetPath_paths["GET"].direct[this.options?.apiDoc?.path || "/api-doc"] =
+          (
+            ctx,
+          ) => {
+            console.log("UI", UI);
+            ctx.send(UI, "text/html");
+          };
         Log.info(
           `✅ Processed routes ${handlersCount} handlers in ${
             Math.round(

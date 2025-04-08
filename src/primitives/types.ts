@@ -218,5 +218,6 @@ export type JetFunc<
   headers?: Record<string, string>;
   info?: string;
   method?: string;
+  path?: string;
   jet_middleware?: JetMiddleware[];
 };

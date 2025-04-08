@@ -209,14 +209,55 @@ export const UTILS = {
 // ? setting up the runtime check
 UTILS.set();
 
-export let _JetPath_paths: Record<methods, Record<string, JetFunc>> = {
-  GET: {},
-  POST: {},
-  HEAD: {},
-  PUT: {},
-  PATCH: {},
-  DELETE: {},
-  OPTIONS: {},
+export let _JetPath_paths: Record<
+  methods,
+  Record<
+    "direct" | "wildcard" | "parameter" | "search",
+    Record<string, JetFunc>
+  >
+> = {
+  GET: {
+    direct: {},
+    parameter: {},
+    search: {},
+    wildcard: {},
+  },
+  POST: {
+    direct: {},
+    parameter: {},
+    search: {},
+    wildcard: {},
+  },
+  HEAD: {
+    direct: {},
+    parameter: {},
+    search: {},
+    wildcard: {},
+  },
+  PUT: {
+    direct: {},
+    parameter: {},
+    search: {},
+    wildcard: {},
+  },
+  PATCH: {
+    direct: {},
+    parameter: {},
+    search: {},
+    wildcard: {},
+  },
+  DELETE: {
+    direct: {},
+    parameter: {},
+    search: {},
+    wildcard: {},
+  },
+  OPTIONS: {
+    direct: {},
+    parameter: {},
+    search: {},
+    wildcard: {},
+  },
 };
 
 export const _jet_middleware: Record<
@@ -299,8 +340,9 @@ const JetPath = async (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
-) => { 
+) => {
   const parsedR = URL_PARSER(req.method as methods, req.url!);
+  console.log("parsedR", parsedR);
   let off = false;
   let ctx: Context;
   let returned: (Function | void)[] = [];
@@ -348,6 +390,16 @@ const JetPath = async (
 };
 
 const handlersPath = (path: string) => {
+  let type = "direct";
+  if (path.includes("$")) {
+    if (path.includes("$0")) {
+      type = "wildcard";
+    } else if (path.includes("$$")) {
+      type = "search";
+    } else {
+      type = "parameter";
+    }
+  }
   let [method, ...segments] = path.split("_");
   let route = "/" + segments.join("/");
   route = route.replace(/\$\$/g, "/?") // Convert optional segments
@@ -355,7 +407,11 @@ const handlersPath = (path: string) => {
     .replace(/\$/g, "/:") // Convert params
     .replaceAll(/\/\//g, "/"); // change normalize akk extra / to /
   return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE)$/.test(method)
-    ? [method, route] as [string, string]
+    ? [method, route, type] as [
+      string,
+      string,
+      "direct" | "wildcard" | "parameter" | "search",
+    ]
     : undefined;
 };
 
@@ -373,12 +429,12 @@ export async function getHandlers(
   source: string,
   print: boolean,
   errorsCount: { file: string; error: string }[] | undefined = undefined,
-  again = false
+  again = false,
 ) {
   let error_source = source;
   source = source || "";
   if (!again) {
-    source = path.resolve(path.join(cwd(), source)); 
+    source = path.resolve(path.join(cwd(), source));
     if (!source.includes(cwd())) {
       Log.warn('source: "' + error_source + '" is invalid');
       Log.error("Jetpath source must be within the project directory");
@@ -386,7 +442,7 @@ export async function getHandlers(
     }
   } else {
     source = path.resolve(cwd(), source);
-  } 
+  }
   const dir = await opendir(source);
   for await (const dirent of dir) {
     if (
@@ -415,9 +471,10 @@ export async function getHandlers(
                   module[p]!.method = params[0];
                   // ? set the path
                   module[p]!.path = params[1];
-                  _JetPath_paths[params[0] as methods][params[1]] = module[
-                    p
-                  ] as JetFunc;
+                  _JetPath_paths[params[0] as methods][params[2]][params[1]] =
+                    module[
+                      p
+                    ] as JetFunc;
                 }
               }
             }
@@ -451,7 +508,7 @@ export async function getHandlers(
         source + "/" + dirent.name,
         print,
         errorsCount,
-        true
+        true,
       );
     }
   }
@@ -567,6 +624,18 @@ export function validator<T extends Record<string, any>>(
   return out as T;
 }
 
+/*
+url parser
+
+order of operations
+
+parse direct match
+parse placeholder
+parse wildcard
+parse search
+
+*/
+
 /**
  * Parses the URL and returns the corresponding handler, parameters, search parameters, and path.
  *
@@ -582,18 +651,17 @@ const URL_PARSER = (
   const routes = _JetPath_paths[method];
   if (!UTILS.runtime["node"]) {
     url = url.slice(url.indexOf("/", 7));
+  } 
+  
+  if (routes.direct[url]) {
+    return [routes.direct[url], {}, {}, url];
   }
 
-  // if (!routes) return;
-  if (routes[url]) {
-    return [routes[url], {}, {}, url];
-  }
-
-  const search: Record<string, string> = {},
-    params: Record<string, string> = {};
+  const params: Record<string, string> = {};
   let path: string, handler: JetFunc;
-  //? place holder & * route checks
-  for (const pathR in routes) {
+
+  //? place holder
+  for (const pathR in routes.parameter) {
     let breaked = false;
     // ? placeholder /: check
     if (pathR.includes(":")) {
@@ -624,10 +692,13 @@ const URL_PARSER = (
       }
       path = pathR;
       //? set path and handler
-      handler = routes[path];
-      break;
+      handler = routes.parameter[path];
+      return [handler, params, {}, path];
     }
-
+  }
+  // ? wildcard /* check
+  const search: Record<string, string> = {};
+  for (const pathR in routes.wildcard) {
     // ? /* check
     if (pathR.includes("*")) {
       const Ried = pathR.slice(0, pathR.length - 1);
@@ -635,11 +706,12 @@ const URL_PARSER = (
         (params as any).extraPath = url.slice(Ried.length);
         path = pathR;
         //? set path and handler
-        handler = routes[path];
-        break;
+        handler = routes.wildcard[path];
+      return [handler, params, {}, path];
       }
     }
   }
+
   //? check for search in the route
   const uio = url.indexOf("?");
   if (uio > -1) {
@@ -652,12 +724,10 @@ const URL_PARSER = (
         search[s_raw[s][0]] = s_raw[s][1];
       }
     }
-    if (routes[path]) {
-      handler = routes[path];
+    if (routes.search[path]) {
+      handler = routes.search[path];
+      return [handler, {}, search, path];
     }
-  }
-  if (handler!) {
-    return [handler, params, search, path!];
   }
   return undefined;
 };
@@ -693,13 +763,15 @@ export const compileAPI = (options: jetOptions): [number, string] => {
   const globalHeaders = options?.globalHeaders || {};
   // ? loop through apis
   for (const method in _JetPath_paths) {
-    // ? Retrieve api info;
-    const routesOfMethod = _JetPath_paths[method as methods];
+    // ? get all api paths from router for each method;
+    const routesOfMethod = Object.values(_JetPath_paths[method as methods]).map(
+      (value) => Object.keys(value).map((key) => (value[key])),
+    ).flat(2).filter((value) => value.length > 0);
 
     if (routesOfMethod && Object.keys(routesOfMethod).length) {
-      for (const route in routesOfMethod) {
+      for (const route of routesOfMethod) {
         // ? Retrieve api handler
-        const validator = routesOfMethod[route];
+        const validator = route;
         // ? Retrieve api body definitions
         const body = validator.body;
         // ? Retrieve api headers definitions
@@ -751,8 +823,8 @@ ${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${
 ###`;
 
         // ? combine api(s)
-        const low = sorted_insert(compiledRoutes, route);
-        compiledRoutes.splice(low, 0, route);
+        const low = sorted_insert(compiledRoutes, route.path!);
+        compiledRoutes.splice(low, 0, route.path!);
         compiledAPIArray.splice(low, 0, api);
         // ? increment handler count
         handlersCount += 1;
@@ -806,7 +878,7 @@ export function assignMiddleware(
       // If middleware is defined for the route, ensure it has exactly one middleware function.
       for (const key in _jet_middleware) {
         if (route.startsWith(key)) {
-          const middleware = _jet_middleware[key]; 
+          const middleware = _jet_middleware[key];
           // Assign the middleware function to the route handler.
           routes[route].jet_middleware.push(middleware);
         }

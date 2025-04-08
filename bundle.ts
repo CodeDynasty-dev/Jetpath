@@ -10,5 +10,4 @@ const code = await readFile("dist/index.js", {
 await writeFile("dist/index.js", code.replace("{{view}}", html));
 console.log("JetPath: compiled!");
 
-
 // [X] npm pack will call npm run prepare which will run this file
