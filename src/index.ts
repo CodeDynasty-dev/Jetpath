@@ -95,8 +95,7 @@ export class JetPath {
         _JetPath_paths["GET"].direct[this.options?.apiDoc?.path || "/api-doc"] =
           (
             ctx,
-          ) => {
-            console.log("UI", UI);
+          ) => { 
             ctx.send(UI, "text/html");
           };
         Log.info(

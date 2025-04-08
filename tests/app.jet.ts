@@ -200,9 +200,8 @@ POST_petImage$id.body = {
 };
 
 // ? error hook
-export const MIDDLEWARE_$0: JetMiddleware = (ctx) => {
+export const MIDDLEWARE_: JetMiddleware = (ctx) => {
   console.log("middleware", ctx);
-
   return (ctx, _err) => {
     console.log("boohoo");
     ctx.throw();
@@ -210,14 +209,12 @@ export const MIDDLEWARE_$0: JetMiddleware = (ctx) => {
 };
 
 export const GET_error: JetFunc = async function (_ctx) {
-  throw new Error("boohoo");
-  // ctx.throw("Edwinger loves jetpath");
+  throw new Error("boohoo"); 
 };
 
 export const POST_: JetFunc = async function (ctx) {
   await ctx.json();
-  const form = await ctx.validate();
-  console.log(form);
+  const form = await ctx.validate(); 
   ctx.send(form);
 };
 
@@ -239,3 +236,6 @@ POST_.body = {
     },
   },
 };
+
+
+export const GET_app$id: JetFunc<{params: {id: string}}> = (ctx)=> ctx.redirect("uplify://audio?id="+ctx.params.id);

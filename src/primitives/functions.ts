@@ -342,20 +342,19 @@ const JetPath = async (
   },
 ) => {
   const parsedR = URL_PARSER(req.method as methods, req.url!);
-  console.log("parsedR", parsedR);
   let off = false;
   let ctx: Context;
-  let returned: (Function | void)[] = [];
+  let returned: (Function | void)[]|undefined;
   if (parsedR) {
     const r = parsedR[0];
     ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
     try {
       //? pre-request middlewares here
-      returned = await Promise.all(r.jet_middleware!.map((m) => m(ctx)));
+      returned = r.jet_middleware && await Promise.all(r.jet_middleware.map((m) => m(ctx)));
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
-      await Promise.all(returned.map((m) => m?.(ctx, null)));
+     returned &&  await Promise.all(returned.map((m) => m?.(ctx, null)));
       return createResponse(res, ctx);
     } catch (error) {
       if (error instanceof JetPathErrors) {
@@ -367,7 +366,7 @@ const JetPath = async (
       } else {
         try {
           //? report error to error middleware
-          await Promise.all(returned.map((m) => m?.(ctx, error)));
+      returned &&    await Promise.all(returned.map((m) => m?.(ctx, error)));
         } catch (error) {
         } finally {
           return createResponse(res, ctx);
@@ -459,6 +458,7 @@ export async function getHandlers(
             const params = handlersPath(p);
             if (params) {
               if (p.startsWith("MIDDLEWARE")) {
+                console.log("middleware");
                 _jet_middleware[params[1]] = module[p];
               } else {
                 // ! HTTP handler
@@ -815,7 +815,7 @@ ${method} ${
           options?.APIdisplay === "UI"
             ? "[--host--]"
             : "http://localhost:" + (options?.port || 8080)
-        }${route} HTTP/1.1
+        }${route.path} HTTP/1.1
 ${headers.length ? headers.join("\n") : ""}\n
 ${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${
           validator?.["info"] ? "#" + validator?.["info"] + "-JETE" : ""
