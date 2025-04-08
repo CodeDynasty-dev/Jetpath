@@ -59,21 +59,17 @@ export class JetPath {
       _JetPath_paths["GET"].wildcard[name] = async (ctx) => {
         const extraPathRaw =
           decodeURI((ctx.params as any)?.["extraPath"] || "").split("?")[0];
+        //? sanitize path
+        //? remove any .. from the path
+        //? and replace it with /
         const safeExtraPath = path.normalize(extraPathRaw).replace(
           /^(\.\.(\/|\\|$))+/,
           "",
         );
-        const filePath = path.join(
-          this.options?.static?.dir || ".",
+        const filePath =  path.join(
+          this.options?.static?.dir || "/",
           safeExtraPath,
-        );
-        // check if the resolved filePath is within the static directory
-        if (
-          !filePath.startsWith(path.resolve(this.options?.static?.dir || "."))
-        ) {
-          ctx.throw(404, "File not found");
-          return;
-        }
+        ); 
         const ext = path.extname(filePath).slice(1);
         const contentType = mime.getType(ext) || "application/octet-stream";
         ctx.sendStream(filePath, contentType);
@@ -154,7 +150,6 @@ export class JetPath {
       }
     }
     assignMiddleware(_JetPath_paths, _jet_middleware);
-
     Log.success(`Listening on http://localhost:${this.options.port}`);
     // ? start server
     this.listening = true;
