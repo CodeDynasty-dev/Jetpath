@@ -5,7 +5,7 @@
 <h1 align="center">JetPath</h1>
 
 <p align="center">
-    JetPath 🚀 - Is the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!!!
+    JetPath 🚀 - the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!!!
     <br/>
     <br/>
     <a href="https://github.com/uiedbook/JetPath#examples"><strong>Explore JetPath APIs »</strong></a>
@@ -30,21 +30,21 @@
 
 In this version, we added/tested these features on all runtimes.
 
-1. auto-generated api documentation UI (JethPath UI).
+1. auto-generated api documentation UI (Jetpath UI).
 2. file uploads [check this example](tests/uploading-files.md)
 3. support for websockets [check this example](tests/websockets-usage.md).
 4. Jet Plugins.
-5. strong schema validation
+5. Robust schema validation
 
 In this version (not this latest), multi-runtime support is no-longer based on
-compartiblity but pure engine api(s).
+compatibility but pure engine api(s).
 
 We Added Examples in the examples folder!
 
 - running Node index.js starts a Node instance for your app.
 - running Deno run index.ts starts a Deno instance for your app.
 - running Bun index.ts starts a Bun instance for your app.
-- looking into serverless, possible with plugins
+- looking into a plugins ecosystem.
 
 this version we fixed issues with the inbuilt cors hook.
 
@@ -85,8 +85,6 @@ JetPath support all web Javascript runtimes:
 - Nodejs.
 - Denojs.
 - Bunjs.
-- and deno deploy (testing)
-- Edge support for runtimes like cloudflare workers supported via plugins.
 
 ## Installation
 
@@ -144,7 +142,7 @@ export const POST_api_v1_payment: JetFunc<{
   });
 
   // ? send response
-  ctx.send({ message: "sucess" });
+  ctx.send({ message: "success" });
 };
 
 POST_api_v1_payment.body = {
@@ -169,7 +167,7 @@ export const GET_api_v1_payment_status$paymentId: JetFunc<
   const status = await payment.getStatusById(ctx.params.paymentId);
   if (status === "SUCCESS") {
     // ? send response
-    ctx.send({ message: "sucess" });
+    ctx.send({ message: "success" });
   } else {
     const id = setInterval(async () => {
       const status = await payment.getStatusById(ctx.params.paymentId);
@@ -177,10 +175,10 @@ export const GET_api_v1_payment_status$paymentId: JetFunc<
         // ? clean up
         clearInterval(id);
         // ? send response
-        ctx.send({ message: "sucess" });
+        ctx.send({ message: "success" });
       }
     }, 1000);
-    //? ctx.eject() - allows any async operation to keep running while the function done exicutiong, always call it last
+    //? ctx.eject() - allows any async operation to keep running while the function done executing, always call it last
     ctx.eject();
   }
 };
@@ -193,7 +191,7 @@ We have exhausted our Roadmap, let's me what your suggestions are!
 we are currently working an integrated admin interface, let us know what you
 think about that!!!
 
-## Apache 2.0 Lincenced
+## Apache 2.0 Licensed
 
 Open sourced And Free.
 
@@ -212,11 +210,5 @@ code is your original work.
 ### Support
 
 Your contribution(s) is a good force for change anytime you do it, you can
-ensure JetPath's continues growth and improvement by contributing a re-occuring
-or fixed donations to:
-
-https://www.buymeacoffee.com/fridaycandour
-
-Or Click.
-
-<a href="https://www.buymeacoffee.com/fridaycandour"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=&slug=fridaycandour&button_colour=FFDD00&font_colour=000000&outline_colour=000000&coffee_colour=ffffff" /></a>
+ensure JetPath's continues growth and improvement by contributing a re-occurring
+or fixed donations to our Github sponsors.
