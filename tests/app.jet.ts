@@ -16,7 +16,7 @@ const app = new JetPath({
   source: ".",
   APIdisplay: "UI",
   // APIdisplay: "HTTP",
-  // static: { dir: "./tests", route: "/" },
+  static: { dir: "./tests", route: "/" },
   port: 9000,
   globalHeaders: {
     "X-PET-TOKEN": " xxxxxxxxxxxxxxx",
@@ -201,7 +201,6 @@ POST_petImage$id.body = {
 
 // ? error hook
 export const MIDDLEWARE_: JetMiddleware = (ctx) => {
-  console.log("middleware", ctx);
   return (ctx, _err) => {
     console.log("boohoo");
     ctx.throw();
