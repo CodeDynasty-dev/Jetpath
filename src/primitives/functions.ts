@@ -350,8 +350,7 @@ const JetPath = async (
     ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
     try {
       //? pre-request middlewares here
-      returned = r.jet_middleware &&
-        await Promise.all(r.jet_middleware.map((m) => m(ctx)));
+      returned = r.jet_middleware?.length ? await Promise.all(r.jet_middleware.map((m) => m(ctx))) : undefined;
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
