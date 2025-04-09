@@ -202,9 +202,11 @@ POST_petImage$id.body = {
   age: {},
 };
 
-// ? error hook
+// ? middleware for all routes after /
 export const MIDDLEWARE_: JetMiddleware = (ctx) => {
+  // pre handler
   return (ctx, err) => {
+    // post handler
     if (err) {
       ctx.code = 500;
       ctx.throw(String(err));
