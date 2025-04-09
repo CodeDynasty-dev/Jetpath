@@ -12,6 +12,8 @@ const app = new JetPath({
     PetShop API Documentation
     This doc provides you with a simple read and write Api to The PetShop API
     `,
+    password: "1234",
+    username: "admin",
   },
   source: ".",
   APIdisplay: "UI",
@@ -69,7 +71,7 @@ export const GET_pets: JetFunc = function (ctx) {
 export const GET_petBy$id: JetFunc<{
   body: PetType;
   params: { id: string };
-  search: {};
+  query: {};
 }> = async function (ctx) {
   const petId = ctx.params.id;
   const pet = pets.find((p) => p.id === petId);
@@ -83,7 +85,7 @@ export const GET_petBy$id: JetFunc<{
 
 // ? /pets
 // Add a New Pet: Add a new pet to the inventory
-export const POST_pets: JetFunc<{ body: PetType; params: {}; search: {} }> =
+export const POST_pets: JetFunc<{ body: PetType; params: {}; query: {} }> =
   async function (ctx) {
     await ctx.json();
     const body = ctx.validate(ctx.body);
@@ -107,14 +109,14 @@ POST_pets.headers = {
 
 // ? /pets/q/?
 // Add a New Pet: Add a new pet to the inventory
-export const GET_pets_search$$: JetFunc<{ search: { name: string } }> =
+export const GET_pets_search$$: JetFunc<{ query: { name: string } }> =
   async function (ctx) {
-    ctx.validate?.(ctx.search);
+    ctx.validate?.(ctx.query);
     ctx.send({
       message: "Pets searched successfully",
       pets: pets.filter(
         (pet) =>
-          pet.name === ctx.search.name || pet.name.includes(ctx.search.name),
+          pet.name === ctx.query.name || pet.name.includes(ctx.query.name),
       ),
     });
   };
@@ -201,9 +203,11 @@ POST_petImage$id.body = {
 
 // ? error hook
 export const MIDDLEWARE_: JetMiddleware = (ctx) => {
-  return (ctx, _err) => {
-    console.log("boohoo");
-    ctx.throw();
+  return (ctx, err) => {
+    if (err) {
+      ctx.code = 500;
+      ctx.throw(String(err));
+    }
   };
 };
 

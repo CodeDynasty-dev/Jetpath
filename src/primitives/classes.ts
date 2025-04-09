@@ -110,7 +110,7 @@ export class Context {
   code = 200;
   request: Request | IncomingMessage | undefined;
   params: Record<string, any> | undefined;
-  search: Record<string, any> | undefined;
+  query: Record<string, any> | undefined;
   body: Record<string, any> | undefined;
   path: string | undefined;
   // ?
@@ -133,12 +133,12 @@ export class Context {
     req: Request,
     path: string,
     params?: Record<string, any>,
-    search?: Record<string, any>,
+    query?: Record<string, any>,
   ) {
     this.request = req;
     this.method = req.method as "GET";
     this.params = params || {};
-    this.search = search || {};
+    this.query = query || {};
     this.path = path;
     this.body = undefined;
     //? load
@@ -191,7 +191,7 @@ export class Context {
       _JetPath_paths[this.method!].direct[this.path!].body ||
         _JetPath_paths[this.method!].parameter[this.path!].body ||
         _JetPath_paths[this.method!].wildcard[this.path!].body ||
-        _JetPath_paths[this.method!].search[this.path!].body,
+        _JetPath_paths[this.method!].query[this.path!].body,
       data,
     );
   }

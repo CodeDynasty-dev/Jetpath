@@ -75,7 +75,7 @@ this out.
 
 ## How JetPath works
 
-JetPath works by search through the source folder and join up any defined
+JetPath works by searching through the source folder and join up any defined
 handlers and hooks that follows it's format in files named [anything].jet.js.
 
 ## Requirements to use JetPath.

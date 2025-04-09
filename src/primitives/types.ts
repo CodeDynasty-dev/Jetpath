@@ -11,7 +11,7 @@ export interface ContextType<
   JetData extends {
     body?: Record<string, any>;
     params?: Record<string, any>;
-    search?: Record<string, any>;
+    query?: Record<string, any>;
   },
   JetPluginTypes extends Record<string, unknown>[],
 > {
@@ -24,9 +24,9 @@ export interface ContextType<
    */
   body: JetData["body"];
   /**
-   * get search params after /?
+   * get query params after /?
    */
-  search: JetData["search"];
+  query: JetData["query"];
   /**
    * get route params in /:thing
    */
@@ -131,6 +131,8 @@ export type jetOptions = {
     color?: string;
     logo?: string;
     path?: string;
+    password?: string;
+    username?: string;
   };
   source?: string;
   credentials?: {
@@ -209,8 +211,8 @@ export type JetFunc<
   JetData extends {
     body?: Record<string, any>;
     params?: Record<string, any>;
-    search?: Record<string, any>;
-  } = { body: {}; params: {}; search: {} },
+    query?: Record<string, any>;
+  } = { body: {}; params: {}; query: {} },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
   (ctx: ContextType<JetData, JetPluginTypes>): Promise<void> | void;

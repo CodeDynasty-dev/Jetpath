@@ -66,10 +66,10 @@ export class JetPath {
           /^(\.\.(\/|\\|$))+/,
           "",
         );
-        const filePath =  path.join(
+        const filePath = path.join(
           this.options?.static?.dir || "/",
           safeExtraPath,
-        ); 
+        );
         const ext = path.extname(filePath).slice(1);
         const contentType = mime.getType(ext) || "application/octet-stream";
         ctx.sendStream(filePath, contentType);
@@ -90,14 +90,31 @@ export class JetPath {
       // ? render API in UI
       if (this.options?.APIdisplay === "UI") {
         UI = compileUI(UI, this.options, compiledAPI);
-        const name = this.options?.apiDoc?.path || "/api-doc";
-        _JetPath_paths["GET"].direct[name] = (
+        const name = (this.options?.apiDoc?.path || "/api-doc") + "?";
+        _JetPath_paths["GET"].query[name] = (
           ctx,
         ) => {
+          if (
+            this.options?.apiDoc?.password || this.options?.apiDoc?.username
+          ) {
+            if (
+              // @ts-expect-error
+              ctx.query?.password !== this.options?.apiDoc?.password ||
+              // @ts-expect-error
+              ctx.query?.username !== this.options?.apiDoc?.username
+            ) {
+              ctx.code = 401;
+              ctx.send(
+                `<h1>401 Unauthorized</h1>`,
+                "text/html",
+              );
+              return;
+            }
+          }
           ctx.send(UI, "text/html");
         };
-        _JetPath_paths["GET"].direct[name].method = "GET";
-        _JetPath_paths["GET"].direct[name].path = name;
+        _JetPath_paths["GET"].query[name].method = "GET";
+        _JetPath_paths["GET"].query[name].path = name;
         Log.info(
           `✅ Processed routes ${handlersCount} handlers in ${
             Math.round(
@@ -108,6 +125,8 @@ export class JetPath {
         Log.success(
           `visit http://localhost:${this.options.port}${
             this.options?.apiDoc?.path || "/api-doc"
+          }?${this.options.apiDoc?.username ? "username=username&" : ""}${
+            this.options.apiDoc?.password ? "password=password" : ""
           } to see the displayed routes in UI`,
         );
       }

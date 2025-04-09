@@ -212,50 +212,50 @@ UTILS.set();
 export let _JetPath_paths: Record<
   methods,
   Record<
-    "direct" | "wildcard" | "parameter" | "search",
+    "direct" | "wildcard" | "parameter" | "query",
     Record<string, JetFunc>
   >
 > = {
   GET: {
     direct: {},
     parameter: {},
-    search: {},
+    query: {},
     wildcard: {},
   },
   POST: {
     direct: {},
     parameter: {},
-    search: {},
+    query: {},
     wildcard: {},
   },
   HEAD: {
     direct: {},
     parameter: {},
-    search: {},
+    query: {},
     wildcard: {},
   },
   PUT: {
     direct: {},
     parameter: {},
-    search: {},
+    query: {},
     wildcard: {},
   },
   PATCH: {
     direct: {},
     parameter: {},
-    search: {},
+    query: {},
     wildcard: {},
   },
   DELETE: {
     direct: {},
     parameter: {},
-    search: {},
+    query: {},
     wildcard: {},
   },
   OPTIONS: {
     direct: {},
     parameter: {},
-    search: {},
+    query: {},
     wildcard: {},
   },
 };
@@ -278,17 +278,17 @@ const createCTX = (
   req: IncomingMessage | Request,
   path: string,
   params?: Record<string, any>,
-  search?: Record<string, any>,
+  query?: Record<string, any>,
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
-    ctx._7(req as Request, path, params, search);
+    ctx._7(req as Request, path, params, query);
     return ctx;
   }
   const ctx = new Context();
   // ? add middlewares to the app object
   Object.assign(ctx.app, UTILS.middlewares);
-  ctx._7(req as Request, path, params, search);
+  ctx._7(req as Request, path, params, query);
   return ctx;
 };
 
@@ -395,7 +395,7 @@ const handlersPath = (path: string) => {
     if (path.includes("$0")) {
       type = "wildcard";
     } else if (path.includes("$$")) {
-      type = "search";
+      type = "query";
     } else {
       type = "parameter";
     }
@@ -410,7 +410,7 @@ const handlersPath = (path: string) => {
     ? [method, route, type] as [
       string,
       string,
-      "direct" | "wildcard" | "parameter" | "search",
+      "direct" | "wildcard" | "parameter" | "query",
     ]
     : undefined;
 };
@@ -631,20 +631,110 @@ order of operations
 
 parse direct match
 parse placeholder
+parse query
 parse wildcard
-parse search
 
 */
 
 /**
- * Parses the URL and returns the corresponding handler, parameters, search parameters, and path.
+ * Parses the URL and returns the corresponding handler, parameters, query parameters, and path.
  *
  * @param method - The HTTP method (e.g., GET, POST, etc.)
  * @param url - The URL to parse
- * @returns ? [handler, params, search, path]
+ * @returns ? [handler, params, query, path]
  */
-
 const URL_PARSER = (
+  method: methods,
+  url: string,
+): [JetFunc, Record<string, any>, Record<string, any>, string] | undefined => {
+  const routes = _JetPath_paths[method];
+
+  // Fast path normalization
+  if (!UTILS.runtime["node"]) {
+    const pathStart = url.indexOf("/", 7);
+    url = pathStart >= 0 ? url.slice(pathStart) : url;
+  }
+
+  //  Direct route lookup - O(1) operation
+  if (routes.direct[url]) {
+    return [routes.direct[url], {}, {}, url];
+  }
+
+  let path = url;
+  let queryIndex = url.indexOf("?");
+
+  if (queryIndex > -1) {
+    const query: Record<string, string> = {};
+    path = url.slice(0, queryIndex + 1);
+    if (routes.query[path]) {
+      if (url.includes("=")) {
+        const queryParams = new URLSearchParams(url.slice(queryIndex));
+        queryParams.forEach((value, key) => {
+          query[key] = value;
+        });
+      }
+      return [routes.query[path], {}, query, path];
+    }
+  }
+
+  // Parameter routes
+  for (const pathR in routes.parameter) {
+    // Quick check to avoid unnecessary processing
+    if (pathR.includes(":")) {
+      // Cache split results to avoid redundant operations
+      const urlFixtures = url.split("/");
+      const pathFixtures = pathR.split("/");
+
+      // Fast length check before deeper comparison
+      if (urlFixtures.length !== pathFixtures.length) {
+        continue;
+      }
+
+      // Use break flag for early exit
+      let breaked = false;
+      for (let i = 0; i < pathFixtures.length; i++) {
+        if (
+          !pathFixtures[i].includes(":") && urlFixtures[i] !== pathFixtures[i]
+        ) {
+          breaked = true;
+          break;
+        }
+      }
+      if (breaked) {
+        continue;
+      }
+
+      // Only process parameters after confirming a match
+      const params: Record<string, string> = {};
+      for (let i = 0; i < pathFixtures.length; i++) {
+        const px = pathFixtures[i];
+        if (px.includes(":")) {
+          // Avoid repeated split operations by storing the paramName
+          const paramName = px.split(":")[1];
+          params[paramName] = urlFixtures[i];
+        }
+      }
+
+      return [routes.parameter[pathR], params, {}, pathR];
+    }
+  }
+
+  // Wildcard routes
+  for (const pathR in routes.wildcard) {
+    if (pathR.includes("*")) {
+      const baseRoute = pathR.slice(0, pathR.length - 1);
+      if (path.startsWith(baseRoute)) {
+        const params: Record<string, any> = {
+          extraPath: path.slice(baseRoute.length),
+        };
+        return [routes.wildcard[pathR], params, {}, pathR];
+      }
+    }
+  }
+
+  return undefined;
+};
+const URL_PARSER2 = (
   method: methods,
   url: string,
 ): [JetFunc, Record<string, any>, Record<string, any>, string] | undefined => {
@@ -696,8 +786,27 @@ const URL_PARSER = (
       return [handler, params, {}, path];
     }
   }
+
+  //? check for query in the route
+  const query: Record<string, string> = {};
+  const uio = url.indexOf("?");
+  if (uio > -1) {
+    path = url.slice(0, uio);
+    if (url.includes("=")) {
+      const s_raw = Array.from(
+        new URLSearchParams(url.slice(path.length)).entries(),
+      );
+      for (let s = 0; s < s_raw.length; s++) {
+        query[s_raw[s][0]] = s_raw[s][1];
+      }
+    }
+    if (routes.query[path]) {
+      handler = routes.query[path];
+      return [handler, {}, query, path];
+    }
+  }
+
   // ? wildcard /* check
-  const search: Record<string, string> = {};
   for (const pathR in routes.wildcard) {
     // ? /* check
     if (pathR.includes("*")) {
@@ -709,24 +818,6 @@ const URL_PARSER = (
         handler = routes.wildcard[path];
         return [handler, params, {}, path];
       }
-    }
-  }
-
-  //? check for search in the route
-  const uio = url.indexOf("?");
-  if (uio > -1) {
-    path = url.slice(0, uio);
-    if (url.includes("=")) {
-      const s_raw = Array.from(
-        new URLSearchParams(url.slice(path.length)).entries(),
-      );
-      for (let s = 0; s < s_raw.length; s++) {
-        search[s_raw[s][0]] = s_raw[s][1];
-      }
-    }
-    if (routes.search[path]) {
-      handler = routes.search[path];
-      return [handler, {}, search, path];
     }
   }
   return undefined;
