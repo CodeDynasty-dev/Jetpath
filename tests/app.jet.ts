@@ -12,6 +12,7 @@ const app = new JetPath({
     PetShop API Documentation
     This doc provides you with a simple read and write Api to The PetShop API
     `,
+    // color: "#ff0303",
     password: "1234",
     username: "admin",
   },

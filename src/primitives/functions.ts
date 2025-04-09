@@ -734,94 +734,6 @@ const URL_PARSER = (
 
   return undefined;
 };
-const URL_PARSER2 = (
-  method: methods,
-  url: string,
-): [JetFunc, Record<string, any>, Record<string, any>, string] | undefined => {
-  const routes = _JetPath_paths[method];
-  if (!UTILS.runtime["node"]) {
-    url = url.slice(url.indexOf("/", 7));
-  }
-
-  if (routes.direct[url]) {
-    return [routes.direct[url], {}, {}, url];
-  }
-
-  const params: Record<string, string> = {};
-  let path: string, handler: JetFunc;
-
-  //? place holder
-  for (const pathR in routes.parameter) {
-    let breaked = false;
-    // ? placeholder /: check
-    if (pathR.includes(":")) {
-      const urlFixtures = url.split("/");
-      const pathFixtures = pathR.split("/");
-      if (urlFixtures.length !== pathFixtures.length) {
-        continue;
-      }
-
-      for (let i = 0; i < pathFixtures.length; i++) {
-        if (
-          !pathFixtures[i].includes(":") &&
-          urlFixtures[i] !== pathFixtures[i]
-        ) {
-          breaked = true;
-          break;
-        }
-      }
-      if (breaked) {
-        continue;
-      }
-
-      for (let i = 0; i < pathFixtures.length; i++) {
-        const px = pathFixtures[i];
-        if (px.includes(":")) {
-          params[px.split(":")[1]] = urlFixtures[i];
-        }
-      }
-      path = pathR;
-      //? set path and handler
-      handler = routes.parameter[path];
-      return [handler, params, {}, path];
-    }
-  }
-
-  //? check for query in the route
-  const query: Record<string, string> = {};
-  const uio = url.indexOf("?");
-  if (uio > -1) {
-    path = url.slice(0, uio);
-    if (url.includes("=")) {
-      const s_raw = Array.from(
-        new URLSearchParams(url.slice(path.length)).entries(),
-      );
-      for (let s = 0; s < s_raw.length; s++) {
-        query[s_raw[s][0]] = s_raw[s][1];
-      }
-    }
-    if (routes.query[path]) {
-      handler = routes.query[path];
-      return [handler, {}, query, path];
-    }
-  }
-
-  // ? wildcard /* check
-  for (const pathR in routes.wildcard) {
-    // ? /* check
-    if (pathR.includes("*")) {
-      const Ried = pathR.slice(0, pathR.length - 1);
-      if (url.startsWith(Ried)) {
-        (params as any).extraPath = url.slice(Ried.length);
-        path = pathR;
-        //? set path and handler
-        handler = routes.wildcard[path];
-        return [handler, params, {}, path];
-      }
-    }
-  }
-  return undefined;
-};
 
 export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
@@ -834,7 +746,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   return UI.replace("{ JETPATH }", `\`${api}\``)
     .replaceAll("{ JETPATHGH }", `${JSON.stringify(globalHeaders)}`)
     .replaceAll("{NAME}", options?.apiDoc?.name || "JetPath API Doc")
-    .replaceAll("JETPATHCOLOR", options?.apiDoc?.color || "#007bff")
+    .replaceAll("JETPATHCOLOR", options?.apiDoc?.color || "#4285f4")
     .replaceAll(
       "{LOGO}",
       options?.apiDoc?.logo ||
