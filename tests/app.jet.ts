@@ -253,11 +253,8 @@ export const GET_app$id: JetFunc<{ params: { id: string } }> = (ctx) =>
 
 //  for deno
 export const WS_sockets: JetFunc = (ctx) => {
-  const req = ctx.request;
-  if (req.headers.get("upgrade") != "websocket") {
-    ctx.send("failed!");
-  } 
-  const { socket, response } = Deno.upgradeWebSocket(req);
+  const socket = ctx.socket;
+  console.log(socket);
   socket.addEventListener("open", () => {
     console.log("a client connected!");
   });
@@ -267,23 +264,6 @@ export const WS_sockets: JetFunc = (ctx) => {
     } else {
       socket.send("all your "+ event.data +"  are belong to us!");
     }
-  });
-  ctx.sendResponse(response);
+  }); 
 };
-
-//  for bun
-// export const WS_sockets2 = (ctx) => {
-//     // upgrade the request to a WebSocket
-//     console.log("boohoo 2");
-//     if (app.server.upgrade(ctx.request)) {
-//       return; // do not return a Response
-//     }
-  
-//     return {
-//       //? https://bun.sh/docs/api/websockets
-//       message(ws, message) {}, // a message is received
-//       open(ws) {}, // a socket is opened
-//       close(ws, code, message) {}, // a socket is closed
-//       drain(ws) {}, // the socket is ready to receive more data
-//     };
-//   };
+ 

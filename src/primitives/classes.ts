@@ -23,39 +23,6 @@ export class JetPlugin {
   }
 }
 
-/*@credence-[/index.html]-[jetpath plugins]
-
-## jetpath plugins
-
-Jetpath plugins are a way to extend the functionalities of Jetpath.
-They can be used to add new features to Jetpath or to modify existing ones.
-
-Plugins can be used to add new routes, middleware, or to modify the request
-and response objects or even convert to serverless runtime.
-
-### Creating a plugin
-
-```ts
-import { JetPlugin } from "jetpath";
-
-export const plugin = new JetPlugin{
-  name: "plugin",
-  version: "1.0.0",
-  executor({ config }) {
-    return {
-      greet_world() {
-        return {
-          body: "Hello world",
-        };
-      },
-    };
-  },
-});
-
-```
-
-*/
-
 export class Log {
   // Define ANSI escape codes for colors and styles
   static colors = {
@@ -113,6 +80,7 @@ export class Context {
   query: Record<string, any> | undefined;
   body: Record<string, any> | undefined;
   path: string | undefined;
+  socket?: JetSocket;
   // ?
   app: Record<string, any> = {};
   //? load
@@ -294,10 +262,10 @@ export class Context {
     return undefined as never;
   }
   // Only for deno and bun
-  sendResponse(Response: Response) {
+  sendResponse(Response?: Response) {
     // @ts-ignore
     this._6 = Response;
-    this._4 = true; 
+    this._4 = true;
     if (!this._5) throw _DONE;
     this._5();
     return undefined as never;
@@ -332,6 +300,27 @@ export class Context {
             resolve({} as Promise<Type>);
           }
         });
+      });
+    }
+  }
+}
+
+export class JetSocket {
+  private listeners = { "message": [], "close": [], "drain": [], "open": [] };
+  addEventListener(
+    event: "message" | "close" | "drain" | "open",
+    listener: (...param: any[]) => void,
+  ): void {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(listener as never);
+  }
+
+  __binder(eventName: "message" | "close" | "drain" | "open", data: any) {
+    if (this.listeners[eventName]) {
+      this.listeners[eventName].forEach((listener: any) => {
+        listener(data);
       });
     }
   }

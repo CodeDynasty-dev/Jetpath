@@ -57,7 +57,7 @@ export interface ContextType<
    * *Only for deno and bun
    */
   // sendStream(stream: Stream | string, ContentType: string): never;
-  sendResponse(response: Response): never;
+  sendResponse(response?: Response): never;
   /**
    * reply the request
    */

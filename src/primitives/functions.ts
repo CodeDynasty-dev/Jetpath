@@ -12,7 +12,7 @@ import {
   type jetOptions,
   type methods,
 } from "./types.js";
-import { Context, type JetPlugin, Log } from "./classes.js";
+import { Context, type JetPlugin, JetSocket, Log } from "./classes.js";
 
 /**
  * an inbuilt CORS post middleware
@@ -103,6 +103,7 @@ export function corsMiddleware(options: {
     }
   };
 }
+const JetSocketInstance = new JetSocket();
 
 export let _JetPath_paths: Record<
   methods,
@@ -219,18 +220,18 @@ export const UTILS = {
               fetch: JetPath,
               websocket: {
                 sendPings: false,
-                message(ws, message) {
-                  //
+                message(...p) {
+                  JetSocketInstance.__binder("message", p);
                 },
-                close(ws, code, reason) {
-                  //
+                close(...p) {
+                  JetSocketInstance.__binder("close", p);
                 },
-                drain(ws) {
-                  //
+                drain(...p) {
+                  JetSocketInstance.__binder("drain", p);
                 },
-                open(ws) {
-                  //
-                }, 
+                open(...p) {
+                  JetSocketInstance.__binder("open", p);
+                },
               },
             });
           },
@@ -310,16 +311,23 @@ const createCTX = (
   path: string,
   params?: Record<string, any>,
   query?: Record<string, any>,
+  socket?: boolean,
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
     ctx._7(req as Request, path, params, query);
+    if (socket) {
+      ctx.socket = JetSocketInstance;
+    }
     return ctx;
   }
   const ctx = new Context();
   // ? add middlewares to the app object
   Object.assign(ctx.app, UTILS.middlewares);
   ctx._7(req as Request, path, params, query);
+  if (socket) {
+    ctx.socket = JetSocketInstance;
+  }
   return ctx;
 };
 
@@ -358,7 +366,7 @@ const createResponse = (
         headers: ctx?._2,
       });
     }
-    if (ctx._6) return ctx?._6;
+    if (ctx._6 !== false) return ctx?._6;
     // normal response
     return new Response(ctx?._1 || (four04 ? "Not found" : undefined), {
       status: (four04 && 404) || ctx.code,
@@ -394,7 +402,7 @@ const JetPath = async (
   let returned: (Function | void)[] | undefined;
   if (parsedR) {
     const r = parsedR[0];
-    ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2]);
+    ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2], parsedR[4]);
     try {
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
@@ -697,7 +705,9 @@ parse wildcard
  */
 const URL_PARSER = (
   req: { method: methods; url: string; headers: Record<string, string> },
-): [JetFunc, Record<string, any>, Record<string, any>, string] | undefined => {
+):
+  | [JetFunc, Record<string, any>, Record<string, any>, string, boolean]
+  | undefined => {
   const routes = _JetPath_paths[req.method];
   let url: string = req.url;
   // Fast path normalization
@@ -708,7 +718,7 @@ const URL_PARSER = (
 
   //  Direct route lookup - O(1) operation
   if (routes.direct[url]) {
-    return [routes.direct[url], {}, {}, url];
+    return [routes.direct[url], {}, {}, url, false];
   }
 
   let path = url;
@@ -724,7 +734,7 @@ const URL_PARSER = (
           query[key] = value;
         });
       }
-      return [routes.query[path], {}, query, path];
+      return [routes.query[path], {}, query, path, false];
     }
   }
 
@@ -766,14 +776,47 @@ const URL_PARSER = (
         }
       }
 
-      return [routes.parameter[pathR], params, {}, pathR];
+      return [routes.parameter[pathR], params, {}, pathR, false];
     }
   }
 
   // @ts-expect-error
   const conn = req.headers?.["connection"] || req.headers?.get?.("connection");
+  // @ts-ignore
   if (conn === "Upgrade" && _JetPath_WS_HANDLER) {
-    return [_JetPath_WS_HANDLER, {}, {}, path];
+    return [
+      (ctx) => {
+        if (ctx.get("upgrade") != "websocket") {
+          ctx.throw();
+        }
+        if (!UTILS.runtime["deno"]) {
+          // @ts-expect-error
+          const { socket, response } = Deno.upgradeWebSocket(req);
+          // @ts-expect-error
+          socket.addEventListener("open", (...p) => {
+            JetSocketInstance.__binder("open", p);
+          });
+          // @ts-expect-error
+          socket.addEventListener("message", (...p) => {
+            JetSocketInstance.__binder("message", p);
+          });
+          // @ts-expect-error
+          socket.addEventListener("drain", (...p) => {
+            JetSocketInstance.__binder("drain", p);
+          });
+          // @ts-expect-error
+          socket.addEventListener("close", (...p) => {
+            JetSocketInstance.__binder("close", p);
+          });
+          ctx.sendResponse(response);
+        }
+        ctx.sendResponse(undefined);
+      },
+      {},
+      {},
+      path,
+      true,
+    ];
   }
   // Wildcard routes
   for (const pathR in routes.wildcard) {
@@ -783,7 +826,7 @@ const URL_PARSER = (
         const params: Record<string, any> = {
           extraPath: path.slice(baseRoute.length),
         };
-        return [routes.wildcard[pathR], params, {}, pathR];
+        return [routes.wildcard[pathR], params, {}, pathR, false];
       }
     }
   }
