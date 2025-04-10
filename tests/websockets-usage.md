@@ -46,17 +46,24 @@ export const POST_websocket = (ctx) => {
 ## Deno
 
 ```js
-// usage
-POST_socket(ctx) {
-    const {
-      response,
-      socket,
-    } = Deno.upgradeWebSocket(ctx.request);
-    socket.onmessage = (m) => {
-      console.log("Echoing: %s", m.data);
-      socket.send(m.data);
-    };
-    socket.onclose = () => console.log("Client has disconnected");
-    ctx.send("done!")
-}
+// usage go to ws://localhost:8000/sockets
+
+export const WS_sockets: JetFunc = (ctx) => {
+  const req = ctx.request;
+  if (req.headers.get("upgrade") != "websocket") {
+    ctx.send("failed!");
+  } 
+  const { socket, response } = Deno.upgradeWebSocket(req);
+  socket.addEventListener("open", () => {
+    console.log("a client connected!");
+  });
+  socket.addEventListener("message", (event) => {
+    if (event.data === "ping") {
+      socket.send("pong");
+    }
+  });
+  ctx.sendResponse(response);
+};
+
 ```
+ 

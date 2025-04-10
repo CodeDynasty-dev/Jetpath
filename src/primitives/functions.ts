@@ -104,6 +104,73 @@ export function corsMiddleware(options: {
   };
 }
 
+export let _JetPath_paths: Record<
+  methods,
+  Record<
+    "direct" | "wildcard" | "parameter" | "query",
+    Record<string, JetFunc>
+  >
+> = {
+  GET: {
+    direct: {},
+    parameter: {},
+    query: {},
+    wildcard: {},
+  },
+  POST: {
+    direct: {},
+    parameter: {},
+    query: {},
+    wildcard: {},
+  },
+  HEAD: {
+    direct: {},
+    parameter: {},
+    query: {},
+    wildcard: {},
+  },
+  PUT: {
+    direct: {},
+    parameter: {},
+    query: {},
+    wildcard: {},
+  },
+  PATCH: {
+    direct: {},
+    parameter: {},
+    query: {},
+    wildcard: {},
+  },
+  DELETE: {
+    direct: {},
+    parameter: {},
+    query: {},
+    wildcard: {},
+  },
+  OPTIONS: {
+    direct: {},
+    parameter: {},
+    query: {},
+    wildcard: {},
+  },
+};
+
+let _JetPath_WS_HANDLER: JetFunc = undefined as any;
+
+export const _jet_middleware: Record<
+  string,
+  (ctx: Context, err?: unknown) => void | Promise<void>
+> = {};
+
+class JetPathErrors extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export const _DONE = new JetPathErrors("done");
+export const _OFF = new JetPathErrors("off");
+
 export const UTILS = {
   // wsFuncs: [],
   ctxPool: [] as Context[],
@@ -142,16 +209,45 @@ export const UTILS = {
       };
     }
     if (UTILS.runtime["bun"]) {
-      server = {
-        listen(port: number) {
-          server_else = Bun.serve({
-            port,
-            // @ts-expect-error
-            fetch: JetPath,
-          });
-        },
-        edge: false,
-      };
+      // @ts-ignore
+      if (_JetPath_WS_HANDLER) {
+        server = {
+          listen(port: number) {
+            server_else = Bun.serve({
+              port,
+              // @ts-expect-error
+              fetch: JetPath,
+              websocket: {
+                sendPings: false,
+                message(ws, message) {
+                  //
+                },
+                close(ws, code, reason) {
+                  //
+                },
+                drain(ws) {
+                  //
+                },
+                open(ws) {
+                  //
+                }, 
+              },
+            });
+          },
+          edge: false,
+        };
+      } else {
+        server = {
+          listen(port: number) {
+            server_else = Bun.serve({
+              port,
+              // @ts-expect-error
+              fetch: JetPath,
+            });
+          },
+          edge: false,
+        };
+      }
     }
     //! likely on the edge
     //! let's see what the plugins has to say
@@ -209,71 +305,6 @@ export const UTILS = {
 // ? setting up the runtime check
 UTILS.set();
 
-export let _JetPath_paths: Record<
-  methods,
-  Record<
-    "direct" | "wildcard" | "parameter" | "query",
-    Record<string, JetFunc>
-  >
-> = {
-  GET: {
-    direct: {},
-    parameter: {},
-    query: {},
-    wildcard: {},
-  },
-  POST: {
-    direct: {},
-    parameter: {},
-    query: {},
-    wildcard: {},
-  },
-  HEAD: {
-    direct: {},
-    parameter: {},
-    query: {},
-    wildcard: {},
-  },
-  PUT: {
-    direct: {},
-    parameter: {},
-    query: {},
-    wildcard: {},
-  },
-  PATCH: {
-    direct: {},
-    parameter: {},
-    query: {},
-    wildcard: {},
-  },
-  DELETE: {
-    direct: {},
-    parameter: {},
-    query: {},
-    wildcard: {},
-  },
-  OPTIONS: {
-    direct: {},
-    parameter: {},
-    query: {},
-    wildcard: {},
-  },
-};
-
-export const _jet_middleware: Record<
-  string,
-  (ctx: Context, err?: unknown) => void | Promise<void>
-> = {};
-
-class JetPathErrors extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-export const _DONE = new JetPathErrors("done");
-export const _OFF = new JetPathErrors("off");
-
 const createCTX = (
   req: IncomingMessage | Request,
   path: string,
@@ -304,16 +335,31 @@ const createResponse = (
   UTILS.ctxPool.push(ctx);
   // ? prepare response
   if (!UTILS.runtime["node"]) {
+    // redirect
     if (ctx?.code === 301 && ctx._2?.["Location"]) {
       // @ts-ignore
       return Response.redirect(ctx._2?.["Location"]);
     }
+    // ? streaming with ctx.sendStream
     if (ctx?._3) {
+      // handle deno promise.
+      // @ts-expect-error
+      if (UTILS.runtime["deno"] && ctx._3.then) {
+        // @ts-expect-error
+        return ctx._3.then((stream: any) => {
+          return new Response(stream?.readable, {
+            status: (four04 && 404) || ctx.code,
+            headers: ctx?._2,
+          });
+        });
+      }
       return new Response(ctx?._3 as unknown as undefined, {
         status: 200,
         headers: ctx?._2,
       });
     }
+    if (ctx._6) return ctx?._6;
+    // normal response
     return new Response(ctx?._1 || (four04 ? "Not found" : undefined), {
       status: (four04 && 404) || ctx.code,
       headers: ctx?._2,
@@ -327,6 +373,7 @@ const createResponse = (
     });
     return ctx._3.pipe(res);
   }
+
   res.writeHead(
     (four04 && 404) || ctx.code,
     ctx?._2 || { "Content-Type": "text/plain" },
@@ -341,7 +388,7 @@ const JetPath = async (
     req: IncomingMessage;
   },
 ) => {
-  const parsedR = URL_PARSER(req.method as methods, req.url!);
+  const parsedR = URL_PARSER(req as any);
   let off = false;
   let ctx: Context;
   let returned: (Function | void)[] | undefined;
@@ -407,7 +454,7 @@ const handlersPath = (path: string) => {
     .replace(/\$0/g, "/*") // Convert wildcard
     .replace(/\$/g, "/:") // Convert params
     .replaceAll(/\/\//g, "/"); // change normalize akk extra / to /
-  return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE)$/.test(method)
+  return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE|WS)$/.test(method)
     ? [method, route, type] as [
       string,
       string,
@@ -451,8 +498,11 @@ export async function getHandlers(
       dirent.isFile() &&
       (dirent.name.endsWith(".jet.js") || dirent.name.endsWith(".jet.ts"))
     ) {
-      if (print) { 
-        Log.info("Loading routes at ." + source.replace(curr_d, "") + "/" + dirent.name);
+      if (print) {
+        Log.info(
+          "Loading routes at ." + source.replace(curr_d, "") + "/" +
+            dirent.name,
+        );
       }
       try {
         const module = await getModule(source, dirent.name);
@@ -464,11 +514,11 @@ export async function getHandlers(
                 _jet_middleware[params[1]] = module[p];
               } else {
                 // ! HTTP handler
-                if (
-                  typeof params !== "string"
-                  // &&
-                  // _JetPath_paths[params[0] as methods]
-                ) {
+                if (typeof params !== "string") {
+                  if (params[0] === "WS") {
+                    _JetPath_WS_HANDLER = module[p] as JetFunc;
+                    continue;
+                  }
                   // ? set the method
                   module[p]!.method = params[0];
                   // ? set the path
@@ -646,11 +696,10 @@ parse wildcard
  * @returns ? [handler, params, query, path]
  */
 const URL_PARSER = (
-  method: methods,
-  url: string,
+  req: { method: methods; url: string; headers: Record<string, string> },
 ): [JetFunc, Record<string, any>, Record<string, any>, string] | undefined => {
-  const routes = _JetPath_paths[method];
-
+  const routes = _JetPath_paths[req.method];
+  let url: string = req.url;
   // Fast path normalization
   if (!UTILS.runtime["node"]) {
     const pathStart = url.indexOf("/", 7);
@@ -721,6 +770,11 @@ const URL_PARSER = (
     }
   }
 
+  // @ts-expect-error
+  const conn = req.headers?.["connection"] || req.headers?.get?.("connection");
+  if (conn === "Upgrade" && _JetPath_WS_HANDLER) {
+    return [_JetPath_WS_HANDLER, {}, {}, path];
+  }
   // Wildcard routes
   for (const pathR in routes.wildcard) {
     if (pathR.includes("*")) {
@@ -733,7 +787,6 @@ const URL_PARSER = (
       }
     }
   }
-
   return undefined;
 };
 

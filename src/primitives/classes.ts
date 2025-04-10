@@ -151,7 +151,7 @@ export class Context {
     this._4 = false;
     //? used to know if the request has been offloaded
     this._5 = false;
-    //? response
+    //? custom response
     this._6 = false;
     // ? code
     this.code = 200;
@@ -277,13 +277,27 @@ export class Context {
       }"`;
       if (UTILS.runtime["bun"]) {
         stream = Bun.file(stream);
+      } else if (UTILS.runtime["deno"]) {
+        // @ts-expect-error
+        const file = Deno.open(stream).catch(() => {});
+        stream = file;
       } else {
         stream = createReadStream(stream as string, { autoClose: true });
       }
     }
+
     this._2["Content-Type"] = ContentType;
     this._3 = stream as Stream;
     this._4 = true;
+    if (!this._5) throw _DONE;
+    this._5();
+    return undefined as never;
+  }
+  // Only for deno and bun
+  sendResponse(Response: Response) {
+    // @ts-ignore
+    this._6 = Response;
+    this._4 = true; 
     if (!this._5) throw _DONE;
     this._5();
     return undefined as never;

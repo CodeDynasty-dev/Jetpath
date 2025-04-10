@@ -53,6 +53,12 @@ export interface ContextType<
   // sendStream(stream: Stream | string, ContentType: string): never;
   sendStream(stream: any | string, ContentType: string): never;
   /**
+   * send a direct response
+   * *Only for deno and bun
+   */
+  // sendStream(stream: Stream | string, ContentType: string): never;
+  sendResponse(response: Response): never;
+  /**
    * reply the request
    */
   send(data: unknown, ContentType?: string): never;
@@ -90,6 +96,7 @@ export interface ContextType<
   _3?: any; //Stream | undefined; // Stream
   _4?: boolean | undefined;
   _5?: (() => never) | undefined;
+  _6?: Response | false;
 }
 
 export type JetPluginExecutorInitParams = {

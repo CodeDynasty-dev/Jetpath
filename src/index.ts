@@ -113,10 +113,9 @@ export class JetPath {
               }
               let username, password;
               try {
-                const decodedCreds = Buffer.from(encodedCreds, "base64")
-                  .toString(
-                    "utf8",
-                  );
+                const decodedCreds = new TextDecoder().decode(
+                  Uint8Array.from(atob(encodedCreds), (c) => c.charCodeAt(0)),
+                );
                 [username, password] = decodedCreds.split(":");
               } catch (error) {
                 ctx.code = 401;

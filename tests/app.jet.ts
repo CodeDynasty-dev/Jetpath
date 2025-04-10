@@ -13,8 +13,8 @@ const app = new JetPath({
     This doc provides you with a simple read and write Api to The PetShop API
     `,
     // color: "#ff0303",
-    password: "1234",
     username: "admin",
+    password: "1234",
   },
   source: ".",
   APIdisplay: "UI",
@@ -39,6 +39,20 @@ const pluginExample = new JetPlugin({
 app.use(pluginExample);
 
 app.listen();
+
+
+// ? middleware for all routes after /
+export const MIDDLEWARE_: JetMiddleware = () => {
+  // pre handler
+  return (ctx, err) => {
+    // post handler
+    if (err) {
+      ctx.code = 500;
+      ctx.throw(String(err));
+    }
+  };
+};
+
 
 // ? types
 type PetType = {
@@ -130,6 +144,7 @@ export const PUT_petBy$id: JetFunc<{ params: { id: string }; body: PetType }> =
     console.log(updatedPetData);
 
     const petId = ctx.params.id;
+      
     console.log({ updatedPetData, petId });
     const index = pets.findIndex((p) => p.id === petId);
     if (index !== -1) {
@@ -202,17 +217,6 @@ POST_petImage$id.body = {
   age: {},
 };
 
-// ? middleware for all routes after /
-export const MIDDLEWARE_: JetMiddleware = (ctx) => {
-  // pre handler
-  return (ctx, err) => {
-    // post handler
-    if (err) {
-      ctx.code = 500;
-      ctx.throw(String(err));
-    }
-  };
-};
 
 export const GET_error: JetFunc = async function (_ctx) {
   throw new Error("boohoo");
@@ -245,3 +249,41 @@ POST_.body = {
 
 export const GET_app$id: JetFunc<{ params: { id: string } }> = (ctx) =>
   ctx.redirect("uplify://audio?id=" + ctx.params.id);
+
+
+//  for deno
+export const WS_sockets: JetFunc = (ctx) => {
+  const req = ctx.request;
+  if (req.headers.get("upgrade") != "websocket") {
+    ctx.send("failed!");
+  } 
+  const { socket, response } = Deno.upgradeWebSocket(req);
+  socket.addEventListener("open", () => {
+    console.log("a client connected!");
+  });
+  socket.addEventListener("message", (event) => {
+    if (event.data === "ping") {
+      socket.send("pong");
+    } else {
+      socket.send("all your "+ event.data +"  are belong to us!");
+    }
+  });
+  ctx.sendResponse(response);
+};
+
+//  for bun
+// export const WS_sockets2 = (ctx) => {
+//     // upgrade the request to a WebSocket
+//     console.log("boohoo 2");
+//     if (app.server.upgrade(ctx.request)) {
+//       return; // do not return a Response
+//     }
+  
+//     return {
+//       //? https://bun.sh/docs/api/websockets
+//       message(ws, message) {}, // a message is received
+//       open(ws) {}, // a socket is opened
+//       close(ws, code, message) {}, // a socket is closed
+//       drain(ws) {}, // the socket is ready to receive more data
+//     };
+//   };
