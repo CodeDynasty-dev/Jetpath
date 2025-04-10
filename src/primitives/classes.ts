@@ -86,7 +86,7 @@ export class Log {
     bgWhite: "\x1b[47m",
   };
   static print(message: any, color: string) {
-    console.log(`${color}%s${Log.colors.reset}`, `Jetpath: ${message}`);
+    console.log(`${color}%s${Log.colors.reset}`, `${message}`);
   }
 
   static info(message: string) {

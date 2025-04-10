@@ -85,6 +85,7 @@ export class JetPath {
       // ? Load all jetpath functions described in user code
       const errorsCount = await getHandlers(this.options?.source!, true);
       const endTime = performance.now();
+      Log.info("Compiled!");
       //? compile API
       const [handlersCount, compiledAPI] = compileAPI(this.options);
       // ? render API in UI
@@ -155,7 +156,7 @@ export class JetPath {
         };
         _JetPath_paths["GET"].direct[name].method = "GET";
         _JetPath_paths["GET"].direct[name].path = name;
-        Log.info(
+        Log.success(
           `✅ Processed routes ${handlersCount} handlers in ${
             Math.round(
               endTime - startTime,
@@ -163,7 +164,7 @@ export class JetPath {
           }ms`,
         );
         Log.success(
-          `visit http://localhost:${this.options.port}${
+          `🚀 Visit http://localhost:${this.options.port}${
             this.options?.apiDoc?.path || "/api-doc"
           } to see the displayed routes in UI`,
         );
@@ -171,7 +172,7 @@ export class JetPath {
       // ? render API in a .HTTP file
       if (this.options?.APIdisplay === "HTTP") {
         await writeFile("api-doc.http", compiledAPI);
-        Log.info(
+        Log.success(
           `✅ Processed routes ${handlersCount} handlers in ${
             Math.round(
               endTime - startTime,
@@ -179,7 +180,7 @@ export class JetPath {
           }ms`,
         );
         Log.success(
-          `Check http file ./api-doc.http to test the routes Visual Studio rest client extension`,
+          `🚀 Check http file ./api-doc.http to test the routes Visual Studio rest client extension`,
         );
       }
       if (errorsCount) {
@@ -207,7 +208,7 @@ export class JetPath {
       }
     }
     assignMiddleware(_JetPath_paths, _jet_middleware);
-    Log.success(`Listening on http://localhost:${this.options.port}`);
+    Log.success(`🔥 Listening on http://localhost:${this.options.port}`);
     // ? start server
     this.listening = true;
     this.server.listen(this.options.port);

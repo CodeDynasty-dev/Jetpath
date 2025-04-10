@@ -38,6 +38,7 @@
     "dev": "node --watch --experimental-strip-types tests/app.jet.ts",
     "node": "node --watch --experimental-strip-types tests/app.jet.ts",
     "watch": "tsc tests/*.ts --target esnext --watch",
+    "watch:docs": "docmach",
     "build": "bun bundle.ts",
     "lint": "gts lint",
     "clean": "gts clean",
@@ -56,16 +57,16 @@
     "@types/busboy": "^1.5.4",
     "@types/node": "^22.7.5",
     "busboy": "^1.6.0",
-    "ws": "^8.17.0",
+    "docmach": "^1.0.4",
     "gts": "^6.0.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "ws": "^8.17.0"
   },
   "dependencies": {
     "mime": "^4.0.1"
   },
-  "credence": {
-    "docs-directory": ".",
-    "build-directory": "docs",
+  "docmach": {
+    "docs-directory": "docs",
     "assets-folder": "./doc-assets"
   }
 }

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JetPath - The Future of Backend</title> 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bundle.css">
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #f0f0f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #6EE7B7, #3B82F6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text; /* Standard property */
+      color: transparent; /* Fallback */
+    }
+
+    .hero-section {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+      padding-bottom: 100px;
+      padding-top: 100px;
+      position: relative;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(ellipse at center, rgba(63, 94, 251, 0.1) 0%, rgba(10, 10, 10, 0) 70%);
+        z-index: 0;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-card {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+    }
+
+    .feature-card:hover {
+      background-color: rgba(255, 255, 255, 0.07);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .glassmorphism {
+      background: rgba(16, 16, 16, 0.7);
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .hero-title {
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-subtitle {
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6EE7B7, #3B82F6);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s ease;
+      display: inline-block;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #5CDDB5, #2A73E8);
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-secondary {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #f0f0f0;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-weight: 500;
+    }
+
+    .btn-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+
+    .code-block {
+      background-color: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .code-block pre {
+        padding: 1rem;
+        margin: 0;
+        overflow-x: auto;
+    }
+    .code-block code {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+
+    /* Basic syntax highlighting colors */
+    .token.keyword { color: #569cd6; }
+    .token.string { color: #ce9178; }
+    .token.function { color: #dcdcaa; }
+    .token.parameter { color: #9cdcfe; }
+    .token.punctuation { color: #d4d4d4; }
+    .token.decorator { color: #4ec9b0; }
+    .token.number { color: #b5cea8; }
+    .token.comment { color: #6a9955; }
+    .token.class-name { color: #4ec9b0; } /* For class names like JetPath */
+    .token.operator { color: #d4d4d4; } /* For = */
+    .token.method { color: #dcdcaa; } /* For .get, .run, .listen */
+
+    /* Section specific styles */
+    .section-padding {
+        padding-top: 5rem; /* Increased padding */
+        padding-bottom: 5rem; /* Increased padding */
+        padding-left: 1.5rem; /* px-6 */
+        padding-right: 1.5rem; /* px-6 */
+    }
+    @media (min-width: 768px) { /* md: */
+        .section-padding {
+            padding-left: 3rem; /* md:px-12 */
+            padding-right: 3rem; /* md:px-12 */
+        }
+    }
+    @media (min-width: 1024px) { /* lg: */
+        .section-padding {
+            padding-left: 6rem; /* lg:px-24 */
+            padding-right: 6rem; /* lg:px-24 */
+        }
+    }
+    .section-title {
+        font-size: 2.25rem; /* text-4xl */
+        font-weight: 800; /* font-extrabold */
+        text-align: center;
+        margin-bottom: 3rem; /* mb-12 */
+    }
+    @media (min-width: 768px) { /* md: */
+        .section-title {
+            font-size: 2.75rem; /* md:text-5xl */
+            margin-bottom: 4rem; /* md:mb-16 */
+        }
+    }
+
+    /* Icon styling (example) */
+    .feature-icon {
+        background: linear-gradient(135deg, rgba(110, 231, 183, 0.1), rgba(59, 130, 246, 0.1));
+        border-radius: 50%;
+        padding: 0.75rem; /* p-3 */
+        display: inline-flex;
+        margin-bottom: 1rem; /* mb-4 */
+        border: 1px solid rgba(110, 231, 183, 0.2);
+    }
+
+
+  </style>
+</head>
+<body class="overflow-x-hidden">
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="container mx-auto text-center hero-content px-6">
+      <div class="glassmorphism p-10 md:p-16 rounded-3xl max-w-4xl mx-auto">
+        <h1 class="text-5xl md:text-7xl font-extrabold mb-4 hero-title">
+          <span class="gradient-text">JetPath</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-300 mb-8 hero-subtitle max-w-2xl mx-auto">
+          The high-performance, developer-first backend framework for building scalable and efficient web applications with delightful simplicity.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <a href="https://github.com/jetpath-org/jetpath" target="_blank" rel="noopener noreferrer"
+              class="btn-primary text-white py-3 px-8 rounded-full shadow-lg">
+              Get Started
+            </a>
+            <a href="#why-jetpath"
+              class="btn-secondary py-3 px-8 rounded-full shadow-lg">
+              Learn More
+            </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why JetPath Section -->
+  <div id="why-jetpath" class="section-padding">
+    <div class="container mx-auto">
+      <h2 class="section-title gradient-text">Why You'll Love <span class="text-white">Jet</span>Path</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-start">
+        <!-- Simplicity -->
+        <div class="p-6 rounded-lg">
+           <div class="feature-icon">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-emerald-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+             </svg>
+           </div>
+          <h3 class="text-2xl font-semibold mb-4 gradient-text">Simplicity at Its Core</h3>
+          <p class="text-gray-300 mb-6 text-lg leading-relaxed">
+            JetPath strips away the boilerplate. Get started in minutes with an intuitive API inspired by the best, focusing on clarity and ease of use. Perfect for beginners and experts alike.
+          </p>
+          <div class="code-block">
+            <pre><code class="language-python">
+<span class="token comment"># Python Example</span>
+<span class="token keyword">from</span> <span class="token parameter">jetpath</span> <span class="token keyword">import</span> <span class="token class-name">JetPath</span>
+
+<span class="token parameter">app</span> <span class="token operator">=</span> <span class="token class-name">JetPath</span><span class="token punctuation">()</span>
+
+<span class="token decorator">@app.get</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">home</span><span class="token punctuation">():</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Hello, JetPath!"</span><span class="token punctuation">}</span>
+
+<span class="token comment"># Run with: python app.py</span>
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    <span class="token parameter">app</span><span class="token punctuation">.</span><span class="token method">run</span><span class="token punctuation">(</span><span class="token parameter">port</span><span class="token operator">=</span><span class="token number">8000</span><span class="token punctuation">)</span>
+            </code></pre>
+          </div>
+        </div>
+        <!-- Performance -->
+        <div class="p-6 rounded-lg">
+           <div class="feature-icon">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-blue-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+             </svg>
+           </div>
+          <h3 class="text-2xl font-semibold mb-4 gradient-text">Blazing Fast Performance</h3>
+          <p class="text-gray-300 mb-6 text-lg leading-relaxed">
+            Engineered for speed from the ground up. JetPath leverages modern techniques [mention specific tech if applicable, e.g., async, Rust bindings] to handle high concurrency with minimal overhead. Serve thousands of requests per second effortlessly.
+          </p>
+          <div class="code-block">
+            <pre><code class="language-typescript">
+<span class="token comment">// TypeScript/JavaScript Example</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> <span class="token class-name">JetPath</span> <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'jetpath'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token parameter">app</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JetPath</span><span class="token punctuation">();</span>
+
+<span class="token comment">// Route with parameters</span>
+<span class="token parameter">app</span><span class="token punctuation">.</span><span class="token method">get</span><span class="token punctuation">(</span><span class="token string">'/hello/:name'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">{</span> <span class="token parameter">name</span> <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token parameter">req</span><span class="token punctuation">.</span><span class="token parameter">params</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token string">`Hello, </span><span class="token punctuation">${</span><span class="token parameter">name</span><span class="token punctuation">}</span><span class="token string">!`</span><span class="token punctuation">;</span>
+<span class="token punctuation">});</span>
+
+<span class="token parameter">app</span><span class="token punctuation">.</span><span class="token method">listen</span><span class="token punctuation">(</span><span class="token number">3000</span><span class="token punctuation">,</span> <span class="token punctuation">()</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token function">console</span><span class="token punctuation">.</span><span class="token method">log</span><span class="token punctuation">(</span><span class="token string">'🚀 Server running on http://localhost:3000'</span><span class="token punctuation">);</span>
+<span class="token punctuation">});</span>
+            </code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Developer Experience Section (NEW) -->
+  <div class="section-padding bg-gray-950">
+    <div class="container mx-auto">
+      <h2 class="section-title gradient-text">Delightful <span class="text-white">Developer Experience</span></h2>
+      <p class="text-lg md:text-xl text-gray-400 mb-12 max-w-3xl mx-auto text-center">
+        JetPath is designed to make development productive and enjoyable. Spend less time fighting the framework and more time building features.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="feature-card p-6 text-center">
+           <div class="feature-icon mx-auto">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-emerald-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5 3 12m0 0 3.75 4.5M3 12h18" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3">Intuitive API</h3>
+          <p class="text-gray-400">Clean, predictable, and easy-to-learn API design.</p>
+        </div>
+        <div class="feature-card p-6 text-center">
+           <div class="feature-icon mx-auto">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-blue-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3">Sensible Defaults</h3>
+          <p class="text-gray-400">Get started quickly with smart configurations out-of-the-box.</p>
+        </div>
+        <div class="feature-card p-6 text-center">
+           <div class="feature-icon mx-auto">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-purple-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5-4.72-4.72a.75.75 0 0 0-1.06 1.06L14.69 12l-4.72 4.72a.75.75 0 1 0 1.06 1.06l5.25-5.25a.75.75 0 0 0 0-1.06l-5.25-5.25a.75.75 0 0 0-1.06 0Z" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3">Clear Error Handling</h3>
+          <p class="text-gray-400">Understandable error messages to speed up debugging.</p>
+        </div>
+        <!-- Add more DX features like 'Excellent Documentation', 'TypeScript Support' etc. -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Key Features Section (Consider refining or replacing with more specific sections) -->
+  <div class="section-padding">
+    <div class="container mx-auto">
+      <h2 class="section-title gradient-text">Packed with <span class="text-white">Power</span></h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Feature Card Template */}
+        <div class="feature-card p-6">
+           <div class="feature-icon"> <!-- Example Icon -->
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-emerald-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3 gradient-text">High Performance</h3>
+          <p class="text-gray-400">Optimized core for maximum throughput and low latency.</p>
+        </div>
+        <div class="feature-card p-6">
+           <div class="feature-icon"> <!-- Example Icon -->
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75 17.25 12l-3 2.25m-4.5 0L7.5 12l3-2.25M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3 gradient-text">Type Safety</h3>
+          <p class="text-gray-400">First-class TypeScript/Python typing support for robust applications.</p>
+        </div>
+        <div class="feature-card p-6">
+           <div class="feature-icon"> <!-- Example Icon -->
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-yellow-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3 gradient-text">Data Validation</h3>
+          <p class="text-gray-400">Built-in or easily integrated data validation schemas.</p>
+        </div>
+        <div class="feature-card p-6">
+           <div class="feature-icon"> <!-- Example Icon -->
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6v11.25m10.5-11.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-7.5a2.25 2.25 0 0 1 2.25-2.25h.75" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3 gradient-text">Scalability</h3>
+          <p class="text-gray-400">Built to handle growth with a stateless and efficient design.</p>
+        </div>
+        <div class="feature-card p-6">
+           <div class="feature-icon"> <!-- Example Icon -->
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-indigo-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25A2.25 2.25 0 0 1 13.5 8.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3 gradient-text">Modularity</h3>
+          <p class="text-gray-400">Flexible architecture allowing easy customization and extension.</p>
+        </div>
+        <div class="feature-card p-6">
+           <div class="feature-icon"> <!-- Example Icon -->
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-pink-400">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+             </svg>
+           </div>
+          <h3 class="text-xl font-semibold mb-3 gradient-text">Extensibility</h3>
+          <p class="text-gray-400">Integrate easily with middleware, plugins, and other tools.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Spotlight Section -->
+  <div class="section-padding bg-gray-950"> {/* Keep alternating background */}
+    <div class="container mx-auto text-center">
+        <h2 class="section-title gradient-text">Engineered for <span class="text-white">Speed</span></h2>
+        <p class="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+            JetPath is meticulously optimized. We benchmark continuously to ensure top-tier performance, rivaling even low-level frameworks. Focus on features, not performance bottlenecks.
+        </p>
+        {/* Placeholder for a benchmark graphic or comparison */}
+        <div class="glassmorphism p-8 rounded-2xl max-w-2xl mx-auto border border-blue-500/30">
+            <p class="text-2xl font-semibold text-white mb-4">Hypothetical Benchmark</p>
+            <p class="text-gray-400">Requests per second on a standard benchmark:</p>
+            <div class="mt-4 text-left space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-lg font-medium text-emerald-400">JetPath</span>
+                    <span class="text-lg font-bold text-white">~XX,000 req/s</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 90%"></div>
+                </div>
+                 <div class="flex justify-between items-center mt-3">
+                    <span class="text-lg font-medium text-gray-400">Framework X</span>
+                    <span class="text-lg font-bold text-gray-400">~YY,000 req/s</span>
+                </div>
+                 <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div class="bg-gray-500 h-2.5 rounded-full" style="width: 60%"></div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-6">*Illustrative data. Actual benchmarks coming soon.</p>
+        </div>
+    </div>
+  </div>
+
+  <!-- Ecosystem Section (NEW) -->
+  <div class="section-padding">
+    <div class="container mx-auto text-center">
+        <h2 class="section-title gradient-text">Thriving <span class="text-white">Ecosystem</span></h2>
+        <p class="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+            JetPath plays well with others. Leverage a growing ecosystem of plugins, middleware, and community contributions to extend functionality.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glassmorphism p-6 rounded-xl border border-white/10">
+                <h3 class="text-xl font-semibold mb-3 text-emerald-400">Middleware</h3>
+                <p class="text-gray-400">Easily add custom logic or integrate existing middleware for authentication, logging, CORS, and more.</p>
+            </div>
+            <div class="glassmorphism p-6 rounded-xl border border-white/10">
+                <h3 class="text-xl font-semibold mb-3 text-blue-400">Plugins</h3>
+                <p class="text-gray-400">Extend core functionality with reusable plugins for common tasks like database integration or WebSocket handling.</p>
+            </div>
+            <div class="glassmorphism p-6 rounded-xl border border-white/10">
+                <h3 class="text-xl font-semibold mb-3 text-purple-400">Community Driven</h3>
+                <p class="text-gray-400">Contribute your own extensions or benefit from tools and integrations built by the JetPath community.</p>
+            </div>
+        </div>
+         <div class="mt-12">
+             <a href="#" /* Link to plugins/ecosystem page */
+               class="btn-secondary py-3 px-8 rounded-full shadow-lg">
+               Explore Integrations
+             </a>
+         </div>
+    </div>
+  </div>
+
+
+  <!-- Call to Action Section -->
+  <div class="section-padding bg-gradient-to-br from-gray-900 to-black">
+    <div class="container mx-auto text-center glassmorphism p-10 md:p-16 rounded-3xl max-w-4xl mx-auto">
+      <h2 class="text-4xl md:text-5xl font-extrabold mb-6 gradient-text">Ready to Build <span class="text-white">Faster</span>?</h2>
+      <p class="text-lg text-gray-300 mb-10 max-w-xl mx-auto">
+        Explore the documentation, check out the examples, and start your next project with the power and simplicity of JetPath today.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <a href="https://github.com/jetpath-org/jetpath" target="_blank" rel="noopener noreferrer"
+            class="btn-primary text-white py-3 px-8 rounded-full shadow-lg">
+            View on GitHub
+          </a>
+          <a href="#" /* Link to actual docs */
+            class="btn-secondary py-3 px-8 rounded-full shadow-lg">
+            Read the Docs
+          </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-12 px-6 text-center text-gray-500 text-sm border-t border-gray-800">
+    <p>&copy; 2024 JetPath. All rights reserved.</p>
+    <p class="mt-4">
+        <a href="https://github.com/jetpath-org/jetpath" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 mx-2 transition-colors">GitHub</a> |
+        <a href="#" class="hover:text-gray-300 mx-2 transition-colors">Discord</a> | {/* Add link if you have one */}
+        <a href="#" class="hover:text-gray-300 mx-2 transition-colors">Twitter</a>   {/* Add link if you have one */}
+    </p>
+  </footer>
+
+  {/* Basic Syntax Highlighting */}
+  <script>
+    // Very basic highlighting - consider a library like Prism.js or highlight.js
+    document.querySelectorAll('code[class^="language-"]').forEach(block => {
+      let html = block.innerHTML;
+      const lang = block.className.replace('language-', '');
+
+      // General patterns first
+      html = html.replace(/(\/\/.*)/g, '<span class="token comment">$1</span>'); // Single line comments (JS/TS)
+      html = html.replace(/(#.*)/g, '<span class="token comment">$1</span>'); // Comments (Python)
+      html = html.replace(/(\'[^\']*\')|(\"[^\"]*\")|(\`[^\`]*\`)/g, '<span class="token string">$1$2$3</span>'); // Strings
+      html = html.replace(/(\b\d+\b)/g, '<span class="token number">$1</span>'); // Numbers
+      html = html.replace(/(\{|\}|\(|\)|\[|\]|\.|;|,)/g, '<span class="token punctuation">$1</span>'); // Punctuation
+      html = html.replace(/(=|==|=>)/g, '<span class="token operator">$1</span>'); // Operators
+
+      // Language specific keywords and patterns
+      if (lang === 'python') {
+          html = html.replace(/\b(from|import|def|return|if|__name__|class|@)\b/g, '<span class="token keyword">$1</span>');
+          html = html.replace(/(@\w+\.\w+)/g, '<span class="token decorator">$1</span>'); // Decorators like @app.get
+          html = html.replace(/\b([A-Z][a-zA-Z0-9_]*)\b/g, '<span class="token class-name">$1</span>'); // Class names (simple)
+          html = html.replace(/(\w+)\(/g, (match, p1) => { // Function calls/defs
+              if (['def', 'class'].includes(p1)) return match; // Avoid highlighting def/class itself
+              return `<span class="token function">${p1}</span>(`;
+          });
+           html = html.replace(/\.(\w+)/g, '<span class="token method">$1</span>'); // Methods like .run, .get
+      }
+      else if (lang === 'typescript' || lang === 'javascript') {
+          html = html.replace(/\b(import|from|export|const|let|var|new|return|if|else|class|extends|async|await|function)\b/g, '<span class="token keyword">$1</span>');
+           html = html.replace(/\b([A-Z][a-zA-Z0-9_]*)\b/g, '<span class="token class-name">$1</span>'); // Class names (simple)
+           html = html.replace(/(\w+)\(/g, (match, p1) => { // Function calls/defs
+              if (['new', 'function', 'if', 'for', 'while', 'switch'].includes(p1)) return match; // Avoid highlighting keywords
+              return `<span class="token function">${p1}</span>(`;
+          });
+          html = html.replace(/\.(\w+)/g, '<span class="token method">$1</span>'); // Methods like .log, .get, .listen
+          html = html.replace(/(\w+):/g, '<span class="token parameter">$1</span>:'); // Parameters/Object keys (simple)
+      }
+
+      // Apply changes
+      block.innerHTML = html;
+    });
+  </script>
+
+</body>
+</html>

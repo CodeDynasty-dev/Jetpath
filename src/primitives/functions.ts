@@ -432,17 +432,18 @@ export async function getHandlers(
   errorsCount: { file: string; error: string }[] | undefined = undefined,
   again = false,
 ) {
+  const curr_d = cwd();
   let error_source = source;
   source = source || "";
   if (!again) {
-    source = path.resolve(path.join(cwd(), source));
-    if (!source.includes(cwd())) {
+    source = path.resolve(path.join(curr_d, source));
+    if (!source.includes(curr_d)) {
       Log.warn('source: "' + error_source + '" is invalid');
       Log.error("Jetpath source must be within the project directory");
       process.exit(1);
     }
   } else {
-    source = path.resolve(cwd(), source);
+    source = path.resolve(curr_d, source);
   }
   const dir = await opendir(source);
   for await (const dirent of dir) {
@@ -450,8 +451,8 @@ export async function getHandlers(
       dirent.isFile() &&
       (dirent.name.endsWith(".jet.js") || dirent.name.endsWith(".jet.ts"))
     ) {
-      if (print) {
-        Log.info("Loading routes at " + source + "/" + dirent.name);
+      if (print) { 
+        Log.info("Loading routes at ." + source.replace(curr_d, "") + "/" + dirent.name);
       }
       try {
         const module = await getModule(source, dirent.name);
