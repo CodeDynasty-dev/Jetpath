@@ -90,31 +90,71 @@ export class JetPath {
       // ? render API in UI
       if (this.options?.APIdisplay === "UI") {
         UI = compileUI(UI, this.options, compiledAPI);
-        const name = (this.options?.apiDoc?.path || "/api-doc") + "?";
-        _JetPath_paths["GET"].query[name] = (
+        const name = this.options?.apiDoc?.path || "/api-doc";
+        _JetPath_paths["GET"].direct[name] = (
           ctx,
         ) => {
-          if (
-            this.options?.apiDoc?.password || this.options?.apiDoc?.username
-          ) {
-            if (
-              // @ts-expect-error
-              ctx.query?.password !== this.options?.apiDoc?.password ||
-              // @ts-expect-error
-              ctx.query?.username !== this.options?.apiDoc?.username
-            ) {
+          if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
+            const authHeader = ctx.get("authorization");
+            if (authHeader && authHeader.startsWith("Basic ")) {
+              const [authType, encodedCreds] = authHeader.trim().split(" ");
+              if (authType !== "Basic" || !encodedCreds) {
+                ctx.code = 401;
+                ctx.set(
+                  "WWW-Authenticate",
+                  `Basic realm=Jetpath API Doc`,
+                );
+                ctx.send(
+                  `<h1>401 Unauthorized</h1>`,
+                  "text/html",
+                );
+                return;
+              }
+              let username, password;
+              try {
+                const decodedCreds = Buffer.from(encodedCreds, "base64")
+                  .toString(
+                    "utf8",
+                  );
+                [username, password] = decodedCreds.split(":");
+              } catch (error) {
+                ctx.code = 401;
+                ctx.set(
+                  "WWW-Authenticate",
+                  `Basic realm=Jetpath API Doc`,
+                );
+                ctx.send(
+                  `<h1>401 Unauthorized</h1>`,
+                  "text/html",
+                );
+                return;
+              }
+              if (
+                password === this.options?.apiDoc?.password ||
+                username === this.options?.apiDoc?.username
+              ) {
+                ctx.send(UI, "text/html");
+                return;
+              }
+            } else {
               ctx.code = 401;
+              ctx.set(
+                "WWW-Authenticate",
+                `Basic realm=Jetpath API Doc`,
+              );
               ctx.send(
                 `<h1>401 Unauthorized</h1>`,
                 "text/html",
               );
               return;
             }
+          } else {
+            ctx.send(UI, "text/html");
+            return;
           }
-          ctx.send(UI, "text/html");
         };
-        _JetPath_paths["GET"].query[name].method = "GET";
-        _JetPath_paths["GET"].query[name].path = name;
+        _JetPath_paths["GET"].direct[name].method = "GET";
+        _JetPath_paths["GET"].direct[name].path = name;
         Log.info(
           `✅ Processed routes ${handlersCount} handlers in ${
             Math.round(
@@ -125,8 +165,6 @@ export class JetPath {
         Log.success(
           `visit http://localhost:${this.options.port}${
             this.options?.apiDoc?.path || "/api-doc"
-          }?${this.options.apiDoc?.username ? "username=username&" : ""}${
-            this.options.apiDoc?.password ? "password=password" : ""
           } to see the displayed routes in UI`,
         );
       }
