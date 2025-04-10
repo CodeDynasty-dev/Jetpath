@@ -253,7 +253,7 @@ export const GET_app$id: JetFunc<{ params: { id: string } }> = (ctx) =>
 
 //  for deno
 export const WS_sockets: JetFunc = (ctx) => {
-  const socket = ctx.socket;
+  const socket = ctx.socket!;
   console.log(socket);
   socket.addEventListener("open", () => {
     console.log("a client connected!");

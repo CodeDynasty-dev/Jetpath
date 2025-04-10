@@ -32,6 +32,10 @@ export interface ContextType<
    */
   params: JetData["params"];
   /**
+   * websocket socket event class
+   */
+  socket: jet_socket;
+  /**
    * remove request control from the request
    */
   eject(): never;
@@ -230,3 +234,10 @@ export type JetFunc<
   path?: string;
   jet_middleware?: JetMiddleware[];
 };
+
+ interface jet_socket {
+  addEventListener(
+    event: "message" | "close" | "drain" | "open",
+    listener: (...params: any[]) => void,
+  ): void;
+}

@@ -789,7 +789,7 @@ const URL_PARSER = (
         if (ctx.get("upgrade") != "websocket") {
           ctx.throw();
         }
-        if (!UTILS.runtime["deno"]) {
+        if (UTILS.runtime["deno"]) {
           // @ts-expect-error
           const { socket, response } = Deno.upgradeWebSocket(req);
           // @ts-expect-error
@@ -808,8 +808,10 @@ const URL_PARSER = (
           socket.addEventListener("close", (...p) => {
             JetSocketInstance.__binder("close", p);
           });
+          _JetPath_WS_HANDLER(ctx);
           ctx.sendResponse(response);
         }
+        _JetPath_WS_HANDLER(ctx);
         ctx.sendResponse(undefined);
       },
       {},
