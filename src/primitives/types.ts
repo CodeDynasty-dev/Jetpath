@@ -1,6 +1,6 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths } from "./functions.js";
-import type { Context, JetPlugin } from "./classes.js";
+import type {  JetPlugin } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,

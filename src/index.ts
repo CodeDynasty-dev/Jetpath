@@ -12,7 +12,7 @@ import {
   isIdentical,
   UTILS,
 } from "./primitives/functions.js";
-import { JetPluginExecutor, JetPluginExecutorInitParams, type jetOptions } from "./primitives/types.js";
+import {  type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
 import path from "node:path";
 
