@@ -8,3 +8,4 @@ api-doc.http
 dist
 ./dist
 .vscode
+official-plugins/jetbusboy
