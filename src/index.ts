@@ -9,9 +9,10 @@ import {
   compileUI,
   corsMiddleware,
   getHandlers,
+  isIdentical,
   UTILS,
 } from "./primitives/functions.js";
-import { type jetOptions } from "./primitives/types.js";
+import { JetPluginExecutor, JetPluginExecutorInitParams, type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
 import path from "node:path";
 
@@ -36,11 +37,15 @@ export class JetPath {
       });
     }
   }
-  use(plugin: JetPlugin): void {
+  use(plugin: {
+    _setup: (init: any) => any;
+    hasServer?: boolean;
+    executor: any
+  }): void {
     if (this.listening) {
       throw new Error("Your app is listening new plugins can't be added.");
     }
-    if (plugin instanceof JetPlugin) {
+    if (isIdentical(plugin, new JetPlugin({executor:()=>{return {}}}))) {
       this.plugs.push(plugin);
     } else {
       throw Error("invalid Jetpath plugin");

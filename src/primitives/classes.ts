@@ -9,7 +9,7 @@ import type {
 } from "./types.js";
 import { BunFile } from "bun";
 
-export class JetPlugin { 
+export class JetPlugin {
   JetPathServer?: any;
   hasServer?: boolean;
   executor: JetPluginExecutor;
@@ -79,7 +79,7 @@ export class Context {
   body: Record<string, any> | undefined;
   path: string | undefined;
   connection?: JetSocket;
-  plugins= {};
+  plugins = {};
   // ?
   app: Record<string, any> = {};
   //? load
@@ -100,16 +100,14 @@ export class Context {
     req: Request,
     path: string,
     params?: Record<string, any>,
-    query?: Record<string, any>,
-    plugins?: Record<string, any>,
+    query?: Record<string, any>, 
   ) {
     this.request = req;
     this.method = req.method as "GET";
     this.params = params || {};
     this.query = query || {};
     this.path = path;
-    this.body = undefined;
-    this.plugins = plugins||{};
+    this.body = undefined; 
     //? load
     this._1 = undefined;
     // ? header of response

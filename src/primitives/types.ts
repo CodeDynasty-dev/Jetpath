@@ -214,13 +214,20 @@ export type HTTPBody<Obj extends Record<string, any>> = {
   };
 };
 
-export type JetMiddleware = (
-  ctx: Context,
+export type JetMiddleware<
+  JetData extends {
+    body?: Record<string, any>;
+    params?: Record<string, any>;
+    query?: Record<string, any>;
+  } = { body: {}; params: {}; query: {} },
+  JetPluginTypes extends Record<string, unknown>[] = [],
+>  = (
+  ctx: ContextType<JetData, JetPluginTypes>,
 ) =>
   | Promise<void>
   | void
-  | Promise<(ctx: Context, error: unknown) => Promise<any> | any>
-  | ((ctx: Context, error: unknown) => Promise<any> | any);
+  | Promise<(ctx: ContextType<JetData, JetPluginTypes>, error: unknown) => Promise<any> | any>
+  | ((ctx: ContextType<JetData, JetPluginTypes>, error: unknown) => Promise<any> | any);
 
 export type JetFunc<
   JetData extends {

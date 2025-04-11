@@ -4,10 +4,12 @@ import {
   JetPath,
   JetPlugin,
 } from "../dist/index.js";
-import { jetbusboy, type jetBusBoyType } from "../official-plugins/jetbusboy/index.js";
- 
- 
- const app = new JetPath({
+import {
+  jetbusboy,
+  type jetBusBoyType,
+} from "../official-plugins/jetbusboy/index.js";
+
+const app = new JetPath({
   apiDoc: {
     name: "PetShop API",
     info: `
@@ -36,15 +38,16 @@ const pluginExample = new JetPlugin({
       },
     };
   },
-});
-
+}); 
 app.use(pluginExample);
 app.use(jetbusboy);
 
 app.listen();
 
 // ? middleware for all routes after /
-export const MIDDLEWARE_: JetMiddleware = () => {
+export const MIDDLEWARE_: JetMiddleware<{}, [jetBusBoyType]> = (ctx) => {
+  console.log(ctx.plugins.formdata);
+  
   // pre handler
   return (ctx, err) => {
     // post handler
@@ -246,7 +249,7 @@ POST_.body = {
     },
   },
 };
-  
+
 //  for deno and bun only
 export const WS_sockets: JetFunc = (ctx) => {
   const conn = ctx.connection!;
@@ -255,7 +258,7 @@ export const WS_sockets: JetFunc = (ctx) => {
       console.log("a client connected!");
       socket.send("😎 Welcome to jet chat");
     });
-    conn.addEventListener("message", (socket,event) => {
+    conn.addEventListener("message", (socket, event) => {
       if (event.data === "ping") {
         socket.send("pong");
       } else {
@@ -263,27 +266,24 @@ export const WS_sockets: JetFunc = (ctx) => {
       }
     });
   } catch (error) {
-   console.log(error); 
+    console.log(error);
   }
 };
 
-
-
-
 // in your uploader.jet.js
 
-export const  POST_upload: JetFunc<{},[jetBusBoyType]> = async (ctx) => {
+export const POST_upload: JetFunc<{}, [jetBusBoyType]> = async (ctx) => {
   const form = await ctx.app.formData(ctx);
   console.log(form);
   if (form.image) {
     await form.image.saveTo(form.image.filename);
   }
   ctx.send(form);
-}
+};
 
 // body validation and definition
 POST_upload.body = {
-    image: { type: "file", inputType: "file" },
-    video: { type: "file", inputType: "file" },
-    textfield: { type: "string" },
+  image: { type: "file", inputType: "file" },
+  video: { type: "file", inputType: "file" },
+  textfield: { type: "string" },
 };

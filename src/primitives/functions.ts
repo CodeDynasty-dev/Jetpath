@@ -318,16 +318,16 @@ const createCTX = (
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
-    ctx._7(req as Request, path, params, query, UTILS.middlewares);
+    ctx._7(req as Request, path, params, query );
     if (socket) {
       ctx.connection = JetSocketInstance;
     }
     return ctx;
   }
   const ctx = new Context();
-  // ? add middlewares to the app object
-  Object.assign(ctx.app, UTILS.middlewares);
-  ctx._7(req as Request, path, params, query, UTILS.middlewares);
+  // ? add middlewares to the plugins object
+  Object.assign(ctx.plugins, UTILS.middlewares);
+  ctx._7(req as Request, path, params, query);
   if (socket) {
     ctx.connection = JetSocketInstance;
   }
@@ -409,7 +409,7 @@ const JetPath = async (
     try {
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
-        ? await Promise.all(r.jet_middleware.map((m) => m(ctx)))
+        ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
         : undefined;
       //? route handler call
       await r(ctx as any);
@@ -784,13 +784,13 @@ const URL_PARSER = (
 
       return [routes.parameter[pathR], params, {}, pathR, false];
     }
-  }  
-  
+  }
+
   // @ts-expect-error
   const conn = req.headers?.["connection"] || req.headers?.get?.("connection");
   if (conn.includes("Upgrade") && _JetPath_WS_HANDLER) {
     return [
-      (ctx) => { 
+      (ctx) => {
         if (ctx.get("upgrade") != "websocket") {
           ctx.throw();
         }
@@ -799,20 +799,20 @@ const URL_PARSER = (
           const { socket, response } = Deno.upgradeWebSocket(req);
           // @ts-expect-error
           socket.addEventListener("open", (...p) => {
-            JetSocketInstance.__binder("open", [socket,...p]);
+            JetSocketInstance.__binder("open", [socket, ...p]);
           });
           // @ts-expect-error
           socket.addEventListener("message", (...p) => {
-            JetSocketInstance.__binder("message", [socket,...p]);
+            JetSocketInstance.__binder("message", [socket, ...p]);
           });
           // @ts-expect-error
           socket.addEventListener("drain", (...p) => {
-            JetSocketInstance.__binder("drain", [socket,...p]);
+            JetSocketInstance.__binder("drain", [socket, ...p]);
           });
           // @ts-expect-error
           socket.addEventListener("close", (...p) => {
-            JetSocketInstance.__binder("close", [socket,...p]);
-          }); 
+            JetSocketInstance.__binder("close", [socket, ...p]);
+          });
           _JetPath_WS_HANDLER(ctx);
           ctx.sendResponse(response);
         }
@@ -1003,4 +1003,88 @@ export function assignMiddleware(
       }
     }
   }
+}
+
+export function isIdentical<T extends object, U extends object>(
+  instanceA: T | null | undefined,
+  instanceB: U | null | undefined,
+): boolean {
+  if (!instanceA || !instanceB) {
+    return false;
+  }
+  const ownKeysA = Object.getOwnPropertyNames(instanceA);
+  const ownKeysB = Object.getOwnPropertyNames(instanceB);
+  if (ownKeysA.length !== ownKeysB.length) {
+    return false;
+  }
+  ownKeysA.sort();
+  ownKeysB.sort();
+  for (let i = 0; i < ownKeysA.length; i++) {
+    if (ownKeysA[i] !== ownKeysB[i]) {
+      return false;
+    }
+    if (!Object.prototype.hasOwnProperty.call(instanceB, ownKeysA[i])) {
+      return false;
+    }
+  }
+  const protoA = Object.getPrototypeOf(instanceA);
+  const protoB = Object.getPrototypeOf(instanceB);
+  if (protoA === protoB) {
+  } else if (
+    !protoA || !protoB || protoA === Object.prototype ||
+    protoB === Object.prototype
+  ) {
+    if (
+      (protoA && protoA !== Object.prototype) !==
+        (protoB && protoB !== Object.prototype)
+    ) {
+      return false;
+    }
+  } else {
+    const protoKeysA = Object.getOwnPropertyNames(protoA);
+    const protoKeysB = Object.getOwnPropertyNames(protoB);
+    // Filter out constructor as it's handled separately
+    const filteredProtoKeysA = protoKeysA.filter((k) => k !== "constructor")
+      .sort();
+    const filteredProtoKeysB = protoKeysB.filter((k) => k !== "constructor")
+      .sort();
+    if (filteredProtoKeysA.length !== filteredProtoKeysB.length) {
+      return false;
+    }
+    for (let i = 0; i < filteredProtoKeysA.length; i++) {
+      if (filteredProtoKeysA[i] !== filteredProtoKeysB[i]) {
+        return false;
+      }
+      const descriptorA = Object.getOwnPropertyDescriptor(
+        protoA,
+        filteredProtoKeysA[i],
+      );
+      const descriptorB = Object.getOwnPropertyDescriptor(
+        protoB,
+        filteredProtoKeysB[i],
+      );
+      const valA = descriptorA?.value;
+      const valB = descriptorB?.value;
+      if (typeof valA === "function" && typeof valB === "function") {
+        if (valA.length !== valB.length) {
+          return false;
+        }
+      } else if (typeof valA !== typeof valB) {
+        return false;
+      }
+    }
+  }
+
+  if (instanceA.constructor && instanceB.constructor) {
+    if (instanceA.constructor.length !== instanceB.constructor.length) {
+      return false;
+    }
+  } else if (instanceA.constructor !== instanceB.constructor) {
+    console.error(
+      `Shape mismatch: One instance lacks a constructor while the other has one.`,
+    );
+    return false;
+  }
+
+  return true;
 }
