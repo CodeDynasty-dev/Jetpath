@@ -219,17 +219,24 @@ export const UTILS = {
               // @ts-expect-error
               fetch: JetPath,
               websocket: {
-                sendPings: false,
                 message(...p) {
+                  JetSocketInstance.__ws = p.shift() as any;
+                  // @ts-expect-error
+                  p[0] = {
+                    data: p[0],
+                  };
                   JetSocketInstance.__binder("message", p);
                 },
                 close(...p) {
-                  JetSocketInstance.__binder("close", p);
+                  JetSocketInstance.__ws = p.shift() as any;
+                  JetSocketInstance.__binder("close", p.slice(1));
                 },
                 drain(...p) {
+                  JetSocketInstance.__ws = p.shift() as any;
                   JetSocketInstance.__binder("drain", p);
                 },
                 open(...p) {
+                  JetSocketInstance.__ws = p.shift() as any;
                   JetSocketInstance.__binder("open", p);
                 },
               },
@@ -396,7 +403,7 @@ const JetPath = async (
     req: IncomingMessage;
   },
 ) => {
-  const parsedR = URL_PARSER(req as any);
+  const parsedR = URL_PARSER(req as any, res);
   let off = false;
   let ctx: Context;
   let returned: (Function | void)[] | undefined;
@@ -705,6 +712,9 @@ parse wildcard
  */
 const URL_PARSER = (
   req: { method: methods; url: string; headers: Record<string, string> },
+  res?: ServerResponse<IncomingMessage> & {
+    req: IncomingMessage;
+  },
 ):
   | [JetFunc, Record<string, any>, Record<string, any>, string, boolean]
   | undefined => {
@@ -792,6 +802,7 @@ const URL_PARSER = (
         if (UTILS.runtime["deno"]) {
           // @ts-expect-error
           const { socket, response } = Deno.upgradeWebSocket(req);
+          JetSocketInstance.__ws = socket;
           // @ts-expect-error
           socket.addEventListener("open", (...p) => {
             JetSocketInstance.__binder("open", p);
@@ -811,8 +822,12 @@ const URL_PARSER = (
           _JetPath_WS_HANDLER(ctx);
           ctx.sendResponse(response);
         }
-        _JetPath_WS_HANDLER(ctx);
-        ctx.sendResponse(undefined);
+        // @ts-expect-error
+        if (res?.upgrade?.(req)) {
+          _JetPath_WS_HANDLER(ctx);
+          ctx.sendResponse(undefined);
+        }
+        ctx.throw(400);
       },
       {},
       {},

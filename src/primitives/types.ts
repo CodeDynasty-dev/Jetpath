@@ -235,9 +235,11 @@ export type JetFunc<
   jet_middleware?: JetMiddleware[];
 };
 
- interface jet_socket {
+interface jet_socket {
   addEventListener(
     event: "message" | "close" | "drain" | "open",
     listener: (...params: any[]) => void,
   ): void;
+  send(data: any): void;
+  close(code?: number, reason?: string): void;
 }

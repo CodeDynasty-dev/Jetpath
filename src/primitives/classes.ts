@@ -307,6 +307,10 @@ export class Context {
 
 export class JetSocket {
   private listeners = { "message": [], "close": [], "drain": [], "open": [] };
+  /**
+   * @internal
+   */
+  __ws?: WebSocket;
   addEventListener(
     event: "message" | "close" | "drain" | "open",
     listener: (...param: any[]) => void,
@@ -317,10 +321,20 @@ export class JetSocket {
     this.listeners[event].push(listener as never);
   }
 
+  send(data: any) {
+    this.__ws?.send(data);
+  }
+
+  close(code?: number, reason?: string) {
+    this.__ws?.close(code, reason);
+  }
+  /**
+   * @internal
+   */
   __binder(eventName: "message" | "close" | "drain" | "open", data: any) {
     if (this.listeners[eventName]) {
       this.listeners[eventName].forEach((listener: any) => {
-        listener(data);
+        listener(...data);
       });
     }
   }

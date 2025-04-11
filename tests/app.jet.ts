@@ -40,7 +40,6 @@ app.use(pluginExample);
 
 app.listen();
 
-
 // ? middleware for all routes after /
 export const MIDDLEWARE_: JetMiddleware = () => {
   // pre handler
@@ -52,7 +51,6 @@ export const MIDDLEWARE_: JetMiddleware = () => {
     }
   };
 };
-
 
 // ? types
 type PetType = {
@@ -144,7 +142,7 @@ export const PUT_petBy$id: JetFunc<{ params: { id: string }; body: PetType }> =
     console.log(updatedPetData);
 
     const petId = ctx.params.id;
-      
+
     console.log({ updatedPetData, petId });
     const index = pets.findIndex((p) => p.id === petId);
     if (index !== -1) {
@@ -217,7 +215,6 @@ POST_petImage$id.body = {
   age: {},
 };
 
-
 export const GET_error: JetFunc = async function (_ctx) {
   throw new Error("boohoo");
 };
@@ -246,24 +243,25 @@ POST_.body = {
     },
   },
 };
-
-export const GET_app$id: JetFunc<{ params: { id: string } }> = (ctx) =>
-  ctx.redirect("uplify://audio?id=" + ctx.params.id);
-
-
+  
 //  for deno
 export const WS_sockets: JetFunc = (ctx) => {
   const socket = ctx.socket!;
-  console.log(socket);
-  socket.addEventListener("open", () => {
-    console.log("a client connected!");
-  });
-  socket.addEventListener("message", (event) => {
-    if (event.data === "ping") {
-      socket.send("pong");
-    } else {
-      socket.send("all your "+ event.data +"  are belong to us!");
-    }
-  }); 
+  try {
+    
+    socket.addEventListener("open", () => {
+      console.log("a client connected!");
+      socket.send("😎 Welcome to jet chat");
+    });
+    socket.addEventListener("message", (event) => {
+      if (event.data === "ping") {
+        socket.send("pong");
+      } else {
+        socket.send("all your " + event.data + "  are belong to us!");
+      }
+    });
+  } catch (error) {
+   console.log(error);
+    
+  }
 };
- 

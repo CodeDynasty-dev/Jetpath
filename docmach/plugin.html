@@ -1,0 +1,23 @@
+<h2>jetpath plugins</h2>
+<p>Jetpath plugins are a way to extend the functionalities of Jetpath.
+They can be used to add new features to Jetpath or to modify existing ones.</p>
+<p>Plugins can be used to add new routes, middleware, or to modify the request
+and response objects or even convert to serverless runtime.</p>
+<h3>Creating a plugin</h3>
+<pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPlugin</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> plugin = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPlugin</span>{
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;plugin&quot;</span>,
+  <span class="hljs-attr">version</span>: <span class="hljs-string">&quot;1.0.0&quot;</span>,
+  <span class="hljs-title function_">executor</span>(<span class="hljs-params">{ config }</span>) {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-title function_">greet_world</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">return</span> {
+          <span class="hljs-attr">body</span>: <span class="hljs-string">&quot;Hello world&quot;</span>,
+        };
+      },
+    };
+  },
+});
+
+</code></pre>

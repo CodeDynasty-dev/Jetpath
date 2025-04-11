@@ -47,8 +47,6 @@ export class JetPath {
     }
   }
   async listen(): Promise<void> {
-    // ? kickoff server
-    this.server = UTILS.server(this.plugs);
     // ? {-view-} here is replaced at build time to html
     let UI = `{{view}}`; //! could be loaded only when needed
     // ? setting up static server
@@ -206,6 +204,9 @@ export class JetPath {
         }
       }
     }
+    // ? kickoff server
+    this.server = UTILS.server(this.plugs);
+    //
     assignMiddleware(_JetPath_paths, _jet_middleware);
     Log.success(`🔥 Listening on http://localhost:${this.options.port}`);
     // ? start server
