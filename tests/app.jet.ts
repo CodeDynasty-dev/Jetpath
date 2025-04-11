@@ -4,8 +4,10 @@ import {
   JetPath,
   JetPlugin,
 } from "../dist/index.js";
-
-const app = new JetPath({
+import { jetbusboy, type jetBusBoyType } from "../official-plugins/jetbusboy/index.js";
+ 
+ 
+ const app = new JetPath({
   apiDoc: {
     name: "PetShop API",
     info: `
@@ -37,6 +39,7 @@ const pluginExample = new JetPlugin({
 });
 
 app.use(pluginExample);
+app.use(jetbusboy);
 
 app.listen();
 
@@ -262,4 +265,25 @@ export const WS_sockets: JetFunc = (ctx) => {
   } catch (error) {
    console.log(error); 
   }
+};
+
+
+
+
+// in your uploader.jet.js
+
+export const  POST_upload: JetFunc<{},[jetBusBoyType]> = async (ctx) => {
+  const form = await ctx.app.formData(ctx);
+  console.log(form);
+  if (form.image) {
+    await form.image.saveTo(form.image.filename);
+  }
+  ctx.send(form);
+}
+
+// body validation and definition
+POST_upload.body = {
+    image: { type: "file", inputType: "file" },
+    video: { type: "file", inputType: "file" },
+    textfield: { type: "string" },
 };
