@@ -318,7 +318,7 @@ const createCTX = (
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
-    ctx._7(req as Request, path, params, query);
+    ctx._7(req as Request, path, params, query, UTILS.middlewares);
     if (socket) {
       ctx.connection = JetSocketInstance;
     }
@@ -327,7 +327,7 @@ const createCTX = (
   const ctx = new Context();
   // ? add middlewares to the app object
   Object.assign(ctx.app, UTILS.middlewares);
-  ctx._7(req as Request, path, params, query);
+  ctx._7(req as Request, path, params, query, UTILS.middlewares);
   if (socket) {
     ctx.connection = JetSocketInstance;
   }

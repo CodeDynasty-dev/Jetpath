@@ -18,7 +18,11 @@ export interface ContextType<
   /**
    * an object you can set values to per request
    */
-  app: UnionToIntersection<JetPluginTypes[number]> & Record<string, any>;
+  app: {};
+  /**
+   * an object you can set values to per request
+   */
+  plugins: UnionToIntersection<JetPluginTypes[number]> & Record<string, any>;
   /**
    * get body params after /?
    */
