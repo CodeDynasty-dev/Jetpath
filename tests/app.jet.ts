@@ -16,7 +16,7 @@ const app = new JetPath({
     username: "admin",
     password: "1234",
   },
-  source: ".",
+  source: "./tests",
   APIdisplay: "UI",
   // APIdisplay: "HTTP",
   static: { dir: "./tests", route: "/" },
@@ -244,16 +244,15 @@ POST_.body = {
   },
 };
   
-//  for deno
+//  for deno and bun only
 export const WS_sockets: JetFunc = (ctx) => {
-  const socket = ctx.socket!;
+  const conn = ctx.connection!;
   try {
-    
-    socket.addEventListener("open", () => {
+    conn.addEventListener("open", (socket) => {
       console.log("a client connected!");
       socket.send("😎 Welcome to jet chat");
     });
-    socket.addEventListener("message", (event) => {
+    conn.addEventListener("message", (socket,event) => {
       if (event.data === "ping") {
         socket.send("pong");
       } else {
@@ -261,7 +260,6 @@ export const WS_sockets: JetFunc = (ctx) => {
       }
     });
   } catch (error) {
-   console.log(error);
-    
+   console.log(error); 
   }
 };

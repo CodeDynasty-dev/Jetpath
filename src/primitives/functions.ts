@@ -220,23 +220,19 @@ export const UTILS = {
               fetch: JetPath,
               websocket: {
                 message(...p) {
-                  JetSocketInstance.__ws = p.shift() as any;
-                  // @ts-expect-error
-                  p[0] = {
-                    data: p[0],
+                  p[1] = {
+                    // @ts-expect-error
+                    data: p[1],
                   };
                   JetSocketInstance.__binder("message", p);
                 },
                 close(...p) {
-                  JetSocketInstance.__ws = p.shift() as any;
                   JetSocketInstance.__binder("close", p.slice(1));
                 },
                 drain(...p) {
-                  JetSocketInstance.__ws = p.shift() as any;
                   JetSocketInstance.__binder("drain", p);
                 },
                 open(...p) {
-                  JetSocketInstance.__ws = p.shift() as any;
                   JetSocketInstance.__binder("open", p);
                 },
               },
@@ -324,7 +320,7 @@ const createCTX = (
     const ctx = UTILS.ctxPool.shift()!;
     ctx._7(req as Request, path, params, query);
     if (socket) {
-      ctx.socket = JetSocketInstance;
+      ctx.connection = JetSocketInstance;
     }
     return ctx;
   }
@@ -333,7 +329,7 @@ const createCTX = (
   Object.assign(ctx.app, UTILS.middlewares);
   ctx._7(req as Request, path, params, query);
   if (socket) {
-    ctx.socket = JetSocketInstance;
+    ctx.connection = JetSocketInstance;
   }
   return ctx;
 };
@@ -788,37 +784,35 @@ const URL_PARSER = (
 
       return [routes.parameter[pathR], params, {}, pathR, false];
     }
-  }
-
+  }  
+  
   // @ts-expect-error
   const conn = req.headers?.["connection"] || req.headers?.get?.("connection");
-  // @ts-ignore
-  if (conn === "Upgrade" && _JetPath_WS_HANDLER) {
+  if (conn.includes("Upgrade") && _JetPath_WS_HANDLER) {
     return [
-      (ctx) => {
+      (ctx) => { 
         if (ctx.get("upgrade") != "websocket") {
           ctx.throw();
         }
         if (UTILS.runtime["deno"]) {
           // @ts-expect-error
           const { socket, response } = Deno.upgradeWebSocket(req);
-          JetSocketInstance.__ws = socket;
           // @ts-expect-error
           socket.addEventListener("open", (...p) => {
-            JetSocketInstance.__binder("open", p);
+            JetSocketInstance.__binder("open", [socket,...p]);
           });
           // @ts-expect-error
           socket.addEventListener("message", (...p) => {
-            JetSocketInstance.__binder("message", p);
+            JetSocketInstance.__binder("message", [socket,...p]);
           });
           // @ts-expect-error
           socket.addEventListener("drain", (...p) => {
-            JetSocketInstance.__binder("drain", p);
+            JetSocketInstance.__binder("drain", [socket,...p]);
           });
           // @ts-expect-error
           socket.addEventListener("close", (...p) => {
-            JetSocketInstance.__binder("close", p);
-          });
+            JetSocketInstance.__binder("close", [socket,...p]);
+          }); 
           _JetPath_WS_HANDLER(ctx);
           ctx.sendResponse(response);
         }

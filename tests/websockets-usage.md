@@ -1,5 +1,32 @@
-uploading files with JetPath
+# Using websockets in jetpath 
 
+## Deno & Bunjs
+
+```js
+// usage go to ws://localhost:8000/sockets
+
+//  for deno and bun only
+export const WS_sockets: JetFunc = (ctx) => {
+  const conn = ctx.connection!;
+  try {
+    conn.addEventListener("open", (socket) => {
+      console.log("a client connected!");
+      socket.send("😎 Welcome to jet chat");
+    });
+    conn.addEventListener("message", (socket,event) => {
+      if (event.data === "ping") {
+        socket.send("pong");
+      } else {
+        socket.send("all your " + event.data + "  are belong to us!");
+      }
+    });
+  } catch (error) {
+   console.log(error); 
+  }
+};
+
+```
+ 
 ## Node
 
 ```js
@@ -23,47 +50,3 @@ server.listen(port, () => {
 
 //? listen for server upgrade via ctx.request
 ```
-
-## Bun
-
-```js
-// usage
-export const POST_websocket = (ctx) => {
-  // upgrade the request to a WebSocket
-  if (app.server.upgrade(req)) {
-    return; // do not return a Response
-  }
-  return    {
-    //? https://bun.sh/docs/api/websockets
-    message(ws, message) {}, // a message is received
-    open(ws) {}, // a socket is opened
-    close(ws, code, message) {}, // a socket is closed
-    drain(ws) {}, // the socket is ready to receive more data
-  },
-}
-```
-
-## Deno
-
-```js
-// usage go to ws://localhost:8000/sockets
-
-export const WS_sockets: JetFunc = (ctx) => {
-  const req = ctx.request;
-  if (req.headers.get("upgrade") != "websocket") {
-    ctx.send("failed!");
-  } 
-  const { socket, response } = Deno.upgradeWebSocket(req);
-  socket.addEventListener("open", () => {
-    console.log("a client connected!");
-  });
-  socket.addEventListener("message", (event) => {
-    if (event.data === "ping") {
-      socket.send("pong");
-    }
-  });
-  ctx.sendResponse(response);
-};
-
-```
- 

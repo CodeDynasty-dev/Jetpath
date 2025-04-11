@@ -274,7 +274,7 @@
     </div>
 
     <script>
-        const wsUri = "ws://localhost:3000/sockets"; let ws;
+        const wsUri = "ws://localhost:9000/sockets"; let ws;
         const messagesDiv = document.getElementById("messages");
         const messageInput = document.getElementById("messageInput");
         const sendButton = document.getElementById("sendButton");
@@ -283,6 +283,7 @@
         const statusIndicator = document.getElementById("statusIndicator");
         const statusText = document.getElementById("statusText");
         const emojis = ['😀', '😂', '😍', '🤔', '😎', '😭', '👍', '👎', '❤️', '🔥', '🎉', '🚀', '💡', '✨', '👋', '🙏'];
+        let isReconnecting = false;
 
         function initWebSocket() {
             console.log("Attempting to connect to WebSocket...");
@@ -313,11 +314,15 @@
         }
 
         function reconnect() {
+            if (isReconnecting) return;
+            isReconnecting = true;
             setTimeout(() => {
                 console.log("Attempting to reconnect...");
                 initWebSocket();
+                isReconnecting = false;
             }, 2000);
             };
+
 
         function updateStatus(statusClass, text) {
             statusIndicator.className = `status-indicator ${statusClass}`;

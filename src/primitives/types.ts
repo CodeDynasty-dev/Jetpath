@@ -34,7 +34,7 @@ export interface ContextType<
   /**
    * websocket socket event class
    */
-  socket: jet_socket;
+  connection: jet_socket;
   /**
    * remove request control from the request
    */
@@ -238,8 +238,6 @@ export type JetFunc<
 interface jet_socket {
   addEventListener(
     event: "message" | "close" | "drain" | "open",
-    listener: (...params: any[]) => void,
+    listener: (socket: WebSocket, ...params: any[]) => void,
   ): void;
-  send(data: any): void;
-  close(code?: number, reason?: string): void;
 }
