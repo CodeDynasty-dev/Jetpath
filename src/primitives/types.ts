@@ -1,6 +1,6 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths } from "./functions.js";
-import type {  JetPlugin } from "./classes.js";
+import type { JetPlugin } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,
@@ -221,13 +221,21 @@ export type JetMiddleware<
     query?: Record<string, any>;
   } = { body: {}; params: {}; query: {} },
   JetPluginTypes extends Record<string, unknown>[] = [],
->  = (
+> = (
   ctx: ContextType<JetData, JetPluginTypes>,
 ) =>
   | Promise<void>
   | void
-  | Promise<(ctx: ContextType<JetData, JetPluginTypes>, error: unknown) => Promise<any> | any>
-  | ((ctx: ContextType<JetData, JetPluginTypes>, error: unknown) => Promise<any> | any);
+  | Promise<
+    (
+      ctx: ContextType<JetData, JetPluginTypes>,
+      error: unknown,
+    ) => Promise<any> | any
+  >
+  | ((
+    ctx: ContextType<JetData, JetPluginTypes>,
+    error: unknown,
+  ) => Promise<any> | any);
 
 export type JetFunc<
   JetData extends {

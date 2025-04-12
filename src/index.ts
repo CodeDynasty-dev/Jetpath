@@ -12,7 +12,7 @@ import {
   isIdentical,
   UTILS,
 } from "./primitives/functions.js";
-import {  type jetOptions } from "./primitives/types.js";
+import { type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
 import path from "node:path";
 
@@ -40,12 +40,21 @@ export class JetPath {
   use(plugin: {
     _setup: (init: any) => any;
     hasServer?: boolean;
-    executor: any
+    executor: any;
   }): void {
     if (this.listening) {
       throw new Error("Your app is listening new plugins can't be added.");
     }
-    if (isIdentical(plugin, new JetPlugin({executor:()=>{return {}}}))) {
+    if (
+      isIdentical(
+        plugin,
+        new JetPlugin({
+          executor: () => {
+            return {};
+          },
+        }),
+      )
+    ) {
       this.plugs.push(plugin);
     } else {
       throw Error("invalid Jetpath plugin");
@@ -97,7 +106,7 @@ export class JetPath {
         const name = this.options?.apiDoc?.path || "/api-doc";
         _JetPath_paths["GET"].direct[name] = (
           ctx,
-        ) => {
+        ) => { 
           if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
             const authHeader = ctx.get("authorization");
             if (authHeader && authHeader.startsWith("Basic ")) {

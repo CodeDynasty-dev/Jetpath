@@ -181,7 +181,8 @@
     }
     
     .project-info span:last-child {
-      font-size: 16px;
+      font-size: 14px; 
+      font-weight: 500; 
     }
 
     .section {
@@ -994,8 +995,8 @@
       responseContainer.style.display = "block";
     }
 
-    const card = (request, i) => {
-      const payload = JSON.parse(request.payload);
+    const card = (request, i) => { 
+      const payload = JSON.parse(request.payload?.includes("{")? request.payload: '0');
       return div({ className: "card" },
         div({ className: "card-header" },
           h5({ className: "mb-0" },

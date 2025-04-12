@@ -318,7 +318,7 @@ const createCTX = (
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
-    ctx._7(req as Request, path, params, query );
+    ctx._7(req as Request, path, params, query);
     if (socket) {
       ctx.connection = JetSocketInstance;
     }
@@ -428,7 +428,9 @@ const JetPath = async (
           //? report error to error middleware
           returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
         } catch (error) {
+          console.error(error);
         } finally {
+          console.error(error);
           return createResponse(res, ctx);
         }
       }
@@ -788,7 +790,7 @@ const URL_PARSER = (
 
   // @ts-expect-error
   const conn = req.headers?.["connection"] || req.headers?.get?.("connection");
-  if (conn.includes("Upgrade") && _JetPath_WS_HANDLER) {
+  if (conn?.includes("Upgrade") && _JetPath_WS_HANDLER) {
     return [
       (ctx) => {
         if (ctx.get("upgrade") != "websocket") {
@@ -848,7 +850,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
   const globalHeaders = JSON.stringify(
     options?.globalHeaders || {
-      Authorization: "Bearer ****",
+      "Authorization": "Bearer <token>"
     },
   );
 
@@ -863,7 +865,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     )
     .replaceAll(
       "{INFO}",
-      options?.apiDoc?.info || "This is a JetPath api preview.",
+      options?.apiDoc?.info?.replaceAll("\n", "<br>") || "This is a JetPath api preview.",
     );
 };
 

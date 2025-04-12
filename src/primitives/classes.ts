@@ -100,14 +100,14 @@ export class Context {
     req: Request,
     path: string,
     params?: Record<string, any>,
-    query?: Record<string, any>, 
+    query?: Record<string, any>,
   ) {
     this.request = req;
     this.method = req.method as "GET";
     this.params = params || {};
     this.query = query || {};
     this.path = path;
-    this.body = undefined; 
+    this.body = undefined;
     //? load
     this._1 = undefined;
     // ? header of response
