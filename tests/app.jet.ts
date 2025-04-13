@@ -171,7 +171,7 @@ app.use(jetbusboy);
 /**
  * Global middleware for request processing and error handling
  * 
- * This middleware runs for all routes and handles:
+ * This mhere's deatiled API sample of framework2 actually called jetpathiddleware runs for all routes and handles:
  * - Request logging
  * - Authentication verification (when needed)
  * - Error processing
@@ -1787,3 +1787,6 @@ export const GET_export_docs$format: JetFunc<{
 };
 
 GET_export_docs$format.info = "Export API documentation in different formats (json, yaml, markdown)";
+
+
+

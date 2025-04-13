@@ -1101,7 +1101,7 @@
             <div class="code-tabs">
               <div class="code-tab active" data-tab="basic">Basic</div>
               <div class="code-tab" data-tab="advanced">Websocket</div>
-              <div class="code-tab" data-tab="typescript">TypeScript</div>
+              <div class="code-tab" data-tab="typescript">Advanced</div>
             </div>
           </div>
           <div class="code-content">
@@ -1120,53 +1120,54 @@ export const GET_: JetFunc = function (ctx) {
             </div>
             <div class="code-wrapper" id="advanced-code">
               <button class="copy-btn" data-code="advanced">Copy</button>
-              <pre><code class="language-javascript">import { JetPath } from 'jetpath';
+              <pre><code class="language-javascript">import { JetPath } from "jetpath";
 
 const app = new JetPath();
 
-export const WS_sockets: JetFunc = (ctx) => {
-  
+export const WS_room: JetFunc = (ctx) => {
   const conn = ctx.connection!;
 
-    conn.addEventListener("open", (socket) => { 
-      socket.send("😎 Welcome to jet chat");
-    });
+  conn.addEventListener("open", (socket) => {
+    socket.send("😎 Welcome to jet chat");
+  });
 
-    conn.addEventListener("message", (socket, event) => {
-        socket.send("message received");
-    }); 
-
-};</code></pre>
+  conn.addEventListener("message", (socket, event) => {
+    socket.send("message received");
+  });
+};
+</code></pre>
             </div>
             <div class="code-wrapper" id="typescript-code">
               <button class="copy-btn" data-code="typescript">Copy</button>
-              <pre><code class="language-typescript">import { JetPath, t } from 'jetpath';
-
-const app = new JetPath();
-
-// Type validation with built-in validator
-const UserSchema = t.object({
-  name: t.string().min(2).max(50),
-  email: t.string().email(),
-  age: t.number().optional(),
-});
-
-type User = t.infer<typeof UserSchema>;
-
-app.post('/users', ({ body }) => {
-  // Automatic validation and type inference
-  const user: User = body;
+              <pre><code class="language-typescript">export const POST_auth_login: JetFunc = async function (ctx) {
+  await ctx.json();
+  const { username, password } = ctx.validate(ctx.body);
   
-  // Your business logic here
-  return { 
-    success: true,
-    user
-  };
-}, {
-  body: UserSchema
-});
+  const authResult = ctx.plugins.authenticateUser(username, password);
+  
+  if (!authResult.authenticated) {
+    ctx.code = 401;
+    ctx.send({ status: "error", message: authResult.message });
+    return;
+  }
+  
+  ctx.send({
+    status: "success",
+    message: "Authentication successful",
+    token: authResult.token,
+    user: {
+      id: authResult.user.id,
+      username: authResult.user.username,
+      role: authResult.user.role
+    }
+  });
+};
 
-app.listen(3000);</code></pre>
+POST_auth_login.body = {
+  username: { type: "string", required: true, err: "Username is required" },
+  password: { type: "string", required: true, err: "Password is required" }
+};
+</code></pre>
             </div>
           </div>
         </div>
@@ -1228,34 +1229,32 @@ app.listen(3000);</code></pre>
 
 
   <!-- Performance Spotlight Section -->
-  <div class="section-padding bg-gray-950"> {/* Keep alternating background */}
-    <div class="container mx-auto text-center">
+  <div class="section-padding bg-gray-950"> 
+    <div class="container mx-auto text-center grid items-center justify-center">
       <h2 class="section-title gradient-text">Engineered for <span class="text-white">Speed</span></h2>
       <p class="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-        JetPath is meticulously optimized. We benchmark continuously to ensure top-tier performance, rivaling even
-        low-level frameworks. Focus on features, not performance bottlenecks.
-      </p>
-      {/* Placeholder for a benchmark graphic or comparison */}
-      <div class="glassmorphism p-8 rounded-2xl max-w-2xl mx-auto border border-blue-500/30">
-        <p class="text-2xl font-semibold text-white mb-4">Hypothetical Benchmark</p>
+        JetPath is blazingly fast. We benchmark continuously to ensure top-tier performance.
+      </p> 
+      <div class="glassmorphism p-8 rounded-2xl max-w-2xl mx-auto">
+        <p class="text-2xl font-semibold text-white mb-4">Very Close Tie</p>
         <p class="text-gray-400">Requests per second on a standard benchmark:</p>
         <div class="mt-4 text-left space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-lg font-medium text-emerald-400">JetPath</span>
-            <span class="text-lg font-bold text-white">~XX,000 req/s</span>
+            <span class="text-lg font-bold text-white">~7519.36 req/s</span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 90%"></div>
+            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 77%"></div>
           </div>
           <div class="flex justify-between items-center mt-3">
-            <span class="text-lg font-medium text-gray-400">Framework X</span>
-            <span class="text-lg font-bold text-gray-400">~YY,000 req/s</span>
+            <span class="text-lg font-medium text-gray-400">Elysia</span>
+            <span class="text-lg font-bold text-gray-400">~9569.38 req/s</span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gray-500 h-2.5 rounded-full" style="width: 60%"></div>
+            <div class="bg-gray-500 h-2.5 rounded-full" style="width: 90%"></div>
           </div>
         </div>
-        <p class="text-sm text-gray-500 mt-6">*Illustrative data. Actual benchmarks coming soon.</p>
+        <p class="text-sm text-gray-500 mt-6">*initial benchmark. more benchmarks coming soon.</p>
       </div>
     </div>
   </div>
@@ -1374,44 +1373,44 @@ app.listen(3000);</code></pre>
             <tr>
               <th>Feature</th>
               <th>JetPath</th>
+              <th>Elysia</th>
               <th>Express</th>
               <th>Fastify</th>
-              <th>NestJS</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>Performance</td>
               <td class="highlight-cell">Ultra-fast</td>
-              <td>Moderate</td>
+              <td>Ultra-fast</td>
               <td>Fast</td>
               <td>Moderate</td>
             </tr>
             <tr>
               <td>TypeScript Support</td>
               <td class="highlight-cell">First-class</td>
-              <td>Limited</td>
+              <td>First-class</td>
               <td>Good</td>
               <td>Good</td>
             </tr>
             <tr>
               <td>Built-in Validation</td>
               <td class="highlight-cell">Yes</td>
-              <td>No</td>
+              <td>Yes</td>
               <td>Yes</td>
               <td>Yes</td>
             </tr>
             <tr>
               <td>Learning Curve</td>
               <td class="highlight-cell">Low</td>
-              <td>Low</td>
+              <td>Medium</td>
               <td>Medium</td>
               <td>High</td>
             </tr>
             <tr>
               <td>Bundle Size</td>
-              <td class="highlight-cell">&lt; 5MB</td>
-              <td>Small</td>
+              <td class="highlight-cell">&lt; 28KB</td>
+              <td>Medium</td>
               <td>Medium</td>
               <td>Large</td>
             </tr>
