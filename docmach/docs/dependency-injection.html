@@ -1286,172 +1286,179 @@
       });
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
-      <h1>Quick Start Guide</h1>
-<p>Let’s build your first JetPath application! This guide will walk you through creating a simple API server that returns a welcome message.</p>
+      <h1>Dependency Injection in JetPath</h1>
+<p>Dependency Injection (DI) is a design pattern used to manage how components (like services, repositories, controllers) get instances of their dependencies (other components they rely on). While JetPath <strong>does not include a built-in, dedicated Dependency Injection container</strong> like frameworks such as NestJS or Angular, it provides effective patterns for managing dependencies, primarily through its <strong>Plugin System</strong>.</p>
 <hr>
-<h2>Goal</h2>
-<p>Create a basic JetPath server with a single endpoint (<code>GET /</code>) that responds with JSON.</p>
-<h2>Prerequisites</h2>
-<p>Before you start, make sure you have:</p>
+<h2>JetPath’s Approach to Dependencies</h2>
+<p>Instead of relying on a complex DI container, JetPath encourages managing dependencies through:</p>
 <ol>
-<li>Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).</li>
-<li>Completed the steps in the <a href="./installation.md"><strong>Installation Guide</strong></a> to install JetPath and TypeScript.</li>
-<li>Optionally installed a schema library like Zod (recommended).</li>
+<li><strong>Plugins:</strong> Encapsulating related functionality and its dependencies within a plugin, making them accessible via the <code>ctx.plugins</code> object.</li>
+<li><strong>Module Scope / Manual Instantiation:</strong> Creating and managing instances of services or clients within specific modules and importing them where needed.</li>
+<li><strong>(Less Common) Attaching to App/Context:</strong> Sharing singleton instances by attaching them to the main <code>app</code> object or request-scoped instances via <code>ctx.app</code>.</li>
 </ol>
 <hr>
-<h2>Step 1: Set Up Your Project Folder</h2>
-<p>Create a new directory for your project and set up the basic folder structure:</p>
-<pre><code class="language-bash"><span class="hljs-built_in">mkdir</span> my-jetpath-app
-<span class="hljs-built_in">cd</span> my-jetpath-app
-<span class="hljs-built_in">mkdir</span> src
-</code></pre>
-<p>Your structure should look like this:</p>
-<pre><code>my-jetpath-app/
-└── src/
-</code></pre>
-<hr>
-<h2>Step 2: Install Dependencies</h2>
-<p>If you haven’t already, install JetPath and a schema library (we’ll use Zod here). Choose the command for your runtime:</p>
-<pre><code class="language-shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">Using npm (Node.js)</span>
-npm install jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using yarn (Node.js)</span>
-yarn add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using pnpm (Node.js)</span>
-pnpm add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using Bun</span>
-bun add jetpath zod
-<p></code></pre></p>
-<hr>
-<h2>Step 3: Configure TypeScript (<code>tsconfig.json</code>)</h2>
-<p>Create a <code>tsconfig.json</code> file in your project root (<code>my-jetpath-app/</code>). This tells TypeScript how to compile your code.</p>
-<pre><code class="language-js"><span class="hljs-comment">// tsconfig.json</span>
-{
-  <span class="hljs-string">&quot;compilerOptions&quot;</span>: {
-    <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;ES2022&quot;</span>,
-    <span class="hljs-string">&quot;module&quot;</span>: <span class="hljs-string">&quot;ESNext&quot;</span>,
-    <span class="hljs-string">&quot;moduleResolution&quot;</span>: <span class="hljs-string">&quot;Bundler&quot;</span>, <span class="hljs-comment">// Use &quot;NodeNext&quot; or &quot;Node&quot; for Node.js if needed</span>
-    <span class="hljs-string">&quot;esModuleInterop&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;forceConsistentCasingInFileNames&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;strict&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;skipLibCheck&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;outDir&quot;</span>: <span class="hljs-string">&quot;./dist&quot;</span>, <span class="hljs-comment">// Optional: specify output directory</span>
-    <span class="hljs-string">&quot;rootDir&quot;</span>: <span class="hljs-string">&quot;./&quot;</span>,
-    <span class="hljs-string">&quot;resolveJsonModule&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;declaration&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;sourceMap&quot;</span>: <span class="hljs-literal">true</span>
-    <span class="hljs-comment">// Add &quot;types&quot;: [&quot;node&quot;] here if using Node.js and needing Node types</span>
-  },
-  <span class="hljs-string">&quot;include&quot;</span>: [<span class="hljs-string">&quot;src/**/*.ts&quot;</span>, <span class="hljs-string">&quot;server.ts&quot;</span>], <span class="hljs-comment">// Adjust if your entry file has a different name</span>
-  <span class="hljs-string">&quot;exclude&quot;</span>: [<span class="hljs-string">&quot;node_modules&quot;</span>, <span class="hljs-string">&quot;dist&quot;</span>]
+<h2>1. Using the Plugin System (Recommended)</h2>
+<p>The <strong>Plugin System</strong> is the most idiomatic way to manage shared services and dependencies in JetPath.</p>
+<ul>
+<li>
+<p><strong>Concept:</strong> Create a plugin that initializes your dependency (e.g., a database client, an email service, a configuration object) and exposes methods that use that dependency.</p>
+</li>
+<li>
+<p><strong>How it Works:</strong></p>
+<ul>
+<li>Define a <code>JetPlugin</code>.</li>
+<li>Inside the plugin’s <code>executor</code> function, instantiate your dependency (e.g., connect to the database). You can access environment variables or pass configuration during plugin instantiation.</li>
+<li>Return an object from the <code>executor</code> containing the methods that your route handlers will use. These methods have access to the dependency instance via the plugin’s closure scope.</li>
+<li>Register the plugin instance using <code>app.use()</code>.</li>
+<li>Access the exposed methods in your route handlers and middleware via <code>ctx.plugins.yourPluginMethod(...)</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Example: Database Service Plugin (Conceptual)</strong></p>
+<pre><code class="language-typescript"><span class="hljs-comment">// plugins/databasePlugin.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPlugin</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
+<span class="hljs-keyword">import</span> { createDatabaseClient, <span class="hljs-keyword">type</span> <span class="hljs-title class_">DatabaseClient</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../services/database&quot;</span>; <span class="hljs-comment">// Your DB client logic</span>
+<p><span class="hljs-comment">// Define configuration options for the plugin</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">DatabasePluginOptions</span> {
+<span class="hljs-attr">connectionString</span>: <span class="hljs-built_in">string</span>;
+<span class="hljs-attr">maxRetries</span>?: <span class="hljs-built_in">number</span>;
+}</p>
+<p><span class="hljs-comment">// Define the interface for the methods exposed by the plugin</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">DatabasePluginAPI</span> {
+<span class="hljs-attr">getClient</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">DatabaseClient</span>;
+<span class="hljs-attr">findUserById</span>: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">any</span> | <span class="hljs-literal">null</span>&gt;;
+<span class="hljs-attr">createPet</span>: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">data</span>: <span class="hljs-built_in">any</span></span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">any</span>&gt;;
+}</p>
+<p><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createDatabasePlugin</span>(<span class="hljs-params"><span class="hljs-attr">options</span>: <span class="hljs-title class_">DatabasePluginOptions</span></span>): <span class="hljs-title class_">JetPlugin</span> {
+<span class="hljs-keyword">let</span> <span class="hljs-attr">dbClient</span>: <span class="hljs-title class_">DatabaseClient</span> | <span class="hljs-literal">null</span> = <span class="hljs-literal">null</span>; <span class="hljs-comment">// Dependency stored in closure</span></p>
+<p><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPlugin</span>({
+<span class="hljs-comment">// Executor runs when plugin is registered</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">executor</span>(): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">DatabasePluginAPI</span>&gt; {
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>Connecting to database: &lt;span class=&quot;hljs-subst&quot;&gt;${options.connectionString.substring(&lt;span class=&quot;hljs-number&quot;&gt;0&lt;/span&gt;, &lt;span class=&quot;hljs-number&quot;&gt;15&lt;/span&gt;)}&lt;/span&gt;...</code></span>);
+<span class="hljs-comment">// Initialize the dependency</span>
+dbClient = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createDatabaseClient</span>(options.<span class="hljs-property">connectionString</span>, options.<span class="hljs-property">maxRetries</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Database connected.&quot;</span>);</p>
+<pre><code>  &lt;span class=&quot;hljs-comment&quot;&gt;// Return the API accessible via ctx.plugins&lt;/span&gt;
+  &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; {
+    &lt;span class=&quot;hljs-attr&quot;&gt;getClient&lt;/span&gt;: &lt;span class=&quot;hljs-function&quot;&gt;() =&amp;gt;&lt;/span&gt; {
+      &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (!dbClient) &lt;span class=&quot;hljs-keyword&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;hljs-keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;hljs-title class_&quot;&gt;Error&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;Database client not initialized&amp;quot;&lt;/span&gt;);
+      &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; dbClient;
+    },
+    &lt;span class=&quot;hljs-keyword&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;hljs-title function_&quot;&gt;findUserById&lt;/span&gt;(&lt;span class=&quot;hljs-params&quot;&gt;&lt;span class=&quot;hljs-attr&quot;&gt;id&lt;/span&gt;: &lt;span class=&quot;hljs-built_in&quot;&gt;string&lt;/span&gt;&lt;/span&gt;) {
+      &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (!dbClient) &lt;span class=&quot;hljs-keyword&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;hljs-keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;hljs-title class_&quot;&gt;Error&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;Database client not initialized&amp;quot;&lt;/span&gt;);
+      &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; dbClient.&lt;span class=&quot;hljs-title function_&quot;&gt;query&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;SELECT * FROM users WHERE id = $1&amp;quot;&lt;/span&gt;, [id]);
+    },
+    &lt;span class=&quot;hljs-keyword&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;hljs-title function_&quot;&gt;createPet&lt;/span&gt;(&lt;span class=&quot;hljs-params&quot;&gt;&lt;span class=&quot;hljs-attr&quot;&gt;data&lt;/span&gt;: &lt;span class=&quot;hljs-built_in&quot;&gt;any&lt;/span&gt;&lt;/span&gt;) {
+      &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (!dbClient) &lt;span class=&quot;hljs-keyword&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;hljs-keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;hljs-title class_&quot;&gt;Error&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;Database client not initialized&amp;quot;&lt;/span&gt;);
+      &lt;span class=&quot;hljs-comment&quot;&gt;// ... perform insert query using dbClient ...&lt;/span&gt;
+      &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; dbClient.&lt;span class=&quot;hljs-title function_&quot;&gt;query&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;INSERT INTO pets (...) VALUES (...) RETURNING *&amp;quot;&lt;/span&gt;, [...]);
+    }
+  };
 }
 </code></pre>
-<p><em>(Remember to adjust <code>moduleResolution</code> and <code>types</code> based on your specific runtime and setup if needed - see the <a href="https://www.google.com/search?q=./installation.md">Installation Guide</a> for details).</em></p>
-<hr>
-<h2>Step 4: Create Your First Route</h2>
-<p>Inside the <code>src</code> directory, create a file named <code>index.jet.ts</code>. This file will automatically handle requests to the root path (<code>/</code>) of your API.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// src/index.jet.ts</span>
-<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">/**</p>
-<ul>
-<li>Handles GET requests to the root path ('/').
-*/</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">GET_</span>: <span class="hljs-title class_">JetFunc</span> = <span class="hljs-function">(<span class="hljs-params">ctx</span>) =&gt;</span> {
-<span class="hljs-comment">// Use the context (ctx) to send a response</span>
-ctx.<span class="hljs-title function_">send</span>({
-<span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span>,
-<span class="hljs-attr">status</span>: <span class="hljs-string">&quot;ok&quot;</span>,
-<span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
-});
-};</li>
-</ul>
-<p><span class="hljs-comment">// Optional: Add description for API documentation</span>
-<span class="hljs-variable constant_">GET_</span>.<span class="hljs-property">info</span> = <span class="hljs-string">&quot;Returns a welcome message and API status.&quot;</span>;</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the <code>JetFunc</code> type for better type checking of our handler.</li>
-<li>We export a constant named <code>GET_</code>. The <code>GET</code> part maps to the HTTP GET method, and the <code>_</code> combined with the filename <code>index.jet.ts</code> maps to the root path <code>/</code>.</li>
-<li>The function receives the <code>ctx</code> (Context) object.</li>
-<li><code>ctx.send()</code> sends a JSON response back to the client. JetPath automatically sets the <code>Content-Type</code> header to <code>application/json</code> for objects.</li>
-</ul>
-<hr>
-<h2>Step 5: Create the Server Entry Point</h2>
-<p>Now, create a file named <code>server.ts</code> in your project root (<code>my-jetpath-app/</code>). This file initializes and starts the JetPath server.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
+<p>});
+}</p>
+<p><span class="hljs-comment">// server.ts</span>
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">// Define the port the server will listen on</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">3000</span>;</p>
-<p><span class="hljs-comment">// Create a new JetPath instance</span>
-<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
-<span class="hljs-comment">// Specify the directory containing your route files (.jet.ts)</span>
-<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>,</p>
-<p><span class="hljs-comment">// Configure the server port</span>
-<span class="hljs-attr">port</span>: <span class="hljs-variable constant_">PORT</span>,</p>
-<p><span class="hljs-comment">// Configure API documentation generation (optional but recommended)</span>
-<span class="hljs-attr">apiDoc</span>: {
-<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;My First JetPath API&quot;</span>,
-<span class="hljs-attr">info</span>: <span class="hljs-string">&quot;This is the documentation for the Quick Start API.&quot;</span>,
-<span class="hljs-attr">color</span>: <span class="hljs-string">&quot;#7e57c2&quot;</span>, <span class="hljs-comment">// Choose a color!</span>
-},
-<span class="hljs-title class_">APIdisplay</span>: <span class="hljs-string">&quot;UI&quot;</span>, <span class="hljs-comment">// Enable the interactive Swagger-like UI at /docs</span>
-});</p>
-<p><span class="hljs-comment">// Start listening for incoming requests</span>
-app.<span class="hljs-title function_">listen</span>();</p>
-<p><span class="hljs-comment">// Log messages to the console</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>🚀 JetPath server running on http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;</code></span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>📚 API Docs available at http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;/docs</code></span>);</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the main <code>JetPath</code> class.</li>
-<li>We create a new instance, passing configuration options:
-<ul>
-<li><code>source</code>: Tells JetPath where to find your route files.</li>
-<li><code>port</code>: The port number for the server.</li>
-<li><code>apiDoc</code>, <code>APIdisplay</code>: Configures the built-in documentation generator.</li>
-</ul>
-</li>
-<li><code>app.listen()</code> starts the server.</li>
-</ul>
-<hr>
-<h2>Step 6: Run Your Server</h2>
-<p>Open your terminal in the project root (<code>my-jetpath-app/</code>) and run the server using your chosen runtime:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Using Node.js (you might need ts-node or compile first)</span>
-<span class="hljs-comment"># Option 1: Use ts-node (if installed: npm install -D ts-node)</span>
-npx ts-node server.ts
-<span class="hljs-comment"># Option 2: Compile and run</span>
-<span class="hljs-comment"># tsc &amp;&amp; node dist/server.js</span>
-<p><span class="hljs-comment"># Using Deno</span>
-deno run --allow-net --allow-read server.ts</p>
-<p><span class="hljs-comment"># Using Bun</span>
-bun run server.ts
+<span class="hljs-keyword">import</span> { createDatabasePlugin } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./plugins/databasePlugin&quot;</span>;</p>
+<p><span class="hljs-keyword">const</span> dbConnectionString = process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> || <span class="hljs-string">&quot;postgres://user:pass@host:port/db&quot;</span>;
+<span class="hljs-keyword">const</span> databasePlugin = <span class="hljs-title function_">createDatabasePlugin</span>({ <span class="hljs-attr">connectionString</span>: dbConnectionString });</p>
+<p><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({ <span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span> });
+app.<span class="hljs-title function_">use</span>(databasePlugin); <span class="hljs-comment">// Register the plugin</span></p>
+<p>app.<span class="hljs-title function_">listen</span>();</p>
+<p><span class="hljs-comment">// src/users/by$id.jet.ts</span>
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
+<span class="hljs-comment">// Assuming DatabasePluginAPI is exported or available for typing ctx</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">GET_</span>: <span class="hljs-title class_">JetFunc</span>&lt;…&gt; = <span class="hljs-title function_">async</span> (ctx) =&gt; {
+<span class="hljs-keyword">const</span> userId = ctx.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>;
+<span class="hljs-comment">// Access the dependency via the plugin method</span>
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> ctx.<span class="hljs-property">plugins</span>.<span class="hljs-title function_">findUserById</span>(userId);
+<span class="hljs-keyword">if</span> (!user) {
+ctx.<span class="hljs-keyword">throw</span>(<span class="hljs-number">404</span>, <span class="hljs-string">&quot;User not found&quot;</span>);
+}
+ctx.<span class="hljs-title function_">send</span>({ user });
+};
 </code></pre></p>
-<p>You should see the following output (or similar):</p>
-<pre><code>🚀 JetPath server running on http://localhost:3000
-📚 API Docs available at http://localhost:3000/docs
-</code></pre>
+</li>
+<li>
+<p><strong>Pros:</strong> Encapsulates dependencies, promotes modularity, easy access via <code>ctx</code>, good for shared services.</p>
+</li>
+<li>
+<p><strong>Cons:</strong> Primarily suitable for singleton-like dependencies initialized once. Managing request-scoped dependencies might require different patterns.</p>
+</li>
+</ul>
 <hr>
-<h2>Step 7: Verify It Works!</h2>
-<ol>
-<li><strong>Check the API:</strong> Open your web browser and navigate to <code>http://localhost:3000</code>. You should see the JSON response:<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span>
-<span class="hljs-punctuation">}</span>
+<h2>2. Module Scope / Manual Instantiation</h2>
+<p>This is the standard approach in JavaScript/TypeScript without a dedicated DI container.</p>
+<ul>
+<li>
+<p><strong>Concept:</strong> Create instances of your services or dependencies in dedicated files (e.g., <code>services/email.ts</code>, <code>clients/paymentGateway.ts</code>) and configure them there. Then, import these instances directly into the route handler files (<code>.jet.ts</code>) where they are needed.</p>
+</li>
+<li>
+<p><strong>Example:</strong></p>
+<pre><code class="language-typescript"><span class="hljs-comment">// services/notificationService.ts</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">NotificationService</span> {
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">apiKey</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">apiKey</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">NOTIFICATION_API_KEY</span> || <span class="hljs-string">&quot;default-key&quot;</span>;
+    <span class="hljs-keyword">if</span> (!<span class="hljs-variable language_">this</span>.<span class="hljs-property">apiKey</span>) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&quot;Notification API Key not set!&quot;</span>);
+    }
+  }
+  <span class="hljs-title function_">sendWelcomeEmail</span>(<span class="hljs-params"><span class="hljs-attr">email</span>: <span class="hljs-built_in">string</span></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Sending welcome email to <span class="hljs-subst">${email}</span> using key <span class="hljs-subst">${<span class="hljs-variable language_">this</span>.apiKey.substring(<span class="hljs-number">0</span>, <span class="hljs-number">3</span>)}</span>...`</span>);
+    <span class="hljs-comment">// ... actual email sending logic ...</span>
+  }
+}
+<span class="hljs-comment">// Export a singleton instance</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> notificationService = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotificationService</span>();
+<p><span class="hljs-comment">// src/users.jet.ts</span>
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
+<span class="hljs-keyword">import</span> { notificationService } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;…/services/notificationService&quot;</span>; <span class="hljs-comment">// Import instance</span></p>
+<p><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">POST_</span>: <span class="hljs-title class_">JetFunc</span>&lt;…&gt; = <span class="hljs-title function_">async</span> (ctx) =&gt; {
+<span class="hljs-comment">// … create user logic …</span>
+<span class="hljs-keyword">const</span> newUser = { <span class="hljs-attr">id</span>: <span class="hljs-string">'user-456'</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">'test@example.com'</span> };</p>
+<p><span class="hljs-comment">// Directly use the imported service instance</span>
+notificationService.<span class="hljs-title function_">sendWelcomeEmail</span>(newUser.<span class="hljs-property">email</span>);</p>
+<p>ctx.<span class="hljs-property">code</span> = <span class="hljs-number">201</span>;
+ctx.<span class="hljs-title function_">send</span>(newUser);
+};
+</code></pre></p>
+</li>
+<li>
+<p><strong>Pros:</strong> Simple, explicit, leverages standard JS/TS modules, good control over instantiation.</p>
+</li>
+<li>
+<p><strong>Cons:</strong> Can lead to tighter coupling if not managed carefully, managing complex dependency graphs manually can be cumbersome, less suitable for easily swapping implementations during testing without extra work.</p>
+</li>
+</ul>
+<hr>
+<h2>3. Attaching to <code>app</code> or <code>ctx.app</code></h2>
+<ul>
+<li>
+<p><strong>Attaching to <code>app</code>:</strong> You can attach singleton instances (like a database client) directly to the <code>app</code> instance after creating it in <code>server.ts</code>. This instance can potentially be accessed within handlers or middleware (though accessing the main <code>app</code> instance from <code>ctx</code> isn’t directly shown in the provided examples and might require specific patterns).</p>
+<pre><code class="language-typescript"><span class="hljs-comment">// server.ts (Conceptual)</span>
+<span class="hljs-comment">// const dbClient = await createDatabaseClient(...);</span>
+<span class="hljs-comment">// const app = new JetPath(...);</span>
+<span class="hljs-comment">// app.db = dbClient; // Attach directly (Type needs extending if using TS)</span>
 </code></pre>
 </li>
-<li><strong>Check the Docs:</strong> Navigate to <code>http://localhost:3000/docs</code>. You should see the interactive API documentation UI, listing your <code>GET /</code> endpoint.</li>
-</ol>
-<p><strong>Congratulations! You’ve successfully created and run your first JetPath application!</strong></p>
+<li>
+<p><strong>Attaching to <code>ctx.app</code>:</strong> As shown earlier, middleware can attach request-scoped data or potentially request-scoped service instances to <code>ctx.app</code>. This is suitable if you need a dependency instance unique to each request.</p>
+</li>
+<li>
+<p><strong>Pros:</strong> Can work for simple singletons (<code>app</code>) or request-scoped instances (<code>ctx.app</code>).</p>
+</li>
+<li>
+<p><strong>Cons:</strong> Can feel like using global variables (<code>app</code>), potentially obscures dependencies, <code>ctx.app</code> requires careful typing with middleware generics. Generally less clean than using Plugins or module imports for managing dependencies.</p>
+</li>
+</ul>
 <hr>
-<h2>Next Steps</h2>
-<p>Now that you have a basic server running, explore further:</p>
+<h2>Conclusion</h2>
+<p>JetPath provides flexibility in managing dependencies.</p>
 <ul>
-<li><strong>Core Concepts:</strong> Learn about <a href="https://www.google.com/search?q=./core-concepts/routing.md">Routing</a>, the <a href="https://www.google.com/search?q=./core-concepts/context.md">Context Object</a>, <a href="https://www.google.com/search?q=./core-concepts/validation.md">Validation</a>, and <a href="https://www.google.com/search?q=./core-concepts/middleware.md">Middleware</a>.</li>
-<li><strong>Guides:</strong> Build more complex features by following the practical <a href="https://www.google.com/search?q=./guides/crud-api.md">Guides</a>.</li>
+<li><strong>For shared services and singleton resources (like database clients, external API clients, configuration services), the Plugin System is the recommended and most idiomatic approach.</strong> It promotes modularity and provides easy access via <code>ctx.plugins</code>.</li>
+<li><strong>For simpler dependencies or utilities specific to certain routes, standard module imports (Manual Instantiation) offer a direct and explicit way.</strong></li>
 </ul>
     </section>
  

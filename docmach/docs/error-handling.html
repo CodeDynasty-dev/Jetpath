@@ -1286,172 +1286,161 @@
       });
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
-      <h1>Quick Start Guide</h1>
-<p>Let’s build your first JetPath application! This guide will walk you through creating a simple API server that returns a welcome message.</p>
+      <h1>Error Handling</h1>
+<p>Robust error handling is essential for creating reliable and user-friendly APIs. JetPath encourages centralizing error handling logic within your <strong>middleware</strong>, providing a consistent way to catch errors, log them, and send standardized responses to the client.</p>
 <hr>
-<h2>Goal</h2>
-<p>Create a basic JetPath server with a single endpoint (<code>GET /</code>) that responds with JSON.</p>
-<h2>Prerequisites</h2>
-<p>Before you start, make sure you have:</p>
+<h2>Philosophy</h2>
+<p>Instead of scattering <code>try...catch</code> blocks throughout your route handlers for common errors, JetPath’s approach relies on:</p>
 <ol>
-<li>Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).</li>
-<li>Completed the steps in the <a href="./installation.md"><strong>Installation Guide</strong></a> to install JetPath and TypeScript.</li>
-<li>Optionally installed a schema library like Zod (recommended).</li>
+<li><strong>Signaling Errors:</strong> Using <code>ctx.throw()</code> or standard <code>throw new Error()</code> within route handlers or preceding middleware logic when something goes wrong.</li>
+<li><strong>Centralized Catching:</strong> Intercepting these thrown errors within the <strong>post-handler function returned by your middleware</strong>.</li>
+<li><strong>Standardized Responses:</strong> Formatting and sending consistent error responses from the middleware’s error handling block.</li>
 </ol>
 <hr>
-<h2>Step 1: Set Up Your Project Folder</h2>
-<p>Create a new directory for your project and set up the basic folder structure:</p>
-<pre><code class="language-bash"><span class="hljs-built_in">mkdir</span> my-jetpath-app
-<span class="hljs-built_in">cd</span> my-jetpath-app
-<span class="hljs-built_in">mkdir</span> src
-</code></pre>
-<p>Your structure should look like this:</p>
-<pre><code>my-jetpath-app/
-└── src/
-</code></pre>
-<hr>
-<h2>Step 2: Install Dependencies</h2>
-<p>If you haven’t already, install JetPath and a schema library (we’ll use Zod here). Choose the command for your runtime:</p>
-<pre><code class="language-shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">Using npm (Node.js)</span>
-npm install jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using yarn (Node.js)</span>
-yarn add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using pnpm (Node.js)</span>
-pnpm add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using Bun</span>
-bun add jetpath zod
-<p></code></pre></p>
-<hr>
-<h2>Step 3: Configure TypeScript (<code>tsconfig.json</code>)</h2>
-<p>Create a <code>tsconfig.json</code> file in your project root (<code>my-jetpath-app/</code>). This tells TypeScript how to compile your code.</p>
-<pre><code class="language-js"><span class="hljs-comment">// tsconfig.json</span>
-{
-  <span class="hljs-string">&quot;compilerOptions&quot;</span>: {
-    <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;ES2022&quot;</span>,
-    <span class="hljs-string">&quot;module&quot;</span>: <span class="hljs-string">&quot;ESNext&quot;</span>,
-    <span class="hljs-string">&quot;moduleResolution&quot;</span>: <span class="hljs-string">&quot;Bundler&quot;</span>, <span class="hljs-comment">// Use &quot;NodeNext&quot; or &quot;Node&quot; for Node.js if needed</span>
-    <span class="hljs-string">&quot;esModuleInterop&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;forceConsistentCasingInFileNames&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;strict&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;skipLibCheck&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;outDir&quot;</span>: <span class="hljs-string">&quot;./dist&quot;</span>, <span class="hljs-comment">// Optional: specify output directory</span>
-    <span class="hljs-string">&quot;rootDir&quot;</span>: <span class="hljs-string">&quot;./&quot;</span>,
-    <span class="hljs-string">&quot;resolveJsonModule&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;declaration&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;sourceMap&quot;</span>: <span class="hljs-literal">true</span>
-    <span class="hljs-comment">// Add &quot;types&quot;: [&quot;node&quot;] here if using Node.js and needing Node types</span>
-  },
-  <span class="hljs-string">&quot;include&quot;</span>: [<span class="hljs-string">&quot;src/**/*.ts&quot;</span>, <span class="hljs-string">&quot;server.ts&quot;</span>], <span class="hljs-comment">// Adjust if your entry file has a different name</span>
-  <span class="hljs-string">&quot;exclude&quot;</span>: [<span class="hljs-string">&quot;node_modules&quot;</span>, <span class="hljs-string">&quot;dist&quot;</span>]
+<h2>Throwing Errors</h2>
+<p>When you encounter a situation in your route handler (or pre-handler middleware logic) where processing cannot continue normally, you should signal an error. The preferred way is using <code>ctx.throw()</code>.</p>
+<h3>Using <code>ctx.throw()</code></h3>
+<p>The <code>ctx.throw(codeOrData, message?)</code> method is designed specifically for signaling HTTP-related errors. It sets the <code>ctx.code</code> (status code) and attaches an error message, then throws an error that interrupts the current execution flow.</p>
+<ul>
+<li>
+<p><strong>Common Status Codes:</strong></p>
+<ul>
+<li><code>400 Bad Request</code>: Validation errors, malformed requests.</li>
+<li><code>401 Unauthorized</code>: Missing or invalid authentication credentials.</li>
+<li><code>403 Forbidden</code>: Authenticated user lacks permission for the action.</li>
+<li><code>404 Not Found</code>: Resource doesn’t exist.</li>
+<li><code>500 Internal Server Error</code>: Unexpected server-side issues.</li>
+</ul>
+</li>
+<li>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-typescript"><span class="hljs-comment">// 1. Resource Not Found</span>
+<span class="hljs-keyword">if</span> (!pet) {
+  ctx.<span class="hljs-keyword">throw</span>(<span class="hljs-number">404</span>, <span class="hljs-string">`Pet with ID <span class="hljs-subst">${ctx.params.id}</span> not found`</span>);
+}
+<p><span class="hljs-comment">// 2. Unauthorized Access</span>
+<span class="hljs-keyword">const</span> authResult = ctx.<span class="hljs-property">plugins</span>.<span class="hljs-title function_">verifyAuth</span>(ctx);
+<span class="hljs-keyword">if</span> (!authResult.<span class="hljs-property">authenticated</span>) {
+ctx.<span class="hljs-title function_">set</span>(<span class="hljs-string">&quot;WWW-Authenticate&quot;</span>, <span class="hljs-string">&quot;Bearer realm=&amp;quot;protected&amp;quot;&quot;</span>); <span class="hljs-comment">// Set relevant header</span>
+ctx.<span class="hljs-keyword">throw</span>(<span class="hljs-number">401</span>, authResult.<span class="hljs-property">message</span> || <span class="hljs-string">&quot;Authentication required&quot;</span>);
+}</p>
+<p><span class="hljs-comment">// 3. Forbidden Action</span>
+<span class="hljs-keyword">if</span> (ctx.<span class="hljs-property">app</span>.<span class="hljs-property">user</span>?.<span class="hljs-property">role</span> !== <span class="hljs-string">'admin'</span>) {
+ctx.<span class="hljs-keyword">throw</span>(<span class="hljs-number">403</span>, <span class="hljs-string">&quot;Admin privileges required&quot;</span>);
+}</p>
+<p><span class="hljs-comment">// 4. Validation Error (Bad Request)</span>
+<span class="hljs-keyword">try</span> {
+<span class="hljs-keyword">const</span> validatedData = ctx.<span class="hljs-title function_">validate</span>(<span class="hljs-title class_">RequestSchema</span>);
+} <span class="hljs-keyword">catch</span> (validationError) {
+<span class="hljs-comment">// Pass validation message, set code to 400</span>
+ctx.<span class="hljs-keyword">throw</span>(<span class="hljs-number">400</span>, validationError.<span class="hljs-property">message</span>);
+}</p>
+<p><span class="hljs-comment">// 5. Simple Not Found (message optional)</span>
+ctx.<span class="hljs-keyword">throw</span>(<span class="hljs-number">404</span>);
+</code></pre></p>
+<p><em>[cite: examples inspired by logic in tests/app.jet.ts]</em></p>
+</li>
+</ul>
+<h3>Using <code>throw new Error()</code></h3>
+<p>You can also use standard JavaScript <code>throw new Error(&quot;Something broke&quot;)</code>. This is suitable for unexpected internal errors. When caught by the middleware, <code>ctx.code</code> might not be set, so your middleware should typically default to a <code>500 Internal Server Error</code> status code in these cases.</p>
+<pre><code class="language-typescript"><span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">riskyOperation</span>();
+} <span class="hljs-keyword">catch</span> (internalError) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Internal operation failed:&quot;</span>, internalError);
+  <span class="hljs-comment">// Let the middleware handle formatting, just throw</span>
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Internal processing error occurred.&quot;</span>);
 }
 </code></pre>
-<p><em>(Remember to adjust <code>moduleResolution</code> and <code>types</code> based on your specific runtime and setup if needed - see the <a href="https://www.google.com/search?q=./installation.md">Installation Guide</a> for details).</em></p>
 <hr>
-<h2>Step 4: Create Your First Route</h2>
-<p>Inside the <code>src</code> directory, create a file named <code>index.jet.ts</code>. This file will automatically handle requests to the root path (<code>/</code>) of your API.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// src/index.jet.ts</span>
-<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">/**</p>
+<h2>Handling Errors in Middleware</h2>
+<p>The <strong>post-handler function</strong> returned by your <code>MIDDLEWARE_</code> definition is the primary location for catching and handling errors thrown from route handlers, validation logic (<code>ctx.validate</code>), or the pre-handler part of the middleware itself.</p>
+<h3>The <code>err</code> Parameter</h3>
+<p>This function receives the <code>ctx</code> object and an optional second argument, typically named <code>err</code>.</p>
 <ul>
-<li>Handles GET requests to the root path ('/').
-*/</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">GET_</span>: <span class="hljs-title class_">JetFunc</span> = <span class="hljs-function">(<span class="hljs-params">ctx</span>) =&gt;</span> {
-<span class="hljs-comment">// Use the context (ctx) to send a response</span>
-ctx.<span class="hljs-title function_">send</span>({
-<span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span>,
-<span class="hljs-attr">status</span>: <span class="hljs-string">&quot;ok&quot;</span>,
-<span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
+<li>If the route handler and pre-handler logic completed <strong>without throwing</strong>, <code>err</code> will be <code>undefined</code>.</li>
+<li>If any error <strong>was thrown</strong> (using <code>ctx.throw()</code> or <code>throw new Error()</code>), <code>err</code> will be the <code>Error</code> object that was thrown.</li>
+</ul>
+<h3>Middleware Error Handling Block</h3>
+<p>Here’s how to structure the error handling within your middleware’s returned function, based on the example in <code>tests/app.jet.ts</code>:</p>
+<pre><code class="language-typescript"><span class="hljs-comment">// Inside the function returned by MIDDLEWARE_</span>
+<span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">ctx, <span class="hljs-attr">err</span>?: <span class="hljs-title class_">Error</span></span>) =&gt;</span> {
+  <span class="hljs-comment">// =========================</span>
+  <span class="hljs-comment">// === POST-HANDLER CODE ===</span>
+  <span class="hljs-comment">// =========================</span>
+  <span class="hljs-keyword">const</span> duration = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - startTime; <span class="hljs-comment">// Assuming startTime from pre-handler</span>
+  ctx.<span class="hljs-title function_">set</span>(<span class="hljs-string">&quot;X-Response-Time&quot;</span>, <span class="hljs-string">`<span class="hljs-subst">${duration}</span>ms`</span>);
+<p><span class="hljs-comment">// — Central Error Handling Logic —</span>
+<span class="hljs-keyword">if</span> (err) {
+<span class="hljs-comment">// 1. Log the error (essential for debugging)</span>
+<span class="hljs-comment">// Use a proper logger plugin in production</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>({
+<span class="hljs-attr">message</span>: <span class="hljs-string"><code>Request Error: &lt;span class=&quot;hljs-subst&quot;&gt;${err.message}&lt;/span&gt;</code></span>,
+<span class="hljs-attr">stack</span>: err.<span class="hljs-property">stack</span>,
+<span class="hljs-attr">requestId</span>: ctx.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;X-Request-ID&quot;</span>), <span class="hljs-comment">// Include request context</span>
+<span class="hljs-attr">url</span>: ctx.<span class="hljs-property">request</span>.<span class="hljs-property">url</span>,
+<span class="hljs-attr">method</span>: ctx.<span class="hljs-property">request</span>.<span class="hljs-property">method</span>,
 });
-};</li>
-</ul>
-<p><span class="hljs-comment">// Optional: Add description for API documentation</span>
-<span class="hljs-variable constant_">GET_</span>.<span class="hljs-property">info</span> = <span class="hljs-string">&quot;Returns a welcome message and API status.&quot;</span>;</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the <code>JetFunc</code> type for better type checking of our handler.</li>
-<li>We export a constant named <code>GET_</code>. The <code>GET</code> part maps to the HTTP GET method, and the <code>_</code> combined with the filename <code>index.jet.ts</code> maps to the root path <code>/</code>.</li>
-<li>The function receives the <code>ctx</code> (Context) object.</li>
-<li><code>ctx.send()</code> sends a JSON response back to the client. JetPath automatically sets the <code>Content-Type</code> header to <code>application/json</code> for objects.</li>
-</ul>
-<hr>
-<h2>Step 5: Create the Server Entry Point</h2>
-<p>Now, create a file named <code>server.ts</code> in your project root (<code>my-jetpath-app/</code>). This file initializes and starts the JetPath server.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">// Define the port the server will listen on</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">3000</span>;</p>
-<p><span class="hljs-comment">// Create a new JetPath instance</span>
-<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
-<span class="hljs-comment">// Specify the directory containing your route files (.jet.ts)</span>
-<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>,</p>
-<p><span class="hljs-comment">// Configure the server port</span>
-<span class="hljs-attr">port</span>: <span class="hljs-variable constant_">PORT</span>,</p>
-<p><span class="hljs-comment">// Configure API documentation generation (optional but recommended)</span>
-<span class="hljs-attr">apiDoc</span>: {
-<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;My First JetPath API&quot;</span>,
-<span class="hljs-attr">info</span>: <span class="hljs-string">&quot;This is the documentation for the Quick Start API.&quot;</span>,
-<span class="hljs-attr">color</span>: <span class="hljs-string">&quot;#7e57c2&quot;</span>, <span class="hljs-comment">// Choose a color!</span>
-},
-<span class="hljs-title class_">APIdisplay</span>: <span class="hljs-string">&quot;UI&quot;</span>, <span class="hljs-comment">// Enable the interactive Swagger-like UI at /docs</span>
-});</p>
-<p><span class="hljs-comment">// Start listening for incoming requests</span>
-app.<span class="hljs-title function_">listen</span>();</p>
-<p><span class="hljs-comment">// Log messages to the console</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>🚀 JetPath server running on http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;</code></span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>📚 API Docs available at http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;/docs</code></span>);</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the main <code>JetPath</code> class.</li>
-<li>We create a new instance, passing configuration options:
-<ul>
-<li><code>source</code>: Tells JetPath where to find your route files.</li>
-<li><code>port</code>: The port number for the server.</li>
-<li><code>apiDoc</code>, <code>APIdisplay</code>: Configures the built-in documentation generator.</li>
-</ul>
-</li>
-<li><code>app.listen()</code> starts the server.</li>
-</ul>
-<hr>
-<h2>Step 6: Run Your Server</h2>
-<p>Open your terminal in the project root (<code>my-jetpath-app/</code>) and run the server using your chosen runtime:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Using Node.js (you might need ts-node or compile first)</span>
-<span class="hljs-comment"># Option 1: Use ts-node (if installed: npm install -D ts-node)</span>
-npx ts-node server.ts
-<span class="hljs-comment"># Option 2: Compile and run</span>
-<span class="hljs-comment"># tsc &amp;&amp; node dist/server.js</span>
-<p><span class="hljs-comment"># Using Deno</span>
-deno run --allow-net --allow-read server.ts</p>
-<p><span class="hljs-comment"># Using Bun</span>
-bun run server.ts
+<span class="hljs-comment">// Example with logger plugin:</span>
+<span class="hljs-comment">// ctx.plugins.logger?.error({ error: err.message, stack: err.stack, code: ctx.code, requestId: ctx.get(&quot;X-Request-ID&quot;) });</span></p>
+<pre><code>&lt;span class=&quot;hljs-comment&quot;&gt;// 2. Determine the Status Code&lt;/span&gt;
+&lt;span class=&quot;hljs-comment&quot;&gt;// Use ctx.code if it was set by ctx.throw() or before throwing.&lt;/span&gt;
+&lt;span class=&quot;hljs-comment&quot;&gt;// Default to 500 for unexpected errors (where ctx.code might still be 200 or unset).&lt;/span&gt;
+ctx.&lt;span class=&quot;hljs-property&quot;&gt;code&lt;/span&gt; = ctx.&lt;span class=&quot;hljs-property&quot;&gt;code&lt;/span&gt; &amp;gt;= &lt;span class=&quot;hljs-number&quot;&gt;400&lt;/span&gt; ? ctx.&lt;span class=&quot;hljs-property&quot;&gt;code&lt;/span&gt; : &lt;span class=&quot;hljs-number&quot;&gt;500&lt;/span&gt;;
+
+&lt;span class=&quot;hljs-comment&quot;&gt;// 3. Format the Error Response Body&lt;/span&gt;
+&lt;span class=&quot;hljs-comment&quot;&gt;// Avoid leaking sensitive stack traces in production for 5xx errors!&lt;/span&gt;
+&lt;span class=&quot;hljs-keyword&quot;&gt;const&lt;/span&gt; errorMessage = (ctx.&lt;span class=&quot;hljs-property&quot;&gt;code&lt;/span&gt; &amp;gt;= &lt;span class=&quot;hljs-number&quot;&gt;500&lt;/span&gt; &amp;amp;&amp;amp; process.&lt;span class=&quot;hljs-property&quot;&gt;env&lt;/span&gt;.&lt;span class=&quot;hljs-property&quot;&gt;NODE_ENV&lt;/span&gt; === &lt;span class=&quot;hljs-string&quot;&gt;&amp;#x27;production&amp;#x27;&lt;/span&gt;)
+  ? &lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;Internal Server Error&amp;quot;&lt;/span&gt;
+  : err.&lt;span class=&quot;hljs-property&quot;&gt;message&lt;/span&gt; || &lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;An unexpected error occurred&amp;quot;&lt;/span&gt;;
+
+&lt;span class=&quot;hljs-keyword&quot;&gt;const&lt;/span&gt; errorResponse = {
+  &lt;span class=&quot;hljs-attr&quot;&gt;error&lt;/span&gt;: {
+    &lt;span class=&quot;hljs-attr&quot;&gt;message&lt;/span&gt;: errorMessage,
+    &lt;span class=&quot;hljs-attr&quot;&gt;code&lt;/span&gt;: ctx.&lt;span class=&quot;hljs-property&quot;&gt;code&lt;/span&gt;,
+    &lt;span class=&quot;hljs-attr&quot;&gt;requestId&lt;/span&gt;: ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;get&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;X-Request-ID&amp;quot;&lt;/span&gt;), &lt;span class=&quot;hljs-comment&quot;&gt;// Helpful for tracing&lt;/span&gt;
+    &lt;span class=&quot;hljs-comment&quot;&gt;// Optionally include validation details for 400 errors if safe&lt;/span&gt;
+    &lt;span class=&quot;hljs-comment&quot;&gt;// details: (ctx.code === 400 &amp;amp;&amp;amp; err.details) ? err.details : undefined,&lt;/span&gt;
+  },
+  &lt;span class=&quot;hljs-attr&quot;&gt;timestamp&lt;/span&gt;: &lt;span class=&quot;hljs-keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;hljs-title class_&quot;&gt;Date&lt;/span&gt;().&lt;span class=&quot;hljs-title function_&quot;&gt;toISOString&lt;/span&gt;(),
+};
+
+&lt;span class=&quot;hljs-comment&quot;&gt;// 4. Send the Error Response&lt;/span&gt;
+&lt;span class=&quot;hljs-comment&quot;&gt;// Ensure correct Content-Type (usually application/json)&lt;/span&gt;
+ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;Content-Type&amp;quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;application/json&amp;quot;&lt;/span&gt;);
+ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;send&lt;/span&gt;(errorResponse);
+
+&lt;span class=&quot;hljs-comment&quot;&gt;// 5. IMPORTANT: Stop further processing&lt;/span&gt;
+&lt;span class=&quot;hljs-comment&quot;&gt;// Prevent subsequent logic (like 404 checks) from running&lt;/span&gt;
+&lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt;;
+</code></pre>
+<p>} <span class="hljs-comment">// — End of Error Handling —</span></p>
+<p><span class="hljs-comment">// … Handle successful responses or 404s if no error occurred …</span>
+<span class="hljs-comment">// (As shown in the Middleware documentation page)</span>
+};
 </code></pre></p>
-<p>You should see the following output (or similar):</p>
-<pre><code>🚀 JetPath server running on http://localhost:3000
-📚 API Docs available at http://localhost:3000/docs
-</code></pre>
+<p><em>[cite: Based on error handling logic in <code>MIDDLEWARE_</code> in tests/app.jet.ts]</em></p>
 <hr>
-<h2>Step 7: Verify It Works!</h2>
-<ol>
-<li><strong>Check the API:</strong> Open your web browser and navigate to <code>http://localhost:3000</code>. You should see the JSON response:<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span>
-<span class="hljs-punctuation">}</span>
-</code></pre>
-</li>
-<li><strong>Check the Docs:</strong> Navigate to <code>http://localhost:3000/docs</code>. You should see the interactive API documentation UI, listing your <code>GET /</code> endpoint.</li>
-</ol>
-<p><strong>Congratulations! You’ve successfully created and run your first JetPath application!</strong></p>
+<h2>Specific Error Examples</h2>
+<ul>
+<li><strong>404 Not Found:</strong> If <code>err</code> is <code>undefined</code> (no error thrown) <em>and</em> the route handler didn’t send a response, your post-handler middleware logic should detect this (e.g., by checking <code>ctx.response.status === 404</code> or if <code>ctx.response.body</code> is null/undefined) and send a standard 404 response.</li>
+<li><strong>400 Bad Request (Validation):</strong> When <code>ctx.validate()</code> fails, it throws an error. Your middleware catches this. <code>ctx.throw(400, validationError.message)</code> is a good way to trigger this from the handler, ensuring the middleware sets code 400 and uses the validation message.</li>
+<li><strong>401 Unauthorized / 403 Forbidden:</strong> Throw these using <code>ctx.throw(401, &quot;...&quot;)</code> or <code>ctx.throw(403, &quot;...&quot;)</code>. The middleware catches them and sends the response using the specified code and message. Consider adding appropriate headers like <code>WWW-Authenticate</code> via <code>ctx.set()</code> before throwing 401.</li>
+<li><strong>500 Internal Server Error:</strong> Catch unexpected errors (e.g., from <code>throw new Error()</code> or database issues). Set <code>ctx.code = 500</code> and send a generic error message in production to avoid leaking implementation details. Log the full error server-side.</li>
+</ul>
+<hr>
+<h2>Best Practices</h2>
+<ul>
+<li><strong>Centralize:</strong> Implement your primary error handling in global middleware for consistency.</li>
+<li><strong>Standardize Responses:</strong> Use a consistent JSON structure for error responses (e.g., <code>{ error: { message: string, code: number, requestId?: string } }</code> or follow RFC 7807 Problem Details).</li>
+<li><strong>Log Effectively:</strong> Log errors with sufficient context (request ID, URL, user ID if available, full stack trace) on the server.</li>
+<li><strong>Don’t Leak Sensitive Information:</strong> Avoid sending stack traces or detailed internal error messages to the client, especially for 5xx errors in production environments.</li>
+<li><strong>Use <code>ctx.throw()</code>:</strong> Prefer <code>ctx.throw()</code> for signaling HTTP-specific errors with appropriate status codes.</li>
+</ul>
 <hr>
 <h2>Next Steps</h2>
-<p>Now that you have a basic server running, explore further:</p>
 <ul>
-<li><strong>Core Concepts:</strong> Learn about <a href="https://www.google.com/search?q=./core-concepts/routing.md">Routing</a>, the <a href="https://www.google.com/search?q=./core-concepts/context.md">Context Object</a>, <a href="https://www.google.com/search?q=./core-concepts/validation.md">Validation</a>, and <a href="https://www.google.com/search?q=./core-concepts/middleware.md">Middleware</a>.</li>
-<li><strong>Guides:</strong> Build more complex features by following the practical <a href="https://www.google.com/search?q=./guides/crud-api.md">Guides</a>.</li>
+<li>Review the <a href="https://www.google.com/search?q=./middleware.md"><strong>Middleware</strong></a> documentation for the full middleware structure.</li>
+<li>See how the <a href="https://www.google.com/search?q=./context.md"><strong>Context (<code>ctx</code>) Object</strong></a> methods (<code>throw</code>, <code>send</code>, <code>code</code>, <code>set</code>) are used.</li>
 </ul>
     </section>
  

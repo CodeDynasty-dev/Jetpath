@@ -1286,173 +1286,151 @@
       });
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
-      <h1>Quick Start Guide</h1>
-<p>Let’s build your first JetPath application! This guide will walk you through creating a simple API server that returns a welcome message.</p>
-<hr>
-<h2>Goal</h2>
-<p>Create a basic JetPath server with a single endpoint (<code>GET /</code>) that responds with JSON.</p>
-<h2>Prerequisites</h2>
-<p>Before you start, make sure you have:</p>
-<ol>
-<li>Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).</li>
-<li>Completed the steps in the <a href="./installation.md"><strong>Installation Guide</strong></a> to install JetPath and TypeScript.</li>
-<li>Optionally installed a schema library like Zod (recommended).</li>
-</ol>
-<hr>
-<h2>Step 1: Set Up Your Project Folder</h2>
-<p>Create a new directory for your project and set up the basic folder structure:</p>
-<pre><code class="language-bash"><span class="hljs-built_in">mkdir</span> my-jetpath-app
-<span class="hljs-built_in">cd</span> my-jetpath-app
-<span class="hljs-built_in">mkdir</span> src
-</code></pre>
-<p>Your structure should look like this:</p>
-<pre><code>my-jetpath-app/
-└── src/
-</code></pre>
-<hr>
-<h2>Step 2: Install Dependencies</h2>
-<p>If you haven’t already, install JetPath and a schema library (we’ll use Zod here). Choose the command for your runtime:</p>
-<pre><code class="language-shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">Using npm (Node.js)</span>
-npm install jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using yarn (Node.js)</span>
-yarn add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using pnpm (Node.js)</span>
-pnpm add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using Bun</span>
-bun add jetpath zod
-<p></code></pre></p>
-<hr>
-<h2>Step 3: Configure TypeScript (<code>tsconfig.json</code>)</h2>
-<p>Create a <code>tsconfig.json</code> file in your project root (<code>my-jetpath-app/</code>). This tells TypeScript how to compile your code.</p>
-<pre><code class="language-js"><span class="hljs-comment">// tsconfig.json</span>
-{
-  <span class="hljs-string">&quot;compilerOptions&quot;</span>: {
-    <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;ES2022&quot;</span>,
-    <span class="hljs-string">&quot;module&quot;</span>: <span class="hljs-string">&quot;ESNext&quot;</span>,
-    <span class="hljs-string">&quot;moduleResolution&quot;</span>: <span class="hljs-string">&quot;Bundler&quot;</span>, <span class="hljs-comment">// Use &quot;NodeNext&quot; or &quot;Node&quot; for Node.js if needed</span>
-    <span class="hljs-string">&quot;esModuleInterop&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;forceConsistentCasingInFileNames&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;strict&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;skipLibCheck&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;outDir&quot;</span>: <span class="hljs-string">&quot;./dist&quot;</span>, <span class="hljs-comment">// Optional: specify output directory</span>
-    <span class="hljs-string">&quot;rootDir&quot;</span>: <span class="hljs-string">&quot;./&quot;</span>,
-    <span class="hljs-string">&quot;resolveJsonModule&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;declaration&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;sourceMap&quot;</span>: <span class="hljs-literal">true</span>
-    <span class="hljs-comment">// Add &quot;types&quot;: [&quot;node&quot;] here if using Node.js and needing Node types</span>
+      <h1>API Reference: Context (<code>ctx</code>)</h1>
+<p>The <code>Context</code> object (<code>ctx</code>) is passed to every JetPath route handler and middleware function. It serves as the primary interface for interacting with the request, constructing the response, and accessing framework features.</p>
+<p><em>(This reference is based on the <code>ContextType</code> interface provided previously and examples in <code>tests/app.jet.ts</code>)</em></p>
+<h2>Interface Signature</h2>
+<pre><code class="language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">ContextType</span>&lt;
+  <span class="hljs-title class_">JetData</span> <span class="hljs-keyword">extends</span> {
+    <span class="hljs-attr">body</span>?: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt;;
+    <span class="hljs-attr">params</span>?: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt;;
+    <span class="hljs-attr">query</span>?: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt;;
   },
-  <span class="hljs-string">&quot;include&quot;</span>: [<span class="hljs-string">&quot;src/**/*.ts&quot;</span>, <span class="hljs-string">&quot;server.ts&quot;</span>], <span class="hljs-comment">// Adjust if your entry file has a different name</span>
-  <span class="hljs-string">&quot;exclude&quot;</span>: [<span class="hljs-string">&quot;node_modules&quot;</span>, <span class="hljs-string">&quot;dist&quot;</span>]
+  <span class="hljs-title class_">JetPluginTypes</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">unknown</span>&gt;[]
+&gt; {
+  <span class="hljs-comment">// Properties</span>
+  <span class="hljs-attr">app</span>: {};
+  <span class="hljs-attr">plugins</span>: <span class="hljs-title class_">UnionToIntersection</span>&lt;<span class="hljs-title class_">JetPluginTypes</span>[<span class="hljs-built_in">number</span>]&gt; &amp; <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt;;
+  <span class="hljs-attr">body</span>: <span class="hljs-title class_">JetData</span>[<span class="hljs-string">&quot;body&quot;</span>];
+  <span class="hljs-attr">query</span>: <span class="hljs-title class_">JetData</span>[<span class="hljs-string">&quot;query&quot;</span>];
+  <span class="hljs-attr">params</span>: <span class="hljs-title class_">JetData</span>[<span class="hljs-string">&quot;params&quot;</span>];
+  <span class="hljs-attr">connection</span>: jet_socket; <span class="hljs-comment">// WebSocket connection object</span>
+  <span class="hljs-attr">request</span>: <span class="hljs-title class_">Request</span>; <span class="hljs-comment">// Standard Request object</span>
+  <span class="hljs-attr">code</span>: <span class="hljs-built_in">number</span>; <span class="hljs-comment">// HTTP status code</span>
+  <span class="hljs-attr">path</span>: <span class="hljs-built_in">string</span>; <span class="hljs-comment">// Request pathname</span>
+<p><span class="hljs-comment">// Methods</span>
+<span class="hljs-title function_">eject</span>(): <span class="hljs-built_in">never</span>;
+<span class="hljs-title function_">validate</span>(<span class="hljs-attr">data</span>?: <span class="hljs-built_in">any</span>): <span class="hljs-title class_">JetData</span>[<span class="hljs-string">&quot;body&quot;</span>]; <span class="hljs-comment">// Type might vary based on usage</span>
+<span class="hljs-title function_">sendStream</span>(<span class="hljs-attr">stream</span>: <span class="hljs-built_in">any</span> | <span class="hljs-built_in">string</span>, <span class="hljs-title class_">ContentType</span>: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">never</span>;
+<span class="hljs-title function_">sendResponse</span>(<span class="hljs-attr">response</span>?: <span class="hljs-title class_">Response</span>): <span class="hljs-built_in">never</span>;
+<span class="hljs-title function_">send</span>(<span class="hljs-attr">data</span>: <span class="hljs-built_in">unknown</span>, <span class="hljs-title class_">ContentType</span>?: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">never</span>;
+<span class="hljs-keyword">throw</span>(<span class="hljs-attr">codeOrData</span>?: <span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span> | <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt; | <span class="hljs-built_in">unknown</span>, <span class="hljs-attr">message</span>?: <span class="hljs-built_in">string</span> | <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt;): <span class="hljs-built_in">never</span>;
+<span class="hljs-title function_">redirect</span>(<span class="hljs-attr">url</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">code</span>?: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">never</span>; <span class="hljs-comment">// Assuming optional code</span>
+<span class="hljs-title function_">get</span>(<span class="hljs-attr">field</span>: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">string</span> | <span class="hljs-literal">undefined</span>;
+<span class="hljs-title function_">set</span>(<span class="hljs-attr">field</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">value</span>: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">void</span>;
+<span class="hljs-title function_">json</span>(): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt;&gt;;</p>
+<p><span class="hljs-comment">// Internal Properties (Likely not for direct use)</span>
+<span class="hljs-attr">_1</span>?: <span class="hljs-built_in">string</span> | <span class="hljs-literal">undefined</span>;
+<span class="hljs-attr">_2</span>?: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>&gt;;
+<span class="hljs-attr">_3</span>?: <span class="hljs-built_in">any</span>; <span class="hljs-comment">// Stream?</span>
+<span class="hljs-attr">_4</span>?: <span class="hljs-built_in">boolean</span> | <span class="hljs-literal">undefined</span>;
+<span class="hljs-attr">_5</span>?: (<span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">never</span>) | <span class="hljs-literal">undefined</span>;
+<span class="hljs-attr">_6</span>?: <span class="hljs-title class_">Response</span> | <span class="hljs-literal">false</span>;
 }
-</code></pre>
-<p><em>(Remember to adjust <code>moduleResolution</code> and <code>types</code> based on your specific runtime and setup if needed - see the <a href="https://www.google.com/search?q=./installation.md">Installation Guide</a> for details).</em></p>
-<hr>
-<h2>Step 4: Create Your First Route</h2>
-<p>Inside the <code>src</code> directory, create a file named <code>index.jet.ts</code>. This file will automatically handle requests to the root path (<code>/</code>) of your API.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// src/index.jet.ts</span>
-<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">/**</p>
-<ul>
-<li>Handles GET requests to the root path ('/').
-*/</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">GET_</span>: <span class="hljs-title class_">JetFunc</span> = <span class="hljs-function">(<span class="hljs-params">ctx</span>) =&gt;</span> {
-<span class="hljs-comment">// Use the context (ctx) to send a response</span>
-ctx.<span class="hljs-title function_">send</span>({
-<span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span>,
-<span class="hljs-attr">status</span>: <span class="hljs-string">&quot;ok&quot;</span>,
-<span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
-});
-};</li>
-</ul>
-<p><span class="hljs-comment">// Optional: Add description for API documentation</span>
-<span class="hljs-variable constant_">GET_</span>.<span class="hljs-property">info</span> = <span class="hljs-string">&quot;Returns a welcome message and API status.&quot;</span>;</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the <code>JetFunc</code> type for better type checking of our handler.</li>
-<li>We export a constant named <code>GET_</code>. The <code>GET</code> part maps to the HTTP GET method, and the <code>_</code> combined with the filename <code>index.jet.ts</code> maps to the root path <code>/</code>.</li>
-<li>The function receives the <code>ctx</code> (Context) object.</li>
-<li><code>ctx.send()</code> sends a JSON response back to the client. JetPath automatically sets the <code>Content-Type</code> header to <code>application/json</code> for objects.</li>
-</ul>
-<hr>
-<h2>Step 5: Create the Server Entry Point</h2>
-<p>Now, create a file named <code>server.ts</code> in your project root (<code>my-jetpath-app/</code>). This file initializes and starts the JetPath server.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">// Define the port the server will listen on</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">3000</span>;</p>
-<p><span class="hljs-comment">// Create a new JetPath instance</span>
-<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
-<span class="hljs-comment">// Specify the directory containing your route files (.jet.ts)</span>
-<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>,</p>
-<p><span class="hljs-comment">// Configure the server port</span>
-<span class="hljs-attr">port</span>: <span class="hljs-variable constant_">PORT</span>,</p>
-<p><span class="hljs-comment">// Configure API documentation generation (optional but recommended)</span>
-<span class="hljs-attr">apiDoc</span>: {
-<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;My First JetPath API&quot;</span>,
-<span class="hljs-attr">info</span>: <span class="hljs-string">&quot;This is the documentation for the Quick Start API.&quot;</span>,
-<span class="hljs-attr">color</span>: <span class="hljs-string">&quot;#7e57c2&quot;</span>, <span class="hljs-comment">// Choose a color!</span>
-},
-<span class="hljs-title class_">APIdisplay</span>: <span class="hljs-string">&quot;UI&quot;</span>, <span class="hljs-comment">// Enable the interactive Swagger-like UI at /docs</span>
-});</p>
-<p><span class="hljs-comment">// Start listening for incoming requests</span>
-app.<span class="hljs-title function_">listen</span>();</p>
-<p><span class="hljs-comment">// Log messages to the console</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>🚀 JetPath server running on http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;</code></span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>📚 API Docs available at http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;/docs</code></span>);</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the main <code>JetPath</code> class.</li>
-<li>We create a new instance, passing configuration options:
-<ul>
-<li><code>source</code>: Tells JetPath where to find your route files.</li>
-<li><code>port</code>: The port number for the server.</li>
-<li><code>apiDoc</code>, <code>APIdisplay</code>: Configures the built-in documentation generator.</li>
-</ul>
-</li>
-<li><code>app.listen()</code> starts the server.</li>
-</ul>
-<hr>
-<h2>Step 6: Run Your Server</h2>
-<p>Open your terminal in the project root (<code>my-jetpath-app/</code>) and run the server using your chosen runtime:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Using Node.js (you might need ts-node or compile first)</span>
-<span class="hljs-comment"># Option 1: Use ts-node (if installed: npm install -D ts-node)</span>
-npx ts-node server.ts
-<span class="hljs-comment"># Option 2: Compile and run</span>
-<span class="hljs-comment"># tsc &amp;&amp; node dist/server.js</span>
-<p><span class="hljs-comment"># Using Deno</span>
-deno run --allow-net --allow-read server.ts</p>
-<p><span class="hljs-comment"># Using Bun</span>
-bun run server.ts
 </code></pre></p>
-<p>You should see the following output (or similar):</p>
-<pre><code>🚀 JetPath server running on http://localhost:3000
-📚 API Docs available at http://localhost:3000/docs
-</code></pre>
-<hr>
-<h2>Step 7: Verify It Works!</h2>
-<ol>
-<li><strong>Check the API:</strong> Open your web browser and navigate to <code>http://localhost:3000</code>. You should see the JSON response:<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span>
-<span class="hljs-punctuation">}</span>
-</code></pre>
-</li>
-<li><strong>Check the Docs:</strong> Navigate to <code>http://localhost:3000/docs</code>. You should see the interactive API documentation UI, listing your <code>GET /</code> endpoint.</li>
-</ol>
-<p><strong>Congratulations! You’ve successfully created and run your first JetPath application!</strong></p>
-<hr>
-<h2>Next Steps</h2>
-<p>Now that you have a basic server running, explore further:</p>
+<h2>Properties Reference</h2>
 <ul>
-<li><strong>Core Concepts:</strong> Learn about <a href="https://www.google.com/search?q=./core-concepts/routing.md">Routing</a>, the <a href="https://www.google.com/search?q=./core-concepts/context.md">Context Object</a>, <a href="https://www.google.com/search?q=./core-concepts/validation.md">Validation</a>, and <a href="https://www.google.com/search?q=./core-concepts/middleware.md">Middleware</a>.</li>
-<li><strong>Guides:</strong> Build more complex features by following the practical <a href="https://www.google.com/search?q=./guides/crud-api.md">Guides</a>.</li>
+<li><strong><code>app: {}</code></strong>
+<ul>
+<li>Request-scoped object for sharing state between middleware/handlers. Type defined by <code>JetMiddleware</code> generic <code>AppState</code>.</li>
 </ul>
+</li>
+<li><strong><code>plugins: { ... }</code></strong>
+<ul>
+<li>Access methods exposed by registered plugins. Type defined by <code>JetMiddleware</code>/<code>JetFunc</code> generic <code>JetPluginTypes</code>.</li>
+</ul>
+</li>
+<li><strong><code>body: T</code></strong>
+<ul>
+<li>Holds the <em>parsed</em> request body. Populated after calling <code>ctx.json()</code>, <code>ctx.plugins.formData()</code>, <code>ctx.validate()</code>, or via eager pre-processing. Type <code>T</code> inferred from schema.</li>
+</ul>
+</li>
+<li><strong><code>query: T</code></strong>
+<ul>
+<li>Object containing parsed URL query string parameters. Type <code>T</code> inferred from schema. Defaults to <code>Record&lt;string, string | string[]&gt;</code>.</li>
+</ul>
+</li>
+<li><strong><code>params: T</code></strong>
+<ul>
+<li>Object containing parameters from dynamic route segments (e.g., <code>:id</code>). Type <code>T</code> inferred from schema. Defaults to <code>Record&lt;string, string&gt;</code>.</li>
+</ul>
+</li>
+<li><strong><code>connection: jet_socket</code></strong>
+<ul>
+<li>WebSocket connection object, available only in <code>WS_</code> route handlers.</li>
+</ul>
+</li>
+<li><strong><code>request: Request</code></strong>
+<ul>
+<li>The underlying standard Web <code>Request</code> object.</li>
+</ul>
+</li>
+<li><strong><code>code: number</code></strong>
+<ul>
+<li>Get/Set the HTTP status code for the response (default: 200).</li>
+</ul>
+</li>
+<li><strong><code>path: string</code></strong>
+<ul>
+<li>The pathname part of the request URL.</li>
+</ul>
+</li>
+</ul>
+<h2>Methods Reference</h2>
+<p><em>(Methods returning <code>never</code> terminate the request flow)</em></p>
+<ul>
+<li><strong><code>eject(): never</code></strong>
+<ul>
+<li>Detaches JetPath’s automatic response handling. Use for manual stream control.</li>
+</ul>
+</li>
+<li><strong><code>validate(dataOrSchema?: any): T</code></strong>
+<ul>
+<li>Validates context data (body, query, params) against a schema. Throws on error, returns validated data (<code>T</code>) on success.</li>
+</ul>
+</li>
+<li><strong><code>sendStream(stream: ReadableStream | any, ContentType: string): never</code></strong>
+<ul>
+<li>Sends a <code>ReadableStream</code> as the response body. Set <code>ContentType</code>.</li>
+</ul>
+</li>
+<li><strong><code>sendResponse(response?: Response): never</code></strong>
+<ul>
+<li>Sends a pre-constructed standard <code>Response</code> object. Bypasses JetPath serialization.</li>
+</ul>
+</li>
+<li><strong><code>send(data: unknown, ContentType?: string): never</code></strong>
+<ul>
+<li>Sends a response. Auto-serializes objects/arrays to JSON (<code>application/json</code>). Sets <code>Content-Type</code> based on data type or argument. Uses <code>ctx.code</code> for status.</li>
+</ul>
+</li>
+<li><strong><code>throw(codeOrData?, message?): never</code></strong>
+<ul>
+<li>Signals an HTTP error, interrupting flow. Caught by middleware. See <a href="https://www.google.com/search?q=./error-handling.md">Error Handling</a>.</li>
+</ul>
+</li>
+<li><strong><code>redirect(url: string, code: number = 302): never</code></strong>
+<ul>
+<li>Sends an HTTP redirect response (default status 302). Sets <code>Location</code> header.</li>
+</ul>
+</li>
+<li><strong><code>get(field: string): string | undefined</code></strong>
+<ul>
+<li>Gets a request header value (case-insensitive).</li>
+</ul>
+</li>
+<li><strong><code>set(field: string, value: string): void</code></strong>
+<ul>
+<li>Sets a response header value.</li>
+</ul>
+</li>
+<li><strong><code>json(): Promise&lt;Record&lt;string, any&gt;&gt;</code></strong>
+<ul>
+<li>Asynchronously parses the request body as JSON and assigns it to <code>ctx.body</code>. Throws on invalid JSON or if body already consumed.</li>
+</ul>
+</li>
+</ul>
+<p><em>(For more detailed examples and usage context, please refer to the <a href="https://www.google.com/search?q=./context.md">Core Concepts: Context</a> page.)</em></p>
     </section>
  
  

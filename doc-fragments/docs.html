@@ -9,11 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet"> 
-  <link rel="stylesheet" href="/bundle.css">
+ <link rel="stylesheet" href="/bundle.css">
+<link rel="stylesheet" href="/custom-typography.css">
   <style> 
-
  
-
     :root {
       --primary: #6EE7B7;
       --primary-dark: #10B981;
@@ -157,13 +156,64 @@
 
     .mobile-menu-btn {
       display: none;
-      background: none;
+      padding: 0.5rem;
       border: none;
-      color: var(--text);
-      font-size: 1.5rem;
+      background: transparent;
       cursor: pointer;
+      z-index: 100;
     }
-  
+
+    .mobile-menu-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 85;
+    }
+
+    @media (max-width: 1024px) {
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      #doc-side-bar {
+        position: fixed;
+        top: 0;
+        left: -256px;
+        width: 256px;
+        height: 100vh;
+        background: rgba(10, 10, 10, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-right: 1px solid var(--border);
+        z-index: 90;
+        padding: 2rem 1rem;
+        transition: left 0.3s ease;
+      }
+
+      #doc-side-bar.active {
+        left: 0;
+        display: block;
+      }
+
+      .mobile-overlay.active {
+        display: block;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 4rem 1.5rem 1.5rem;
+      }
+    }
+
     /* Code Demo */
     .code-demo {
       width: 100%;
@@ -683,7 +733,7 @@
         padding: 1.5rem;
         background: rgba(10, 10, 10, 0.95);
         backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        -webkit-backpack-filter: blur(10px);
         border-bottom: 1px solid var(--border);
       }
 
@@ -1047,12 +1097,12 @@
   <header class="header">
     <div class="container header-container m-0">
       <div class="logo-container">
-        <a href="#" class="logo">
+        <a href="/" class="logo">
           <div class="flex gap-1">
             <img src="/icon-transparent.webp" class="h-[48px] " alt="">
           </div>
         </a>
-        <a href="#" class="logo">
+        <a href="/" class="logo">
           <span class="logo-text">JetPath</span>
         </a>
       </div>
@@ -1070,24 +1120,23 @@
       </div>
 
       <nav class="nav">  
-        <a href="#performance" class="nav-link">Performance</a>
-        <a href="#ecosystem" class="nav-link">Ecosystem</a>
+        <a href="/performance" class="nav-link">Performance</a>
+        <a href="/ecosystem" class="nav-link">Ecosystem</a>
         <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
       </nav>
 
-      <button class="mobile-menu-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
+      <button class="mobile-menu-btn" aria-label="Toggle navigation">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </div>
   </header>
  
+  <div class="mobile-overlay"></div>
+
   <!-- Sidebar -->
-  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-[8rem]">
+  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-[2rem]">
     <nav class="sticky top-[calc(4rem+1px+2rem)] h-full">
       <!-- Search -->
       <div class="px-4 py-6">
@@ -1117,9 +1166,9 @@
             </svg>
           </div>
           <div class="space-y-1 pl-6 mt-2" id="getting-started-content">
-            <a href="/docs/introduction" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Introduction</a>
-            <a href="/docs/installation" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Installation</a>
-            <a href="/docs/quickstart" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Quick Start</a>
+            <a href="/docs/introduction.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Introduction</a>
+            <a href="/docs/installation.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Installation</a>
+            <a href="/docs/quickstart.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Quick Start</a>
           </div>
         </div>
 
@@ -1137,11 +1186,10 @@
             </svg>
           </div>
           <div class="space-y-1 pl-6 mt-2" id="core-concepts-content">
-            <a href="/docs/routing" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Routing</a>
-            <a href="/docs/middleware" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Middleware</a>
-            <a href="/docs/request" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Request</a>
-            <a href="/docs/response" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Response</a>
-            <a href="/docs/error-handling" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Error Handling</a>
+            <a href="/docs/routing.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Routing</a>
+            <a href="/docs/middleware.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Middleware</a>
+            <a href="/docs/context.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Context (ctx)</a>
+            <a href="/docs/error-handling.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Error Handling</a>
           </div>
         </div>
 
@@ -1159,10 +1207,10 @@
             </svg>
           </div>
           <div class="space-y-1 pl-6 mt-2" id="advanced-content">
-            <a href="/docs/plugins" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Plugins</a>
-            <a href="/docs/dependency-injection" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Dependency Injection</a>
-            <a href="/docs/testing" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Testing</a>
-            <a href="/docs/deployment" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Deployment</a>
+            <a href="/docs/plugins.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Plugins</a>
+            <a href="/docs/dependency-injection.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Dependency Injection</a>
+            <a href="/docs/testing.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Testing</a>
+            <a href="/docs/deployment.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Deployment</a>
           </div>
         </div>
 
@@ -1180,9 +1228,8 @@
             </svg>
           </div>
           <div class="space-y-1 pl-6 mt-2" id="api-reference-content">
-            <a href="/docs/api/types" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Types</a>
-            <a href="/docs/api/decorators" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Decorators</a>
-            <a href="/docs/api/context" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Context</a>
+            <a href="/docs/api-reference/types.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Types</a>
+              <a href="/docs/api-reference/context.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Context</a>
           </div>
         </div>
       </div>
@@ -1238,7 +1285,7 @@
         });
       });
     </script>
-    <section class="section interactive-features" >
+    <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
       {{content}}
     </section>
  
@@ -1289,30 +1336,29 @@
         <div class="footer-links-group">
           <h4 class="footer-heading">Documentation</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="#">Getting Started</a></li>
-            <li class="footer-link"><a href="#">API Reference</a></li>
-            <li class="footer-link"><a href="#">Tutorials</a></li>
-            <li class="footer-link"><a href="#">Examples</a></li>
+            <li class="footer-link"><a href="/docs/introduction.html">Getting Started</a></li>
+            <li class="footer-link"><a href="/docs/installation.html">API Reference</a></li>
+            <li class="footer-link"><a href="/docs/installation.html">Installation</a></li>
+            <li class="footer-link"><a href="/docs/home-links/toturial.html">Tutorials</a></li>
           </ul>
         </div>
 
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="#">GitHub</a></li>
-            <li class="footer-link"><a href="#">Discord</a></li>
-            <li class="footer-link"><a href="#">Twitter</a></li>
-            <li class="footer-link"><a href="#">Blog</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
+            <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
+            <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
           </ul>
         </div>
 
         <div class="footer-links-group">
           <h4 class="footer-heading">More</h4>
-          <ul class="footer-links">
-            <li class="footer-link"><a href="#">Showcase</a></li>
-            <li class="footer-link"><a href="#">Roadmap</a></li>
-            <li class="footer-link"><a href="#">Contribute</a></li>
-            <li class="footer-link"><a href="#">Sponsors</a></li>
+          <ul class="footer-links"> 
+            <li class="footer-link"><a href="/docs/roadmap.html">Roadmap</a></li>
+            <li class="footer-link"><a href="/docs/contribute.html">Contribute</a></li>
+            <li class="footer-link"><a href="/docs/sponsors.html">Sponsors</a></li>
           </ul>
         </div>
       </div>
@@ -1333,13 +1379,7 @@
         header.classList.remove('header-scrolled');
       }
     });
-
-    // Mobile menu toggle
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const nav = document.querySelector('.nav');
-    mobileMenuBtn.addEventListener('click', () => {
-      nav.classList.toggle('active');
-    });
+ 
 
     // Code tabs
     const codeTabs = document.querySelectorAll('.code-tab');
@@ -1510,6 +1550,31 @@
       });
     });
 
+    // Mobile menu functionality
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn'); 
+    const sidebar = document.getElementById('doc-side-bar');
+    const mobileOverlay = document.querySelector('.mobile-overlay');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      mobileOverlay.classList.toggle('active');
+    });
+
+    mobileOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      mobileOverlay.classList.remove('active');
+    });
+
+    // Close menu when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 1024 && 
+          !sidebar.contains(e.target) && 
+          !mobileMenuBtn.contains(e.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+      }
+    });
   </script>
   <script src="/prism.js"></script>
 </body>

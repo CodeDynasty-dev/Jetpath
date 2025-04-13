@@ -1286,172 +1286,135 @@
       });
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
-      <h1>Quick Start Guide</h1>
-<p>Let’s build your first JetPath application! This guide will walk you through creating a simple API server that returns a welcome message.</p>
+      <h1>Installation</h1>
+<p>Get ready to build universal JavaScript backends! Installing JetPath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.</p>
 <hr>
-<h2>Goal</h2>
-<p>Create a basic JetPath server with a single endpoint (<code>GET /</code>) that responds with JSON.</p>
 <h2>Prerequisites</h2>
-<p>Before you start, make sure you have:</p>
+<p>Before you begin, ensure you have the following installed:</p>
 <ol>
-<li>Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).</li>
-<li>Completed the steps in the <a href="./installation.md"><strong>Installation Guide</strong></a> to install JetPath and TypeScript.</li>
-<li>Optionally installed a schema library like Zod (recommended).</li>
-</ol>
-<hr>
-<h2>Step 1: Set Up Your Project Folder</h2>
-<p>Create a new directory for your project and set up the basic folder structure:</p>
-<pre><code class="language-bash"><span class="hljs-built_in">mkdir</span> my-jetpath-app
-<span class="hljs-built_in">cd</span> my-jetpath-app
-<span class="hljs-built_in">mkdir</span> src
-</code></pre>
-<p>Your structure should look like this:</p>
-<pre><code>my-jetpath-app/
-└── src/
-</code></pre>
-<hr>
-<h2>Step 2: Install Dependencies</h2>
-<p>If you haven’t already, install JetPath and a schema library (we’ll use Zod here). Choose the command for your runtime:</p>
-<pre><code class="language-shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">Using npm (Node.js)</span>
-npm install jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using yarn (Node.js)</span>
-yarn add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using pnpm (Node.js)</span>
-pnpm add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using Bun</span>
-bun add jetpath zod
-<p></code></pre></p>
-<hr>
-<h2>Step 3: Configure TypeScript (<code>tsconfig.json</code>)</h2>
-<p>Create a <code>tsconfig.json</code> file in your project root (<code>my-jetpath-app/</code>). This tells TypeScript how to compile your code.</p>
-<pre><code class="language-js"><span class="hljs-comment">// tsconfig.json</span>
-{
-  <span class="hljs-string">&quot;compilerOptions&quot;</span>: {
-    <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;ES2022&quot;</span>,
-    <span class="hljs-string">&quot;module&quot;</span>: <span class="hljs-string">&quot;ESNext&quot;</span>,
-    <span class="hljs-string">&quot;moduleResolution&quot;</span>: <span class="hljs-string">&quot;Bundler&quot;</span>, <span class="hljs-comment">// Use &quot;NodeNext&quot; or &quot;Node&quot; for Node.js if needed</span>
-    <span class="hljs-string">&quot;esModuleInterop&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;forceConsistentCasingInFileNames&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;strict&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;skipLibCheck&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;outDir&quot;</span>: <span class="hljs-string">&quot;./dist&quot;</span>, <span class="hljs-comment">// Optional: specify output directory</span>
-    <span class="hljs-string">&quot;rootDir&quot;</span>: <span class="hljs-string">&quot;./&quot;</span>,
-    <span class="hljs-string">&quot;resolveJsonModule&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;declaration&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;sourceMap&quot;</span>: <span class="hljs-literal">true</span>
-    <span class="hljs-comment">// Add &quot;types&quot;: [&quot;node&quot;] here if using Node.js and needing Node types</span>
-  },
-  <span class="hljs-string">&quot;include&quot;</span>: [<span class="hljs-string">&quot;src/**/*.ts&quot;</span>, <span class="hljs-string">&quot;server.ts&quot;</span>], <span class="hljs-comment">// Adjust if your entry file has a different name</span>
-  <span class="hljs-string">&quot;exclude&quot;</span>: [<span class="hljs-string">&quot;node_modules&quot;</span>, <span class="hljs-string">&quot;dist&quot;</span>]
-}
-</code></pre>
-<p><em>(Remember to adjust <code>moduleResolution</code> and <code>types</code> based on your specific runtime and setup if needed - see the <a href="https://www.google.com/search?q=./installation.md">Installation Guide</a> for details).</em></p>
-<hr>
-<h2>Step 4: Create Your First Route</h2>
-<p>Inside the <code>src</code> directory, create a file named <code>index.jet.ts</code>. This file will automatically handle requests to the root path (<code>/</code>) of your API.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// src/index.jet.ts</span>
-<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">/**</p>
+<li><strong>A JavaScript Runtime:</strong>
 <ul>
-<li>Handles GET requests to the root path ('/').
-*/</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">GET_</span>: <span class="hljs-title class_">JetFunc</span> = <span class="hljs-function">(<span class="hljs-params">ctx</span>) =&gt;</span> {
-<span class="hljs-comment">// Use the context (ctx) to send a response</span>
-ctx.<span class="hljs-title function_">send</span>({
-<span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span>,
-<span class="hljs-attr">status</span>: <span class="hljs-string">&quot;ok&quot;</span>,
-<span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
-});
-};</li>
-</ul>
-<p><span class="hljs-comment">// Optional: Add description for API documentation</span>
-<span class="hljs-variable constant_">GET_</span>.<span class="hljs-property">info</span> = <span class="hljs-string">&quot;Returns a welcome message and API status.&quot;</span>;</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the <code>JetFunc</code> type for better type checking of our handler.</li>
-<li>We export a constant named <code>GET_</code>. The <code>GET</code> part maps to the HTTP GET method, and the <code>_</code> combined with the filename <code>index.jet.ts</code> maps to the root path <code>/</code>.</li>
-<li>The function receives the <code>ctx</code> (Context) object.</li>
-<li><code>ctx.send()</code> sends a JSON response back to the client. JetPath automatically sets the <code>Content-Type</code> header to <code>application/json</code> for objects.</li>
-</ul>
-<hr>
-<h2>Step 5: Create the Server Entry Point</h2>
-<p>Now, create a file named <code>server.ts</code> in your project root (<code>my-jetpath-app/</code>). This file initializes and starts the JetPath server.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">// Define the port the server will listen on</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">3000</span>;</p>
-<p><span class="hljs-comment">// Create a new JetPath instance</span>
-<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
-<span class="hljs-comment">// Specify the directory containing your route files (.jet.ts)</span>
-<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>,</p>
-<p><span class="hljs-comment">// Configure the server port</span>
-<span class="hljs-attr">port</span>: <span class="hljs-variable constant_">PORT</span>,</p>
-<p><span class="hljs-comment">// Configure API documentation generation (optional but recommended)</span>
-<span class="hljs-attr">apiDoc</span>: {
-<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;My First JetPath API&quot;</span>,
-<span class="hljs-attr">info</span>: <span class="hljs-string">&quot;This is the documentation for the Quick Start API.&quot;</span>,
-<span class="hljs-attr">color</span>: <span class="hljs-string">&quot;#7e57c2&quot;</span>, <span class="hljs-comment">// Choose a color!</span>
-},
-<span class="hljs-title class_">APIdisplay</span>: <span class="hljs-string">&quot;UI&quot;</span>, <span class="hljs-comment">// Enable the interactive Swagger-like UI at /docs</span>
-});</p>
-<p><span class="hljs-comment">// Start listening for incoming requests</span>
-app.<span class="hljs-title function_">listen</span>();</p>
-<p><span class="hljs-comment">// Log messages to the console</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>🚀 JetPath server running on http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;</code></span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>📚 API Docs available at http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;/docs</code></span>);</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the main <code>JetPath</code> class.</li>
-<li>We create a new instance, passing configuration options:
-<ul>
-<li><code>source</code>: Tells JetPath where to find your route files.</li>
-<li><code>port</code>: The port number for the server.</li>
-<li><code>apiDoc</code>, <code>APIdisplay</code>: Configures the built-in documentation generator.</li>
+<li><strong>Node.js:</strong> Version 18.x or later recommended. (<a href="https://nodejs.org/">Download Node.js</a>)</li>
+<li><strong>Deno:</strong> Version 1.30 or later recommended. (<a href="https://deno.land/manual/getting_started/installation">Install Deno</a>)</li>
+<li><strong>Bun:</strong> Version 1.0 or later recommended. (<a href="https://bun.sh/docs/installation">Install Bun</a>)</li>
 </ul>
 </li>
-<li><code>app.listen()</code> starts the server.</li>
-</ul>
-<hr>
-<h2>Step 6: Run Your Server</h2>
-<p>Open your terminal in the project root (<code>my-jetpath-app/</code>) and run the server using your chosen runtime:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Using Node.js (you might need ts-node or compile first)</span>
-<span class="hljs-comment"># Option 1: Use ts-node (if installed: npm install -D ts-node)</span>
-npx ts-node server.ts
-<span class="hljs-comment"># Option 2: Compile and run</span>
-<span class="hljs-comment"># tsc &amp;&amp; node dist/server.js</span>
-<p><span class="hljs-comment"># Using Deno</span>
-deno run --allow-net --allow-read server.ts</p>
-<p><span class="hljs-comment"># Using Bun</span>
-bun run server.ts
-</code></pre></p>
-<p>You should see the following output (or similar):</p>
-<pre><code>🚀 JetPath server running on http://localhost:3000
-📚 API Docs available at http://localhost:3000/docs
+<li><strong>TypeScript:</strong> JetPath is built with TypeScript and provides first-class typing support. While you can use it with JavaScript, TypeScript is highly recommended for the best experience.<pre><code class="language-bash">npm install -g typescript <span class="hljs-comment"># Or use the version included with Deno/Bun</span>
 </code></pre>
+</li>
+<li><strong>(Optional but Recommended) A Schema Validation Library:</strong> For robust validation and type inference, we strongly recommend installing a library like Zod or TypeBox. Examples in this documentation often use Zod.<pre><code class="language-bash">npm install zod
+<span class="hljs-comment"># or</span>
+bun add zod
+<span class="hljs-comment"># or import from a CDN/registry in Deno</span>
+</code></pre>
+</li>
+</ol>
 <hr>
-<h2>Step 7: Verify It Works!</h2>
-<ol>
-<li><strong>Check the API:</strong> Open your web browser and navigate to <code>http://localhost:3000</code>. You should see the JSON response:<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span>
+<h2>Installing JetPath</h2>
+<p>Choose the installation method corresponding to your primary development runtime.</p>
+<h3>1. For Node.js (using npm, yarn, or pnpm)</h3>
+<p>If you’re developing primarily within the Node.js ecosystem:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Using npm</span>
+npm install jetpath
+<p><span class="hljs-comment"># Using yarn</span>
+yarn add jetpath</p>
+<p><span class="hljs-comment"># Using pnpm</span>
+pnpm add jetpath
+</code></pre></p>
+<p>Don’t forget your preferred schema library:</p>
+<pre><code class="language-bash">npm install zod
+<span class="hljs-comment"># or</span>
+yarn add zod
+<span class="hljs-comment"># or</span>
+pnpm add zod
+</code></pre>
+<h3>2. For Deno</h3>
+<p>Deno typically uses direct URL imports. Add JetPath as a dependency in your <code>deno.json</code> or <code>jsr.json</code> file, or import it directly.</p>
+<p><strong>(Option A - Using <code>deno.json</code> / <code>jsr.json</code>)</strong></p>
+<p>Add JetPath and your schema library to your import map or dependency list (replace with actual URLs/versions when available):</p>
+<pre><code class="language-jsonc"><span class="hljs-comment">// deno.json (example using import map)</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;imports&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;jetpath&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jsr:@jetpath/jetpath@^0.1.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Example using JSR</span>
+    <span class="hljs-attr">&quot;zod&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npm:zod@^3.23.0&quot;</span> <span class="hljs-comment">// Example using npm specifier</span>
+    <span class="hljs-comment">// OR direct URLs:</span>
+    <span class="hljs-comment">// &quot;jetpath&quot;: &quot;[https://deno.land/x/jetpath@v0.1.0/mod.ts](https://deno.land/x/jetpath@v0.1.0/mod.ts)&quot;, // Example Deno Land URL</span>
+    <span class="hljs-comment">// &quot;zod&quot;: &quot;[https://deno.land/x/zod@v3.23.0/mod.ts](https://deno.land/x/zod@v3.23.0/mod.ts)&quot;</span>
+  <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
-</li>
-<li><strong>Check the Docs:</strong> Navigate to <code>http://localhost:3000/docs</code>. You should see the interactive API documentation UI, listing your <code>GET /</code> endpoint.</li>
+<p><strong>(Option B - Direct URL Import)</strong></p>
+<p>Import directly in your TypeScript files (replace with actual URLs when available):</p>
+<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jsr:@jetpath/jetpath@^0.1.0&quot;</span>; <span class="hljs-comment">// Example JSR</span>
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;npm:zod@^3.23.0&quot;</span>; <span class="hljs-comment">// Example npm specifier</span>
+<span class="hljs-comment">// OR</span>
+<span class="hljs-comment">// import { JetPath } from &quot;[https://deno.land/x/jetpath@v0.1.0/mod.ts](https://deno.land/x/jetpath@v0.1.0/mod.ts)&quot;;</span>
+<span class="hljs-comment">// import { z } from &quot;[https://deno.land/x/zod@v3.23.0/mod.ts](https://deno.land/x/zod@v3.23.0/mod.ts)&quot;;</span>
+</code></pre>
+<h3>3. For Bun</h3>
+<p>If you’re developing primarily with Bun:</p>
+<pre><code class="language-bash">bun add jetpath
+</code></pre>
+<p>Install your schema library:</p>
+<pre><code class="language-bash">bun add zod
+</code></pre>
+<hr>
+<h2>Project Setup</h2>
+<p>Regardless of the runtime, a basic project structure and TypeScript configuration are recommended.</p>
+<p><strong>1. Folder Structure:</strong></p>
+<p>A common structure looks like this:</p>
+<pre><code>your-project/
+├── src/              # Your JetPath route handlers (.jet.ts files)
+│   └── index.jet.ts  # Maps to &quot;/&quot;
+├── server.ts         # Your main server entry point (initializes JetPath)
+├── node_modules/     # (Node.js/Bun)
+├── package.json      # (Node.js/Bun)
+├── bun.lockb         # (Bun)
+├── deno.json         # (Deno - optional)
+└── tsconfig.json     # TypeScript configuration
+</code></pre>
+<p><strong>2. TypeScript Configuration (<code>tsconfig.json</code>):</strong></p>
+<p>Create a <code>tsconfig.json</code> file in your project root. A good starting point:</p>
+<pre><code class="language-js">{
+  <span class="hljs-string">&quot;compilerOptions&quot;</span>: {
+    <span class="hljs-comment">/* Base Options */</span>
+    <span class="hljs-string">&quot;esModuleInterop&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Enables compatibility with CommonJS modules</span>
+    <span class="hljs-string">&quot;skipLibCheck&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Speeds up compilation by skipping type checking of declaration files</span>
+    <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;ES2022&quot;</span>, <span class="hljs-comment">// Target modern ECMAScript features</span>
+    <span class="hljs-string">&quot;allowJs&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Allow JavaScript files to be compiled</span>
+    <span class="hljs-string">&quot;resolveJsonModule&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Allow importing JSON files</span>
+    <span class="hljs-string">&quot;moduleDetection&quot;</span>: <span class="hljs-string">&quot;force&quot;</span>, <span class="hljs-comment">// Treat files as modules</span>
+    <span class="hljs-comment">/* Module Resolution */</span>
+    <span class="hljs-string">&quot;module&quot;</span>: <span class="hljs-string">&quot;ESNext&quot;</span>, <span class="hljs-comment">// Use modern module system </span>
+    <span class="hljs-comment">/* Strictness &amp; Code Quality */</span>
+    <span class="hljs-string">&quot;strict&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Enable all strict type-checking options</span>
+    <span class="hljs-string">&quot;noUncheckedIndexedAccess&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Add &#x27;undefined&#x27; to indexed types</span>
+    <span class="hljs-string">&quot;noImplicitAny&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Require explicit &#x27;any&#x27; type</span>
+    <span class="hljs-string">&quot;forceConsistentCasingInFileNames&quot;</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Disallow inconsistently-cased references to the same file</span>
+    <span class="hljs-comment">/* Output */</span>
+    <span class="hljs-string">&quot;outDir&quot;</span>: <span class="hljs-string">&quot;./dist&quot;</span>, <span class="hljs-comment">// Optional: Output directory for compiled JavaScript</span>
+    <span class="hljs-string">&quot;rootDir&quot;</span>: <span class="hljs-string">&quot;./&quot;</span>,    <span class="hljs-comment">// Specify the root directory of input files </span>
+  }, 
+  <span class="hljs-string">&quot;exclude&quot;</span>: [<span class="hljs-string">&quot;node_modules&quot;</span>, <span class="hljs-string">&quot;dist&quot;</span>] <span class="hljs-comment">// Files/directories to exclude</span>
+}
+<p></code></pre></p>
+<ul>
+<li><strong>Adjust <code>moduleResolution</code>:</strong> Use <code>&quot;Bundler&quot;</code> (recommended for modern tools), <code>&quot;NodeNext&quot;</code> (for Node ESM), or <code>&quot;Node&quot;</code> (for Node CJS) depending on your Node.js setup. Deno’s module resolution might not require explicit setting here if using import maps.</li>
+<li><strong>Adjust <code>types</code>:</strong> Add <code>&quot;node&quot;</code> if you need Node.js built-in types.</li>
+</ul>
+<hr>
+<h2>Verify Installation</h2>
+<ol>
+<li>Create the basic <code>src/index.jet.ts</code> and <code>server.ts</code> files as shown in the <a href="https://www.google.com/search?q=./quick-start.md"><strong>Quick Start</strong></a> guide.</li>
+<li>Run your <code>server.ts</code> file using your chosen runtime (node, deno run, bun run).</li>
+<li>Visit <code>http://localhost:3000</code> (or your configured port) in your browser. You should see the welcome message from your root route.</li>
 </ol>
-<p><strong>Congratulations! You’ve successfully created and run your first JetPath application!</strong></p>
+<p>If you see the welcome message, JetPath is installed and configured correctly!</p>
 <hr>
 <h2>Next Steps</h2>
-<p>Now that you have a basic server running, explore further:</p>
 <ul>
-<li><strong>Core Concepts:</strong> Learn about <a href="https://www.google.com/search?q=./core-concepts/routing.md">Routing</a>, the <a href="https://www.google.com/search?q=./core-concepts/context.md">Context Object</a>, <a href="https://www.google.com/search?q=./core-concepts/validation.md">Validation</a>, and <a href="https://www.google.com/search?q=./core-concepts/middleware.md">Middleware</a>.</li>
-<li><strong>Guides:</strong> Build more complex features by following the practical <a href="https://www.google.com/search?q=./guides/crud-api.md">Guides</a>.</li>
+<li><strong>Quick Start:</strong> Build your first simple API following the <a href="https://www.google.com/search?q=./quick-start.md"><strong>Quick Start</strong></a> guide.</li>
+<li><strong>Core Concepts:</strong> Dive deeper into how JetPath works by reading the <a href="https://www.google.com/search?q=./core-concepts/routing.md"><strong>Core Concepts</strong></a>.</li>
 </ul>
     </section>
  

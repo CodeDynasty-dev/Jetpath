@@ -1,0 +1,181 @@
+/* Custom Typography Styles */
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --font-size-6xl: 4rem;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+}
+
+/* Base Typography */
+body {
+  font-family: var(--font-family);
+  line-height: var(--line-height-normal);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: var(--line-height-tight);
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: var(--font-size-4xl);
+  color: var(--text);
+}
+
+h2 {
+  font-size: var(--font-size-3xl);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: var(--font-size-2xl);
+  color: var(--text);
+}
+
+h4 {
+  font-size: var(--font-size-xl);
+  color: var(--text-light);
+}
+
+h5 {
+  font-size: var(--font-size-lg);
+  color: var(--text-light);
+}
+
+h6 {
+  font-size: var(--font-size-base);
+  color: var(--text-light);
+}
+
+/* Paragraphs */
+p {
+  font-size: var(--font-size-base);
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+}
+
+/* Lists */
+ul, ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* Code Blocks */
+pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  background: rgba(16, 16, 16, 0.9);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  background: rgba(16, 16, 16, 0.9);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: var(--primary);
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 3px solid var(--primary);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background: rgba(16, 16, 16, 0.9);
+  color: var(--text-light);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-weight: 600;
+  background: rgba(16, 16, 16, 0.9);
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
+/* Emphasis */
+strong {
+  color: var(--text);
+}
+
+em {
+  color: var(--text-light);
+}
+
+/* Horizontal Rules */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  h1 {
+    font-size: var(--font-size-3xl);
+  }
+  
+  h2 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  h3 {
+    font-size: var(--font-size-xl);
+  }
+  
+  h4 {
+    font-size: var(--font-size-lg);
+  }
+  
+  pre {
+    font-size: 0.8125rem;
+  }
+}

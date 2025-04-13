@@ -1286,172 +1286,213 @@
       });
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
-      <h1>Quick Start Guide</h1>
-<p>Let’s build your first JetPath application! This guide will walk you through creating a simple API server that returns a welcome message.</p>
+      <h1>Testing &amp; Debugging</h1>
+<p>Ensuring your JetPath application is reliable and maintainable requires effective testing and debugging strategies. JetPath’s structure, with its focus on distinct handlers, plugins, and middleware, lends itself well to various testing approaches.</p>
 <hr>
-<h2>Goal</h2>
-<p>Create a basic JetPath server with a single endpoint (<code>GET /</code>) that responds with JSON.</p>
-<h2>Prerequisites</h2>
-<p>Before you start, make sure you have:</p>
-<ol>
-<li>Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).</li>
-<li>Completed the steps in the <a href="./installation.md"><strong>Installation Guide</strong></a> to install JetPath and TypeScript.</li>
-<li>Optionally installed a schema library like Zod (recommended).</li>
-</ol>
-<hr>
-<h2>Step 1: Set Up Your Project Folder</h2>
-<p>Create a new directory for your project and set up the basic folder structure:</p>
-<pre><code class="language-bash"><span class="hljs-built_in">mkdir</span> my-jetpath-app
-<span class="hljs-built_in">cd</span> my-jetpath-app
-<span class="hljs-built_in">mkdir</span> src
-</code></pre>
-<p>Your structure should look like this:</p>
-<pre><code>my-jetpath-app/
-└── src/
-</code></pre>
-<hr>
-<h2>Step 2: Install Dependencies</h2>
-<p>If you haven’t already, install JetPath and a schema library (we’ll use Zod here). Choose the command for your runtime:</p>
-<pre><code class="language-shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">Using npm (Node.js)</span>
-npm install jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using yarn (Node.js)</span>
-yarn add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using pnpm (Node.js)</span>
-pnpm add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using Bun</span>
-bun add jetpath zod
-<p></code></pre></p>
-<hr>
-<h2>Step 3: Configure TypeScript (<code>tsconfig.json</code>)</h2>
-<p>Create a <code>tsconfig.json</code> file in your project root (<code>my-jetpath-app/</code>). This tells TypeScript how to compile your code.</p>
-<pre><code class="language-js"><span class="hljs-comment">// tsconfig.json</span>
-{
-  <span class="hljs-string">&quot;compilerOptions&quot;</span>: {
-    <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;ES2022&quot;</span>,
-    <span class="hljs-string">&quot;module&quot;</span>: <span class="hljs-string">&quot;ESNext&quot;</span>,
-    <span class="hljs-string">&quot;moduleResolution&quot;</span>: <span class="hljs-string">&quot;Bundler&quot;</span>, <span class="hljs-comment">// Use &quot;NodeNext&quot; or &quot;Node&quot; for Node.js if needed</span>
-    <span class="hljs-string">&quot;esModuleInterop&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;forceConsistentCasingInFileNames&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;strict&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;skipLibCheck&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;outDir&quot;</span>: <span class="hljs-string">&quot;./dist&quot;</span>, <span class="hljs-comment">// Optional: specify output directory</span>
-    <span class="hljs-string">&quot;rootDir&quot;</span>: <span class="hljs-string">&quot;./&quot;</span>,
-    <span class="hljs-string">&quot;resolveJsonModule&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;declaration&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;sourceMap&quot;</span>: <span class="hljs-literal">true</span>
-    <span class="hljs-comment">// Add &quot;types&quot;: [&quot;node&quot;] here if using Node.js and needing Node types</span>
-  },
-  <span class="hljs-string">&quot;include&quot;</span>: [<span class="hljs-string">&quot;src/**/*.ts&quot;</span>, <span class="hljs-string">&quot;server.ts&quot;</span>], <span class="hljs-comment">// Adjust if your entry file has a different name</span>
-  <span class="hljs-string">&quot;exclude&quot;</span>: [<span class="hljs-string">&quot;node_modules&quot;</span>, <span class="hljs-string">&quot;dist&quot;</span>]
-}
-</code></pre>
-<p><em>(Remember to adjust <code>moduleResolution</code> and <code>types</code> based on your specific runtime and setup if needed - see the <a href="https://www.google.com/search?q=./installation.md">Installation Guide</a> for details).</em></p>
-<hr>
-<h2>Step 4: Create Your First Route</h2>
-<p>Inside the <code>src</code> directory, create a file named <code>index.jet.ts</code>. This file will automatically handle requests to the root path (<code>/</code>) of your API.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// src/index.jet.ts</span>
-<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">/**</p>
+<h2>Testing Strategies</h2>
+<p>A balanced testing approach typically involves a mix of unit, integration, and potentially end-to-end tests.</p>
+<h3>1. Unit Testing</h3>
 <ul>
-<li>Handles GET requests to the root path ('/').
-*/</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">GET_</span>: <span class="hljs-title class_">JetFunc</span> = <span class="hljs-function">(<span class="hljs-params">ctx</span>) =&gt;</span> {
-<span class="hljs-comment">// Use the context (ctx) to send a response</span>
-ctx.<span class="hljs-title function_">send</span>({
-<span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span>,
-<span class="hljs-attr">status</span>: <span class="hljs-string">&quot;ok&quot;</span>,
-<span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
+<li><strong>Goal:</strong> Test individual, isolated pieces of code (units) without external dependencies like databases, external APIs, or the full framework request/response cycle.</li>
+<li><strong>What to Test:</strong>
+<ul>
+<li><strong>Utility Functions:</strong> Any standalone helper functions.</li>
+<li><strong>Plugin Logic:</strong> Test the core logic within plugin <code>executor</code> functions or methods, mocking any external dependencies they might have.</li>
+<li><strong>Route Handler Logic (with Mocking):</strong> Test the business logic <em>within</em> a route handler function. This requires mocking the <code>ctx</code> object and any <code>ctx.plugins</code> or <code>ctx.app</code> properties the handler uses. This can be complex but allows testing intricate logic in isolation.</li>
+<li><strong>Validation Logic:</strong> If you have complex custom validation functions (passed to schemas), test them directly.</li>
+</ul>
+</li>
+<li><strong>Tools:</strong>
+<ul>
+<li><strong>Test Runners:</strong> Vitest, Jest (Node.js/Bun), Deno.test (Deno).</li>
+<li><strong>Mocking Libraries:</strong> <code>vi.fn()</code> (Vitest), <code>jest.fn()</code> (Jest), standard mocking techniques.</li>
+</ul>
+</li>
+<li><strong>Example (Conceptual Handler Unit Test):</strong><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { GET_petBy$id } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../src/pets/by$id.jet.ts&#x27;</span>; <span class="hljs-comment">// Import the handler</span>
+<span class="hljs-keyword">import</span> { describe, it, expect, vi } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest&#x27;</span>; <span class="hljs-comment">// Example using Vitest</span>
+<p><span class="hljs-comment">// Mock the database plugin method used by the handler</span>
+<span class="hljs-keyword">const</span> mockFindPetById = vi.<span class="hljs-title function_">fn</span>();</p>
+<p><span class="hljs-title function_">describe</span>(<span class="hljs-string">'GET_petBy$id handler'</span>, <span class="hljs-function">() =&gt;</span> {
+<span class="hljs-title function_">it</span>(<span class="hljs-string">'should send a pet when found'</span>, <span class="hljs-title function_">async</span> () =&gt; {
+<span class="hljs-keyword">const</span> mockPet = { <span class="hljs-attr">id</span>: <span class="hljs-string">'pet-123'</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">'Buddy'</span> };
+mockFindPetById.<span class="hljs-title function_">mockResolvedValue</span>(mockPet); <span class="hljs-comment">// Simulate finding the pet</span></p>
+<pre><code>&lt;span class=&quot;hljs-comment&quot;&gt;// Create a mock context object&lt;/span&gt;
+&lt;span class=&quot;hljs-keyword&quot;&gt;const&lt;/span&gt; mockCtx = {
+  &lt;span class=&quot;hljs-attr&quot;&gt;params&lt;/span&gt;: { &lt;span class=&quot;hljs-attr&quot;&gt;id&lt;/span&gt;: &lt;span class=&quot;hljs-string&quot;&gt;&amp;#x27;pet-123&amp;#x27;&lt;/span&gt; },
+  &lt;span class=&quot;hljs-attr&quot;&gt;query&lt;/span&gt;: {},
+  &lt;span class=&quot;hljs-attr&quot;&gt;plugins&lt;/span&gt;: { &lt;span class=&quot;hljs-attr&quot;&gt;findPetById&lt;/span&gt;: mockFindPetById }, &lt;span class=&quot;hljs-comment&quot;&gt;// Provide mocked plugin&lt;/span&gt;
+  &lt;span class=&quot;hljs-attr&quot;&gt;app&lt;/span&gt;: {},
+  &lt;span class=&quot;hljs-attr&quot;&gt;code&lt;/span&gt;: &lt;span class=&quot;hljs-number&quot;&gt;200&lt;/span&gt;,
+  &lt;span class=&quot;hljs-attr&quot;&gt;send&lt;/span&gt;: vi.&lt;span class=&quot;hljs-title function_&quot;&gt;fn&lt;/span&gt;(), &lt;span class=&quot;hljs-comment&quot;&gt;// Mock the send function&lt;/span&gt;
+  &lt;span class=&quot;hljs-attr&quot;&gt;throw&lt;/span&gt;: vi.&lt;span class=&quot;hljs-title function_&quot;&gt;fn&lt;/span&gt;(),
+  &lt;span class=&quot;hljs-comment&quot;&gt;// ... mock other ctx methods/properties as needed&lt;/span&gt;
+};
+
+&lt;span class=&quot;hljs-keyword&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;hljs-title function_&quot;&gt;GET_petBy$id&lt;/span&gt;(mockCtx &lt;span class=&quot;hljs-keyword&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;hljs-built_in&quot;&gt;any&lt;/span&gt;); &lt;span class=&quot;hljs-comment&quot;&gt;// Execute the handler with mock context&lt;/span&gt;
+
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(mockFindPetById).&lt;span class=&quot;hljs-title function_&quot;&gt;toHaveBeenCalledWith&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;#x27;pet-123&amp;#x27;&lt;/span&gt;);
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;send&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toHaveBeenCalledWith&lt;/span&gt;({ &lt;span class=&quot;hljs-attr&quot;&gt;status&lt;/span&gt;: &lt;span class=&quot;hljs-string&quot;&gt;&amp;#x27;success&amp;#x27;&lt;/span&gt;, &lt;span class=&quot;hljs-attr&quot;&gt;pet&lt;/span&gt;: mockPet });
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;code&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toBe&lt;/span&gt;(&lt;span class=&quot;hljs-number&quot;&gt;200&lt;/span&gt;);
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;throw&lt;/span&gt;).&lt;span class=&quot;hljs-property&quot;&gt;not&lt;/span&gt;.&lt;span class=&quot;hljs-title function_&quot;&gt;toHaveBeenCalled&lt;/span&gt;();
+</code></pre>
+<p>});</p>
+<p><span class="hljs-title function_">it</span>(<span class="hljs-string">'should throw 404 when pet not found'</span>, <span class="hljs-title function_">async</span> () =&gt; {
+mockFindPetById.<span class="hljs-title function_">mockResolvedValue</span>(<span class="hljs-literal">null</span>); <span class="hljs-comment">// Simulate not finding the pet</span></p>
+<pre><code>&lt;span class=&quot;hljs-keyword&quot;&gt;const&lt;/span&gt; mockCtx = { &lt;span class=&quot;hljs-comment&quot;&gt;/* ... similar mock context ... */&lt;/span&gt; };
+mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;plugins&lt;/span&gt;.&lt;span class=&quot;hljs-property&quot;&gt;findPetById&lt;/span&gt; = mockFindPetById;
+mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;throw&lt;/span&gt; = vi.&lt;span class=&quot;hljs-title function_&quot;&gt;fn&lt;/span&gt;(); &lt;span class=&quot;hljs-comment&quot;&gt;// Important: mock throw&lt;/span&gt;
+mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;send&lt;/span&gt; = vi.&lt;span class=&quot;hljs-title function_&quot;&gt;fn&lt;/span&gt;();
+
+&lt;span class=&quot;hljs-keyword&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;hljs-title function_&quot;&gt;GET_petBy$id&lt;/span&gt;(mockCtx &lt;span class=&quot;hljs-keyword&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;hljs-built_in&quot;&gt;any&lt;/span&gt;);
+
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(mockFindPetById).&lt;span class=&quot;hljs-title function_&quot;&gt;toHaveBeenCalledWith&lt;/span&gt;(expect.&lt;span class=&quot;hljs-title function_&quot;&gt;any&lt;/span&gt;(&lt;span class=&quot;hljs-title class_&quot;&gt;String&lt;/span&gt;));
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;throw&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toHaveBeenCalledWith&lt;/span&gt;(&lt;span class=&quot;hljs-number&quot;&gt;404&lt;/span&gt;, expect.&lt;span class=&quot;hljs-title function_&quot;&gt;stringContaining&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;quot;Pet not found&amp;quot;&lt;/span&gt;));
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;send&lt;/span&gt;).&lt;span class=&quot;hljs-property&quot;&gt;not&lt;/span&gt;.&lt;span class=&quot;hljs-title function_&quot;&gt;toHaveBeenCalled&lt;/span&gt;();
+</code></pre>
+<p>});
 });
-};</li>
-</ul>
-<p><span class="hljs-comment">// Optional: Add description for API documentation</span>
-<span class="hljs-variable constant_">GET_</span>.<span class="hljs-property">info</span> = <span class="hljs-string">&quot;Returns a welcome message and API status.&quot;</span>;</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the <code>JetFunc</code> type for better type checking of our handler.</li>
-<li>We export a constant named <code>GET_</code>. The <code>GET</code> part maps to the HTTP GET method, and the <code>_</code> combined with the filename <code>index.jet.ts</code> maps to the root path <code>/</code>.</li>
-<li>The function receives the <code>ctx</code> (Context) object.</li>
-<li><code>ctx.send()</code> sends a JSON response back to the client. JetPath automatically sets the <code>Content-Type</code> header to <code>application/json</code> for objects.</li>
-</ul>
-<hr>
-<h2>Step 5: Create the Server Entry Point</h2>
-<p>Now, create a file named <code>server.ts</code> in your project root (<code>my-jetpath-app/</code>). This file initializes and starts the JetPath server.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">// Define the port the server will listen on</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">3000</span>;</p>
-<p><span class="hljs-comment">// Create a new JetPath instance</span>
-<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
-<span class="hljs-comment">// Specify the directory containing your route files (.jet.ts)</span>
-<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>,</p>
-<p><span class="hljs-comment">// Configure the server port</span>
-<span class="hljs-attr">port</span>: <span class="hljs-variable constant_">PORT</span>,</p>
-<p><span class="hljs-comment">// Configure API documentation generation (optional but recommended)</span>
-<span class="hljs-attr">apiDoc</span>: {
-<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;My First JetPath API&quot;</span>,
-<span class="hljs-attr">info</span>: <span class="hljs-string">&quot;This is the documentation for the Quick Start API.&quot;</span>,
-<span class="hljs-attr">color</span>: <span class="hljs-string">&quot;#7e57c2&quot;</span>, <span class="hljs-comment">// Choose a color!</span>
-},
-<span class="hljs-title class_">APIdisplay</span>: <span class="hljs-string">&quot;UI&quot;</span>, <span class="hljs-comment">// Enable the interactive Swagger-like UI at /docs</span>
-});</p>
-<p><span class="hljs-comment">// Start listening for incoming requests</span>
-app.<span class="hljs-title function_">listen</span>();</p>
-<p><span class="hljs-comment">// Log messages to the console</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>🚀 JetPath server running on http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;</code></span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>📚 API Docs available at http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;/docs</code></span>);</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the main <code>JetPath</code> class.</li>
-<li>We create a new instance, passing configuration options:
-<ul>
-<li><code>source</code>: Tells JetPath where to find your route files.</li>
-<li><code>port</code>: The port number for the server.</li>
-<li><code>apiDoc</code>, <code>APIdisplay</code>: Configures the built-in documentation generator.</li>
-</ul>
-</li>
-<li><code>app.listen()</code> starts the server.</li>
-</ul>
-<hr>
-<h2>Step 6: Run Your Server</h2>
-<p>Open your terminal in the project root (<code>my-jetpath-app/</code>) and run the server using your chosen runtime:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Using Node.js (you might need ts-node or compile first)</span>
-<span class="hljs-comment"># Option 1: Use ts-node (if installed: npm install -D ts-node)</span>
-npx ts-node server.ts
-<span class="hljs-comment"># Option 2: Compile and run</span>
-<span class="hljs-comment"># tsc &amp;&amp; node dist/server.js</span>
-<p><span class="hljs-comment"># Using Deno</span>
-deno run --allow-net --allow-read server.ts</p>
-<p><span class="hljs-comment"># Using Bun</span>
-bun run server.ts
 </code></pre></p>
-<p>You should see the following output (or similar):</p>
-<pre><code>🚀 JetPath server running on http://localhost:3000
-📚 API Docs available at http://localhost:3000/docs
-</code></pre>
-<hr>
-<h2>Step 7: Verify It Works!</h2>
-<ol>
-<li><strong>Check the API:</strong> Open your web browser and navigate to <code>http://localhost:3000</code>. You should see the JSON response:<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span>
-<span class="hljs-punctuation">}</span>
-</code></pre>
 </li>
-<li><strong>Check the Docs:</strong> Navigate to <code>http://localhost:3000/docs</code>. You should see the interactive API documentation UI, listing your <code>GET /</code> endpoint.</li>
-</ol>
-<p><strong>Congratulations! You’ve successfully created and run your first JetPath application!</strong></p>
+</ul>
+<h3>2. Integration Testing</h3>
+<ul>
+<li><strong>Goal:</strong> Test how different parts of <em>your</em> application work together, including routing, middleware, handlers, and potentially plugins, usually by making live HTTP requests to a running instance of your JetPath app.</li>
+<li><strong>What to Test:</strong>
+<ul>
+<li><strong>API Endpoints:</strong> Send requests to your routes and assert the response status code, headers, and body content.</li>
+<li><strong>Middleware Logic:</strong> Verify that middleware (e.g., auth, logging headers) behaves correctly for different routes.</li>
+<li><strong>Validation:</strong> Send requests with invalid data and assert that appropriate error responses (e.g., 400 Bad Request) are returned.</li>
+<li><strong>Error Handling:</strong> Test specific error conditions (like requesting a non-existent resource or triggering an intentional error) and assert the standardized error response format. The <code>GET_error</code> route in <code>tests/app.jet.ts</code> is a good example target for this. [cite: tests/app.jet.ts]</li>
+</ul>
+</li>
+<li><strong>Setup:</strong>
+<ul>
+<li>You typically need to run your JetPath server in a test environment.</li>
+<li>Consider using a separate test database or mocking database calls at a higher level if needed.</li>
+</ul>
+</li>
+<li><strong>Tools:</strong>
+<ul>
+<li><strong>HTTP Client Libraries:</strong>
+<ul>
+<li><code>supertest</code> (Popular for Node.js/Express-like apps, might need adaptation for JetPath’s server instance).</li>
+<li>Standard <code>Workspace</code> API (Available in Node.js, Deno, Bun - often sufficient).</li>
+</ul>
+</li>
+<li><strong>Test Runners:</strong> Vitest, Jest, Deno.test.</li>
+</ul>
+</li>
+<li><strong>Example (Conceptual Integration Test using <code>Workspace</code>):</strong><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { describe, it, expect, beforeAll, afterAll } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest&#x27;</span>;
+<span class="hljs-comment">// Assuming you have a way to start/stop your JetPath app programmatically</span>
+<span class="hljs-keyword">import</span> { startTestServer, stopTestServer, appInstance } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./test-setup&#x27;</span>; <span class="hljs-comment">// Your test setup helper</span>
+<p><span class="hljs-title function_">describe</span>(<span class="hljs-string">'Pet API Integration Tests'</span>, <span class="hljs-function">() =&gt;</span> {
+<span class="hljs-keyword">let</span> <span class="hljs-attr">serverUrl</span>: <span class="hljs-built_in">string</span>;</p>
+<p><span class="hljs-title function_">beforeAll</span>(<span class="hljs-title function_">async</span> () =&gt; {
+serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title function_">startTestServer</span>(); <span class="hljs-comment">// Starts JetPath on a random port</span>
+});</p>
+<p><span class="hljs-title function_">afterAll</span>(<span class="hljs-title function_">async</span> () =&gt; {
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">stopTestServer</span>();
+});</p>
+<p><span class="hljs-title function_">it</span>(<span class="hljs-string">'GET /pets should return a list of pets'</span>, <span class="hljs-title function_">async</span> () =&gt; {
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string"><code>&lt;span class=&quot;hljs-subst&quot;&gt;${serverUrl}&lt;/span&gt;/pets</code></span>);
+<span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();</p>
+<pre><code>&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(response.&lt;span class=&quot;hljs-property&quot;&gt;status&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toBe&lt;/span&gt;(&lt;span class=&quot;hljs-number&quot;&gt;200&lt;/span&gt;);
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(response.&lt;span class=&quot;hljs-property&quot;&gt;headers&lt;/span&gt;.&lt;span class=&quot;hljs-title function_&quot;&gt;get&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;#x27;content-type&amp;#x27;&lt;/span&gt;)).&lt;span class=&quot;hljs-title function_&quot;&gt;toContain&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;#x27;application/json&amp;#x27;&lt;/span&gt;);
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(&lt;span class=&quot;hljs-title class_&quot;&gt;Array&lt;/span&gt;.&lt;span class=&quot;hljs-title function_&quot;&gt;isArray&lt;/span&gt;(data.&lt;span class=&quot;hljs-property&quot;&gt;pets&lt;/span&gt;)).&lt;span class=&quot;hljs-title function_&quot;&gt;toBe&lt;/span&gt;(&lt;span class=&quot;hljs-literal&quot;&gt;true&lt;/span&gt;);
+&lt;span class=&quot;hljs-comment&quot;&gt;// Add more assertions about the data structure&lt;/span&gt;
+</code></pre>
+<p>});</p>
+<p><span class="hljs-title function_">it</span>(<span class="hljs-string">'GET /petBy/:id should return 404 for non-existent pet'</span>, <span class="hljs-title function_">async</span> () =&gt; {
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string"><code>&lt;span class=&quot;hljs-subst&quot;&gt;${serverUrl}&lt;/span&gt;/petBy/non-existent-id</code></span>);
+<span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();</p>
+<pre><code>&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(response.&lt;span class=&quot;hljs-property&quot;&gt;status&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toBe&lt;/span&gt;(&lt;span class=&quot;hljs-number&quot;&gt;404&lt;/span&gt;);
+&lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(data.&lt;span class=&quot;hljs-property&quot;&gt;error&lt;/span&gt;?.&lt;span class=&quot;hljs-property&quot;&gt;message&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toContain&lt;/span&gt;(&lt;span class=&quot;hljs-string&quot;&gt;&amp;#x27;Pet not found&amp;#x27;&lt;/span&gt;);
+</code></pre>
+<p>});</p>
+<p><span class="hljs-title function_">it</span>(<span class="hljs-string">'POST /pets should require authentication (if implemented)'</span>, <span class="hljs-title function_">async</span> () =&gt; {
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string"><code>&lt;span class=&quot;hljs-subst&quot;&gt;${serverUrl}&lt;/span&gt;/pets</code></span>, {
+<span class="hljs-attr">method</span>: <span class="hljs-string">'POST'</span>,
+<span class="hljs-attr">headers</span>: { <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span> },
+<span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">'Test'</span>, <span class="hljs-attr">species</span>: <span class="hljs-string">'Dog'</span>, <span class="hljs-comment">/* … */</span> })
+});
+<span class="hljs-comment">// Assuming middleware checks auth and returns 401 if missing</span>
+<span class="hljs-title function_">expect</span>(response.<span class="hljs-property">status</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-number">401</span>);
+});</p>
+<p><span class="hljs-title function_">it</span>(<span class="hljs-string">'GET /error should trigger error handling middleware'</span>, <span class="hljs-title function_">async</span> () =&gt; {
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string"><code>&lt;span class=&quot;hljs-subst&quot;&gt;${serverUrl}&lt;/span&gt;/error</code></span>);
+<span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();</p>
+<pre><code> &lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(response.&lt;span class=&quot;hljs-property&quot;&gt;status&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toBe&lt;/span&gt;(&lt;span class=&quot;hljs-number&quot;&gt;500&lt;/span&gt;); &lt;span class=&quot;hljs-comment&quot;&gt;// Assuming middleware sets 500 for generic errors&lt;/span&gt;
+ &lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(data.&lt;span class=&quot;hljs-property&quot;&gt;error&lt;/span&gt;?.&lt;span class=&quot;hljs-property&quot;&gt;message&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toBeDefined&lt;/span&gt;();
+ &lt;span class=&quot;hljs-title function_&quot;&gt;expect&lt;/span&gt;(data.&lt;span class=&quot;hljs-property&quot;&gt;error&lt;/span&gt;?.&lt;span class=&quot;hljs-property&quot;&gt;requestId&lt;/span&gt;).&lt;span class=&quot;hljs-title function_&quot;&gt;toBeDefined&lt;/span&gt;();
+</code></pre>
+<p>});
+});
+</code></pre></p>
+</li>
+</ul>
+<h3>3. End-to-End (E2E) Testing</h3>
+<ul>
+<li><strong>Goal:</strong> Simulate real user interactions with the entire system, including the frontend (if applicable) and the backend API.</li>
+<li><strong>Tools:</strong> Playwright, Cypress.</li>
+<li><strong>Scope:</strong> Typically involves setting up the full application stack and running automated browser tests that interact with the UI and trigger API calls. Less common for pure API testing unless verifying interactions with specific clients.</li>
+</ul>
+<hr>
+<h2>Debugging Techniques</h2>
+<p>When things go wrong, here’s how to troubleshoot your JetPath application:</p>
+<h3>1. Console Logging</h3>
+<ul>
+<li>The simplest method. Use <code>console.log()</code>, <code>console.warn()</code>, <code>console.error()</code> strategically within your handlers, middleware, and plugins to trace execution flow and inspect variable values.</li>
+<li>Consider using a structured logging plugin for more organized and filterable logs, especially in production or complex scenarios. Include request IDs in your logs to trace a single request’s journey.</li>
+</ul>
+<h3>2. Runtime Debuggers</h3>
+<p>Use the built-in debugging capabilities of your chosen runtime:</p>
+<ul>
+<li><strong>Node.js:</strong>
+<ul>
+<li>Start your server with the inspect flag: <code>node --inspect server.ts</code> (or attach to <code>ts-node</code>).</li>
+<li>Connect using Chrome DevTools (<code>chrome://inspect</code>) or your IDE’s debugger (like VS Code’s JavaScript Debugger).</li>
+<li>Set breakpoints, step through code, inspect variables.</li>
+</ul>
+</li>
+<li><strong>Deno:</strong>
+<ul>
+<li>Start with the inspect flag: <code>deno run --inspect --allow-net --allow-read server.ts</code> or <code>--inspect-brk</code> to pause on the first line.</li>
+<li>Connect using Chrome DevTools or your IDE debugger.</li>
+</ul>
+</li>
+<li><strong>Bun:</strong>
+<ul>
+<li>Start with the inspect flag: <code>bun --inspect server.ts</code>.</li>
+<li>Connect using compatible debuggers (support might vary, check Bun’s documentation).</li>
+</ul>
+</li>
+</ul>
+<h3>3. Debugging Routing Issues</h3>
+<p>If requests aren’t hitting the handler you expect:</p>
+<ul>
+<li><strong>Check Filenames and Paths:</strong> Ensure your <code>.jet.ts</code> files and folders exactly match the desired URL structure. Case sensitivity matters on some systems.</li>
+<li><strong>Check Export Names:</strong> Verify the <code>METHOD_</code> prefix and any <code>optionalPathSegment</code> match the HTTP method and expected path. Double-check the use of <code>$</code> for parameters and <code>$</code> for catch-alls.</li>
+<li><strong>Look for Conflicts:</strong> Ensure you don’t have conflicting definitions (e.g., two different files/exports trying to handle the exact same METHOD + Path).</li>
+<li><strong>Use a Route Listing Tool:</strong> <em>(Recommendation)</em> An official JetPath CLI command like <code>jetpath routes</code> would be invaluable here, showing exactly how JetPath mapped files/exports to routes.</li>
+</ul>
+<h3>4. Debugging Validation Errors</h3>
+<ul>
+<li><strong>Check Schemas:</strong> Carefully review your Zod/TypeBox/custom schema definitions (<code>.body</code>, <code>.query</code>, <code>.params</code> attached to handlers or defined in <code>defineHandler</code>).</li>
+<li><strong>Inspect Input:</strong> Log the raw <code>ctx.query</code>, <code>ctx.params</code>, or the <em>parsed</em> <code>ctx.body</code> (after <code>ctx.json()</code> or similar) <em>before</em> calling <code>ctx.validate()</code> to see the exact data being validated.</li>
+<li><strong>Check <code>ctx.validate()</code> Call:</strong> Ensure you are calling <code>ctx.validate()</code> correctly and passing the right schema object if not using automatic validation.</li>
+<li><strong>Examine Error Messages:</strong> The error thrown by <code>ctx.validate()</code> usually contains details about which field failed and why. Ensure your error handling middleware logs this detail.</li>
+</ul>
+<h3>5. Debugging Middleware</h3>
+<ul>
+<li><strong>Trace Execution:</strong> Add <code>console.log</code> statements at the beginning of the pre-handler section and the beginning of the post-handler function to confirm middleware is running for the expected routes.</li>
+<li><strong>Inspect <code>ctx.app</code>:</strong> Log <code>ctx.app</code> before and after middleware runs to see how it modifies request-scoped state.</li>
+<li><strong>Check <code>err</code> Parameter:</strong> In the post-handler function <code>(ctx, err) =&gt; { ... }</code>, always log the <code>err</code> object to see if errors from the handler are being caught correctly.</li>
+</ul>
 <hr>
 <h2>Next Steps</h2>
-<p>Now that you have a basic server running, explore further:</p>
 <ul>
-<li><strong>Core Concepts:</strong> Learn about <a href="https://www.google.com/search?q=./core-concepts/routing.md">Routing</a>, the <a href="https://www.google.com/search?q=./core-concepts/context.md">Context Object</a>, <a href="https://www.google.com/search?q=./core-concepts/validation.md">Validation</a>, and <a href="https://www.google.com/search?q=./core-concepts/middleware.md">Middleware</a>.</li>
-<li><strong>Guides:</strong> Build more complex features by following the practical <a href="https://www.google.com/search?q=./guides/crud-api.md">Guides</a>.</li>
+<li>Review the <a href="./middleware.md"><strong>Middleware</strong></a> documentation for error handling patterns.</li>
+<li>Consult the documentation for your chosen JavaScript runtime (Node.js, Deno, Bun) for more advanced debugging techniques.</li>
 </ul>
     </section>
  

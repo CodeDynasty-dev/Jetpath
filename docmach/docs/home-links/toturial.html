@@ -1132,110 +1132,7 @@
       </button>
     </div>
   </header>
- 
-  <div class="mobile-overlay"></div>
-
-  <!-- Sidebar -->
-  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-[2rem]">
-    <nav class="sticky top-[calc(4rem+1px+2rem)] h-full">
-      <!-- Search -->
-      <div class="px-4 py-6">
-        <div class="relative">  
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-            </svg> 
-          </div>
-          <input type="text" name="doc-search" id="doc-search" class="block w-full pl-10 pr-3 py-2 border border-gray-700 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 sm:text-sm" placeholder="Search documentation">
-        </div>
-      </div>
-
-      <!-- Navigation Links -->
-      <div class="space-y-2">
-        <!-- Getting Started Section -->
-        <div class="px-4">
-          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="getting-started">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-              <span class="text-sm font-medium">Getting Started</span>
-            </div>
-            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <div class="space-y-1 pl-6 mt-2" id="getting-started-content">
-            <a href="/docs/introduction.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Introduction</a>
-            <a href="/docs/installation.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Installation</a>
-            <a href="/docs/quickstart.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Quick Start</a>
-          </div>
-        </div>
-
-        <!-- Core Concepts Section -->
-        <div class="px-4">
-          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="core-concepts">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span class="text-sm font-medium">Core Concepts</span>
-            </div>
-            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <div class="space-y-1 pl-6 mt-2" id="core-concepts-content">
-            <a href="/docs/routing.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Routing</a>
-            <a href="/docs/middleware.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Middleware</a>
-            <a href="/docs/context.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Context (ctx)</a>
-            <a href="/docs/error-handling.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Error Handling</a>
-          </div>
-        </div>
-
-        <!-- Advanced Section -->
-        <div class="px-4">
-          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="advanced">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              <span class="text-sm font-medium">Advanced</span>
-            </div>
-            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <div class="space-y-1 pl-6 mt-2" id="advanced-content">
-            <a href="/docs/plugins.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Plugins</a>
-            <a href="/docs/dependency-injection.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Dependency Injection</a>
-            <a href="/docs/testing.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Testing</a>
-            <a href="/docs/deployment.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Deployment</a>
-          </div>
-        </div>
-
-        <!-- API Reference Section -->
-        <div class="px-4">
-          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="api-reference">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <span class="text-sm font-medium">API Reference</span>
-            </div>
-            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <div class="space-y-1 pl-6 mt-2" id="api-reference-content">
-            <a href="/docs/api-reference/types.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Types</a>
-              <a href="/docs/api-reference/context.html" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Context</a>
-          </div>
-        </div>
-      </div>
-    </nav>
-  </aside>
-
+  
   <main class="main-content">
     <script>
       // Initialize sections
@@ -1286,173 +1183,121 @@
       });
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
-      <h1>Quick Start Guide</h1>
-<p>Let’s build your first JetPath application! This guide will walk you through creating a simple API server that returns a welcome message.</p>
+      <h1>Tutorials</h1>
+<p>Welcome to the JetPath Tutorials section! These guides provide practical, step-by-step instructions for building common features and tackling specific tasks using the JetPath framework. While the <a href="./core-concepts/routing.md">Core Concepts</a> explain <em>how</em> things work, these tutorials show you <em>how to do it</em>.</p>
+<p>We’ll often refer to concepts demonstrated in the PetShop API example found in the <code>tests/app.jet.ts</code> file.</p>
 <hr>
-<h2>Goal</h2>
-<p>Create a basic JetPath server with a single endpoint (<code>GET /</code>) that responds with JSON.</p>
-<h2>Prerequisites</h2>
-<p>Before you start, make sure you have:</p>
-<ol>
-<li>Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).</li>
-<li>Completed the steps in the <a href="./installation.md"><strong>Installation Guide</strong></a> to install JetPath and TypeScript.</li>
-<li>Optionally installed a schema library like Zod (recommended).</li>
-</ol>
-<hr>
-<h2>Step 1: Set Up Your Project Folder</h2>
-<p>Create a new directory for your project and set up the basic folder structure:</p>
-<pre><code class="language-bash"><span class="hljs-built_in">mkdir</span> my-jetpath-app
-<span class="hljs-built_in">cd</span> my-jetpath-app
-<span class="hljs-built_in">mkdir</span> src
-</code></pre>
-<p>Your structure should look like this:</p>
-<pre><code>my-jetpath-app/
-└── src/
-</code></pre>
-<hr>
-<h2>Step 2: Install Dependencies</h2>
-<p>If you haven’t already, install JetPath and a schema library (we’ll use Zod here). Choose the command for your runtime:</p>
-<pre><code class="language-shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">Using npm (Node.js)</span>
-npm install jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using yarn (Node.js)</span>
-yarn add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using pnpm (Node.js)</span>
-pnpm add jetpath zod
-<span class="hljs-meta prompt_">
-# </span><span class="language-bash">Using Bun</span>
-bun add jetpath zod
-<p></code></pre></p>
-<hr>
-<h2>Step 3: Configure TypeScript (<code>tsconfig.json</code>)</h2>
-<p>Create a <code>tsconfig.json</code> file in your project root (<code>my-jetpath-app/</code>). This tells TypeScript how to compile your code.</p>
-<pre><code class="language-js"><span class="hljs-comment">// tsconfig.json</span>
-{
-  <span class="hljs-string">&quot;compilerOptions&quot;</span>: {
-    <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;ES2022&quot;</span>,
-    <span class="hljs-string">&quot;module&quot;</span>: <span class="hljs-string">&quot;ESNext&quot;</span>,
-    <span class="hljs-string">&quot;moduleResolution&quot;</span>: <span class="hljs-string">&quot;Bundler&quot;</span>, <span class="hljs-comment">// Use &quot;NodeNext&quot; or &quot;Node&quot; for Node.js if needed</span>
-    <span class="hljs-string">&quot;esModuleInterop&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;forceConsistentCasingInFileNames&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;strict&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;skipLibCheck&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;outDir&quot;</span>: <span class="hljs-string">&quot;./dist&quot;</span>, <span class="hljs-comment">// Optional: specify output directory</span>
-    <span class="hljs-string">&quot;rootDir&quot;</span>: <span class="hljs-string">&quot;./&quot;</span>,
-    <span class="hljs-string">&quot;resolveJsonModule&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;declaration&quot;</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-string">&quot;sourceMap&quot;</span>: <span class="hljs-literal">true</span>
-    <span class="hljs-comment">// Add &quot;types&quot;: [&quot;node&quot;] here if using Node.js and needing Node types</span>
-  },
-  <span class="hljs-string">&quot;include&quot;</span>: [<span class="hljs-string">&quot;src/**/*.ts&quot;</span>, <span class="hljs-string">&quot;server.ts&quot;</span>], <span class="hljs-comment">// Adjust if your entry file has a different name</span>
-  <span class="hljs-string">&quot;exclude&quot;</span>: [<span class="hljs-string">&quot;node_modules&quot;</span>, <span class="hljs-string">&quot;dist&quot;</span>]
-}
-</code></pre>
-<p><em>(Remember to adjust <code>moduleResolution</code> and <code>types</code> based on your specific runtime and setup if needed - see the <a href="https://www.google.com/search?q=./installation.md">Installation Guide</a> for details).</em></p>
-<hr>
-<h2>Step 4: Create Your First Route</h2>
-<p>Inside the <code>src</code> directory, create a file named <code>index.jet.ts</code>. This file will automatically handle requests to the root path (<code>/</code>) of your API.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// src/index.jet.ts</span>
-<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetFunc</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">/**</p>
+<h2>Available Tutorials</h2>
+<p>Here’s a list of available tutorials to help you master JetPath:</p>
+<h3>1. Building Your First CRUD API</h3>
 <ul>
-<li>Handles GET requests to the root path ('/').
-*/</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">GET_</span>: <span class="hljs-title class_">JetFunc</span> = <span class="hljs-function">(<span class="hljs-params">ctx</span>) =&gt;</span> {
-<span class="hljs-comment">// Use the context (ctx) to send a response</span>
-ctx.<span class="hljs-title function_">send</span>({
-<span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span>,
-<span class="hljs-attr">status</span>: <span class="hljs-string">&quot;ok&quot;</span>,
-<span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
-});
-};</li>
-</ul>
-<p><span class="hljs-comment">// Optional: Add description for API documentation</span>
-<span class="hljs-variable constant_">GET_</span>.<span class="hljs-property">info</span> = <span class="hljs-string">&quot;Returns a welcome message and API status.&quot;</span>;</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
+<li><strong>Goal:</strong> Create a complete Create, Read, Update, Delete (CRUD) API for managing resources (e.g., “Pets”).</li>
+<li><strong>Covers:</strong>
 <ul>
-<li>We import the <code>JetFunc</code> type for better type checking of our handler.</li>
-<li>We export a constant named <code>GET_</code>. The <code>GET</code> part maps to the HTTP GET method, and the <code>_</code> combined with the filename <code>index.jet.ts</code> maps to the root path <code>/</code>.</li>
-<li>The function receives the <code>ctx</code> (Context) object.</li>
-<li><code>ctx.send()</code> sends a JSON response back to the client. JetPath automatically sets the <code>Content-Type</code> header to <code>application/json</code> for objects.</li>
-</ul>
-<hr>
-<h2>Step 5: Create the Server Entry Point</h2>
-<p>Now, create a file named <code>server.ts</code> in your project root (<code>my-jetpath-app/</code>). This file initializes and starts the JetPath server.</p>
-<pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-comment">// Define the port the server will listen on</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">3000</span>;</p>
-<p><span class="hljs-comment">// Create a new JetPath instance</span>
-<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
-<span class="hljs-comment">// Specify the directory containing your route files (.jet.ts)</span>
-<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>,</p>
-<p><span class="hljs-comment">// Configure the server port</span>
-<span class="hljs-attr">port</span>: <span class="hljs-variable constant_">PORT</span>,</p>
-<p><span class="hljs-comment">// Configure API documentation generation (optional but recommended)</span>
-<span class="hljs-attr">apiDoc</span>: {
-<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;My First JetPath API&quot;</span>,
-<span class="hljs-attr">info</span>: <span class="hljs-string">&quot;This is the documentation for the Quick Start API.&quot;</span>,
-<span class="hljs-attr">color</span>: <span class="hljs-string">&quot;#7e57c2&quot;</span>, <span class="hljs-comment">// Choose a color!</span>
-},
-<span class="hljs-title class_">APIdisplay</span>: <span class="hljs-string">&quot;UI&quot;</span>, <span class="hljs-comment">// Enable the interactive Swagger-like UI at /docs</span>
-});</p>
-<p><span class="hljs-comment">// Start listening for incoming requests</span>
-app.<span class="hljs-title function_">listen</span>();</p>
-<p><span class="hljs-comment">// Log messages to the console</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>🚀 JetPath server running on http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;</code></span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string"><code>📚 API Docs available at http://localhost:&lt;span class=&quot;hljs-subst&quot;&gt;${PORT}&lt;/span&gt;/docs</code></span>);</p>
-<p></code></pre></p>
-<p><strong>Explanation:</strong></p>
-<ul>
-<li>We import the main <code>JetPath</code> class.</li>
-<li>We create a new instance, passing configuration options:
-<ul>
-<li><code>source</code>: Tells JetPath where to find your route files.</li>
-<li><code>port</code>: The port number for the server.</li>
-<li><code>apiDoc</code>, <code>APIdisplay</code>: Configures the built-in documentation generator.</li>
+<li>Setting up routes for <code>GET /resource</code>, <code>POST /resource</code>, <code>GET /resource/:id</code>, <code>PUT /resource/:id</code>, <code>DELETE /resource/:id</code> using file/export conventions.</li>
+<li>Handling path parameters (<code>ctx.params</code>).</li>
+<li>Parsing JSON request bodies (<code>ctx.json()</code>).</li>
+<li>Validating request bodies and parameters (<code>ctx.validate()</code> with schemas).</li>
+<li>Sending JSON responses (<code>ctx.send()</code>).</li>
+<li>Basic in-memory data storage patterns (adaptable to databases).</li>
 </ul>
 </li>
-<li><code>app.listen()</code> starts the server.</li>
+<li><strong>Concepts:</strong> Routing, Context, Validation, Request/Response Handling.</li>
+<li><strong>Based on:</strong> Pet management routes (<code>GET_pets</code>, <code>POST_pets</code>, <code>GET_petBy$id</code>, <code>PUT_petBy$id</code>, <code>DELETE_petBy$id</code>) in [cite: tests/app.jet.ts].</li>
 </ul>
-<hr>
-<h2>Step 6: Run Your Server</h2>
-<p>Open your terminal in the project root (<code>my-jetpath-app/</code>) and run the server using your chosen runtime:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Using Node.js (you might need ts-node or compile first)</span>
-<span class="hljs-comment"># Option 1: Use ts-node (if installed: npm install -D ts-node)</span>
-npx ts-node server.ts
-<span class="hljs-comment"># Option 2: Compile and run</span>
-<span class="hljs-comment"># tsc &amp;&amp; node dist/server.js</span>
-<p><span class="hljs-comment"># Using Deno</span>
-deno run --allow-net --allow-read server.ts</p>
-<p><span class="hljs-comment"># Using Bun</span>
-bun run server.ts
-</code></pre></p>
-<p>You should see the following output (or similar):</p>
-<pre><code>🚀 JetPath server running on http://localhost:3000
-📚 API Docs available at http://localhost:3000/docs
-</code></pre>
-<hr>
-<h2>Step 7: Verify It Works!</h2>
-<ol>
-<li><strong>Check the API:</strong> Open your web browser and navigate to <code>http://localhost:3000</code>. You should see the JSON response:<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Welcome to your first JetPath API!&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span>
-<span class="hljs-punctuation">}</span>
-</code></pre>
-</li>
-<li><strong>Check the Docs:</strong> Navigate to <code>http://localhost:3000/docs</code>. You should see the interactive API documentation UI, listing your <code>GET /</code> endpoint.</li>
-</ol>
-<p><strong>Congratulations! You’ve successfully created and run your first JetPath application!</strong></p>
-<hr>
-<h2>Next Steps</h2>
-<p>Now that you have a basic server running, explore further:</p>
+<h3>2. Adding Authentication &amp; Authorization</h3>
 <ul>
-<li><strong>Core Concepts:</strong> Learn about <a href="https://www.google.com/search?q=./core-concepts/routing.md">Routing</a>, the <a href="https://www.google.com/search?q=./core-concepts/context.md">Context Object</a>, <a href="https://www.google.com/search?q=./core-concepts/validation.md">Validation</a>, and <a href="https://www.google.com/search?q=./core-concepts/middleware.md">Middleware</a>.</li>
-<li><strong>Guides:</strong> Build more complex features by following the practical <a href="https://www.google.com/search?q=./guides/crud-api.md">Guides</a>.</li>
+<li><strong>Goal:</strong> Secure your API endpoints using token-based authentication (e.g., JWT) and implement basic role checks.</li>
+<li><strong>Covers:</strong>
+<ul>
+<li>Creating a custom authentication plugin (<code>JetPlugin</code>) to handle token generation and validation. [cite: tests/app.jet.ts]</li>
+<li>Setting up a login route (<code>POST /auth/login</code>) to issue tokens. [cite: tests/app.jet.ts]</li>
+<li>Using middleware (<code>MIDDLEWARE_</code>) to check for valid tokens on incoming requests. [cite: tests/app.jet.ts]</li>
+<li>Protecting specific routes based on authentication status.</li>
+<li>Implementing basic authorization checks (e.g., admin-only routes) using <code>ctx.app</code> state set by middleware. [cite: tests/app.jet.ts]</li>
+<li>Using <code>ctx.throw()</code> for sending <code>401 Unauthorized</code> and <code>403 Forbidden</code> responses.</li>
 </ul>
+</li>
+<li><strong>Concepts:</strong> Plugins, Middleware, Context (<code>ctx.plugins</code>, <code>ctx.app</code>), Error Handling.</li>
+</ul>
+<h3>3. Handling File Uploads</h3>
+<ul>
+<li><strong>Goal:</strong> Implement endpoints that accept file uploads (e.g., images) using <code>multipart/form-data</code>.</li>
+<li><strong>Covers:</strong>
+<ul>
+<li>Using an official or custom plugin (like <code>jetbusboy</code>) to parse <code>multipart/form-data</code>. [cite: tests/app.jet.ts]</li>
+<li>Accessing uploaded file details (filename, mimetype, size) and text fields via <code>ctx.plugins.formData()</code>. [cite: tests/app.jet.ts]</li>
+<li>Saving uploaded files to the server’s filesystem or preparing them for cloud storage.</li>
+<li>Validating file types and sizes.</li>
+<li>Discussing cross-runtime considerations for file handling (Node vs. Deno vs. Bun) and how plugins help abstract this. [cite: tests/uploading-files.md]</li>
+</ul>
+</li>
+<li><strong>Concepts:</strong> Plugins, Context, Request Handling, Cross-Runtime Patterns.</li>
+<li><strong>Based on:</strong> <code>POST_petImage$id</code>, <code>POST_upload</code> routes in [cite: tests/app.jet.ts] and examples in [cite: tests/uploading-files.md].</li>
+</ul>
+<h3>4. Real-time Updates with WebSockets</h3>
+<ul>
+<li><strong>Goal:</strong> Set up a WebSocket endpoint for real-time communication between the server and clients.</li>
+<li><strong>Covers:</strong>
+<ul>
+<li>Defining WebSocket handlers using the <code>WS_</code> export convention. [cite: tests/app.jet.ts]</li>
+<li>Accessing the WebSocket connection object (<code>ctx.connection</code>).</li>
+<li>Handling connection events (<code>open</code>, <code>close</code>, <code>error</code>).</li>
+<li>Sending and receiving messages (<code>message</code> event, <code>socket.send()</code>).</li>
+<li>Broadcasting messages to multiple connected clients (requires managing connections).</li>
+<li>Basic ping/pong for health checks.</li>
+<li>Building a simple client-side implementation (using HTML/JS) to connect and interact. [cite: tests/index.html]</li>
+<li>Cross-runtime notes for WebSocket server setup. [cite: tests/websockets-usage.md]</li>
+</ul>
+</li>
+<li><strong>Concepts:</strong> Routing (WebSockets), Context (<code>ctx.connection</code>).</li>
+<li><strong>Based on:</strong> <code>WS_live</code> route in [cite: tests/app.jet.ts] and examples in [cite: tests/websockets-usage.md, tests/index.html].</li>
+</ul>
+<h3>5. Advanced Validation &amp; Error Handling</h3>
+<ul>
+<li><strong>Goal:</strong> Implement robust input validation using a library like Zod and configure centralized, user-friendly error responses.</li>
+<li><strong>Covers:</strong>
+<ul>
+<li>Defining complex validation schemas (nested objects, arrays, custom rules) using Zod/TypeBox.</li>
+<li>Integrating schemas with <code>defineHandler</code> (recommended pattern) or attaching them directly.</li>
+<li>Validating request body, query parameters, and path parameters.</li>
+<li>Customizing validation error messages.</li>
+<li>Implementing detailed error handling in global middleware (<code>MIDDLEWARE_</code>) to catch validation errors (<code>400</code>), auth errors (<code>401</code>/<code>403</code>), not found errors (<code>404</code>), and server errors (<code>500</code>). [cite: tests/app.jet.ts]</li>
+<li>Formatting consistent JSON error responses (e.g., including request IDs).</li>
+<li>Using the <code>GET_error</code> route example for testing error paths. [cite: tests/app.jet.ts]</li>
+</ul>
+</li>
+<li><strong>Concepts:</strong> Validation, Schemas, Middleware, Error Handling, Context (<code>ctx.throw</code>, <code>ctx.validate</code>).</li>
+</ul>
+<h3>6. Creating &amp; Using Custom Plugins</h3>
+<ul>
+<li><strong>Goal:</strong> Learn how to build your own reusable JetPath plugins to encapsulate specific functionality or dependencies.</li>
+<li><strong>Covers:</strong>
+<ul>
+<li>The structure of a <code>JetPlugin</code> using the <code>executor</code> function.</li>
+<li>Initializing dependencies (like API clients or services) within a plugin.</li>
+<li>Returning an API object from the <code>executor</code>.</li>
+<li>Passing configuration options to plugins.</li>
+<li>Registering and using the custom plugin via <code>app.use()</code> and <code>ctx.plugins</code>.</li>
+</ul>
+</li>
+<li><strong>Concepts:</strong> Plugins, Dependency Injection patterns.</li>
+<li><strong>Based on:</strong> <code>authPlugin</code> example structure in [cite: tests/app.jet.ts].</li>
+</ul>
+<h3>7. Setting up API Documentation</h3>
+<ul>
+<li><strong>Goal:</strong> Configure and utilize JetPath’s built-in automatic API documentation generation.</li>
+<li><strong>Covers:</strong>
+<ul>
+<li>Configuring <code>apiDoc</code> and <code>APIdisplay</code> options in the <code>JetPath</code> constructor. [cite: tests/app.jet.ts]</li>
+<li>Adding descriptions and metadata to schemas (e.g., using Zod’s <code>.describe()</code>) and route handlers (<code>GET_.info = &quot;...&quot;</code>) to enrich the generated documentation.</li>
+<li>Accessing the interactive Swagger UI (usually at <code>/docs</code>).</li>
+<li>Understanding how schemas translate into documentation.</li>
+</ul>
+</li>
+<li><strong>Concepts:</strong> Configuration, Schemas, Documentation.</li>
+</ul>
+<hr>
     </section>
  
  
