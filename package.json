@@ -39,7 +39,7 @@
     "node": "node --watch --experimental-strip-types tests/app.jet.ts",
     "watch": "tsc tests/*.ts --target esnext --watch",
     "watch:docs": "docmach",
-    "build": "bun bundle.ts",
+    "build": "npx docmach build",
     "lint": "gts lint",
     "clean": "gts clean",
     "fix": "gts fix",
