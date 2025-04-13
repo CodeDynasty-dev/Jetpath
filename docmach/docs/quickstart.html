@@ -9,9 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet"> 
-  <link rel="stylesheet" href="bundle.css">
+  <link rel="stylesheet" href="/bundle.css">
+  <style> 
 
-  <style>
+ 
+
     :root {
       --primary: #6EE7B7;
       --primary-dark: #10B981;
@@ -161,87 +163,7 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
-
-    /* Hero Section */
-    .hero {
-      padding-top: 10rem;
-      padding-bottom: 6rem;
-      position: relative;
-      overflow: hidden;
-
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image:
-        radial-gradient(circle at 20% 30%, rgba(110, 231, 183, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
-      z-index: -1;
-    }
-
-    .hero-grid {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image:
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 30px 30px;
-      z-index: -1;
-    }
-
-    .hero-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .hero-badge {
-      background: rgba(110, 231, 183, 0.1);
-      border: 1px solid rgba(110, 231, 183, 0.2);
-      color: var(--primary);
-      font-size: 0.875rem;
-      font-weight: 500;
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-title {
-      font-size: 3.5rem;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-subtitle {
-      font-size: 1.25rem;
-      color: var(--text-light);
-      max-width: 700px;
-      margin-bottom: 2.5rem;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 4rem;
-    }
-
+  
     /* Code Demo */
     .code-demo {
       width: 100%;
@@ -1010,17 +932,7 @@
         /* md:mb-16 */
       }
     }
-
-    .glassmorphism {
-      background: rgba(16, 16, 16, 0.7);
-      border-radius: 16px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 8px;
-      margin-top: 1rem;
-    }
+ 
 
     .red {
       border: 1px red solid;
@@ -1088,9 +1000,38 @@
     :not(pre)>code[class*=language-], pre[class*=language-] {
       background-color: unset !important;
     }
+
+    #doc-side-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 256px;
+      height: 100vh;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-right: 1px solid var(--border);
+      z-index: 90;
+      padding: 4rem 1rem 1rem;
+    }
+
+    .main-content {
+      margin-left: 256px;
+      padding: 4rem 1.5rem 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      #doc-side-bar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 4rem 1.5rem 1.5rem;
+      }
+    }
   </style>
 
-  <link href="prism.css" rel="stylesheet" />
+  <link href="/prism.css" rel="stylesheet" />
 
 </head>
 
@@ -1104,11 +1045,11 @@
  
   <!-- Header -->
   <header class="header">
-    <div class="container header-container">
+    <div class="container header-container m-0">
       <div class="logo-container">
         <a href="#" class="logo">
           <div class="flex gap-1">
-            <img src="icon-transparent.webp" class="h-[88px]" alt="">
+            <img src="/icon-transparent.webp" class="h-[48px] " alt="">
           </div>
         </a>
         <a href="#" class="logo">
@@ -1132,7 +1073,6 @@
         <a href="#performance" class="nav-link">Performance</a>
         <a href="#ecosystem" class="nav-link">Ecosystem</a>
         <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
-        <a href="/docs/quickstart.html" class="btn btn-primary">Get Started</a>
       </nav>
 
       <button class="mobile-menu-btn">
@@ -1145,468 +1085,164 @@
       </button>
     </div>
   </header>
-
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-grid"></div>
-    <div class="container bg-[url(icon-transparent.webp)] bg-cover bg-no-repeat bg-center bg-size-[400px]">
-      <div class="hero-content">
-        <div class="hero-badge">Blazing Fast Backend Framework</div>
-        <h1 class="hero-title">Build high-performance APIs with minimal effort</h1>
-        <p class="hero-subtitle">JetPath is a modern Node.js framework designed for speed and developer productivity.
-          Build robust, type-safe APIs with elegant syntax and unmatched performance.</p>
-        <div class="hero-cta">
+ 
+  <!-- Sidebar -->
+  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-[8rem]">
+    <nav class="sticky top-[calc(4rem+1px+2rem)] h-full">
+      <!-- Search -->
+      <div class="px-4 py-6">
+        <div class="relative">  
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg> 
+          </div>
+          <input type="text" name="doc-search" id="doc-search" class="block w-full pl-10 pr-3 py-2 border border-gray-700 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 sm:text-sm" placeholder="Search documentation">
         </div>
+      </div>
 
-        <!-- Code Demo -->
-        <div class="code-demo !mt-2">
-          <div class="code-header">
-            <div class="code-dots">
-              <div class="code-dot red"></div>
-              <div class="code-dot yellow"></div>
-              <div class="code-dot green"></div>
+      <!-- Navigation Links -->
+      <div class="space-y-2">
+        <!-- Getting Started Section -->
+        <div class="px-4">
+          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="getting-started">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              <span class="text-sm font-medium">Getting Started</span>
             </div>
-            <div class="code-tabs">
-              <div class="code-tab active" data-tab="basic">Basic</div>
-              <div class="code-tab" data-tab="advanced">Websocket</div>
-              <div class="code-tab" data-tab="typescript">Advanced</div>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+          <div class="space-y-1 pl-6 mt-2" id="getting-started-content">
+            <a href="/docs/introduction" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Introduction</a>
+            <a href="/docs/installation" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Installation</a>
+            <a href="/docs/quickstart" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Quick Start</a>
+          </div>
+        </div>
+
+        <!-- Core Concepts Section -->
+        <div class="px-4">
+          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="core-concepts">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span class="text-sm font-medium">Core Concepts</span>
             </div>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </div>
-          <div class="code-content">
-            <div class="code-wrapper active" id="basic-code">
-              <button class="copy-btn" data-code="basic">Copy</button>
-              <pre><code class="language-javascript">import { type JetFunc, JetPath } from "jetpath";
+          <div class="space-y-1 pl-6 mt-2" id="core-concepts-content">
+            <a href="/docs/routing" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Routing</a>
+            <a href="/docs/middleware" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Middleware</a>
+            <a href="/docs/request" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Request</a>
+            <a href="/docs/response" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Response</a>
+            <a href="/docs/error-handling" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Error Handling</a>
+          </div>
+        </div>
 
-const app = new JetPath();
-
-app.listen();
-
-// this goes to = get /
-export const GET_: JetFunc = function (ctx) {
-  ctx.send("hello world!");
-};</code></pre>
+        <!-- Advanced Section -->
+        <div class="px-4">
+          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="advanced">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span class="text-sm font-medium">Advanced</span>
             </div>
-            <div class="code-wrapper" id="advanced-code">
-              <button class="copy-btn" data-code="advanced">Copy</button>
-              <pre><code class="language-javascript">import { JetPath } from "jetpath";
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+          <div class="space-y-1 pl-6 mt-2" id="advanced-content">
+            <a href="/docs/plugins" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Plugins</a>
+            <a href="/docs/dependency-injection" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Dependency Injection</a>
+            <a href="/docs/testing" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Testing</a>
+            <a href="/docs/deployment" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Deployment</a>
+          </div>
+        </div>
 
-const app = new JetPath();
-
-export const WS_room: JetFunc = (ctx) => {
-  const conn = ctx.connection!;
-
-  conn.addEventListener("open", (socket) => {
-    socket.send("😎 Welcome to jet chat");
-  });
-
-  conn.addEventListener("message", (socket, event) => {
-    socket.send("message received");
-  });
-};
-</code></pre>
+        <!-- API Reference Section -->
+        <div class="px-4">
+          <div class="flex items-center justify-between text-gray-400 cursor-pointer hover:text-white" data-section="api-reference">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span class="text-sm font-medium">API Reference</span>
             </div>
-            <div class="code-wrapper" id="typescript-code">
-              <button class="copy-btn" data-code="typescript">Copy</button>
-              <pre><code class="language-typescript">export const POST_auth_login: JetFunc = async function (ctx) {
-  await ctx.json();
-  const { username, password } = ctx.validate(ctx.body);
-  
-  const authResult = ctx.plugins.authenticateUser(username, password);
-  
-  if (!authResult.authenticated) {
-    ctx.code = 401;
-    ctx.send({ status: "error", message: authResult.message });
-    return;
-  }
-  
-  ctx.send({
-    status: "success",
-    message: "Authentication successful",
-    token: authResult.token,
-    user: {
-      id: authResult.user.id,
-      username: authResult.user.username,
-      role: authResult.user.role
-    }
-  });
-};
-
-POST_auth_login.body = {
-  username: { type: "string", required: true, err: "Username is required" },
-  password: { type: "string", required: true, err: "Password is required" }
-};
-</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-cta !mt-24 !mb-0">
-          <a href="#" class="btn btn-primary">Get Started</a>
-          <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">View on
-            GitHub</a>
-        </div>
-
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Interactive Terminal Animation -->
-  <div class="container">
-    <div class="terminal">
-      <div class="terminal-header">
-        <div class="code-dots">
-          <div class="code-dot red"></div>
-          <div class="code-dot yellow"></div>
-          <div class="code-dot green"></div>
-        </div>
-        <div class="terminal-title">Terminal</div>
-      </div>
-      <div class="terminal-body">
-        <div class="terminal-line">
-          <span class="terminal-prompt">$</span>
-          <span class="terminal-output" style="animation-delay: 0s">npm install jetpath</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-prompt">$</span>
-          <span class="terminal-output" style="animation-delay: 0.8s">npx jetpath init my-api</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 1.6s">✓ Creating project structure...</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 2.4s">✓ Installing dependencies...</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 3.2s">✓ Configuring TypeScript...</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 4s">🚀 Project created successfully!</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-prompt">$</span>
-          <span class="terminal-output" style="animation-delay: 4.8s">cd my-api && npm run dev</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 5.6s">🔥 JetPath server running at
-            http://localhost:3000</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- Performance Spotlight Section -->
-  <div class="section-padding bg-gray-950"> 
-    <div class="container mx-auto text-center grid items-center justify-center">
-      <h2 class="section-title gradient-text">Engineered for <span class="text-white">Speed</span></h2>
-      <p class="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-        JetPath is blazingly fast. We benchmark continuously to ensure top-tier performance.
-      </p> 
-      <div class="glassmorphism rounded-2xl max-w-2xl">
-        <p class="text-2xl font-semibold text-white my-4">Very Close Tie</p>
-        <p class="text-gray-400">Requests per second on a standard benchmark:</p>
-        <div class="!m-4 text-left space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="text-lg font-medium text-emerald-400">JetPath</span>
-            <span class="text-lg font-bold text-white">~7519.36 req/s</span>
-          </div>
-          <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 81%"></div>
-          </div>
-          <div class="flex justify-between items-center mt-3">
-            <span class="text-lg font-medium text-gray-400">Elysia</span>
-            <span class="text-lg font-bold text-gray-400">~9569.38 req/s</span>
-          </div>
-          <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gray-500 h-2.5 rounded-full" style="width: 90%"></div>
-          </div>
-        </div>
-        <p class="text-sm text-gray-500 mt-6">*initial benchmark. more benchmarks coming soon.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Features Section -->
-  <section class="section" id="features">
-    <div class="container">
-      <h2 class="section-title">Feature-rich <span>Developer Experience</span></h2>
-      <p class="section-subtitle">JetPath is designed to make backend development enjoyable with powerful built-in
-        features that boost productivity.</p>
-
-      <div class="interactive-features">
-        <button class="feature-btn active" data-feature="performance">Performance</button>
-        <button class="feature-btn" data-feature="typescript">TypeScript</button>
-        <button class="feature-btn" data-feature="validation">Validation</button>
-        <button class="feature-btn" data-feature="middleware">Middleware</button>
-        <button class="feature-btn" data-feature="plugins">Plugins</button>
-      </div>
-
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </div>
-          <h3 class="feature-title">Lightning Fast</h3>
-          <p class="feature-description">Built with performance in mind from day one. JetPath handles thousands of
-            requests per second with minimal latency and resource usage.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-              <polyline points="2 17 12 22 22 17"></polyline>
-              <polyline points="2 12 12 17 22 12"></polyline>
-            </svg>
+          <div class="space-y-1 pl-6 mt-2" id="api-reference-content">
+            <a href="/docs/api/types" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Types</a>
+            <a href="/docs/api/decorators" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Decorators</a>
+            <a href="/docs/api/context" class="block px-3 py-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200">Context</a>
           </div>
-          <h3 class="feature-title">Intuitive API</h3>
-          <p class="feature-description">Clean, elegant syntax that makes developing complex applications
-            straightforward. Express your business logic clearly without boilerplate.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              <path d="M9 14h6"></path>
-              <path d="M9 10h6"></path>
-              <path d="M9 18h6"></path>
-            </svg>
-          </div>
-          <h3 class="feature-title">Built-in Validation</h3>
-          <p class="feature-description">Stop worrying about malformed data. JetPath's built-in validation ensures your
-            API only receives what it expects, with automatic TypeScript integration.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="3" y1="9" x2="21" y2="9"></line>
-              <line x1="9" y1="21" x2="9" y2="9"></line>
-            </svg>
-          </div>
-          <h3 class="feature-title">Modular Architecture</h3>
-          <p class="feature-description">Organize your application with route groups, modules, and middleware. Build
-            complex applications that remain maintainable as they grow.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </div>
-          <h3 class="feature-title">Zero Compromise</h3>
-          <p class="feature-description">Get both developer experience and runtime performance. No need to choose
-            between productivity and speed - JetPath delivers both.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-              <line x1="16" y1="8" x2="2" y2="22"></line>
-              <line x1="17.5" y1="15" x2="9" y2="15"></line>
-            </svg>
-          </div>
-          <h3 class="feature-title">Typescript-First</h3>
-          <p class="feature-description">Experience perfect type safety from HTTP request to response. Catch errors
-            before runtime with full TypeScript integration.</p>
         </div>
       </div>
-    </div>
-  </section>
+    </nav>
+  </aside>
 
-  <!-- Why JetPath Section -->
-  <section class="section why-jetpath" id="why-jetpath">
-    <div class="container">
-      <h2 class="section-title">Why Choose <span>JetPath</span></h2>
-      <p class="section-subtitle">JetPath combines the best ideas from popular frameworks while avoiding their pitfalls.
-        Experience backend development without compromises.</p>
-
-      <div class="comparison-table">
-        <table width="100%">
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>JetPath</th>
-              <th>Elysia</th>
-              <th>Express</th>
-              <th>Fastify</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Performance</td>
-              <td class="highlight-cell">Ultra-fast</td>
-              <td>Ultra-fast</td>
-              <td>Fast</td>
-              <td>Moderate</td>
-            </tr>
-            <tr>
-              <td>TypeScript Support</td>
-              <td class="highlight-cell">First-class</td>
-              <td>First-class</td>
-              <td>Good</td>
-              <td>Good</td>
-            </tr>
-            <tr>
-              <td>Built-in Validation</td>
-              <td class="highlight-cell">Yes</td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td>Yes</td>
-            </tr>
-            <tr>
-              <td>Learning Curve</td>
-              <td class="highlight-cell">Low</td>
-              <td>Medium</td>
-              <td>Medium</td>
-              <td>High</td>
-            </tr>
-            <tr>
-              <td>Bundle Size</td>
-              <td class="highlight-cell">&lt; 28KB</td>
-              <td>Medium</td>
-              <td>Medium</td>
-              <td>Large</td>
-            </tr>
-            <tr>
-              <td>WebSocket Support</td>
-              <td class="highlight-cell">Built-in</td>
-              <td>Plugin</td>
-              <td>Plugin</td>
-              <td>Built-in</td>
-            </tr>
-              <td>Cross-runtime support</td>
-              <td class="highlight-cell">Built-in</td>
-              <td>No</td>
-              <td>No</td>
-              <td>No</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- Performance Section -->
-  <section class="section performance" id="performance">
-    <div class="container">
-      <h2 class="section-title">Unmatched <span>Performance</span></h2>
-      <p class="section-subtitle">When speed matters, JetPath delivers.</p>
-
-      <div class="benchmark-container">
+  <main class="main-content">
+    <script>
+      // Initialize sections
+      document.querySelectorAll('[data-section]').forEach(section => {
+        const contentId = section.dataset.section + '-content';
+        const content = document.getElementById(contentId);
+        const arrow = section.querySelector('svg');
         
-        <div class="benchmark-grid">
-          <div class="benchmark-card">
-            <div class="benchmark-value">84,200</div>
-            <div class="benchmark-label">JetPath</div>
-          </div>
-          
-          <div class="benchmark-card">
-            <div class="benchmark-value">52,396</div>
-            <div class="benchmark-label">Fastify</div>
-          </div> 
-          
-          <div class="benchmark-card">
-            <div class="benchmark-value">14,201</div>
-            <div class="benchmark-label">Express</div>
-          </div>
-        </div>
-        <h3 class="mt-8">Requests per second (higher is better)</h3>
-      </div>
-    </div>
-  </section>
+        // Add click handler
+        section.addEventListener('click', () => {
+          content.classList.toggle('hidden');
+          arrow.classList.toggle('rotate-90');
+        });
+      });
 
-  <!-- Ecosystem Section -->
-  <section class="section ecosystem" id="ecosystem">
-    <div class="container">
-      <h2 class="section-title">Rich <span>Ecosystem</span></h2>
-      <p class="section-subtitle">JetPath comes with everything you need to build modern web applications and APIs.</p>
+      // Add active state to current page
+      const currentPath = window.location.pathname;
+      document.querySelectorAll('#doc-side-bar a').forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('bg-gray-700', 'text-white', 'font-medium');
+        }
+      });
 
-      <div class="ecosystem-cards">
-        <div class="ecosystem-card">
-          <div class="ecosystem-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6"></polyline>
-              <polyline points="8 6 2 12 8 18"></polyline>
-            </svg>
-          </div>
-          <h3 class="ecosystem-title">JetPath CLI</h3>
-          <p class="ecosystem-description">Scaffold projects and generate code with our powerful command-line tool.</p>
-        </div>
+      // Add smooth scroll behavior
+      document.querySelectorAll('#doc-side-bar a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = link.getAttribute('href');
+          if (href.startsWith('#')) {
+            const target = document.querySelector(href);
+            if (target) {
+              const headerHeight = document.querySelector('.header').offsetHeight;
+              const elementPosition = target.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
 
-        <!-- <div class="ecosystem-card">
-          <div class="ecosystem-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </svg>
-          </div>
-          <h3 class="ecosystem-title">ORM Integration</h3>
-          <p class="ecosystem-description">Seamless integration with popular ORMs including Prisma, TypeORM, and
-            Sequelize.</p>
-        </div> -->
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
 
-        <div class="ecosystem-card">
-          <div class="ecosystem-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-          </div>
-          <h3 class="ecosystem-title">Authentication</h3>
-          <p class="ecosystem-description">Built-in authentication with support for JWT, OAuth, and more.</p>
-        </div>
-
-        <div class="ecosystem-card">
-          <div class="ecosystem-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-          </div>
-          <h3 class="ecosystem-title">Deployment</h3>
-          <p class="ecosystem-description">Deploy to any environment with Docker, serverless, and cloud platform
-            integrations.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section class="cta" id="cta">
-    <div class="container">
-      <div class="cta-content">
-        <h2 class="cta-title">Ready to build something amazing?</h2>
-        <p class="cta-description">Join number of developers who have already chosen JetPath for their next and existing projects.
-        </p>
-        <div class="cta-buttons">
-          <a href="#" class="btn btn-primary">Get Started</a>
-          <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">Star on
-            GitHub</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
+              // Close mobile menu if open
+              nav.classList.remove('active');
+            }
+          } else {
+            window.location.href = href;
+          }
+        });
+      });
+    </script>
+    <section class="section interactive-features" >
+      <h1>hello world</h1>
+    </section>
+ 
+ 
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
@@ -1778,18 +1414,7 @@ POST_auth_login.body = {
       } else {
         cursorHighlight.style.opacity = '0.1';
       }
-    });
-
-    // Terminal typing animation
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        const terminalOutputs = document.querySelectorAll('.terminal-output');
-        terminalOutputs.forEach(output => {
-          output.style.opacity = '1';
-        });
-      }, 500);
-    });
-
+    }); 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
@@ -1814,8 +1439,80 @@ POST_auth_login.body = {
       });
     });
 
+
+     const sidebarLinks = document.querySelectorAll('.doc-link');
+    const contentSections = document.querySelectorAll('article [id]'); // Select elements with IDs within the article
+
+    function highlightSidebarLink() {
+        let currentSectionId = '';
+        const headerHeight = document.querySelector('.header').offsetHeight;
+        const scrollPosition = window.pageYOffset + headerHeight + 50; // Add offset
+
+        contentSections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollPosition >= sectionTop) {
+                currentSectionId = section.id;
+            }
+        });
+
+        sidebarLinks.forEach(link => {
+            link.classList.remove('text-[--primary]', 'font-semibold'); // Use Tailwind classes or custom classes
+            link.classList.add('text-[--text-light]');
+            if (link.getAttribute('href') === `#${currentSectionId}`) {
+                link.classList.add('text-[--primary]', 'font-semibold');
+                link.classList.remove('text-[--text-light]');
+            }
+        });
+    }
+
+    // Debounce function to limit scroll event handler calls
+    function debounce(func, wait = 10, immediate = true) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    };
+
+    const debouncedHighlight = debounce(highlightSidebarLink, 50);
+
+    window.addEventListener('scroll', debouncedHighlight);
+    window.addEventListener('load', highlightSidebarLink); // Initial highlight on load
+
+    // Smooth scrolling for doc links (adjust if existing smooth scroll handles this)
+    sidebarLinks.forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (!targetId || targetId === '#') return;
+
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          const headerHeight = document.querySelector('.header').offsetHeight;
+          const elementPosition = targetElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20; // Extra offset
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+
+          // Optionally update URL hash without page jump
+          // history.pushState(null, null, targetId);
+        }
+      });
+    });
+
   </script>
-  <script src="prism.js"></script>
+  <script src="/prism.js"></script>
 </body>
 
 </html>
+

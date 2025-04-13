@@ -8,9 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/prism.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/themes/prism-tomorrow.min.css">
+    rel="stylesheet"> 
   <link rel="stylesheet" href="bundle.css">
 
   <style>
@@ -28,13 +26,7 @@
       --border: rgba(255, 255, 255, 0.1);
       --border-light: rgba(255, 255, 255, 0.05);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+ 
     body {
       background-color: var(--dark);
       color: var(--text);
@@ -1026,12 +1018,76 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 8px;
+      margin-top: 1rem;
     }
 
     .red {
       border: 1px red solid;
     }
 
+
+        .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .search-bar-container {
+      flex-grow: 1;
+      max-width: 400px;
+    }
+
+    .search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .search-bar:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(110, 231, 183, 0.2);
+    }
+
+    .search-input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1rem;
+      width: 100%;
+      outline: none;
+    }
+
+    .search-bar svg {
+      margin-right: 0.5rem;
+    }
+
+    /* Media Queries */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-wrap: wrap;
+      }
+
+      .search-bar-container {
+        flex-basis: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .search-bar {
+        max-width: 100%;
+      }
+    }
+
+    :not(pre)>code[class*=language-], pre[class*=language-] {
+      background-color: unset !important;
+    }
   </style>
 
   <link href="prism.css" rel="stylesheet" />
@@ -1045,38 +1101,51 @@
   <!-- Decorative shapes -->
   <div class="custom-shape shape-1"></div>
   <div class="custom-shape shape-2"></div>
-
+ 
   <!-- Header -->
   <header class="header">
     <div class="container header-container">
-      <a href="#" class="logo">
-        <div class="flex gap-1">
-          <img src="icon-transparent.webp" class="h-[88px]" alt="">
-      </a>
-      <a href="#" class="logo">
-        <span class="logo-text">JetPath</span>
-      </a>
-    </div>
+      <div class="logo-container">
+        <a href="#" class="logo">
+          <div class="flex gap-1">
+            <img src="icon-transparent.webp" class="h-[88px]" alt="">
+          </div>
+        </a>
+        <a href="#" class="logo">
+          <span class="logo-text">JetPath</span>
+        </a>
+      </div>
 
-    <nav class="nav">
-      <a href="#features" class="nav-link">Features</a>
-      <a href="#why-jetpath" class="nav-link">Why JetPath</a>
-      <a href="#performance" class="nav-link">Performance</a>
-      <a href="#ecosystem" class="nav-link">Ecosystem</a>
-      <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
-      <a href="#" class="btn btn-primary">Get Started</a>
-    </nav>
+      <!-- Search Bar -->
+      <div class="search-bar-container">
+        <div class="search-bar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="search-input" placeholder="Search...">
+        </div>
+      </div>
 
-    <button class="mobile-menu-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="current
-        stroke=" currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-    </button>
+      <nav class="nav">  
+        <a href="#performance" class="nav-link">Performance</a>
+        <a href="#ecosystem" class="nav-link">Ecosystem</a>
+        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="/docs/quickstart.html" class="btn btn-primary">Get Started</a>
+      </nav>
+
+      <button class="mobile-menu-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </header>
+
 
   <!-- Hero Section -->
   <section class="hero">
@@ -1235,16 +1304,16 @@ POST_auth_login.body = {
       <p class="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
         JetPath is blazingly fast. We benchmark continuously to ensure top-tier performance.
       </p> 
-      <div class="glassmorphism p-8 rounded-2xl max-w-2xl mx-auto">
-        <p class="text-2xl font-semibold text-white mb-4">Very Close Tie</p>
+      <div class="glassmorphism rounded-2xl max-w-2xl">
+        <p class="text-2xl font-semibold text-white my-4">Very Close Tie</p>
         <p class="text-gray-400">Requests per second on a standard benchmark:</p>
-        <div class="mt-4 text-left space-y-2">
+        <div class="!m-4 text-left space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-lg font-medium text-emerald-400">JetPath</span>
             <span class="text-lg font-bold text-white">~7519.36 req/s</span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 77%"></div>
+            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 81%"></div>
           </div>
           <div class="flex justify-between items-center mt-3">
             <span class="text-lg font-medium text-gray-400">Elysia</span>
@@ -1421,6 +1490,12 @@ POST_auth_login.body = {
               <td>Plugin</td>
               <td>Built-in</td>
             </tr>
+              <td>Cross-runtime support</td>
+              <td class="highlight-cell">Built-in</td>
+              <td>No</td>
+              <td>No</td>
+              <td>No</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -1431,33 +1506,27 @@ POST_auth_login.body = {
   <section class="section performance" id="performance">
     <div class="container">
       <h2 class="section-title">Unmatched <span>Performance</span></h2>
-      <p class="section-subtitle">When speed matters, JetPath delivers. Experience blazing fast response times and high
-        throughput even under heavy load.</p>
+      <p class="section-subtitle">When speed matters, JetPath delivers.</p>
 
       <div class="benchmark-container">
-        <h3>Requests per second (higher is better)</h3>
-
+        
         <div class="benchmark-grid">
           <div class="benchmark-card">
-            <div class="benchmark-value">64,200</div>
+            <div class="benchmark-value">84,200</div>
             <div class="benchmark-label">JetPath</div>
           </div>
-
+          
           <div class="benchmark-card">
-            <div class="benchmark-value">52,300</div>
+            <div class="benchmark-value">52,396</div>
             <div class="benchmark-label">Fastify</div>
-          </div>
-
+          </div> 
+          
           <div class="benchmark-card">
-            <div class="benchmark-value">38,700</div>
-            <div class="benchmark-label">Hapi</div>
-          </div>
-
-          <div class="benchmark-card">
-            <div class="benchmark-value">14,200</div>
+            <div class="benchmark-value">14,201</div>
             <div class="benchmark-label">Express</div>
           </div>
         </div>
+        <h3 class="mt-8">Requests per second (higher is better)</h3>
       </div>
     </div>
   </section>
@@ -1481,7 +1550,7 @@ POST_auth_login.body = {
           <p class="ecosystem-description">Scaffold projects and generate code with our powerful command-line tool.</p>
         </div>
 
-        <div class="ecosystem-card">
+        <!-- <div class="ecosystem-card">
           <div class="ecosystem-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1492,7 +1561,7 @@ POST_auth_login.body = {
           <h3 class="ecosystem-title">ORM Integration</h3>
           <p class="ecosystem-description">Seamless integration with popular ORMs including Prisma, TypeORM, and
             Sequelize.</p>
-        </div>
+        </div> -->
 
         <div class="ecosystem-card">
           <div class="ecosystem-icon">
@@ -1527,7 +1596,7 @@ POST_auth_login.body = {
     <div class="container">
       <div class="cta-content">
         <h2 class="cta-title">Ready to build something amazing?</h2>
-        <p class="cta-description">Join thousands of developers who have already chosen JetPath for their next project.
+        <p class="cta-description">Join number of developers who have already chosen JetPath for their next and existing projects.
         </p>
         <div class="cta-buttons">
           <a href="#" class="btn btn-primary">Get Started</a>
@@ -1544,7 +1613,7 @@ POST_auth_login.body = {
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="footer-logo">JetPath</div>
-          <p class="footer-tagline">Blazing Fast Backend Framework for Node.js</p>
+          <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
             <a href="#" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
