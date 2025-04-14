@@ -1031,15 +1031,34 @@
     }
 
     /* Media Queries */
+   
+    /* Media Queries */
     @media (max-width: 768px) {
       .header-container {
-        flex-wrap: wrap;
+        /* flex-wrap: wrap; */
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+      }
+      .shape-1, .shape-2 {
+        display: none;
+      }
+      .header-container.container {
+        width: 100%;
+        padding: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
       }
 
       .search-bar-container {
         flex-basis: 100%;
         max-width: 100%;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      .header-container .flex.w-full.justify-between {
+        min-width: 80vw;
+        margin: 0 auto;
       }
 
       .search-bar {
@@ -1093,18 +1112,29 @@
   <div class="custom-shape shape-1"></div>
   <div class="custom-shape shape-2"></div>
  
-  <!-- Header -->
-  <header class="header">
-    <div class="container header-container m-0">
-      <div class="logo-container">
-        <a href="/" class="logo">
-          <div class="flex gap-1">
-            <img src="/icon-transparent.webp" class="h-[48px] " alt="">
+ <!-- Header -->
+  <header class="header w-full">
+    <div class="container header-container w-full">
+      <div class="flex w-full justify-between">
+
+        <div class="logo-container">
+          <a href="/" title="JetPath" class="logo">
+            <div class="flex gap-1">
+              <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
           <span class="logo-text">JetPath</span>
         </a>
+      </div>
+        <button class="mobile-menu-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        </button>
       </div>
 
       <!-- Search Bar -->
@@ -1119,17 +1149,13 @@
         </div>
       </div>
 
-      <nav class="nav">  
-        <a href="/performance" class="nav-link">Performance</a>
-        <a href="/ecosystem" class="nav-link">Ecosystem</a>
+      <nav class="nav lg:ml-6">  
+        <a href="/docs/introduction.html" class="nav-link">Docs</a>
+        <a href="/docs/performance" class="nav-link">Performance</a>
+        <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
         <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
-
-      <button class="mobile-menu-btn" aria-label="Toggle navigation">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
     </div>
   </header>
  
@@ -1464,7 +1490,7 @@ bun run server.ts
           <div class="footer-logo">JetPath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="#" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1472,7 +1498,7 @@ bun run server.ts
                 </path>
               </svg>
             </a>
-            <a href="#" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1480,7 +1506,7 @@ bun run server.ts
                 </path>
               </svg>
             </a>
-            <a href="#" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1488,7 +1514,7 @@ bun run server.ts
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="#" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
