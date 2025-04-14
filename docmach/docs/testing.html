@@ -189,7 +189,8 @@
         top: 0;
         left: -256px;
         width: 256px;
-        height: 100vh;
+        min-height: 100vh;
+        height: 100%;
         background: rgba(10, 10, 10, 0.8);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
@@ -1162,7 +1163,7 @@
   <div class="mobile-overlay"></div>
 
   <!-- Sidebar -->
-  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-[2rem]">
+  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-14 max-md:mt-[8rem]">
     <nav class="sticky top-[calc(4rem+1px+2rem)] h-full">
       <!-- Search -->
       <div class="px-4 py-6">
@@ -1311,7 +1312,7 @@
         });
       });
     </script>
-    <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
+    <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>Testing &amp; Debugging</h1>
 <p>Ensuring your JetPath application is reliable and maintainable requires effective testing and debugging strategies. JetPath’s structure, with its focus on distinct handlers, plugins, and middleware, lends itself well to various testing approaches.</p>
 <hr>

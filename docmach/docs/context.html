@@ -189,7 +189,8 @@
         top: 0;
         left: -256px;
         width: 256px;
-        height: 100vh;
+        min-height: 100vh;
+        height: 100%;
         background: rgba(10, 10, 10, 0.8);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
@@ -1162,7 +1163,7 @@
   <div class="mobile-overlay"></div>
 
   <!-- Sidebar -->
-  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-[2rem]">
+  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-14 max-md:mt-[8rem]">
     <nav class="sticky top-[calc(4rem+1px+2rem)] h-full">
       <!-- Search -->
       <div class="px-4 py-6">
@@ -1311,7 +1312,7 @@
         });
       });
     </script>
-    <section class="max-w-4xl mx-auto my-8 mt-[10rem]" >
+    <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>Core Concepts: Context (<code>ctx</code>)</h1>
 <p>The <code>Context</code> object, universally referred to as <code>ctx</code> in JetPath, is the central nervous system for handling individual HTTP requests within your application. It acts as a container for request data, a toolkit for crafting responses, an access point for framework features like plugins and validation, and a temporary state holder for the duration of a single request-response cycle. Understanding <code>ctx</code> is key to mastering JetPath.</p>
 <hr>
