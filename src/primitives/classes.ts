@@ -155,10 +155,10 @@ export class Context {
 
   validate(data: any = this.body || {}) {
     return validator(
-      _JetPath_paths[this.method!].direct[this.path!].body ||
-        _JetPath_paths[this.method!].parameter[this.path!].body ||
-        _JetPath_paths[this.method!].wildcard[this.path!].body ||
-        _JetPath_paths[this.method!].query[this.path!].body,
+      _JetPath_paths[this.method!].direct[this.path!]?.body ||
+        _JetPath_paths[this.method!].parameter[this.path!]?.body ||
+        _JetPath_paths[this.method!].wildcard[this.path!]?.body ||
+        _JetPath_paths[this.method!].query[this.path!]?.body,
       data,
     );
   }
