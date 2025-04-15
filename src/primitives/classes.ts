@@ -280,10 +280,10 @@ export class Context {
           string,
           any
         >;
-        return this.body as Promise<Type>;
       } catch (error) {
-        return Promise.reject(error);
+        this.body = {}
       }
+      return this.body as Promise<Type>;
     } else {
       return await new Promise<Type>((resolve) => {
         const chunks: Uint8Array[] = [];
