@@ -767,15 +767,19 @@
         isSet = true;
         const key = div.querySelector("span").textContent.replace(":", "");
         if (input.type === "file") {
-          result[key.trim()] = input.files[0];
-          return;
-        }
-        let value;
-        try {
-          value = JSON.parse(input.value);
-        } catch (error) {
-          value = input.value;
-        }
+            result[key] = input.files[0];
+            return;
+          }
+          if (input.type === "number") {
+            input.value = Number(input.value);
+          }
+          const parseValue = (value)=> {
+            if (/^-?\d+$/.test(value) && input.type !== "number") {
+              return String(value);
+            }
+            return value;
+          }
+          let value = parseValue(input.value); 
         result[key.trim()] = value;
       });
       if (!isSet) return;
@@ -801,8 +805,11 @@
             result[key] = input.files[0];
             return;
           }
+          if (input.type === "number") {
+            input.value = Number(input.value);
+          }
           const parseValue = (value)=> {
-            if (/^-?\d+$/.test(value)) {
+            if (/^-?\d+$/.test(value) && input.type !== "number") {
               return String(value);
             }
             return value;
