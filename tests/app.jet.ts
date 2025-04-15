@@ -11,11 +11,7 @@ import {
   type JetFunc,
   type JetMiddleware, 
 } from "../dist/index.js";
-
-import { 
-  jetbusboy,
-  type jetBusBoyType,
-} from "../official-plugins/jetbusboy/index.js";
+ 
 
 // import { createLogger } from "../official-plugins/jetlogger/index.js";
 
@@ -160,8 +156,7 @@ const authPlugin = new JetPlugin({
 // });
 
 // Register plugins
-app.use(authPlugin);
-app.use(jetbusboy);
+app.use(authPlugin); 
 // app.use(loggerPlugin);
 
 // =============================================================================
@@ -180,7 +175,7 @@ app.use(jetbusboy);
  * @param {Object} ctx - The request context
  * @returns {Function} The post-handler middleware
  */
-export const MIDDLEWARE_: JetMiddleware<{}, [jetBusBoyType]> = (ctx) => {
+export const MIDDLEWARE_: JetMiddleware<{} > = (ctx) => {
   const startTime = Date.now();
   const requestId = `req-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   
@@ -1022,7 +1017,7 @@ GET_pets_search$$.info = "Advanced search for pets by various criteria";
   
 export const POST_petImage$id: JetFunc<{
   params: { id: string };
-}, [jetBusBoyType]> = async function (ctx) {
+} > = async function (ctx) {
   // Check if user is an admin
   if (!ctx.plugins.isAdmin(ctx)) {
     ctx.code = 403;
@@ -1537,7 +1532,7 @@ WS_live.info = "WebSocket for real-time inventory updates and notifications";
  * @route POST /upload
  * @access Authenticated (Admin only)
  */
-export const POST_upload: JetFunc<{}, [jetBusBoyType]> = async (ctx) => {
+export const POST_upload: JetFunc<{} > = async (ctx) => {
   // Check if user is an admin
   if (!ctx.plugins.isAdmin(ctx)) {
     ctx.code = 403;

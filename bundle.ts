@@ -6,7 +6,8 @@ const html = await readFile("src/primitives/api-doc.html", {
 });
 const code = await readFile("dist/index.js", {
   encoding: "utf-8",
-});
+}); 
+
 await writeFile("dist/index.js", code.replace("{{view}}", html));
 console.log("JetPath: compiled!");
 

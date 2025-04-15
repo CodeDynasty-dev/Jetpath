@@ -3,5 +3,6 @@
 
 echo  "  Packing ...."
 tsc 
+bun bundle
 npm pack
 mv **.tgz ~/zips 

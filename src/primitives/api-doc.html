@@ -801,12 +801,14 @@
             result[key] = input.files[0];
             return;
           }
-          let value;
-          try {
-            value = JSON.parse(input.value);
-          } catch (error) {
-            value = input.value;
+          const parseValue = (value)=> {
+            if (/^-?\d+$/.test(value)) {
+              return String(value);
+            }
+            return value;
           }
+          let value = parseValue(input.value); 
+
           if (isObject === 'true') {
             if ((result[subOrdinate])) {
               result[subOrdinate][key] = value;
