@@ -1090,3 +1090,196 @@ export function isIdentical<T extends object, U extends object>(
 
   return true;
 }
+
+
+function validateBoundary(boundary: string) { 
+  if (boundary.length > 100) {
+    throw new Error('Invalid boundary: too long');
+  } 
+  if (!/^[a-zA-Z0-9\-_.]+$/.test(boundary)) {
+    throw new Error('Invalid boundary: contains invalid characters');
+  }
+  return boundary;
+}
+
+function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxBodySize?: number } = {}) {
+  const { maxBodySize } = options;
+  if (typeof maxBodySize === 'number' && rawBody.byteLength > maxBodySize) {
+    throw new Error(`Body size (${rawBody.byteLength} bytes) exceeds limit of ${maxBodySize} bytes.`);
+  }
+  const decoder = new TextDecoder('latin1');
+  const bodyText = decoder.decode(rawBody);
+  
+  const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
+  if (!boundaryMatch) {
+    throw new Error('Content-Type header is missing a valid boundary parameter.');
+  }
+  const boundary = boundaryMatch[1] || boundaryMatch[2];
+  if (!boundary) {
+    throw new Error('Boundary not specified in Content-Type header.');
+  }
+  const validatedBoundary = validateBoundary(boundary);
+  
+  const delimiter = `--${validatedBoundary}`;
+  const rawParts = bodyText
+    .split(delimiter)
+    .map(part => part.trim())
+    .filter(part => part && part !== '--');
+  
+  const fields: Record<string, string | string[]> = {};
+  const files: Record<string, { fileName: string; contentType: string; content: Uint8Array }> = {};
+  
+  function parseHeaders(headerText: string): Record<string, string> {
+    const headers: Record<string, string> = {};
+    const lines = headerText.split('\r\n');
+    for (const line of lines) {
+      const sep = line.indexOf(':');
+      if (sep === -1) continue;
+      const key = line.slice(0, sep).trim().toLowerCase();
+      const value = line.slice(sep + 1).trim();
+      headers[key] = value;
+    }
+    return headers;
+  }
+    // @ts-expect-error
+  const encoder = new TextEncoder('latin1');
+  
+  for (const part of rawParts) {
+    const idx = part.indexOf('\r\n\r\n');
+    if (idx === -1) continue; // malformed part; skip.
+    const rawHeaderBlock = part.slice(0, idx);
+    const contentText = part.slice(idx + 4);
+  
+    const headers = parseHeaders(rawHeaderBlock);
+    const disposition = headers['content-disposition'];
+    if (!disposition) continue;
+    const nameMatch = disposition.match(/name="([^"]+)"/i);
+    if (!nameMatch) continue;
+    const fieldName = nameMatch[1];
+    const fileNameMatch = disposition.match(/filename="([^"]*)"/i);
+    const fileName = fileNameMatch ? fileNameMatch[1] : null;
+  
+    if (fileName) { 
+      files[fieldName] = {
+        fileName,
+        contentType: headers['content-type'] || 'application/octet-stream',
+        content: encoder.encode(contentText)
+      };
+    } else { 
+      if (fields.hasOwnProperty(fieldName)) {
+        if (Array.isArray(fields[fieldName])) {
+          fields[fieldName].push(contentText);
+        } else {
+          fields[fieldName] = [fields[fieldName], contentText];
+        }
+      } else {
+        fields[fieldName] = contentText;
+      }
+    }
+  }
+  
+  return { ...fields, ...files };
+}
+ 
+export function parseUrlEncoded(bodyText: string): Record<string, string | string[]> {
+  const params = new URLSearchParams(bodyText);
+  const result: Record<string, string | string[]> = {};
+  for (const [key, value] of params.entries()) {
+    if (result.hasOwnProperty(key)) {
+      if (Array.isArray(result[key])) {
+        result[key].push(value);
+      } else {
+        result[key] = [result[key], value];
+      }
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
+
+/**
+ * Helper for Node.js: Reads the IncomingMessage stream, collecting chunks and checking size.
+ */
+function collectRequestBody(req: any, maxBodySize: number): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    req.on("data", (chunk: Buffer) => {
+      size += chunk.length;
+      if (maxBodySize && size > maxBodySize) {
+        reject(new Error("Payload Too Large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => {
+      resolve(new Uint8Array(Buffer.concat(chunks)));
+    });
+    req.on("error", (err: any) => reject(err));
+  });
+} 
+
+/**
+ * Reads the request/stream and returns a Promise that resolves to the parsed body.
+ *
+ * This function works for Node.js (IncomingMessage), Fetch Request (Deno, Bun, browser),
+ * and similar environments. It automatically checks the Content-Type header and enforces a maximum body size.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} options
+ *    - maxBodySize (number): Maximum allowed size in bytes (default: 1MB).
+ *    - contentType (string): Override the Content-Type header.
+ * @returns {Promise<Object>} Resolves to one of:
+ *    - For multipart/form-data: { fields, files }
+ *    - For application/x-www-form-urlencoded: { fields }
+ *    - For application/json: Parsed JSON object.
+ *    - For other content types: { text: string }
+ */
+export async function parseRequest(req: any, options: { maxBodySize?: number, contentType?: string } = {}): Promise<Record<string, any>>  {
+  const { maxBodySize = 5 * 1024 * 1024 } = options;
+  let contentType = options.contentType || "";
+  let rawBody: Uint8Array;
+  
+  // Check for Fetch-compatible objects (Deno, Bun, browsers)
+  if (typeof req.arrayBuffer === "function") {
+    if (!contentType && req.headers && typeof req.headers.get === "function") {
+      contentType = req.headers.get("content-type") || "";
+    }
+    const arrayBuffer = await req.arrayBuffer();
+    rawBody = new Uint8Array(arrayBuffer);
+    if (rawBody.byteLength > maxBodySize) {
+      throw new Error("Payload Too Large");
+    }
+  } 
+  else if (typeof req.on === "function") {
+    if (!contentType && req.headers) {
+      contentType = req.headers["content-type"] || "";
+    }
+    rawBody = await collectRequestBody(req, maxBodySize);
+  } else {
+    throw new Error("Unsupported request object type");
+  }
+  
+  const ct = contentType.toLowerCase(); 
+  const decoder = new TextDecoder("utf-8");
+  let bodyText: string;
+  
+  if (ct.includes("application/json")) {
+    bodyText = decoder.decode(rawBody);
+    return JSON.parse(bodyText);
+  }
+  else if (ct.includes("application/x-www-form-urlencoded")) {
+    bodyText = decoder.decode(rawBody);
+    return parseUrlEncoded(bodyText)  
+  }
+  else if (ct.includes("multipart/form-data")) {
+    return parseFormData(rawBody, contentType, { maxBodySize });
+  }
+  else {
+    bodyText = decoder.decode(rawBody);
+    return { parsed: bodyText };
+  }
+}

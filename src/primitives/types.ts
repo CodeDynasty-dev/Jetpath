@@ -93,7 +93,7 @@ export interface ContextType<
    * Parses the request as JSON
    */
 
-  json(): Promise<Record<string, any>>;
+  parse(): Promise<Record<string, any>>;
 
   /**
    * get original request

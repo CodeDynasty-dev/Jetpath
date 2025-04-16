@@ -1,7 +1,7 @@
 import { createReadStream } from "node:fs";
 import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
-import { _DONE, _JetPath_paths, _OFF, UTILS, validator } from "./functions.js";
+import { _DONE, _JetPath_paths, _OFF, parseRequest, UTILS, validator } from "./functions.js";
 import type {
   JetPluginExecutor,
   JetPluginExecutorInitParams,
@@ -270,37 +270,11 @@ export class Context {
     return undefined as never;
   }
 
-  async json<Type extends any = Record<string, any>>(): Promise<Type> {
+  async parse<Type extends any = Record<string, any>>(): Promise<Type> {
     if (this.body) {
       return this.body as Promise<Type>;
     }
-    if (!UTILS.runtime["node"]) {
-      try {
-        this.body = await (this.request as unknown as Request).json() as Record<
-          string,
-          any
-        >;
-      } catch (error) {
-        this.body = {}
-      }
-      return this.body as Promise<Type>;
-    } else {
-      return await new Promise<Type>((resolve) => {
-        const chunks: Uint8Array[] = [];
-        (this.request as IncomingMessage).on("data", (chunk: Uint8Array) => {
-          chunks.push(chunk);
-        });
-        (this.request as IncomingMessage).on("end", () => {
-          try {
-            const body = Buffer.concat(chunks).toString();
-            this.body = JSON.parse(body);
-            resolve(this.body as Type);
-          } catch (error) {
-            resolve({} as Promise<Type>);
-          }
-        });
-      });
-    }
+    return parseRequest(this.request, {}) as Promise<Type>; 
   }
 }
 

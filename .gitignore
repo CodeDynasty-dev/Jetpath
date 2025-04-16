@@ -9,3 +9,5 @@ dist
 ./dist
 .vscode
 official-plugins
+security-audits
+formdata-psrser.ts
