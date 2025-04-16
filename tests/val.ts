@@ -68,7 +68,7 @@ export function validator<T extends Record<string, any>>(
             );
             out[key as keyof T] = validatedArray as T[keyof T];
             continue;
-          } catch (e) {
+          } catch (e: any) {
             errors.push(`${key}: ${e.message}`);
             continue;
           }
@@ -92,7 +92,7 @@ export function validator<T extends Record<string, any>>(
               value,
             ) as T[keyof T];
             continue;
-          } catch (e) {
+          } catch (e: any) {
             errors.push(`${key}: ${e.message}`);
             continue;
           }
@@ -231,58 +231,58 @@ function runBenchmark() {
 }
 
 // Example usage and tests
-function runExamples() {
-  // Valid data
-  try {
-    const validResult = validator(userSchema, {
-      username: "john_doe123",
-      email: "john@example.com",
-      age: 25,
-      password: "Password123",
-      interests: ["coding", "reading"],
-      metadata: { theme: "dark" },
-      newsletter: true,
-    });
-    console.log("Valid data result:", validResult);
-  } catch (error) {
-    console.error("Validation failed:", error);
-  }
+// function runExamples() {
+//   // Valid data
+//   try {
+//     const validResult = validator(userSchema, {
+//       username: "john_doe123",
+//       email: "john@example.com",
+//       age: 25,
+//       password: "Password123",
+//       interests: ["coding", "reading"],
+//       metadata: { theme: "dark" },
+//       newsletter: true,
+//     });
+//     console.log("Valid data result:", validResult);
+//   } catch (error) {
+//     console.error("Validation failed:", error);
+//   }
 
-  // Invalid data examples
-  const invalidCases = [
-    {
-      case: "Missing required field",
-      data: { username: "john_doe123" },
-    },
-    {
-      case: "Invalid email",
-      data: {
-        username: "john_doe123",
-        email: "invalid-email",
-        age: 25,
-        password: "Password123",
-      },
-    },
-    {
-      case: "Underage user",
-      data: {
-        username: "john_doe123",
-        email: "john@example.com",
-        age: 16,
-        password: "Password123",
-      },
-    },
-  ];
+//   // Invalid data examples
+//   const invalidCases = [
+//     {
+//       case: "Missing required field",
+//       data: { username: "john_doe123" },
+//     },
+//     {
+//       case: "Invalid email",
+//       data: {
+//         username: "john_doe123",
+//         email: "invalid-email",
+//         age: 25,
+//         password: "Password123",
+//       },
+//     },
+//     {
+//       case: "Underage user",
+//       data: {
+//         username: "john_doe123",
+//         email: "john@example.com",
+//         age: 16,
+//         password: "Password123",
+//       },
+//     },
+//   ];
 
-  for (const { case: testCase, data } of invalidCases) {
-    try {
-      validator(userSchema, data);
-      console.log(`${testCase}: Unexpectedly passed`);
-    } catch (error) {
-      console.log(`${testCase}: ${error.message}`);
-    }
-  }
-}
+//   for (const { case: testCase, data } of invalidCases) {
+//     try {
+//       validator(userSchema, data);
+//       console.log(`${testCase}: Unexpectedly passed`);
+//     } catch (error: any) {
+//       console.log(`${testCase}: ${error.message}`);
+//     }
+//   }
+// }
 
 // Run examples and benchmark
 // runExamples();

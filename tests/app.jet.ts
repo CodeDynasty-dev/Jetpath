@@ -9,6 +9,7 @@ import {
   JetPath,
   JetPlugin,
   type JetFunc,
+  type ContextType,
   type JetMiddleware, 
 } from "../dist/index.js";
  
@@ -68,9 +69,8 @@ const app = new JetPath({
  */
 const authPlugin = new JetPlugin({
   executor() {
-    // In a real application, use a secure secret management solution
-    const JWT_SECRET = process.env.JWT_SECRET || "pet-shop-secret-key";
-    const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "admin-secret-key";
+    // In a real application, use a secure secret management solution 
+    const ADMIN_API_KEY = process.env["ADMIN_API_KEY"] || "admin-secret-key";
     
     // Simple in-memory user store (use a database in production)
     const users = [
@@ -85,7 +85,7 @@ const authPlugin = new JetPlugin({
        * @param {string} password - User's password
        * @returns {object} Authentication result with token if successful
        */
-      authenticateUser(username, password) {
+      authenticateUser(username: string, password: string) {
         const user = users.find(u => u.username === username && u.password === password);
         if (!user) {
           return { authenticated: false, message: "Invalid credentials" };
@@ -105,7 +105,7 @@ const authPlugin = new JetPlugin({
        * @param {JetRequest} request - The incoming request
        * @returns {object} Verification result with user info if authenticated
        */
-      verifyAuth(ctx) {
+      verifyAuth(ctx: ContextType<any, any>) {
         const authHeader = ctx.get("authorization"); 
         
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -132,14 +132,14 @@ const authPlugin = new JetPlugin({
        * @param {JetRequest} request - The incoming request
        * @returns {boolean} Whether the user is an admin
        */ 
-      isAdmin(ctx) {
+      isAdmin(ctx: ContextType<any, any>) {
         // Check for admin API key
         if (ctx.get("x-admin-Key") === ADMIN_API_KEY) {
           return true;
         }
         
         // Alternatively check user role
-        const auth = this.verifyAuth(ctx);
+        const auth = this["verifyAuth"](ctx);
         return auth.authenticated && auth.user.role === "admin";
       }
     };
@@ -199,11 +199,11 @@ export const MIDDLEWARE_: JetMiddleware<{} > = (ctx) => {
   
   // Verify authentication for protected routes
   if (!isPublicRoute && ctx.request.url !== "/" && !ctx.request.url.includes("/docs")) {
-    const auth = ctx.plugins.verifyAuth(ctx, ctx.request);
+    const auth = ctx.plugins["verifyAuth"](ctx, ctx.request);
     if (!auth.authenticated) {
       ctx.code = 401; 
       ctx.set("WWW-Authenticate", "Bear");
-      ctx.plugins?.logger?.warn({
+      ctx.plugins?.["logger"]?.warn({
         requestId,
         message: "Authentication failed",
         url: ctx.request.url
@@ -212,23 +212,25 @@ export const MIDDLEWARE_: JetMiddleware<{} > = (ctx) => {
     }
     
     // Attach user info to context for use in route handlers
-    ctx.app.user = auth.user;
+    // Attach user info to context for use in route handlers
+    ctx.app["user"] = auth.user;
   }
 
-  return (ctx, err) => {
+  return (ctx, err: any) => {
     console.log(err);
     
     const duration = Date.now() - startTime;
     
     // Add standard response headers
-    ctx.request.headers["X-Response-Time"] = `${duration}ms`;
+    ctx.set("X-Response-Time", `${duration}ms`);
     
     // Handle errors
     if (err) {
       ctx.code = ctx.code >= 400 ? ctx.code : 500;
       
       // Log the error
-      ctx.plugins?.logger?.error({
+      // Log the error
+      ctx.plugins?.["logger"]?.error({
         requestId,
         error: err.message,
         stack: err.stack,
@@ -249,7 +251,7 @@ export const MIDDLEWARE_: JetMiddleware<{} > = (ctx) => {
     
     // 404 handler
     if (ctx.code === 404) {
-      ctx.plugins?.logger?.warn({
+      ctx.plugins?.["logger"]?.warn({
         requestId,
         message: "Resource not found",
         url: ctx.request.url,
@@ -266,7 +268,8 @@ export const MIDDLEWARE_: JetMiddleware<{} > = (ctx) => {
     }
     
     // Log successful response
-    ctx.plugins?.logger?.info({
+    // Log successful response
+    ctx.plugins?.["logger"]?.info({
       requestId,
       status: ctx.code,
       duration,
@@ -303,7 +306,7 @@ export const MIDDLEWARE_: JetMiddleware<{} > = (ctx) => {
  */
 
 type PetType = {
-  id: string;
+  id?: string;
   name: string;
   species: string;
   breed: string;
@@ -314,8 +317,8 @@ type PetType = {
   image?: string;
   price: number;
   available: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   tags?: string[];
   health?: {
     vaccinated?: boolean;
@@ -340,7 +343,7 @@ type PetType = {
  * In a production application, this would be replaced with a real database
  * @type {Array<PetType>}
  */
-const pets = [
+const pets: PetType[] = [
   {
     id: "pet-1",
     name: "Max",
@@ -434,11 +437,11 @@ GET_.info = "Returns API information and status";
  * @route POST /auth/login
  * @access Public
  */
-export const POST_auth_login: JetFunc = async function (ctx) {
+export const POST_auth_login: JetFunc<{ body: { username: string; password: string } }> = async function (ctx) {
   await ctx.json();
   const { username, password } = ctx.validate(ctx.body);
   
-  const authResult = ctx.plugins.authenticateUser(username, password);
+  const authResult = ctx.plugins["authenticateUser"](username, password);
   
   if (!authResult.authenticated) {
     ctx.code = 401;
@@ -503,7 +506,7 @@ export const GET_pets: JetFunc<{
   
   // Filter by availability
   if (available !== undefined) {
-    const isAvailable = available === true || available === "true";
+    const isAvailable = available === Boolean(available); 
     filteredPets = filteredPets.filter(pet => pet.available === isAvailable);
   }
   
@@ -538,7 +541,7 @@ export const GET_pets: JetFunc<{
   const sortField = sort.startsWith("-") ? sort.substring(1) : sort;
   const sortDirection = sort.startsWith("-") ? -1 : 1;
   
-  filteredPets.sort((a, b) => {
+  filteredPets.sort((a:any, b:any) => {
     if (a[sortField] < b[sortField]) return -1 * sortDirection;
     if (a[sortField] > b[sortField]) return 1 * sortDirection;
     return 0;
@@ -552,9 +555,9 @@ export const GET_pets: JetFunc<{
   
   // Create next and previous page URLs if applicable 
   
-  const baseUrl = new URL(ctx.get("host")).origin + "/pets";
-  let nextPage = null;
-  let prevPage = null;
+  const baseUrl = new URL(ctx.get("host")!).origin + "/pets";
+  let nextPage: string | null = null;
+  let prevPage: string | null = null;
   
   if (offset + limit < filteredPets.length) {
     nextPage = `${baseUrl}?limit=${limit}&offset=${offset + limit}`;
@@ -605,7 +608,7 @@ export const GET_petBy$id: JetFunc<{
   query: { includeReviews?: boolean };
 }> = async function (ctx) {
   const petId = ctx.params.id;
-  const includeReviews = ctx.query.includeReviews === true || ctx.query.includeReviews === "true";
+  const includeReviews = ctx.query.includeReviews === true || ctx.query.includeReviews === Boolean("true");
   
   // Find pet by id
   const pet = pets.find((p) => p.id === petId);
@@ -620,7 +623,7 @@ export const GET_petBy$id: JetFunc<{
   }
   
   // Include reviews if requested
-  let petData = { ...pet };
+  let petData: any = { ...pet };
   
   if (includeReviews) {
     const petReviews = reviews.filter(review => review.petId === petId);
@@ -656,7 +659,7 @@ export const POST_pets: JetFunc<{
   body: PetType;
 }> = async function (ctx) {
   // Check if user is an admin
-  if (!ctx.plugins.isAdmin(ctx)) {
+  if (!ctx.plugins["isAdmin"](ctx)) {
     ctx.code = 403;
     ctx.send({ 
       status: "error",
@@ -681,10 +684,11 @@ export const POST_pets: JetFunc<{
   pets.push(newPet);
   
   // Log pet creation
-  ctx.plugins?.logger?.info({
+  // Log pet creation
+  ctx.plugins?.["logger"]?.info({
     action: "create_pet",
     petId: newPet.id,
-    adminId: ctx.app.user?.id || "unknown"
+    adminId: ctx.app["user"]?.id || "unknown"
   });
   
   ctx.code = 201; // Created
@@ -759,7 +763,8 @@ POST_pets.body = {
       neutered: { type: "boolean" },
       medicalHistory: { type: "array", arrayType: "string" }
     }
-  }
+  },
+
 };
 
 POST_pets.info = "Add a new pet to the inventory (admin only)";
@@ -774,7 +779,7 @@ export const PUT_petBy$id: JetFunc<{
   body: Partial<PetType>;
 }> = async function (ctx) {
   // Check if user is an admin
-  if (!ctx.plugins.isAdmin(ctx)) {
+  if (!ctx.plugins["isAdmin"](ctx)) {
     ctx.code = 403;
     ctx.send({ 
       status: "error",
@@ -812,10 +817,11 @@ export const PUT_petBy$id: JetFunc<{
   pets[index] = updatedPet;
   
   // Log pet update
-  ctx.plugins?.logger?.info({
+  // Log pet update
+  ctx.plugins?.["logger"]?.info({
     action: "update_pet",
     petId: updatedPet.id,
-    adminId: ctx.app.user?.id || "unknown",
+    adminId: ctx.app["user"]?.id || "unknown",
     changes: Object.keys(updatedPetData).join(", ")
   });
   
@@ -860,7 +866,7 @@ export const DELETE_petBy$id: JetFunc<{
   params: { id: string } 
 }> = function (ctx) {
   // Check if user is an admin
-  if (!ctx.plugins.isAdmin(ctx)) {
+  if (!ctx.plugins["isAdmin"](ctx)) {
     ctx.code = 403;
     ctx.send({ 
       status: "error",
@@ -896,10 +902,11 @@ export const DELETE_petBy$id: JetFunc<{
   });
   
   // Log pet deletion
-  ctx.plugins?.logger?.info({
+  // Log pet deletion
+  ctx.plugins?.["logger"]?.info({
     action: "delete_pet",
     petId: deletedPet.id,
-    adminId: ctx.app.user?.id || "unknown"
+    adminId: ctx.app["user"]?.id || "unknown"
   });
   
   ctx.send({ 
@@ -975,7 +982,7 @@ export const GET_pets_search$$: JetFunc<{
       const tagList = tags.split(',').map(tag => tag.trim().toLowerCase());
       filteredPets = filteredPets.filter(pet =>
         pet.tags && tagList.some(tag =>
-          pet.tags.map(t => t.toLowerCase()).includes(tag)
+          pet.tags?.map(t => t.toLowerCase()).includes(tag)
         )
       );
     }
@@ -1019,7 +1026,7 @@ export const POST_petImage$id: JetFunc<{
   params: { id: string };
 } > = async function (ctx) {
   // Check if user is an admin
-  if (!ctx.plugins.isAdmin(ctx)) {
+  if (!ctx.plugins["isAdmin"](ctx)) {
     ctx.code = 403;
     ctx.send({ 
       status: "error",
@@ -1044,7 +1051,7 @@ export const POST_petImage$id: JetFunc<{
   
   try {
     // Parse form data
-    const formData = await ctx.plugins.formData(ctx);
+    const formData = await ctx.plugins["formData"](ctx);
     const image = formData.image;
     
     if (!image) {
@@ -1080,11 +1087,12 @@ export const POST_petImage$id: JetFunc<{
     pets[index].updatedAt = new Date().toISOString();
     
     // Log image upload
-    ctx.plugins?.logger?.info({
+    // Log image upload
+    ctx.plugins?.["logger"]?.info({
       action: "upload_pet_image",
       petId,
       imageUrl,
-      adminId: ctx.app.user?.id || "unknown"
+      adminId: ctx.app["user"]?.id || "unknown"
     });
     
     ctx.send({
@@ -1093,8 +1101,8 @@ export const POST_petImage$id: JetFunc<{
       imageUrl,
       pet: pets[index]
     });
-  } catch (error) {
-    ctx.plugins?.logger?.error({
+  } catch (error:any) {
+    ctx.plugins?.["logger"]?.error({
       action: "upload_pet_image_error",
       petId,
       error: error.message
@@ -1181,7 +1189,7 @@ export const GET_petBy$id_reviews: JetFunc<{
   const sortField = sort.startsWith("-") ? sort.substring(1) : sort;
   const sortDirection = sort.startsWith("-") ? -1 : 1;
   
-  petReviews.sort((a, b) => {
+  petReviews.sort((a: any, b: any) => {
     if (a[sortField] < b[sortField]) return -1 * sortDirection;
     if (a[sortField] > b[sortField]) return 1 * sortDirection;
     return 0;
@@ -1218,7 +1226,7 @@ export const POST_petBy$id_reviews: JetFunc<{
   };
 }> = async function (ctx) {
   // Verify user is authenticated
-  const auth = ctx.plugins.verifyAuth(ctx, ctx.request);
+  const auth = ctx.plugins["verifyAuth"](ctx, ctx.request);
   if (!auth.authenticated) {
     ctx.code = 401;
     ctx.send({ 
@@ -1260,7 +1268,8 @@ export const POST_petBy$id_reviews: JetFunc<{
   reviews.push(newReview);
   
   // Log review creation
-  ctx.plugins?.logger?.info({
+  // Log review creation
+  ctx.plugins?.["logger"]?.info({
     action: "create_review",
     reviewId: newReview.id,
     petId,
@@ -1300,7 +1309,7 @@ export const DELETE_reviews$reviewId: JetFunc<{
   params: { reviewId: string };
 }> = function (ctx) {
   // Verify user is authenticated
-  const auth = ctx.plugins.verifyAuth(ctx, ctx.request);
+  const auth = ctx.plugins["verifyAuth"](ctx, ctx.request);
   if (!auth.authenticated) {
     ctx.code = 401;
     ctx.send({ 
@@ -1343,7 +1352,8 @@ export const DELETE_reviews$reviewId: JetFunc<{
   const deletedReview = reviews.splice(reviewIndex, 1)[0];
   
   // Log review deletion
-  ctx.plugins?.logger?.info({
+  // Log review deletion
+  ctx.plugins?.["logger"]?.info({
     action: "delete_review",
     reviewId,
     petId: deletedReview.petId,
@@ -1370,7 +1380,7 @@ DELETE_reviews$reviewId.info = "Delete a review (admin or review owner only)";
  */
 export const GET_stats: JetFunc = function (ctx) {
   // Check if user is an admin
-  if (!ctx.plugins.isAdmin(ctx)) {
+  if (!ctx.plugins["isAdmin"](ctx)) {
     ctx.code = 403;
     ctx.send({ 
       status: "error",
@@ -1385,7 +1395,7 @@ export const GET_stats: JetFunc = function (ctx) {
   const totalSpecies = new Set(pets.map(pet => pet.species)).size;
   
   // Count pets by species
-  const speciesCount = {};
+  const speciesCount: Record<string, number> = {};
   pets.forEach(pet => {
     speciesCount[pet.species] = (speciesCount[pet.species] || 0) + 1;
   });
@@ -1508,16 +1518,6 @@ export const WS_live: JetFunc = (ctx) => {
     
   } catch (error) {
     console.error("WebSocket error:", error);
-    
-    // Try to send error to client if connection is still open
-    try {
-      conn.send(JSON.stringify({
-        type: "error",
-        message: "WebSocket error occurred"
-      }));
-    } catch (e) {
-      // Connection might already be closed
-    }
   }
 };
 
@@ -1534,7 +1534,7 @@ WS_live.info = "WebSocket for real-time inventory updates and notifications";
  */
 export const POST_upload: JetFunc<{} > = async (ctx) => {
   // Check if user is an admin
-  if (!ctx.plugins.isAdmin(ctx)) {
+  if (!ctx.plugins["isAdmin"](ctx)) {
     ctx.code = 403;
     ctx.send({ 
       status: "error",
@@ -1545,8 +1545,8 @@ export const POST_upload: JetFunc<{} > = async (ctx) => {
   
   try {
     // Parse form data
-    const form = await ctx.plugins.formData(ctx);
-    const results = {};
+    const form = await ctx.plugins["formData"](ctx);
+    const results: Record<string, any> = {};
     
     // Process each file in the form
     for (const fieldName in form) {
@@ -1591,9 +1591,10 @@ export const POST_upload: JetFunc<{} > = async (ctx) => {
     }
     
     // Log upload activity
-    ctx.plugins?.logger?.info({
+    // Log upload activity
+    ctx.plugins?.["logger"]?.info({
       action: "file_upload",
-      userId: ctx.app.user?.id || "unknown",
+      userId: ctx.app["user"]?.id || "unknown",
       files: Object.keys(results).filter(key => results[key].url)
     });
     
@@ -1603,8 +1604,8 @@ export const POST_upload: JetFunc<{} > = async (ctx) => {
       data: results
     });
     
-  } catch (error) {
-    ctx.plugins?.logger?.error({
+  } catch (error: any) {
+    ctx.plugins?.["logger"]?.error({
       action: "file_upload_error",
       error: error.message
     });
@@ -1668,7 +1669,18 @@ export const GET_health: JetFunc = function (ctx) {
 };
 
 GET_health.info = "API health check endpoint";
-
+interface ApiInfo {
+  name: string;
+  version: string;
+  description: string;
+  baseUrl: string;
+endpoints: Array<{
+    path: string;
+    method: string;
+    description: string;
+    parameters?: Record<string, string | undefined>;
+  }>;
+}
 // =============================================================================
 // EXPORT DOCUMENTATION
 // =============================================================================
@@ -1684,7 +1696,7 @@ export const GET_export_docs$format: JetFunc<{
   const format = ctx.params.format.toLowerCase();
   
   // Basic API information
-  const apiInfo = {
+  const apiInfo: ApiInfo = {
     name: "PetShop API",
     version: "1.0.0",
     description: "A comprehensive API for managing pet shop inventory",
@@ -1723,7 +1735,7 @@ export const GET_export_docs$format: JetFunc<{
   
   // Format the output based on requested format
   if (format === "json") {
-    ctx.request.headers["Content-Type"] = "application/json";
+    ctx.set("Content-Type", "application/json");
     ctx.send(apiInfo);
   } else if (format === "yaml" || format === "yml") {
     // Simple YAML conversion for demonstration
@@ -1733,7 +1745,7 @@ export const GET_export_docs$format: JetFunc<{
     yaml += `baseUrl: ${apiInfo.baseUrl}\n`;
     yaml += `endpoints:\n`;
     
-    apiInfo.endpoints.forEach(endpoint => {
+    apiInfo.endpoints.forEach((endpoint: any) => {
       yaml += `  - path: ${endpoint.path}\n`;
       yaml += `    method: ${endpoint.method}\n`;
       yaml += `    description: ${endpoint.description}\n`;
@@ -1745,7 +1757,7 @@ export const GET_export_docs$format: JetFunc<{
       }
     });
     
-    ctx.request.headers["Content-Type"] = "text/yaml";
+    ctx.set("Content-Type", "text/yaml");
     ctx.send(yaml);
   } else if (format === "markdown" || format === "md") {
     // Generate markdown documentation
@@ -1754,7 +1766,7 @@ export const GET_export_docs$format: JetFunc<{
     markdown += `Base URL: ${apiInfo.baseUrl}\n\n`;
     markdown += `## Endpoints\n\n`;
     
-    apiInfo.endpoints.forEach(endpoint => {
+    apiInfo.endpoints.forEach((endpoint: any) => {
       markdown += `### ${endpoint.method} ${endpoint.path}\n\n`;
       markdown += `${endpoint.description}\n\n`;
       
@@ -1770,7 +1782,7 @@ export const GET_export_docs$format: JetFunc<{
       }
     });
     
-    ctx.request.headers["Content-Type"] = "text/markdown";
+    ctx.set("Content-Type", "text/markdown");
     ctx.send(markdown);
   } else {
     ctx.code = 400;

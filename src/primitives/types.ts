@@ -18,7 +18,7 @@ export interface ContextType<
   /**
    * an object you can set values to per request
    */
-  app: {};
+  app: Record<string, any>;
   /**
    * an object you can set values to per request
    */
