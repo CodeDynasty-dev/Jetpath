@@ -7,7 +7,6 @@ import type {
   JetPluginExecutorInitParams,
   methods,
 } from "./types.js";
-import { BunFile } from "bun";
 
 export class JetPlugin {
   JetPathServer?: any;
@@ -234,7 +233,7 @@ export class Context {
     throw _OFF;
   }
 
-  sendStream(stream: Stream | string | BunFile, ContentType: string) {
+  sendStream(stream: Stream | string, ContentType: string) {
     if (!this._2) {
       this._2 = {};
     }
@@ -243,6 +242,7 @@ export class Context {
         stream.split("/").at(-1) || "unnamed.bin"
       }"`;
       if (UTILS.runtime["bun"]) {
+        // @ts-expect-error
         stream = Bun.file(stream);
       } else if (UTILS.runtime["deno"]) {
         // @ts-expect-error

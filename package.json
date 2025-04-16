@@ -57,7 +57,7 @@
     "@types/busboy": "^1.5.4",
     "@types/node": "^22.7.5",
     "busboy": "^1.6.0",
-    "docmach": "^1.0.13",
+    "docmach": "^1.0.14",
     "gts": "^6.0.2",
     "typescript": "^5.6.3",
     "ws": "^8.17.0"
