@@ -27,7 +27,16 @@ import { Context, type JetPlugin, JetSocket, Log } from "./classes.js";
  */
 
 let cors: (ctx: Context) => void;
-
+const optionsCtx = {
+  _1: undefined,
+  _2: {},
+  code: 204,
+  set(field: string, value: string) {
+    if (field && value) {
+      (this._2 as Record<string, string>)[field ] = value;
+    }
+  }
+};
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
   allowMethods?: allowedMethods;
@@ -49,6 +58,35 @@ export function corsMiddleware(options: {
   options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
     !!options.keepHeadersOnError;
   //
+      //?  pre populate context for Preflight Request 
+      if (options.maxAge) {
+        optionsCtx.set("Access-Control-Max-Age", options.maxAge);
+      }
+      if (!options.privateNetworkAccess) {
+        if (options.allowMethods) {
+          optionsCtx.set(
+            "Access-Control-Allow-Methods",
+            options.allowMethods.join(","),
+          );
+        }
+        if (options.secureContext) {
+          optionsCtx.set(
+            "Cross-Origin-Opener-Policy",
+            options.secureContext["Cross-Origin-Embedder-Policy"],
+          );
+          optionsCtx.set(
+            "Cross-Origin-Embedder-Policy",
+            options.secureContext["Cross-Origin-Embedder-Policy"],
+          );
+        }
+        if (options.allowHeaders) {
+          optionsCtx.set(
+             "Access-Control-Allow-Headers",
+            options.allowHeaders.join(","),
+          );
+        }
+      }
+  
   cors = (ctx: Context) => {
     //? Add Vary header to indicate response varies based on the Origin header
     ctx.set("Vary", "Origin");
@@ -69,36 +107,7 @@ export function corsMiddleware(options: {
           options.secureContext["Cross-Origin-Embedder-Policy"],
         );
       }
-    } else {
-      //? Preflight Request
-      if (options.maxAge) {
-        ctx.set("Access-Control-Max-Age", options.maxAge);
-      }
-      if (!options.privateNetworkAccess) {
-        if (options.allowMethods) {
-          ctx.set(
-            "Access-Control-Allow-Methods",
-            options.allowMethods.join(","),
-          );
-        }
-        if (options.secureContext) {
-          ctx.set(
-            "Cross-Origin-Opener-Policy",
-            options.secureContext["Cross-Origin-Embedder-Policy"],
-          );
-          ctx.set(
-            "Cross-Origin-Embedder-Policy",
-            options.secureContext["Cross-Origin-Embedder-Policy"],
-          );
-        }
-        if (options.allowHeaders) {
-          ctx.set(
-            "Access-Control-Allow-Headers",
-            options.allowHeaders.join(","),
-          );
-        }
-      }
-    }
+    } 
   };
 }
 const JetSocketInstance = new JetSocket();
@@ -340,6 +349,7 @@ const createResponse = (
 ) => {
   //? add cors headers
   cors?.(ctx);
+  // ? add ctx to ctx pool
   UTILS.ctxPool.push(ctx);
   // ? prepare response
   if (!UTILS.runtime["node"]) {
@@ -389,16 +399,7 @@ const createResponse = (
   res.end(ctx?._1 || (four04 ? "Not found" : undefined));
   return undefined;
 };
-const optionsCtx = {
-  _1: undefined,
-  _2: {},
-  code: 204,
-  set(field: string, value: string) {
-    if (field && value) {
-      (this._2 as Record<string, string>)[field ] = value;
-    }
-  }
-};
+
   
 const JetPath = async (
   req: IncomingMessage,
