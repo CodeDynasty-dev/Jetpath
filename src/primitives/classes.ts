@@ -1,7 +1,7 @@
 import { createReadStream } from "node:fs";
 import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
-import { _DONE, _JetPath_paths, _OFF, parseRequest, UTILS, validator } from "./functions.js";
+import { _DONE, _JetPath_paths, parseRequest, UTILS, validator } from "./functions.js";
 import type {
   AnyExecutor,
   JetPluginExecutorInitParams,
@@ -238,10 +238,7 @@ export class Context {
     }
   }
 
-  eject(): never {
-    throw _OFF;
-  }
-
+  
   sendStream(stream: Stream | string, ContentType: string) {
     if (!this._2) {
       this._2 = {};

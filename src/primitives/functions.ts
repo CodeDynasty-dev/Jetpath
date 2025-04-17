@@ -37,9 +37,9 @@ export function corsMiddleware(options: {
   credentials?: boolean;
   secureContext?: {
     "Cross-Origin-Opener-Policy":
-      | "same-origin"
-      | "unsafe-none"
-      | "same-origin-allow-popups";
+    | "same-origin"
+    | "unsafe-none"
+    | "same-origin-allow-popups";
     "Cross-Origin-Embedder-Policy": "require-corp" | "unsafe-none";
   };
   privateNetworkAccess?: any;
@@ -96,9 +96,6 @@ export function corsMiddleware(options: {
             "Access-Control-Allow-Headers",
             options.allowHeaders.join(","),
           );
-        }
-        if (!ctx.code) {
-          ctx.code = 204;
         }
       }
     }
@@ -170,8 +167,7 @@ class JetPathErrors extends Error {
   }
 }
 
-export const _DONE = new JetPathErrors("done");
-export const _OFF = new JetPathErrors("off");
+export const _DONE = new JetPathErrors("done")
 
 export const UTILS = {
   // wsFuncs: [],
@@ -393,15 +389,28 @@ const createResponse = (
   res.end(ctx?._1 || (four04 ? "Not found" : undefined));
   return undefined;
 };
-
+const optionsCtx = {
+  _1: undefined,
+  _2: {},
+  code: 204,
+  set(field: string, value: string) {
+    if (field && value) {
+      (this._2 as Record<string, string>)[field ] = value;
+    }
+  }
+};
+  
 const JetPath = async (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
 ) => {
+
+  if (req.method === "OPTIONS") {
+    return createResponse(res, optionsCtx as Context  ) ;
+  }
   const parsedR = URL_PARSER(req as any, res);
-  let off = false;
   let ctx: Context;
   let returned: (Function | void)[] | undefined;
   if (parsedR) {
@@ -419,11 +428,8 @@ const JetPath = async (
       return createResponse(res, ctx);
     } catch (error) {
       if (error instanceof JetPathErrors) {
-        if (error.message !== "off") {
-          return createResponse(res, ctx);
-        } else {
-          off = true;
-        }
+        return createResponse(res, ctx);
+
       } else {
         try {
           //? report error to error middleware
@@ -437,18 +443,9 @@ const JetPath = async (
       }
     }
   }
-  if (!off) {
-    if (req.method === "OPTIONS") {
-      return createResponse(res, createCTX(req, ""));
-    }
-    return createResponse(res, createCTX(req, ""), true);
-  } else {
-    return new Promise((r) => {
-      ctx!._5 = () => {
-        r(createResponse(res, ctx!));
-      };
-    });
-  }
+
+  return createResponse(res, createCTX(req, ""), true);
+
 };
 
 const handlersPath = (path: string) => {
@@ -515,7 +512,7 @@ export async function getHandlers(
       if (print) {
         Log.info(
           "Loading routes at ." + source.replace(curr_d, "") + "/" +
-            dirent.name,
+          dirent.name,
         );
       }
       try {
@@ -539,7 +536,7 @@ export async function getHandlers(
                   module[p]!.path = params[1];
                   _JetPath_paths[params[0] as methods][params[2]][params[1]] =
                     module[
-                      p
+                    p
                     ] as JetFunc;
                 }
               }
@@ -862,7 +859,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     .replaceAll(
       "{LOGO}",
       options?.apiDoc?.logo ||
-        "https://raw.githubusercontent.com/Uiedbook/JetPath/main/icon-transparent.webp",
+      "https://raw.githubusercontent.com/Uiedbook/JetPath/main/icon-transparent.webp",
     )
     .replaceAll(
       "{INFO}",
@@ -928,15 +925,13 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         }
         // ? combine api infos into .http format
         const api = `\n
-${method} ${
-          options?.APIdisplay === "UI"
+${method} ${options?.APIdisplay === "UI"
             ? "[--host--]"
             : "http://localhost:" + (options?.port || 8080)
-        }${route.path} HTTP/1.1
+          }${route.path} HTTP/1.1
 ${headers.length ? headers.join("\n") : ""}\n
-${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${
-          validator?.["info"] ? "#" + validator?.["info"] + "-JETE" : ""
-        }
+${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${validator?.["info"] ? "#" + validator?.["info"] + "-JETE" : ""
+          }
 ###`;
 
         // ? combine api(s)
@@ -1039,7 +1034,7 @@ export function isIdentical<T extends object, U extends object>(
   ) {
     if (
       (protoA && protoA !== Object.prototype) !==
-        (protoB && protoB !== Object.prototype)
+      (protoB && protoB !== Object.prototype)
     ) {
       return false;
     }
@@ -1093,10 +1088,10 @@ export function isIdentical<T extends object, U extends object>(
 }
 
 
-function validateBoundary(boundary: string) { 
+function validateBoundary(boundary: string) {
   if (boundary.length > 100) {
     throw new Error('Invalid boundary: too long');
-  } 
+  }
   if (!/^[a-zA-Z0-9\-_.]+$/.test(boundary)) {
     throw new Error('Invalid boundary: contains invalid characters');
   }
@@ -1110,7 +1105,7 @@ function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxB
   }
   const decoder = new TextDecoder('latin1');
   const bodyText = decoder.decode(rawBody);
-  
+
   const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
   if (!boundaryMatch) {
     throw new Error('Content-Type header is missing a valid boundary parameter.');
@@ -1120,16 +1115,16 @@ function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxB
     throw new Error('Boundary not specified in Content-Type header.');
   }
   const validatedBoundary = validateBoundary(boundary);
-  
+
   const delimiter = `--${validatedBoundary}`;
   const rawParts = bodyText
     .split(delimiter)
     .map(part => part.trim())
     .filter(part => part && part !== '--');
-  
+
   const fields: Record<string, string | string[]> = {};
-  const files: Record<string, { fileName: string; contentType: string; content: Uint8Array }> = {};
-  
+  const files: Record<string, { fileName: string; content: Uint8Array; mimeType: string }> = {};
+
   function parseHeaders(headerText: string): Record<string, string> {
     const headers: Record<string, string> = {};
     const lines = headerText.split('\r\n');
@@ -1142,15 +1137,15 @@ function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxB
     }
     return headers;
   }
-    // @ts-expect-error
+  // @ts-expect-error
   const encoder = new TextEncoder('latin1');
-  
+
   for (const part of rawParts) {
     const idx = part.indexOf('\r\n\r\n');
     if (idx === -1) continue; // malformed part; skip.
     const rawHeaderBlock = part.slice(0, idx);
     const contentText = part.slice(idx + 4);
-  
+
     const headers = parseHeaders(rawHeaderBlock);
     const disposition = headers['content-disposition'];
     if (!disposition) continue;
@@ -1159,14 +1154,14 @@ function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxB
     const fieldName = nameMatch[1];
     const fileNameMatch = disposition.match(/filename="([^"]*)"/i);
     const fileName = fileNameMatch ? fileNameMatch[1] : null;
-  
-    if (fileName) { 
+
+    if (fileName) {
       files[fieldName] = {
         fileName,
-        contentType: headers['content-type'] || 'application/octet-stream',
-        content: encoder.encode(contentText)
+        content: encoder.encode(contentText),
+        mimeType: headers['content-type'] || 'application/octet-stream'
       };
-    } else { 
+    } else {
       if (fields.hasOwnProperty(fieldName)) {
         if (Array.isArray(fields[fieldName])) {
           fields[fieldName].push(contentText);
@@ -1178,10 +1173,10 @@ function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxB
       }
     }
   }
-  
+
   return { ...fields, ...files };
 }
- 
+
 export function parseUrlEncoded(bodyText: string): Record<string, string | string[]> {
   const params = new URLSearchParams(bodyText);
   const result: Record<string, string | string[]> = {};
@@ -1221,7 +1216,7 @@ function collectRequestBody(req: any, maxBodySize: number): Promise<Uint8Array> 
     });
     req.on("error", (err: any) => reject(err));
   });
-} 
+}
 
 /**
  * Reads the request/stream and returns a Promise that resolves to the parsed body.
@@ -1239,11 +1234,11 @@ function collectRequestBody(req: any, maxBodySize: number): Promise<Uint8Array> 
  *    - For application/json: Parsed JSON object.
  *    - For other content types: { text: string }
  */
-export async function parseRequest(req: any, options: { maxBodySize?: number, contentType?: string } = {}): Promise<Record<string, any>>  {
+export async function parseRequest(req: any, options: { maxBodySize?: number, contentType?: string } = {}): Promise<Record<string, any>> {
   const { maxBodySize = 5 * 1024 * 1024 } = options;
   let contentType = options.contentType || "";
   let rawBody: Uint8Array;
-  
+
   // Check for Fetch-compatible objects (Deno, Bun, browsers)
   if (typeof req.arrayBuffer === "function") {
     if (!contentType && req.headers && typeof req.headers.get === "function") {
@@ -1254,7 +1249,7 @@ export async function parseRequest(req: any, options: { maxBodySize?: number, co
     if (rawBody.byteLength > maxBodySize) {
       throw new Error("Payload Too Large");
     }
-  } 
+  }
   else if (typeof req.on === "function") {
     if (!contentType && req.headers) {
       contentType = req.headers["content-type"] || "";
@@ -1263,18 +1258,18 @@ export async function parseRequest(req: any, options: { maxBodySize?: number, co
   } else {
     throw new Error("Unsupported request object type");
   }
-  
-  const ct = contentType.toLowerCase(); 
+
+  const ct = contentType.toLowerCase();
   const decoder = new TextDecoder("utf-8");
   let bodyText: string;
-  
+
   if (ct.includes("application/json")) {
     bodyText = decoder.decode(rawBody);
     return JSON.parse(bodyText);
   }
   else if (ct.includes("application/x-www-form-urlencoded")) {
     bodyText = decoder.decode(rawBody);
-    return parseUrlEncoded(bodyText)  
+    return parseUrlEncoded(bodyText)
   }
   else if (ct.includes("multipart/form-data")) {
     return parseFormData(rawBody, contentType, { maxBodySize });

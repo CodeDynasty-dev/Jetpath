@@ -29,3 +29,24 @@
 {"timestamp":"2025-04-17T16:46:53.675Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
 {"timestamp":"2025-04-17T16:47:17.612Z","level":"info","method":"POST","url":"/upload"}
 {"timestamp":"2025-04-17T16:47:17.642Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:49:30.788Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:49:31.066Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:52:27.928Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:52:28.128Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:57:54.008Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:57:54.141Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"ENOENT: no such file or directory, open './public/images/1744909074130-20250225_155129.png'\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:01:10.581Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:01:10.630Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"ENOENT: no such file or directory, open '/home/friday/Codedynasty/opensource/jetpath/uploads/1744909270627-20250225_155129.png'\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:02:04.011Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:02:04.046Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:05:07.686Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:05:18.094Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:06:24.583Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:06:24.611Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:06:24.612Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:19:29.310Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:19:29.392Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:19:29.397Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:40:50.987Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:40:51.050Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T17:40:51.053Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}

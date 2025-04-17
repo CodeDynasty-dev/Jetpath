@@ -39,10 +39,6 @@ export interface ContextType<
    */
   connection: jet_socket;
   /**
-   * remove request control from the request
-   */
-  eject(): never;
-  /**
    * reply the request
    */
   request: Request;

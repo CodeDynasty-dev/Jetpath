@@ -5,6 +5,7 @@
  * including proper error handling, validation, authentication, logging, 
  * file uploads, real-time communication, and more.
  */
+import { writeFile } from "node:fs/promises";
 import {
   JetPath,
   type JetFunc,
@@ -12,6 +13,7 @@ import {
 } from "../dist/index.js";
 import { authPlugin, type AuthPluginType } from "./plugins/auth.ts";
 import { jetlogger, type jetloggerType } from "./plugins/logging.ts";
+import { resolve } from "node:path";
 
 
 
@@ -991,7 +993,7 @@ export const POST_petImage$id: JetFunc<{
     const imageUrl = `/assets/images/${filename}`;
 
     // Save image to disk (in production, consider using a CDN or object storage)
-    await image.saveTo(`./public/images/${filename}`);
+    await image.saveTo(`./images/${filename}`);
 
     // Update pet with new image URL
     pets[index].image = imageUrl;
@@ -1457,44 +1459,27 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
   try {
     // Parse form data
     const form = await ctx.parse();
-    console.log(form);
     const results: Record<string, any> = {};
 
     // Process each file in the form
     for (const fieldName in form) {
       const field = form[fieldName];
-
       // Check if field is a file
-      if (field && field.filename) {
+      if (field && field.fileName) {
         // Generate unique filename to prevent overwrites
         const timestamp = Date.now();
-        const uniqueFilename = `${timestamp}-${field.filename}`;
-
+        const uniqueFilename = `${timestamp}-${field.fileName}`;
         // Save file to appropriate directory based on mimetype
-        let saveDir = "./public/uploads";
-        let publicPath = "/assets/uploads";
-
-        if (field.mimetype.startsWith("image/")) {
-          saveDir = "./public/images";
-          publicPath = "/assets/images";
-        } else if (field.mimetype.startsWith("video/")) {
-          saveDir = "./public/videos";
-          publicPath = "/assets/videos";
-        } else if (field.mimetype.startsWith("audio/")) {
-          saveDir = "./public/audio";
-          publicPath = "/assets/audio";
-        }
-
+        let saveDir = "./tests/uploads";
         // Save the file
-        await field.saveTo(`${saveDir}/${uniqueFilename}`);
-
+        await writeFile(resolve(saveDir, uniqueFilename), field.content);
         // Store result information
         results[fieldName] = {
-          filename: field.filename,
+          fileName: field.fileName,
           savedAs: uniqueFilename,
           size: field.size,
-          mimetype: field.mimetype,
-          url: `${publicPath}/${uniqueFilename}`
+          mimeType: field.mimeType,
+          url: `${saveDir}/${uniqueFilename}`
         };
       } else {
         // Store text field values
@@ -1504,7 +1489,7 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
 
     // Log upload activity
     // Log upload activity
-    ctx.plugins?.["logger"]?.info({
+    ctx.plugins.info(ctx, {
       action: "file_upload",
       userId: ctx.app["user"]?.id || "unknown",
       files: Object.keys(results).filter(key => results[key].url)
@@ -1528,6 +1513,7 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
       message: "Failed to process file upload"
     });
   }
+  
 };
 
 POST_upload.body = {

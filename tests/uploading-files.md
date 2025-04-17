@@ -36,8 +36,7 @@ export async function POST_(ctx: Context) {
   bb.on("close", () => {
     ctx.send("done!");
   });
-  ctx.request.pipe(bb);
-  ctx.eject();
+  ctx.request.pipe(bb)
 }
 export const BODY_: JetSchema = {
   body: {
