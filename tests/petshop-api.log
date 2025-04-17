@@ -1,52 +1,54 @@
-{"timestamp":"2025-04-17T16:27:27.841Z","level":"info","method":"POST","url":"/auth/login"}
-{"timestamp":"2025-04-17T16:27:28.363Z","level":"info","method":"POST","url":"/auth/login"}
-{"timestamp":"2025-04-17T16:27:28.743Z","level":"info","method":"POST","url":"/auth/login"}
-{"timestamp":"2025-04-17T16:27:28.999Z","level":"info","method":"POST","url":"/auth/login"}
-{"timestamp":"2025-04-17T16:30:16.511Z","level":"info","method":"POST","url":"/auth/login"}
-{"timestamp":"2025-04-17T16:30:55.587Z","level":"info","method":"GET","url":"/api-doc"}
-{"timestamp":"2025-04-17T16:30:57.622Z","level":"info","method":"GET","url":"/api-doc"}
-{"timestamp":"2025-04-17T16:31:02.992Z","level":"info","method":"POST","url":"/auth/login"}
-{"timestamp":"2025-04-17T16:31:24.779Z","level":"info","method":"GET","url":"/error"}
-{"timestamp":"2025-04-17T16:38:20.886Z","level":"info","method":"GET","url":"/error"}
-{"timestamp":"2025-04-17T16:38:23.310Z","level":"info","method":"GET","url":"/error"}
-{"timestamp":"2025-04-17T16:38:23.927Z","level":"info","method":"GET","url":"/error"}
-{"timestamp":"2025-04-17T16:38:29.276Z","level":"info","method":"PUT","url":"/petBy/:id"}
-{"timestamp":"2025-04-17T16:40:21.788Z","level":"info","method":"PUT","url":"/petBy/:id"}
-{"timestamp":"2025-04-17T16:40:21.801Z","level":"error","message":"Error: available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"PUT","url":"/petBy/:id"}
-{"timestamp":"2025-04-17T16:40:23.061Z","level":"info","method":"PUT","url":"/petBy/:id"}
-{"timestamp":"2025-04-17T16:40:23.063Z","level":"error","message":"Error: available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"PUT","url":"/petBy/:id"}
-{"timestamp":"2025-04-17T16:41:00.075Z","level":"info","method":"GET","url":"/api-doc"}
-{"timestamp":"2025-04-17T16:41:05.153Z","level":"info","method":"POST","url":"/auth/login"}
-{"timestamp":"2025-04-17T16:41:22.529Z","level":"info","method":"GET","url":"/error"}
-{"timestamp":"2025-04-17T16:41:30.848Z","level":"info","method":"GET","url":"/error"}
-{"timestamp":"2025-04-17T16:41:30.852Z","level":"error","message":"Error: This is an intentional error for testing error handling","method":"GET","url":"/error"}
-{"timestamp":"2025-04-17T16:41:39.266Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:44:57.015Z","level":"info","message":"undefined","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:44:57.026Z","level":"error","message":"[object Object]","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:45:50.517Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:45:50.525Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"ctx.plugins.formData is not a function\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:46:53.655Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:46:53.675Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:47:17.612Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:47:17.642Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:49:30.788Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:49:31.066Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:52:27.928Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:52:28.128Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:57:54.008Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T16:57:54.141Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"ENOENT: no such file or directory, open './public/images/1744909074130-20250225_155129.png'\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:01:10.581Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:01:10.630Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"ENOENT: no such file or directory, open '/home/friday/Codedynasty/opensource/jetpath/uploads/1744909270627-20250225_155129.png'\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:02:04.011Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:02:04.046Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:05:07.686Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:05:18.094Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:06:24.583Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:06:24.611Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:06:24.612Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:19:29.310Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:19:29.392Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:19:29.397Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:40:50.987Z","level":"info","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:40:51.050Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
-{"timestamp":"2025-04-17T17:40:51.053Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:05:13.275Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:05:13.489Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"Payload Too Large\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:28:55.475Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:28:55.656Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"Payload Too Large\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:07.254Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:07.371Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:07.371Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:15.886Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:15.999Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:16.000Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:56.621Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:56.781Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:29:56.782Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:32:23.362Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:32:23.559Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:32:23.560Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:33:59.322Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:33:59.476Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:33:59.477Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:34:34.053Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:34:34.149Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:34:34.150Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:36:05.166Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:36:05.342Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:36:05.344Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:38:53.633Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:38:53.821Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:38:53.823Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:40:42.736Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:40:42.841Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type object\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:42:54.931Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:42:55.045Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:42:58.720Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:42:58.798Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:50:13.150Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:50:13.289Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:50:21.941Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:50:22.045Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:50:22.046Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:51:04.524Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:51:04.616Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:51:04.617Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:51:12.072Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:51:12.201Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:51:12.201Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:53:51.789Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:53:51.951Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:53:51.952Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:54:22.331Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:54:22.414Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:54:22.416Z","level":"error","message":"null","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:55:26.321Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:55:26.512Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T20:55:26.513Z","level":"error","message":"null","method":"POST","url":"/upload"}

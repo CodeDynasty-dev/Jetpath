@@ -47,10 +47,6 @@ export interface ContextType<
    */
   code: number;
   /**
-   * validate body
-   */
-  validate: (data?: any) => JetData["body"];
-  /**
    * send a stream
    */
   // sendStream(stream: Stream | string, ContentType: string): never;
@@ -85,9 +81,8 @@ export interface ContextType<
    */
   set(field: string, value: string): void;
   /**
-   * Parses the request as JSON
+   * Parses the request body
    */
-
   parse(): Promise<Record<string, any>>;
 
   /**
@@ -111,10 +106,14 @@ export type JetPluginExecutorInitParams = {
   server: Server<typeof IncomingMessage, typeof ServerResponse>;
   routesObject: typeof _JetPath_paths;
   JetPath_app: (req: Request) => Response;
-}; 
+};
 
 // A helper type for “any function of the right shape”
-export type AnyExecutor = (this: any, init: JetPluginExecutorInitParams, config: Record<string, unknown>) => any;
+export type AnyExecutor = (
+  this: any,
+  init: JetPluginExecutorInitParams,
+  config: Record<string, unknown>,
+) => any;
 
 export type contentType =
   | "application/x-www-form-urlencoded"

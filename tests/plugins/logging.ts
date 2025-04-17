@@ -132,7 +132,7 @@ export const jetlogger = new JetPlugin({
                 if (!shouldLog('debug')) return;
                 emit(buildEntry('debug', ctx, message, meta));
             },
-            info(ctx: { request: Request }, message: any, meta?: Record<string, unknown>) {
+            info(ctx: { request: Request }, message?: any, meta?: Record<string, unknown>) {
                 if (!shouldLog('info')) return;
                 emit(buildEntry('info', ctx, message, meta));
             },

@@ -29,7 +29,7 @@ export const authPlugin = new JetPlugin({
        * @param {string} password - User's password
        * @returns {object} Authentication result with token if successful
        */
-      authenticateUser(username: string, password: string): object {
+      authenticateUser(username: string, password: string) {
         const user = users.find(u => u.username === username && u.password === password);
         if (!user) {
           return { authenticated: false, message: "Invalid credentials" };
@@ -49,7 +49,7 @@ export const authPlugin = new JetPlugin({
        * @param {JetRequest} request - The incoming request
        * @returns {object} Verification result with user info if authenticated
        */
-      verifyAuth(ctx: ContextType<any, any>): object {
+      verifyAuth(ctx: ContextType<any, any>)  {
         const authHeader = ctx.get("authorization");
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {

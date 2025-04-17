@@ -1,15 +1,25 @@
 import { createReadStream } from "node:fs";
 import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
-import { _DONE, _JetPath_paths, parseRequest, UTILS, validator } from "./functions.js";
+import {
+  _DONE,
+  _JetPath_paths,
+  parseRequest,
+  UTILS,
+  validator,
+} from "./functions.js";
 import type {
   AnyExecutor,
+  JetFunc,
   JetPluginExecutorInitParams,
   methods,
 } from "./types.js";
 import { resolve } from "node:path";
 
-export class JetPlugin< C extends Record<string, unknown> = Record<string, unknown>,E extends AnyExecutor = AnyExecutor> {
+export class JetPlugin<
+  C extends Record<string, unknown> = Record<string, unknown>,
+  E extends AnyExecutor = AnyExecutor,
+> {
   executor: E;
   JetPathServer?: any;
   hasServer?: boolean;
@@ -24,10 +34,6 @@ export class JetPlugin< C extends Record<string, unknown> = Record<string, unkno
     this.config = config;
   }
 }
-
-
-
-
 
 export class Log {
   // Define ANSI escape codes for colors and styles
@@ -97,16 +103,17 @@ export class Context {
   // //? stream
   _3?: Stream = undefined;
   //? used to know if the request has ended
-  _4 = false;
+  _4: boolean = false;
   //? used to know if the request has been offloaded
-  _5: any = false;
+  _5: JetFunc | null = null;
   //? response
-  _6 = false;
+  _6: boolean = false;
   method: methods | undefined;
   // ? reset the COntext to default state
   _7(
     req: Request,
     path: string,
+    route: JetFunc,
     params?: Record<string, any>,
     query?: Record<string, any>,
   ) {
@@ -124,8 +131,8 @@ export class Context {
     this._3 = undefined;
     //? used to know if the request has ended
     this._4 = false;
-    //? used to know if the request has been offloaded
-    this._5 = false;
+    //? the route handler
+    this._5 = route;
     //? custom response
     this._6 = false;
     // ? code
@@ -156,19 +163,7 @@ export class Context {
     }
     this._2["Content-Type"] = ctype;
     this._4 = true;
-    if (!this._5) throw _DONE;
-    this._5();
-    return undefined as never;
-  }
-
-  validate(data: any = this.body || {}) {
-    return validator(
-      _JetPath_paths[this.method!].direct[this.path!]?.body ||
-        _JetPath_paths[this.method!].parameter[this.path!]?.body ||
-        _JetPath_paths[this.method!].wildcard[this.path!]?.body ||
-        _JetPath_paths[this.method!].query[this.path!]?.body,
-      data,
-    );
+    throw _DONE;
   }
 
   redirect(url: string) {
@@ -179,9 +174,7 @@ export class Context {
     this._2["Location"] = url;
     this._1 = undefined;
     this._4 = true;
-    if (!this._5) throw _DONE;
-    this._5();
-    return undefined as never;
+    throw _DONE;
   }
 
   throw(code: unknown = 404, message: unknown = "Not Found") {
@@ -213,9 +206,7 @@ export class Context {
       }
     }
     this._4 = true;
-    if (!this._5) throw _DONE;
-    this._5();
-    return undefined as never;
+    throw _DONE;
   }
 
   get(field: string) {
@@ -238,7 +229,6 @@ export class Context {
     }
   }
 
-  
   sendStream(stream: Stream | string, ContentType: string) {
     if (!this._2) {
       this._2 = {};
@@ -255,35 +245,37 @@ export class Context {
         const file = Deno.open(stream).catch(() => {});
         stream = file;
       } else {
-        stream = createReadStream(resolve(stream) as string, { autoClose: true });
+        stream = createReadStream(resolve(stream) as string, {
+          autoClose: true,
+        });
       }
     }
 
     this._2["Content-Type"] = ContentType;
     this._3 = stream as Stream;
     this._4 = true;
-    if (!this._5) throw _DONE;
-    this._5();
-    return undefined as never;
+    throw _DONE;
   }
   // Only for deno and bun
   sendResponse(Response?: Response) {
     // @ts-ignore
     this._6 = Response;
     this._4 = true;
-    if (!this._5) throw _DONE;
-    this._5();
-    return undefined as never;
+    throw _DONE;
   }
 
   async parse<Type extends any = Record<string, any>>(options?: {
     maxBodySize?: number;
     contentType?: string;
-}): Promise<Type> {
+  }): Promise<Type> {
     if (this.body) {
       return this.body as Promise<Type>;
     }
-    this.body = await parseRequest(this.request, options) as Promise<Type>; 
+    this.body = await parseRequest(this.request, options) as Promise<Type>;
+    if (this._5!.body) {
+      this.body = validator(this._5!.body, this.body);
+    }
+    // validate here;
     return this.body as Promise<Type>;
   }
 }

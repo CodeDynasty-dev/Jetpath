@@ -6,8 +6,8 @@ import { createServer } from "node:http";
 // type imports
 import { type IncomingMessage, type ServerResponse } from "node:http";
 import {
-  AnyExecutor,
   type allowedMethods,
+  AnyExecutor,
   type HTTPBody,
   type JetFunc,
   type jetOptions,
@@ -33,9 +33,9 @@ const optionsCtx = {
   code: 204,
   set(field: string, value: string) {
     if (field && value) {
-      (this._2 as Record<string, string>)[field ] = value;
+      (this._2 as Record<string, string>)[field] = value;
     }
-  }
+  },
 };
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
@@ -46,9 +46,9 @@ export function corsMiddleware(options: {
   credentials?: boolean;
   secureContext?: {
     "Cross-Origin-Opener-Policy":
-    | "same-origin"
-    | "unsafe-none"
-    | "same-origin-allow-popups";
+      | "same-origin"
+      | "unsafe-none"
+      | "same-origin-allow-popups";
     "Cross-Origin-Embedder-Policy": "require-corp" | "unsafe-none";
   };
   privateNetworkAccess?: any;
@@ -58,35 +58,35 @@ export function corsMiddleware(options: {
   options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
     !!options.keepHeadersOnError;
   //
-      //?  pre populate context for Preflight Request 
-      if (options.maxAge) {
-        optionsCtx.set("Access-Control-Max-Age", options.maxAge);
-      }
-      if (!options.privateNetworkAccess) {
-        if (options.allowMethods) {
-          optionsCtx.set(
-            "Access-Control-Allow-Methods",
-            options.allowMethods.join(","),
-          );
-        }
-        if (options.secureContext) {
-          optionsCtx.set(
-            "Cross-Origin-Opener-Policy",
-            options.secureContext["Cross-Origin-Embedder-Policy"],
-          );
-          optionsCtx.set(
-            "Cross-Origin-Embedder-Policy",
-            options.secureContext["Cross-Origin-Embedder-Policy"],
-          );
-        }
-        if (options.allowHeaders) {
-          optionsCtx.set(
-             "Access-Control-Allow-Headers",
-            options.allowHeaders.join(","),
-          );
-        }
-      }
-  
+  //?  pre populate context for Preflight Request
+  if (options.maxAge) {
+    optionsCtx.set("Access-Control-Max-Age", options.maxAge);
+  }
+  if (!options.privateNetworkAccess) {
+    if (options.allowMethods) {
+      optionsCtx.set(
+        "Access-Control-Allow-Methods",
+        options.allowMethods.join(","),
+      );
+    }
+    if (options.secureContext) {
+      optionsCtx.set(
+        "Cross-Origin-Opener-Policy",
+        options.secureContext["Cross-Origin-Embedder-Policy"],
+      );
+      optionsCtx.set(
+        "Cross-Origin-Embedder-Policy",
+        options.secureContext["Cross-Origin-Embedder-Policy"],
+      );
+    }
+    if (options.allowHeaders) {
+      optionsCtx.set(
+        "Access-Control-Allow-Headers",
+        options.allowHeaders.join(","),
+      );
+    }
+  }
+
   cors = (ctx: Context) => {
     //? Add Vary header to indicate response varies based on the Origin header
     ctx.set("Vary", "Origin");
@@ -107,7 +107,7 @@ export function corsMiddleware(options: {
           options.secureContext["Cross-Origin-Embedder-Policy"],
         );
       }
-    } 
+    }
   };
 }
 const JetSocketInstance = new JetSocket();
@@ -170,13 +170,13 @@ export const _jet_middleware: Record<
   (ctx: Context, err?: unknown) => void | Promise<void>
 > = {};
 
-class JetPathErrors extends Error {
+export class JetPathErrors extends Error {
   constructor(message: string) {
     super(message);
   }
 }
 
-export const _DONE = new JetPathErrors("done")
+export const _DONE = new JetPathErrors("done");
 
 export const UTILS = {
   // wsFuncs: [],
@@ -198,7 +198,9 @@ export const UTILS = {
   },
   runtime: null as unknown as Record<string, boolean>,
   // validators: {} as Record<string, JetSchema>,
-  server(plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[]): { listen: any; edge: boolean } | void {
+  server(
+    plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[],
+  ): { listen: any; edge: boolean } | void {
     let server;
     let server_else;
     if (UTILS.runtime["node"]) {
@@ -318,13 +320,14 @@ UTILS.set();
 const createCTX = (
   req: IncomingMessage | Request,
   path: string,
+  route: JetFunc,
   params?: Record<string, any>,
   query?: Record<string, any>,
   socket?: boolean,
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
-    ctx._7(req as Request, path, params, query);
+    ctx._7(req as Request, path, route, params, query);
     if (socket) {
       ctx.connection = JetSocketInstance;
     }
@@ -333,7 +336,7 @@ const createCTX = (
   const ctx = new Context();
   // ? add middlewares to the plugins object
   Object.assign(ctx.plugins, UTILS.middlewares);
-  ctx._7(req as Request, path, params, query);
+  ctx._7(req as Request, path, route, params, query);
   if (socket) {
     ctx.connection = JetSocketInstance;
   }
@@ -400,23 +403,21 @@ const createResponse = (
   return undefined;
 };
 
-  
 const JetPath = async (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
 ) => {
-
   if (req.method === "OPTIONS") {
-    return createResponse(res, optionsCtx as Context  ) ;
+    return createResponse(res, optionsCtx as Context);
   }
   const parsedR = URL_PARSER(req as any, res);
   let ctx: Context;
   let returned: (Function | void)[] | undefined;
   if (parsedR) {
     const r = parsedR[0];
-    ctx = createCTX(req, parsedR[3], parsedR[1], parsedR[2], parsedR[4]);
+    ctx = createCTX(req, parsedR[3], r, parsedR[1], parsedR[2], parsedR[4]);
     try {
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
@@ -430,7 +431,6 @@ const JetPath = async (
     } catch (error) {
       if (error instanceof JetPathErrors) {
         return createResponse(res, ctx);
-
       } else {
         try {
           //? report error to error middleware
@@ -438,15 +438,13 @@ const JetPath = async (
         } catch (error) {
           console.error(error);
         } finally {
-          console.error(error);
           return createResponse(res, ctx);
         }
       }
     }
   }
 
-  return createResponse(res, createCTX(req, ""), true);
-
+  return createResponse(res, createCTX(req, "", null as any), true);
 };
 
 const handlersPath = (path: string) => {
@@ -513,7 +511,7 @@ export async function getHandlers(
       if (print) {
         Log.info(
           "Loading routes at ." + source.replace(curr_d, "") + "/" +
-          dirent.name,
+            dirent.name,
         );
       }
       try {
@@ -537,7 +535,7 @@ export async function getHandlers(
                   module[p]!.path = params[1];
                   _JetPath_paths[params[0] as methods][params[2]][params[1]] =
                     module[
-                    p
+                      p
                     ] as JetFunc;
                 }
               }
@@ -591,7 +589,7 @@ export function validator<T extends Record<string, any>>(
   const out: Partial<T> = {};
 
   for (const [key, defs] of Object.entries(schema)) {
-    const {
+    let {
       RegExp,
       arrayType,
       err,
@@ -653,9 +651,15 @@ export function validator<T extends Record<string, any>>(
             continue;
           }
         }
-      } else if (typeof value !== type && type !== "file") {
-        errors.push(`${key} must be of type ${type}`);
-        continue;
+      } else {
+        if (typeof value !== type) {
+          if (type === "file" && typeof value === "object") {
+                out[key as keyof T] = value;
+            continue;
+          }
+          errors.push(`${key} must be of type ${type}`);
+          continue;
+        }
       }
     }
 
@@ -849,7 +853,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
   const globalHeaders = JSON.stringify(
     options?.globalHeaders || {
-      "Authorization": "Bearer <token>"
+      "Authorization": "Bearer <token>",
     },
   );
 
@@ -860,11 +864,12 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     .replaceAll(
       "{LOGO}",
       options?.apiDoc?.logo ||
-      "https://raw.githubusercontent.com/Uiedbook/JetPath/main/icon-transparent.webp",
+        "https://raw.githubusercontent.com/Uiedbook/JetPath/main/icon-transparent.webp",
     )
     .replaceAll(
       "{INFO}",
-      options?.apiDoc?.info?.replaceAll("\n", "<br>") || "This is a JetPath api preview.",
+      options?.apiDoc?.info?.replaceAll("\n", "<br>") ||
+        "This is a JetPath api preview.",
     );
 };
 
@@ -926,13 +931,15 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         }
         // ? combine api infos into .http format
         const api = `\n
-${method} ${options?.APIdisplay === "UI"
+${method} ${
+          options?.APIdisplay === "UI"
             ? "[--host--]"
             : "http://localhost:" + (options?.port || 8080)
-          }${route.path} HTTP/1.1
+        }${route.path} HTTP/1.1
 ${headers.length ? headers.join("\n") : ""}\n
-${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${validator?.["info"] ? "#" + validator?.["info"] + "-JETE" : ""
-          }
+${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${
+          validator?.["info"] ? "#" + validator?.["info"] + "-JETE" : ""
+        }
 ###`;
 
         // ? combine api(s)
@@ -1035,7 +1042,7 @@ export function isIdentical<T extends object, U extends object>(
   ) {
     if (
       (protoA && protoA !== Object.prototype) !==
-      (protoB && protoB !== Object.prototype)
+        (protoB && protoB !== Object.prototype)
     ) {
       return false;
     }
@@ -1088,89 +1095,75 @@ export function isIdentical<T extends object, U extends object>(
   return true;
 }
 
-
-function validateBoundary(boundary: string) {
-  if (boundary.length > 100) {
-    throw new Error('Invalid boundary: too long');
-  }
-  if (!/^[a-zA-Z0-9\-_.]+$/.test(boundary)) {
-    throw new Error('Invalid boundary: contains invalid characters');
-  }
-  return boundary;
-}
-
-function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxBodySize?: number } = {}) {
+export function parseFormData(
+  rawBody: Uint8Array,
+  contentType: string,
+  options: { maxBodySize?: number } = {},
+) {
   const { maxBodySize } = options;
-  if (typeof maxBodySize === 'number' && rawBody.byteLength > maxBodySize) {
-    throw new Error(`Body size (${rawBody.byteLength} bytes) exceeds limit of ${maxBodySize} bytes.`);
+  if (maxBodySize && rawBody.byteLength > maxBodySize) {
+    throw new Error(
+      `Body exceeds max size: ${rawBody.byteLength} > ${maxBodySize}`,
+    );
   }
-  const decoder = new TextDecoder('latin1');
-  const bodyText = decoder.decode(rawBody);
 
-  const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
-  if (!boundaryMatch) {
-    throw new Error('Content-Type header is missing a valid boundary parameter.');
-  }
-  const boundary = boundaryMatch[1] || boundaryMatch[2];
-  if (!boundary) {
-    throw new Error('Boundary not specified in Content-Type header.');
-  }
-  const validatedBoundary = validateBoundary(boundary);
+  const boundaryMatch = contentType.match(/boundary="?([^";]+)"?/i);
+  if (!boundaryMatch) throw new Error("Invalid multipart boundary");
 
-  const delimiter = `--${validatedBoundary}`;
-  const rawParts = bodyText
-    .split(delimiter)
-    .map(part => part.trim())
-    .filter(part => part && part !== '--');
+  const boundary = `--${boundaryMatch[1]}`;
+  const boundaryBytes = new TextEncoder().encode(boundary);
 
+  const decoder = new TextDecoder("utf-8");
   const fields: Record<string, string | string[]> = {};
-  const files: Record<string, { fileName: string; content: Uint8Array; mimeType: string }> = {};
+  const files: Record<
+    string,
+    { fileName: string; content: Uint8Array; mimeType: string }
+  > = {};
 
-  function parseHeaders(headerText: string): Record<string, string> {
-    const headers: Record<string, string> = {};
-    const lines = headerText.split('\r\n');
-    for (const line of lines) {
-      const sep = line.indexOf(':');
-      if (sep === -1) continue;
-      const key = line.slice(0, sep).trim().toLowerCase();
-      const value = line.slice(sep + 1).trim();
-      headers[key] = value;
+  const parts = splitBuffer(rawBody, boundaryBytes).slice(1, -1); // remove preamble and epilogue
+
+  for (const part of parts) {
+    const headerEndIndex = indexOfDoubleCRLF(part);
+    if (headerEndIndex === -1) continue;
+
+    const headerBytes = part.slice(0, headerEndIndex);
+    let body = part.slice(headerEndIndex + 4); // Skip \r\n\r\n
+    // 2) Strip leading CRLF
+    if (body[0] === 13 && body[1] === 10) {
+      body = body.slice(2);
     }
-    return headers;
-  }
-  // @ts-expect-error
-  const encoder = new TextEncoder('latin1');
+    // 3) Strip trailing CRLF
+    if (
+      body[body.length - 2] === 13 &&
+      body[body.length - 1] === 10
+    ) {
+      body = body.slice(0, body.length - 2);
+    }
+    const headerText = decoder.decode(headerBytes);
+    const headers = parseHeaders(headerText);
 
-  for (const part of rawParts) {
-    const idx = part.indexOf('\r\n\r\n');
-    if (idx === -1) continue; // malformed part; skip.
-    const rawHeaderBlock = part.slice(0, idx);
-    const contentText = part.slice(idx + 4);
-
-    const headers = parseHeaders(rawHeaderBlock);
-    const disposition = headers['content-disposition'];
+    const disposition = headers["content-disposition"];
     if (!disposition) continue;
-    const nameMatch = disposition.match(/name="([^"]+)"/i);
+
+    const nameMatch = disposition.match(/name="([^"]+)"/);
     if (!nameMatch) continue;
+
     const fieldName = nameMatch[1];
-    const fileNameMatch = disposition.match(/filename="([^"]*)"/i);
-    const fileName = fileNameMatch ? fileNameMatch[1] : null;
+    const fileNameMatch = disposition.match(/filename="([^"]*)"/);
+    const fileName = fileNameMatch?.[1] || null;
 
     if (fileName) {
-      files[fieldName] = {
-        fileName,
-        content: encoder.encode(contentText),
-        mimeType: headers['content-type'] || 'application/octet-stream'
-      };
+      const mimeType = headers["content-type"] || "application/octet-stream";
+      files[fieldName] = { fileName, content: body, mimeType };
     } else {
-      if (fields.hasOwnProperty(fieldName)) {
-        if (Array.isArray(fields[fieldName])) {
-          fields[fieldName].push(contentText);
-        } else {
-          fields[fieldName] = [fields[fieldName], contentText];
-        }
+      const value = decoder.decode(body);
+      if (fieldName in fields) {
+        const existing = fields[fieldName];
+        fields[fieldName] = Array.isArray(existing)
+          ? [...existing, value]
+          : [existing, value];
       } else {
-        fields[fieldName] = contentText;
+        fields[fieldName] = value;
       }
     }
   }
@@ -1178,7 +1171,64 @@ function parseFormData(rawBody: Uint8Array, contentType: string, options: { maxB
   return { ...fields, ...files };
 }
 
-export function parseUrlEncoded(bodyText: string): Record<string, string | string[]> {
+function parseHeaders(headerText: string): Record<string, string> {
+  const headers: Record<string, string> = {};
+  const lines = headerText.split(/\r\n/);
+  for (const line of lines) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim().toLowerCase();
+    const val = line.slice(idx + 1).trim();
+    headers[key] = val;
+  }
+  return headers;
+}
+
+function indexOfDoubleCRLF(buffer: Uint8Array): number {
+  for (let i = 0; i < buffer.length - 3; i++) {
+    if (
+      buffer[i] === 13 &&
+      buffer[i + 1] === 10 &&
+      buffer[i + 2] === 13 &&
+      buffer[i + 3] === 10
+    ) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function splitBuffer(buffer: Uint8Array, delimiter: Uint8Array): Uint8Array[] {
+  const parts: Uint8Array[] = [];
+  let start = 0;
+
+  while (start < buffer.length) {
+    const idx = indexOf(buffer, delimiter, start);
+    if (idx === -1) break;
+    parts.push(buffer.slice(start, idx));
+    start = idx + delimiter.length;
+  }
+
+  if (start <= buffer.length) {
+    parts.push(buffer.slice(start));
+  }
+
+  return parts;
+}
+
+function indexOf(buffer: Uint8Array, search: Uint8Array, from = 0): number {
+  outer: for (let i = from; i <= buffer.length - search.length; i++) {
+    for (let j = 0; j < search.length; j++) {
+      if (buffer[i + j] !== search[j]) continue outer;
+    }
+    return i;
+  }
+  return -1;
+}
+
+export function parseUrlEncoded(
+  bodyText: string,
+): Record<string, string | string[]> {
   const params = new URLSearchParams(bodyText);
   const result: Record<string, string | string[]> = {};
   for (const [key, value] of params.entries()) {
@@ -1195,11 +1245,13 @@ export function parseUrlEncoded(bodyText: string): Record<string, string | strin
   return result;
 }
 
-
 /**
  * Helper for Node.js: Reads the IncomingMessage stream, collecting chunks and checking size.
  */
-function collectRequestBody(req: any, maxBodySize: number): Promise<Uint8Array> {
+function collectRequestBody(
+  req: any,
+  maxBodySize: number,
+): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     let size = 0;
@@ -1221,21 +1273,11 @@ function collectRequestBody(req: any, maxBodySize: number): Promise<Uint8Array> 
 
 /**
  * Reads the request/stream and returns a Promise that resolves to the parsed body.
- *
- * This function works for Node.js (IncomingMessage), Fetch Request (Deno, Bun, browser),
- * and similar environments. It automatically checks the Content-Type header and enforces a maximum body size.
- *
- * @param {Object} req - The request object.
- * @param {Object} options
- *    - maxBodySize (number): Maximum allowed size in bytes (default: 1MB).
- *    - contentType (string): Override the Content-Type header.
- * @returns {Promise<Object>} Resolves to one of:
- *    - For multipart/form-data: { fields, files }
- *    - For application/x-www-form-urlencoded: { fields }
- *    - For application/json: Parsed JSON object.
- *    - For other content types: { text: string }
  */
-export async function parseRequest(req: any, options: { maxBodySize?: number, contentType?: string } = {}): Promise<Record<string, any>> {
+export async function parseRequest(
+  req: any,
+  options: { maxBodySize?: number; contentType?: string } = {},
+): Promise<Record<string, any>> {
   const { maxBodySize = 5 * 1024 * 1024 } = options;
   let contentType = options.contentType || "";
   let rawBody: Uint8Array;
@@ -1250,8 +1292,7 @@ export async function parseRequest(req: any, options: { maxBodySize?: number, co
     if (rawBody.byteLength > maxBodySize) {
       throw new Error("Payload Too Large");
     }
-  }
-  else if (typeof req.on === "function") {
+  } else if (typeof req.on === "function") {
     if (!contentType && req.headers) {
       contentType = req.headers["content-type"] || "";
     }
@@ -1267,15 +1308,12 @@ export async function parseRequest(req: any, options: { maxBodySize?: number, co
   if (ct.includes("application/json")) {
     bodyText = decoder.decode(rawBody);
     return JSON.parse(bodyText);
-  }
-  else if (ct.includes("application/x-www-form-urlencoded")) {
+  } else if (ct.includes("application/x-www-form-urlencoded")) {
     bodyText = decoder.decode(rawBody);
-    return parseUrlEncoded(bodyText)
-  }
-  else if (ct.includes("multipart/form-data")) {
+    return parseUrlEncoded(bodyText);
+  } else if (ct.includes("multipart/form-data")) {
     return parseFormData(rawBody, contentType, { maxBodySize });
-  }
-  else {
+  } else {
     bodyText = decoder.decode(rawBody);
     return { parsed: bodyText };
   }

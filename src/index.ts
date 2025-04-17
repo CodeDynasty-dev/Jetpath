@@ -55,7 +55,9 @@ export class JetPath {
         }),
       )
     ) {
-      this.plugs.push(plugin as JetPlugin<Record<string, unknown>, AnyExecutor>);
+      this.plugs.push(
+        plugin as JetPlugin<Record<string, unknown>, AnyExecutor>,
+      );
     } else {
       throw Error("invalid Jetpath plugin");
     }
@@ -168,13 +170,15 @@ export class JetPath {
         _JetPath_paths["GET"].direct[name].method = "GET";
         _JetPath_paths["GET"].direct[name].path = name;
         Log.success(
-          `✅ Processed routes ${handlersCount} handlers in ${Math.round(
-            endTime - startTime,
-          )
+          `✅ Processed routes ${handlersCount} handlers in ${
+            Math.round(
+              endTime - startTime,
+            )
           }ms`,
         );
         Log.success(
-          `🚀 Visit http://localhost:${this.options.port}${this.options?.apiDoc?.path || "/api-doc"
+          `🚀 Visit http://localhost:${this.options.port}${
+            this.options?.apiDoc?.path || "/api-doc"
           } to see the displayed routes in UI`,
         );
       }
@@ -182,9 +186,10 @@ export class JetPath {
       if (this.options?.APIdisplay === "HTTP") {
         await writeFile("api-doc.http", compiledAPI);
         Log.success(
-          `✅ Processed routes ${handlersCount} handlers in ${Math.round(
-            endTime - startTime,
-          )
+          `✅ Processed routes ${handlersCount} handlers in ${
+            Math.round(
+              endTime - startTime,
+            )
           }ms`,
         );
         Log.success(
@@ -194,7 +199,8 @@ export class JetPath {
       if (errorsCount) {
         for (let i = 0; i < errorsCount.length; i++) {
           Log.error(
-            `\nReport: ${errorsCount[i].file} file was not loaded due to \n "${errorsCount[i].error
+            `\nReport: ${errorsCount[i].file} file was not loaded due to \n "${
+              errorsCount[i].error
             }" error; \n please resolve!`,
           );
         }
@@ -205,8 +211,10 @@ export class JetPath {
       if (errorsCount) {
         for (let i = 0; i < errorsCount.length; i++) {
           Log.error(
-            `\n\n\nReport: ${errorsCount[i].file
-            } file was not loaded due to \n "${errorsCount[i].error
+            `\n\n\nReport: ${
+              errorsCount[i].file
+            } file was not loaded due to \n "${
+              errorsCount[i].error
             }" error; \n please resolve!`,
           );
         }
@@ -225,9 +233,11 @@ export class JetPath {
 
 //? exports
 export type {
+  AnyExecutor,
   ContextType,
   JetFunc,
   JetMiddleware,
-  JetPluginExecutorInitParams, AnyExecutor,
+  JetPluginExecutorInitParams,
 } from "./primitives/types.js";
 export { JetPlugin } from "./primitives/classes.js";
+export { JetPathErrors } from "./primitives/functions.js";

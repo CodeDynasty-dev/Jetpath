@@ -8,6 +8,7 @@
 import { writeFile } from "node:fs/promises";
 import {
   JetPath,
+  JetPathErrors,
   type JetFunc,
   type JetMiddleware,
 } from "../dist/index.js";
@@ -352,7 +353,7 @@ GET_.info = "Returns API information and status";
  */
 export const POST_auth_login: JetFunc<{ body: { username: string; password: string } }, [AuthPluginType]> = async function (ctx) {
   await ctx.parse();
-  const { username, password } = ctx.validate();
+  const { username, password } = ctx.body;
 
   const authResult = ctx.plugins.authenticateUser(username, password);
 
@@ -367,9 +368,9 @@ export const POST_auth_login: JetFunc<{ body: { username: string; password: stri
     message: "Authentication successful",
     token: authResult.token,
     user: {
-      id: authResult.user.id,
-      username: authResult.user.username,
-      role: authResult.user.role
+      id: authResult.user?.id,
+      username: authResult.user?.username,
+      role: authResult.user?.role
     }
   });
 };
@@ -582,7 +583,7 @@ export const POST_pets: JetFunc<{
   }
 
   await ctx.parse();
-  const petData = ctx.validate(ctx.body);
+  const petData =  (ctx.body);
 
   // Generate unique ID and metadata
   const newPet = {
@@ -703,7 +704,7 @@ export const PUT_petBy$id: JetFunc<{
 
   const petId = ctx.params.id;
   await ctx.parse();
-  const updatedPetData = ctx.validate(ctx.body);
+  const updatedPetData =  (ctx.body);
 
   // Find pet by ID
   const index = pets.findIndex((p) => p.id === petId);
@@ -847,7 +848,6 @@ export const GET_pets_search$$: JetFunc<{
   }
 }> = async function (ctx) {
   // Validate query parameters
-  ctx.validate?.(ctx.query);
 
   const {
     name,
@@ -1164,14 +1164,14 @@ export const POST_petBy$id_reviews: JetFunc<{
   }
 
   await ctx.parse();
-  const { rating, comment } = ctx.validate(ctx.body);
+  const { rating, comment } =  (ctx.body);
 
   // Create new review
   const newReview = {
     id: `review-${Date.now()}`,
     petId,
-    userId: auth.user.id,
-    username: auth.user.username,
+    userId: auth.user!.id,
+    username: auth.user!.username,
     rating,
     comment,
     createdAt: new Date().toISOString()
@@ -1182,11 +1182,11 @@ export const POST_petBy$id_reviews: JetFunc<{
 
   // Log review creation
   // Log review creation
-  ctx.plugins?.["logger"]?.info({
+  ctx.plugins.info({
     action: "create_review",
     reviewId: newReview.id,
     petId,
-    userId: auth.user.id
+    userId: auth.user?.id
   });
 
   ctx.code = 201; // Created
@@ -1249,8 +1249,8 @@ export const DELETE_reviews$reviewId: JetFunc<{
   const review = reviews[reviewIndex];
 
   // Check if user is the review owner or an admin
-  const isOwner = review.userId === auth.user.id;
-  const isAdmin = auth.user.role === "admin";
+  const isOwner = review.userId === auth.user?.id;
+  const isAdmin = auth.user?.role === "admin";
 
   if (!isOwner && !isAdmin) {
     ctx.code = 403;
@@ -1266,11 +1266,11 @@ export const DELETE_reviews$reviewId: JetFunc<{
 
   // Log review deletion
   // Log review deletion
-  ctx.plugins?.["logger"]?.info({
+  ctx.plugins.info({
     action: "delete_review",
     reviewId,
     petId: deletedReview.petId,
-    userId: auth.user.id
+    userId: auth.user?.id
   });
 
   ctx.send({
@@ -1466,13 +1466,15 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
       const field = form[fieldName];
       // Check if field is a file
       if (field && field.fileName) {
+        console.log(field);  
+        
         // Generate unique filename to prevent overwrites
         const timestamp = Date.now();
         const uniqueFilename = `${timestamp}-${field.fileName}`;
         // Save file to appropriate directory based on mimetype
         let saveDir = "./tests/uploads";
         // Save the file
-        await writeFile(resolve(saveDir, uniqueFilename), field.content);
+        await writeFile(resolve(saveDir, uniqueFilename), field.content, { encoding: "latin1" });
         // Store result information
         results[fieldName] = {
           fileName: field.fileName,
@@ -1487,8 +1489,6 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
       }
     }
 
-    // Log upload activity
-    // Log upload activity
     ctx.plugins.info(ctx, {
       action: "file_upload",
       userId: ctx.app["user"]?.id || "unknown",
@@ -1502,14 +1502,14 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
     });
 
   } catch (error: any) {
-    ctx.plugins?.error(ctx,{
+    if(error instanceof JetPathErrors)  return 
+    ctx.plugins.error(ctx, {
       action: "file_upload_error",
       error: error.message
     });
-
     ctx.code = 500;
     ctx.send({
-      status: "error",
+      status: error.message|| "error",
       message: "Failed to process file upload"
     });
   }
@@ -1518,7 +1518,7 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
 
 POST_upload.body = {
   image: { type: "file", inputType: "file", required: false },
-  document: { type: "file", inputType: "file", required: false },
+  document: { type: "file", inputType: "file", required: true },
   title: { type: "string", required: false },
   description: { type: "string", required: false },
   tags: { type: "string", required: false }
