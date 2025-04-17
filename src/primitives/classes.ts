@@ -3,22 +3,31 @@ import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
 import { _DONE, _JetPath_paths, _OFF, parseRequest, UTILS, validator } from "./functions.js";
 import type {
-  JetPluginExecutor,
+  AnyExecutor,
   JetPluginExecutorInitParams,
   methods,
 } from "./types.js";
+import { resolve } from "node:path";
 
-export class JetPlugin {
+export class JetPlugin< C extends Record<string, unknown> = Record<string, unknown>,E extends AnyExecutor = AnyExecutor> {
+  executor: E;
   JetPathServer?: any;
   hasServer?: boolean;
-  executor: JetPluginExecutor;
-  constructor({ executor }: { executor: JetPluginExecutor }) {
+  config: C = {} as C;
+  constructor({ executor }: { executor: E }) {
     this.executor = executor;
   }
   _setup(init: JetPluginExecutorInitParams): any {
-    return this.executor.call(this, init);
+    return this.executor.call(this, init, this.config);
+  }
+  setConfig(config: C): void {
+    this.config = config;
   }
 }
+
+
+
+
 
 export class Log {
   // Define ANSI escape codes for colors and styles
@@ -249,7 +258,7 @@ export class Context {
         const file = Deno.open(stream).catch(() => {});
         stream = file;
       } else {
-        stream = createReadStream(stream as string, { autoClose: true });
+        stream = createReadStream(resolve(stream) as string, { autoClose: true });
       }
     }
 
@@ -270,11 +279,15 @@ export class Context {
     return undefined as never;
   }
 
-  async parse<Type extends any = Record<string, any>>(): Promise<Type> {
+  async parse<Type extends any = Record<string, any>>(options?: {
+    maxBodySize?: number;
+    contentType?: string;
+}): Promise<Type> {
     if (this.body) {
       return this.body as Promise<Type>;
     }
-    return parseRequest(this.request, {}) as Promise<Type>; 
+    this.body = await parseRequest(this.request, options) as Promise<Type>; 
+    return this.body as Promise<Type>;
   }
 }
 

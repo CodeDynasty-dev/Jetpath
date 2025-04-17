@@ -12,7 +12,7 @@ import {
   isIdentical,
   UTILS,
 } from "./primitives/functions.js";
-import { type jetOptions } from "./primitives/types.js";
+import { AnyExecutor, type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
 import path from "node:path";
 
@@ -20,7 +20,7 @@ export class JetPath {
   public server: any;
   private listening: boolean = false;
   private options: jetOptions = { port: 8080, APIdisplay: "UI", cors: true };
-  private plugs: JetPlugin[] = [];
+  private plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[] = [];
   constructor(options?: jetOptions) {
     Object.assign(this.options, options || {});
     if (!this.options.port) this.options.port = 8080;
@@ -55,7 +55,7 @@ export class JetPath {
         }),
       )
     ) {
-      this.plugs.push(plugin);
+      this.plugs.push(plugin as JetPlugin<Record<string, unknown>, AnyExecutor>);
     } else {
       throw Error("invalid Jetpath plugin");
     }
@@ -106,7 +106,7 @@ export class JetPath {
         const name = this.options?.apiDoc?.path || "/api-doc";
         _JetPath_paths["GET"].direct[name] = (
           ctx,
-        ) => { 
+        ) => {
           if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
             const authHeader = ctx.get("authorization");
             if (authHeader && authHeader.startsWith("Basic ")) {
@@ -168,15 +168,13 @@ export class JetPath {
         _JetPath_paths["GET"].direct[name].method = "GET";
         _JetPath_paths["GET"].direct[name].path = name;
         Log.success(
-          `✅ Processed routes ${handlersCount} handlers in ${
-            Math.round(
-              endTime - startTime,
-            )
+          `✅ Processed routes ${handlersCount} handlers in ${Math.round(
+            endTime - startTime,
+          )
           }ms`,
         );
         Log.success(
-          `🚀 Visit http://localhost:${this.options.port}${
-            this.options?.apiDoc?.path || "/api-doc"
+          `🚀 Visit http://localhost:${this.options.port}${this.options?.apiDoc?.path || "/api-doc"
           } to see the displayed routes in UI`,
         );
       }
@@ -184,10 +182,9 @@ export class JetPath {
       if (this.options?.APIdisplay === "HTTP") {
         await writeFile("api-doc.http", compiledAPI);
         Log.success(
-          `✅ Processed routes ${handlersCount} handlers in ${
-            Math.round(
-              endTime - startTime,
-            )
+          `✅ Processed routes ${handlersCount} handlers in ${Math.round(
+            endTime - startTime,
+          )
           }ms`,
         );
         Log.success(
@@ -197,8 +194,7 @@ export class JetPath {
       if (errorsCount) {
         for (let i = 0; i < errorsCount.length; i++) {
           Log.error(
-            `\nReport: ${errorsCount[i].file} file was not loaded due to \n "${
-              errorsCount[i].error
+            `\nReport: ${errorsCount[i].file} file was not loaded due to \n "${errorsCount[i].error
             }" error; \n please resolve!`,
           );
         }
@@ -209,10 +205,8 @@ export class JetPath {
       if (errorsCount) {
         for (let i = 0; i < errorsCount.length; i++) {
           Log.error(
-            `\n\n\nReport: ${
-              errorsCount[i].file
-            } file was not loaded due to \n "${
-              errorsCount[i].error
+            `\n\n\nReport: ${errorsCount[i].file
+            } file was not loaded due to \n "${errorsCount[i].error
             }" error; \n please resolve!`,
           );
         }
@@ -234,5 +228,6 @@ export type {
   ContextType,
   JetFunc,
   JetMiddleware,
+  JetPluginExecutorInitParams, AnyExecutor,
 } from "./primitives/types.js";
 export { JetPlugin } from "./primitives/classes.js";

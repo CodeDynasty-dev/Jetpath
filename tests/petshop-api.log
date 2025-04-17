@@ -1,0 +1,31 @@
+{"timestamp":"2025-04-17T16:27:27.841Z","level":"info","method":"POST","url":"/auth/login"}
+{"timestamp":"2025-04-17T16:27:28.363Z","level":"info","method":"POST","url":"/auth/login"}
+{"timestamp":"2025-04-17T16:27:28.743Z","level":"info","method":"POST","url":"/auth/login"}
+{"timestamp":"2025-04-17T16:27:28.999Z","level":"info","method":"POST","url":"/auth/login"}
+{"timestamp":"2025-04-17T16:30:16.511Z","level":"info","method":"POST","url":"/auth/login"}
+{"timestamp":"2025-04-17T16:30:55.587Z","level":"info","method":"GET","url":"/api-doc"}
+{"timestamp":"2025-04-17T16:30:57.622Z","level":"info","method":"GET","url":"/api-doc"}
+{"timestamp":"2025-04-17T16:31:02.992Z","level":"info","method":"POST","url":"/auth/login"}
+{"timestamp":"2025-04-17T16:31:24.779Z","level":"info","method":"GET","url":"/error"}
+{"timestamp":"2025-04-17T16:38:20.886Z","level":"info","method":"GET","url":"/error"}
+{"timestamp":"2025-04-17T16:38:23.310Z","level":"info","method":"GET","url":"/error"}
+{"timestamp":"2025-04-17T16:38:23.927Z","level":"info","method":"GET","url":"/error"}
+{"timestamp":"2025-04-17T16:38:29.276Z","level":"info","method":"PUT","url":"/petBy/:id"}
+{"timestamp":"2025-04-17T16:40:21.788Z","level":"info","method":"PUT","url":"/petBy/:id"}
+{"timestamp":"2025-04-17T16:40:21.801Z","level":"error","message":"Error: available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"PUT","url":"/petBy/:id"}
+{"timestamp":"2025-04-17T16:40:23.061Z","level":"info","method":"PUT","url":"/petBy/:id"}
+{"timestamp":"2025-04-17T16:40:23.063Z","level":"error","message":"Error: available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"PUT","url":"/petBy/:id"}
+{"timestamp":"2025-04-17T16:41:00.075Z","level":"info","method":"GET","url":"/api-doc"}
+{"timestamp":"2025-04-17T16:41:05.153Z","level":"info","method":"POST","url":"/auth/login"}
+{"timestamp":"2025-04-17T16:41:22.529Z","level":"info","method":"GET","url":"/error"}
+{"timestamp":"2025-04-17T16:41:30.848Z","level":"info","method":"GET","url":"/error"}
+{"timestamp":"2025-04-17T16:41:30.852Z","level":"error","message":"Error: This is an intentional error for testing error handling","method":"GET","url":"/error"}
+{"timestamp":"2025-04-17T16:41:39.266Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:44:57.015Z","level":"info","message":"undefined","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:44:57.026Z","level":"error","message":"[object Object]","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:45:50.517Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:45:50.525Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"ctx.plugins.formData is not a function\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:46:53.655Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:46:53.675Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:47:17.612Z","level":"info","method":"POST","url":"/upload"}
+{"timestamp":"2025-04-17T16:47:17.642Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"done\"}","method":"POST","url":"/upload"}

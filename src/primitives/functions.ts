@@ -6,6 +6,7 @@ import { createServer } from "node:http";
 // type imports
 import { type IncomingMessage, type ServerResponse } from "node:http";
 import {
+  AnyExecutor,
   type allowedMethods,
   type HTTPBody,
   type JetFunc,
@@ -192,7 +193,7 @@ export const UTILS = {
   },
   runtime: null as unknown as Record<string, boolean>,
   // validators: {} as Record<string, JetSchema>,
-  server(plugs: JetPlugin[]): { listen: any; edge: boolean } | void {
+  server(plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[]): { listen: any; edge: boolean } | void {
     let server;
     let server_else;
     if (UTILS.runtime["node"]) {

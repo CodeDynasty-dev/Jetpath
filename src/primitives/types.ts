@@ -1,6 +1,5 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths } from "./functions.js";
-import type { JetPlugin } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,
@@ -12,8 +11,8 @@ export interface ContextType<
     body?: Record<string, any>;
     params?: Record<string, any>;
     query?: Record<string, any>;
-  },
-  JetPluginTypes extends Record<string, unknown>[],
+  } = { body: {}; params: {}; query: {} },
+  JetPluginTypes extends Record<string, unknown>[] = [],
 > {
   /**
    * an object you can set values to per request
@@ -116,11 +115,10 @@ export type JetPluginExecutorInitParams = {
   server: Server<typeof IncomingMessage, typeof ServerResponse>;
   routesObject: typeof _JetPath_paths;
   JetPath_app: (req: Request) => Response;
-};
-export type JetPluginExecutor = (
-  this: JetPlugin,
-  init: JetPluginExecutorInitParams,
-) => Record<string, any>;
+}; 
+
+// A helper type for “any function of the right shape”
+export type AnyExecutor = (this: any, init: JetPluginExecutorInitParams, config: Record<string, unknown>) => any;
 
 export type contentType =
   | "application/x-www-form-urlencoded"
