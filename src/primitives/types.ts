@@ -253,3 +253,9 @@ interface jet_socket {
     listener: (socket: WebSocket, ...params: any[]) => void,
   ): void;
 }
+
+export type JetFile = {
+  fileName: string;
+  content: Uint8Array;
+  mimeType: string;
+};
