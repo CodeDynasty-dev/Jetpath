@@ -1,11 +1,11 @@
 <br/>
 <p align="center">
-     <img src="icon.webp" alt="JetPath" width="190" height="190">
+     <img src="icon.png" alt="JetPath" width="190" height="190">
 
 <h1 align="center">JetPath</h1>
 
 <p align="center">
-    JetPath 🚀 - the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!!!
+   JetPath is the fast and minimalist framework for Node, Deno and Bun.
     <br/>
     <br/>
     <a href="https://jetpath.codedynasty.dev"><strong>Explore JetPath APIs »</strong></a>
@@ -23,59 +23,35 @@
 [![npm Version](https://img.shields.io/npm/v/jetpath.svg)](https://www.npmjs.com/package/JetPath)
 ![Forks](https://img.shields.io/github/forks/codedynasty-dev/JetPath?style=social)
 ![Stargazers](https://img.shields.io/github/stars/codedynasty-dev/JetPath?style=social)
-
---
-
+ 
 ## Latest version info
 
 In this version, we added/tested these features on all runtimes.
 
 1. auto-generated api documentation UI (Jetpath UI).
-2. file uploads [check this example](tests/uploading-files.md)
-3. support for websockets [check this example](tests/websockets-usage.md).
+2. file uploads
+3. support for websockets
 4. Jet Plugins.
 5. Robust schema validation
+6. Multi-runtime support
+7. Robust Context and body parser
+8. Security audits and fixes
+9. Robust error handling
+10. Robust logging
+11. Robust middleware
+12. Performance enhancements
 
 In this version, multi-runtime support is no-longer based on
 compatibility but pure engine api(s). 
 
 - more speed, same size, more power.
 
-# Rationale - [Docs](https://jetpath.codedynasty.dev/)
 
-JetPath is the Granular web framework aimed for speed and ease of use.
-
-[benchmark repo](https://github.com/FridayCandour/jetpath-benchmark)
-
-- JetPath now runs on the runtime you are using, bun or node or deno.
-- Function names as routing patterns (newest innovation you haven't seen
-  before).
-- Pre and Error request hooks.
-- Inbuilt Cors handlers hook.
-- Fast, Small and easy as peasy.
-- Inbuilt API auto doc functionality.
-
-JetPath is designed as a light, simple and powerful, using the an intuitive
-route as function name system. you can be able to design and manage your api(s)
-with the smallest granularity possible.
-
---
-  
-
-## Installation
-
-Install JetPath Right away on your project using npm or Javascript other package
-managers.
-
-```
-npm i jetpath --save
-```
-
-#### A basic project setup
+## Syntax
 
 ```ts
-// in your src/index.jet.js
-import { Context, JetFunc, JetPath } from "./dist/index.js";
+// src/index.jet.js
+import { Context, JetFunc, JetPath } from "jetpath";
 
 const app = new JetPath({ APIdisplay: "HTTP" });
 
@@ -89,10 +65,40 @@ export const GET_: JetFunc = async function (ctx) {
 
 // this goes to = post /
 export const POST_: JetFunc = async function (ctx) {
-  ctx.send("a simple post path!");
+  ctx.send( ctx.parse() );
 };
- 
- 
+
+// this goes to = post /api/v1/payments
+export const POST_api_v1_payments: JetFunc = async function (ctx) {
+    const { amount, currency, account } = ctx.parse();
+    ctx.plugin.charge({ amount, currency, account });
+    ctx.send({ success: true, message: "Payment successful" });
+};
+```
+
+# Rationale - [Docs](https://jetpath.codedynasty.dev/)
+
+JetPath is designed for high performance, security and ease of use, using convention over configuration method, jetpath ensure you spend less time on configuration and more time on the functionalities and concise organization of all your projects.
+
+[benchmark repo](https://github.com/FridayCandour/jetpath-benchmark)
+
+- JetPath now runs on the runtime you are using, bun or node or deno.
+- Function names as routing patterns.
+- Middleware and error handler design.
+- Inbuilt Cors, body parser, websocket, cookies and logger handlers.
+- Inbuilt API auto doc functionality. 
+- Fast, Small and easy as peasy - jetpath will make your projects shine.
+
+--
+  
+
+## Installation
+
+Install Jetpath Right away on your project using npm or Javascript other package
+managers.
+
+```
+npm i jetpath --save
 ```
  
 
