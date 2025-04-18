@@ -109,7 +109,7 @@ Open sourced And Free.
 ### Contribution and License Agreement
 
 If you contribute code to this project, you are implicitly allowing your code to
-be distributed under the MIT license. You are also implicitly verifying that all
+be distributed under the Apache 2.0 license. You are also implicitly verifying that all
 code are your original work.
 
 ### Support
