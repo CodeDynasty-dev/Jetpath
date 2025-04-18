@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-     <img src="icon.png" alt="Jetpath" width="190" height="190">
+     <img src="https://github.com/CodeDynasty-dev/Jetpath/raw/main/icon.png" alt="Jetpath" width="190" height="190">
 
 <h1 align="center">Jetpath</h1>
 
