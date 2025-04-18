@@ -51,7 +51,7 @@ compatibility but pure engine api(s).
 
 ```ts
 // src/index.jet.js
-import { Context, JetFunc, Jetpath } from "jetpath";
+import { type JetFunc, Jetpath } from "jetpath";
 
 const app = new Jetpath({ APIdisplay: "HTTP" });
 
