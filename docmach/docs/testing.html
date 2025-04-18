@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JetPath - Blazing Fast Backend Framework</title>
+  <title>Jetpath - Blazing Fast Backend Framework</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -409,7 +409,7 @@
       flex-grow: 1;
     }
 
-    /* Why JetPath Section */
+    /* Why Jetpath Section */
     .why-jetpath {
       background: linear-gradient(to bottom, var(--dark), var(--dark-light));
     }
@@ -1119,13 +1119,13 @@
       <div class="flex w-full justify-between">
 
         <div class="logo-container">
-          <a href="/" title="JetPath" class="logo">
+          <a href="/" title="Jetpath" class="logo">
             <div class="flex gap-1">
               <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
-          <span class="logo-text">JetPath</span>
+          <span class="logo-text">Jetpath</span>
         </a>
       </div>
         <button class="mobile-menu-btn">
@@ -1154,7 +1154,7 @@
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
         <a href="/docs/performance" class="nav-link">Performance</a>
         <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
-        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
     </div>
@@ -1314,7 +1314,7 @@
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>Testing &amp; Debugging</h1>
-<p>Ensuring your JetPath application is reliable and maintainable requires effective testing and debugging strategies. JetPath’s structure, with its focus on distinct handlers, plugins, and middleware, lends itself well to various testing approaches.</p>
+<p>Ensuring your Jetpath application is reliable and maintainable requires effective testing and debugging strategies. Jetpath’s structure, with its focus on distinct handlers, plugins, and middleware, lends itself well to various testing approaches.</p>
 <hr>
 <h2>Testing Strategies</h2>
 <p>A balanced testing approach typically involves a mix of unit, integration, and potentially end-to-end tests.</p>
@@ -1383,7 +1383,7 @@ mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;send&lt;/span&gt; = vi.&lt;s
 </ul>
 <h3>2. Integration Testing</h3>
 <ul>
-<li><strong>Goal:</strong> Test how different parts of <em>your</em> application work together, including routing, middleware, handlers, and potentially plugins, usually by making live HTTP requests to a running instance of your JetPath app.</li>
+<li><strong>Goal:</strong> Test how different parts of <em>your</em> application work together, including routing, middleware, handlers, and potentially plugins, usually by making live HTTP requests to a running instance of your Jetpath app.</li>
 <li><strong>What to Test:</strong>
 <ul>
 <li><strong>API Endpoints:</strong> Send requests to your routes and assert the response status code, headers, and body content.</li>
@@ -1394,7 +1394,7 @@ mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;send&lt;/span&gt; = vi.&lt;s
 </li>
 <li><strong>Setup:</strong>
 <ul>
-<li>You typically need to run your JetPath server in a test environment.</li>
+<li>You typically need to run your Jetpath server in a test environment.</li>
 <li>Consider using a separate test database or mocking database calls at a higher level if needed.</li>
 </ul>
 </li>
@@ -1402,7 +1402,7 @@ mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;send&lt;/span&gt; = vi.&lt;s
 <ul>
 <li><strong>HTTP Client Libraries:</strong>
 <ul>
-<li><code>supertest</code> (Popular for Node.js/Express-like apps, might need adaptation for JetPath’s server instance).</li>
+<li><code>supertest</code> (Popular for Node.js/Express-like apps, might need adaptation for Jetpath’s server instance).</li>
 <li>Standard <code>Workspace</code> API (Available in Node.js, Deno, Bun - often sufficient).</li>
 </ul>
 </li>
@@ -1410,12 +1410,12 @@ mockCtx.&lt;span class=&quot;hljs-property&quot;&gt;send&lt;/span&gt; = vi.&lt;s
 </ul>
 </li>
 <li><strong>Example (Conceptual Integration Test using <code>Workspace</code>):</strong><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { describe, it, expect, beforeAll, afterAll } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vitest&#x27;</span>;
-<span class="hljs-comment">// Assuming you have a way to start/stop your JetPath app programmatically</span>
+<span class="hljs-comment">// Assuming you have a way to start/stop your Jetpath app programmatically</span>
 <span class="hljs-keyword">import</span> { startTestServer, stopTestServer, appInstance } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./test-setup&#x27;</span>; <span class="hljs-comment">// Your test setup helper</span>
 <p><span class="hljs-title function_">describe</span>(<span class="hljs-string">'Pet API Integration Tests'</span>, <span class="hljs-function">() =&gt;</span> {
 <span class="hljs-keyword">let</span> <span class="hljs-attr">serverUrl</span>: <span class="hljs-built_in">string</span>;</p>
 <p><span class="hljs-title function_">beforeAll</span>(<span class="hljs-title function_">async</span> () =&gt; {
-serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title function_">startTestServer</span>(); <span class="hljs-comment">// Starts JetPath on a random port</span>
+serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title function_">startTestServer</span>(); <span class="hljs-comment">// Starts Jetpath on a random port</span>
 });</p>
 <p><span class="hljs-title function_">afterAll</span>(<span class="hljs-title function_">async</span> () =&gt; {
 <span class="hljs-keyword">await</span> <span class="hljs-title function_">stopTestServer</span>();
@@ -1465,7 +1465,7 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
 </ul>
 <hr>
 <h2>Debugging Techniques</h2>
-<p>When things go wrong, here’s how to troubleshoot your JetPath application:</p>
+<p>When things go wrong, here’s how to troubleshoot your Jetpath application:</p>
 <h3>1. Console Logging</h3>
 <ul>
 <li>The simplest method. Use <code>console.log()</code>, <code>console.warn()</code>, <code>console.error()</code> strategically within your handlers, middleware, and plugins to trace execution flow and inspect variable values.</li>
@@ -1500,7 +1500,7 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
 <li><strong>Check Filenames and Paths:</strong> Ensure your <code>.jet.ts</code> files and folders exactly match the desired URL structure. Case sensitivity matters on some systems.</li>
 <li><strong>Check Export Names:</strong> Verify the <code>METHOD_</code> prefix and any <code>optionalPathSegment</code> match the HTTP method and expected path. Double-check the use of <code>$</code> for parameters and <code>$</code> for catch-alls.</li>
 <li><strong>Look for Conflicts:</strong> Ensure you don’t have conflicting definitions (e.g., two different files/exports trying to handle the exact same METHOD + Path).</li>
-<li><strong>Use a Route Listing Tool:</strong> <em>(Recommendation)</em> An official JetPath CLI command like <code>jetpath routes</code> would be invaluable here, showing exactly how JetPath mapped files/exports to routes.</li>
+<li><strong>Use a Route Listing Tool:</strong> <em>(Recommendation)</em> An official Jetpath CLI command like <code>jetpath routes</code> would be invaluable here, showing exactly how Jetpath mapped files/exports to routes.</li>
 </ul>
 <h3>4. Debugging Validation Errors</h3>
 <ul>
@@ -1529,10 +1529,10 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">JetPath</div>
+          <div class="footer-logo">Jetpath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1540,7 +1540,7 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1548,7 +1548,7 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1556,7 +1556,7 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -1580,7 +1580,7 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank">GitHub</a></li>
             <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
             <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
             <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
@@ -1598,7 +1598,7 @@ serverUrl = <span class="hljs-keyword">await</span> <span class="hljs-title func
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2025 JetPath. All rights reserved.</p>
+        <p>&copy; 2025 Jetpath. All rights reserved.</p>
       </div>
     </div>
   </footer>

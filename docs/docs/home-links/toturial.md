@@ -10,7 +10,7 @@
 
 # Tutorials
 
-Welcome to the JetPath Tutorials section! These guides provide practical, step-by-step instructions for building common features and tackling specific tasks using the JetPath framework. While the [Core Concepts](./core-concepts/routing.md) explain *how* things work, these tutorials show you *how to do it*.
+Welcome to the Jetpath Tutorials section! These guides provide practical, step-by-step instructions for building common features and tackling specific tasks using the Jetpath framework. While the [Core Concepts](./core-concepts/routing.md) explain *how* things work, these tutorials show you *how to do it*.
 
 We'll often refer to concepts demonstrated in the PetShop API example found in the `tests/app.jet.ts` file.
 
@@ -18,7 +18,7 @@ We'll often refer to concepts demonstrated in the PetShop API example found in t
 
 ## Available Tutorials
 
-Here's a list of available tutorials to help you master JetPath:
+Here's a list of available tutorials to help you master Jetpath:
 
 ### 1. Building Your First CRUD API
 
@@ -87,7 +87,7 @@ Here's a list of available tutorials to help you master JetPath:
 
 ### 6. Creating & Using Custom Plugins
 
-* **Goal:** Learn how to build your own reusable JetPath plugins to encapsulate specific functionality or dependencies.
+* **Goal:** Learn how to build your own reusable Jetpath plugins to encapsulate specific functionality or dependencies.
 * **Covers:**
     * The structure of a `JetPlugin` using the `executor` function.
     * Initializing dependencies (like API clients or services) within a plugin.
@@ -99,9 +99,9 @@ Here's a list of available tutorials to help you master JetPath:
 
 ### 7. Setting up API Documentation
 
-* **Goal:** Configure and utilize JetPath's built-in automatic API documentation generation.
+* **Goal:** Configure and utilize Jetpath's built-in automatic API documentation generation.
 * **Covers:**
-    * Configuring `apiDoc` and `APIdisplay` options in the `JetPath` constructor. [cite: tests/app.jet.ts]
+    * Configuring `apiDoc` and `APIdisplay` options in the `Jetpath` constructor. [cite: tests/app.jet.ts]
     * Adding descriptions and metadata to schemas (e.g., using Zod's `.describe()`) and route handlers (`GET_.info = "..."`) to enrich the generated documentation.
     * Accessing the interactive Swagger UI (usually at `/docs`).
     * Understanding how schemas translate into documentation.

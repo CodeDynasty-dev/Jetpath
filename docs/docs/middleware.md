@@ -2,7 +2,7 @@
   
 # Core Concepts: Middleware
 
-Middleware functions are a fundamental part of building applications with JetPath. They allow you to execute code **before** your route handler runs and **after** it completes, enabling you to implement cross-cutting concerns like logging, authentication, data validation, error handling, and response formatting in a clean, reusable way.
+Middleware functions are a fundamental part of building applications with Jetpath. They allow you to execute code **before** your route handler runs and **after** it completes, enabling you to implement cross-cutting concerns like logging, authentication, data validation, error handling, and response formatting in a clean, reusable way.
 
 ---
 
@@ -20,9 +20,9 @@ Think of middleware as functions that sit in the middle of the request-response 
 
 ## Defining Middleware
 
-In JetPath, middleware is typically defined by exporting a special function named `MIDDLEWARE_` from a `.jet.ts` file.
+In Jetpath, middleware is typically defined by exporting a special function named `MIDDLEWARE_` from a `.jet.ts` file.
 
-* **Structure:** A JetPath middleware function takes the `ctx` (Context) object as its argument and **must return another function**. This inner function represents the post-handler logic and receives `ctx` and an optional `err` object.
+* **Structure:** A Jetpath middleware function takes the `ctx` (Context) object as its argument and **must return another function**. This inner function represents the post-handler logic and receives `ctx` and an optional `err` object.
 
 ```typescript
 import { type JetMiddleware, type JetContext } from "jetpath";
@@ -121,7 +121,7 @@ export const MIDDLEWARE_: JetMiddleware<AppState, AppPlugins> = (ctx: JetContext
 
 ## Execution Flow & Order
 
-1.  JetPath matches the incoming request to a route handler.
+1.  Jetpath matches the incoming request to a route handler.
 2.  The **pre-handler** section of the most relevant `MIDDLEWARE_` function executes. *(See Scoping below)*.
 3.  **(If not ended early)** The route handler function executes.
 4.  The **post-handler** section (the returned function) of the `MIDDLEWARE_` function executes, receiving the context and any error that occurred.
@@ -132,12 +132,12 @@ If multiple middleware functions apply (e.g., global and folder-level - see Scop
 
 ## Scoping Middleware
 
-*(Note: The provided example `tests/app.jet.ts` only explicitly shows a global middleware defined in the main app file. The following describes common patterns for scoping in file-based frameworks, which JetPath might implement or could adopt.)*
+*(Note: The provided example `tests/app.jet.ts` only explicitly shows a global middleware defined in the main app file. The following describes common patterns for scoping in file-based frameworks, which Jetpath might implement or could adopt.)*
 
 Middleware can potentially be scoped to apply globally or only to specific parts of your API:
 
   * **Global Middleware:** Defining `MIDDLEWARE_` in your main application entry file (`app.jet.ts` in the example) or the root `src/index.jet.ts` likely applies it to *all* incoming requests.
-  * **Directory/Layout Middleware (Potential Pattern):** Frameworks often allow defining middleware in special files within subdirectories (e.g., `src/admin/_middleware.jet.ts` or `src/admin/_layout.jet.ts`). Such middleware would apply only to routes defined within that directory and its subdirectories, executing after global middleware but before the specific route handler. This allows applying specific logic (like admin authentication checks) only where needed. *[Confirmation needed from JetPath specifics if this pattern is supported].*
+  * **Directory/Layout Middleware (Potential Pattern):** Frameworks often allow defining middleware in special files within subdirectories (e.g., `src/admin/_middleware.jet.ts` or `src/admin/_layout.jet.ts`). Such middleware would apply only to routes defined within that directory and its subdirectories, executing after global middleware but before the specific route handler. This allows applying specific logic (like admin authentication checks) only where needed. *[Confirmation needed from Jetpath specifics if this pattern is supported].*
 
 -----
 

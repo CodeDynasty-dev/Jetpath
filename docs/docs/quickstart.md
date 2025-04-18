@@ -3,20 +3,20 @@
  
 # Quick Start Guide
 
-Let's build your first JetPath application! This guide will walk you through creating a simple API server that returns a welcome message.
+Let's build your first Jetpath application! This guide will walk you through creating a simple API server that returns a welcome message.
 
 ---
 
 ## Goal
 
-Create a basic JetPath server with a single endpoint (`GET /`) that responds with JSON.
+Create a basic Jetpath server with a single endpoint (`GET /`) that responds with JSON.
 
 ## Prerequisites
 
 Before you start, make sure you have:
 
 1.  Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).
-2.  Completed the steps in the [**Installation Guide**](./installation.md) to install JetPath and TypeScript.
+2.  Completed the steps in the [**Installation Guide**](./installation.md) to install Jetpath and TypeScript.
 3.  Optionally installed a schema library like Zod (recommended).
 
 ---
@@ -42,7 +42,7 @@ my-jetpath-app/
 
 ## Step 2: Install Dependencies
 
-If you haven't already, install JetPath and a schema library (we'll use Zod here). Choose the command for your runtime:
+If you haven't already, install Jetpath and a schema library (we'll use Zod here). Choose the command for your runtime:
 
 ```shell
 # Using npm (Node.js)
@@ -106,7 +106,7 @@ import type { JetFunc } from "jetpath";
 export const GET_: JetFunc = (ctx) => {
   // Use the context (ctx) to send a response
   ctx.send({
-    message: "Welcome to your first JetPath API!",
+    message: "Welcome to your first Jetpath API!",
     status: "ok",
     timestamp: new Date().toISOString(),
   });
@@ -122,23 +122,23 @@ GET_.info = "Returns a welcome message and API status.";
   * We import the `JetFunc` type for better type checking of our handler.
   * We export a constant named `GET_`. The `GET` part maps to the HTTP GET method, and the `_` combined with the filename `index.jet.ts` maps to the root path `/`.
   * The function receives the `ctx` (Context) object.
-  * `ctx.send()` sends a JSON response back to the client. JetPath automatically sets the `Content-Type` header to `application/json` for objects.
+  * `ctx.send()` sends a JSON response back to the client. Jetpath automatically sets the `Content-Type` header to `application/json` for objects.
 
 -----
 
 ## Step 5: Create the Server Entry Point
 
-Now, create a file named `server.ts` in your project root (`my-jetpath-app/`). This file initializes and starts the JetPath server.
+Now, create a file named `server.ts` in your project root (`my-jetpath-app/`). This file initializes and starts the Jetpath server.
 
 ```typescript
 // server.ts
-import { JetPath } from "jetpath";
+import { Jetpath } from "jetpath";
 
 // Define the port the server will listen on
 const PORT = 3000;
 
-// Create a new JetPath instance
-const app = new JetPath({
+// Create a new Jetpath instance
+const app = new Jetpath({
   // Specify the directory containing your route files (.jet.ts)
   source: "./src",
 
@@ -147,7 +147,7 @@ const app = new JetPath({
 
   // Configure API documentation generation (optional but recommended)
   apiDoc: {
-    name: "My First JetPath API",
+    name: "My First Jetpath API",
     info: "This is the documentation for the Quick Start API.",
     color: "#7e57c2", // Choose a color!
   },
@@ -158,16 +158,16 @@ const app = new JetPath({
 app.listen();
 
 // Log messages to the console
-console.log(`🚀 JetPath server running on http://localhost:${PORT}`);
+console.log(`🚀 Jetpath server running on http://localhost:${PORT}`);
 console.log(`📚 API Docs available at http://localhost:${PORT}/docs`);
 
 ```
 
 **Explanation:**
 
-  * We import the main `JetPath` class.
+  * We import the main `Jetpath` class.
   * We create a new instance, passing configuration options:
-      * `source`: Tells JetPath where to find your route files.
+      * `source`: Tells Jetpath where to find your route files.
       * `port`: The port number for the server.
       * `apiDoc`, `APIdisplay`: Configures the built-in documentation generator.
   * `app.listen()` starts the server.
@@ -195,7 +195,7 @@ bun run server.ts
 You should see the following output (or similar):
 
 ```
-🚀 JetPath server running on http://localhost:3000
+🚀 Jetpath server running on http://localhost:3000
 📚 API Docs available at http://localhost:3000/docs
 ```
 
@@ -206,14 +206,14 @@ You should see the following output (or similar):
 1.  **Check the API:** Open your web browser and navigate to `http://localhost:3000`. You should see the JSON response:
     ```json
     {
-      "message": "Welcome to your first JetPath API!",
+      "message": "Welcome to your first Jetpath API!",
       "status": "ok",
       "timestamp": "..."
     }
     ```
 2.  **Check the Docs:** Navigate to `http://localhost:3000/docs`. You should see the interactive API documentation UI, listing your `GET /` endpoint.
 
-**Congratulations\! You've successfully created and run your first JetPath application\!**
+**Congratulations\! You've successfully created and run your first Jetpath application\!**
 
 -----
 

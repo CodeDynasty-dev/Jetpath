@@ -2,13 +2,13 @@
   
 # Error Handling
 
-Robust error handling is essential for creating reliable and user-friendly APIs. JetPath encourages centralizing error handling logic within your **middleware**, providing a consistent way to catch errors, log them, and send standardized responses to the client.
+Robust error handling is essential for creating reliable and user-friendly APIs. Jetpath encourages centralizing error handling logic within your **middleware**, providing a consistent way to catch errors, log them, and send standardized responses to the client.
 
 ---
 
 ## Philosophy
 
-Instead of scattering `try...catch` blocks throughout your route handlers for common errors, JetPath's approach relies on:
+Instead of scattering `try...catch` blocks throughout your route handlers for common errors, Jetpath's approach relies on:
 
 1.  **Signaling Errors:** Using `ctx.throw()` or standard `throw new Error()` within route handlers or preceding middleware logic when something goes wrong.
 2.  **Centralized Catching:** Intercepting these thrown errors within the **post-handler function returned by your middleware**.

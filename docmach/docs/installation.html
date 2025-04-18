@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JetPath - Blazing Fast Backend Framework</title>
+  <title>Jetpath - Blazing Fast Backend Framework</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -409,7 +409,7 @@
       flex-grow: 1;
     }
 
-    /* Why JetPath Section */
+    /* Why Jetpath Section */
     .why-jetpath {
       background: linear-gradient(to bottom, var(--dark), var(--dark-light));
     }
@@ -1119,13 +1119,13 @@
       <div class="flex w-full justify-between">
 
         <div class="logo-container">
-          <a href="/" title="JetPath" class="logo">
+          <a href="/" title="Jetpath" class="logo">
             <div class="flex gap-1">
               <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
-          <span class="logo-text">JetPath</span>
+          <span class="logo-text">Jetpath</span>
         </a>
       </div>
         <button class="mobile-menu-btn">
@@ -1154,7 +1154,7 @@
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
         <a href="/docs/performance" class="nav-link">Performance</a>
         <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
-        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
     </div>
@@ -1314,7 +1314,7 @@
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>Installation</h1>
-<p>Get ready to build universal JavaScript backends! Installing JetPath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.</p>
+<p>Get ready to build universal JavaScript backends! Installing Jetpath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.</p>
 <hr>
 <h2>Prerequisites</h2>
 <p>Before you begin, ensure you have the following installed:</p>
@@ -1326,7 +1326,7 @@
 <li><strong>Bun:</strong> Version 1.0 or later recommended. (<a href="https://bun.sh/docs/installation">Install Bun</a>)</li>
 </ul>
 </li>
-<li><strong>TypeScript:</strong> JetPath is built with TypeScript and provides first-class typing support. While you can use it with JavaScript, TypeScript is highly recommended for the best experience.<pre><code class="language-bash">npm install -g typescript <span class="hljs-comment"># Or use the version included with Deno/Bun</span>
+<li><strong>TypeScript:</strong> Jetpath is built with TypeScript and provides first-class typing support. While you can use it with JavaScript, TypeScript is highly recommended for the best experience.<pre><code class="language-bash">npm install -g typescript <span class="hljs-comment"># Or use the version included with Deno/Bun</span>
 </code></pre>
 </li>
 <li><strong>(Optional but Recommended) A Schema Validation Library:</strong> For robust validation and type inference, we strongly recommend installing a library like Zod or TypeBox. Examples in this documentation often use Zod.<pre><code class="language-bash">npm install zod
@@ -1337,7 +1337,7 @@ bun add zod
 </li>
 </ol>
 <hr>
-<h2>Installing JetPath</h2>
+<h2>Installing Jetpath</h2>
 <p>Choose the installation method corresponding to your primary development runtime.</p>
 <h3>1. For Node.js (using npm, yarn, or pnpm)</h3>
 <p>If you’re developing primarily within the Node.js ecosystem:</p>
@@ -1356,9 +1356,9 @@ yarn add zod
 pnpm add zod
 </code></pre>
 <h3>2. For Deno</h3>
-<p>Deno typically uses direct URL imports. Add JetPath as a dependency in your <code>deno.json</code> or <code>jsr.json</code> file, or import it directly.</p>
+<p>Deno typically uses direct URL imports. Add Jetpath as a dependency in your <code>deno.json</code> or <code>jsr.json</code> file, or import it directly.</p>
 <p><strong>(Option A - Using <code>deno.json</code> / <code>jsr.json</code>)</strong></p>
-<p>Add JetPath and your schema library to your import map or dependency list (replace with actual URLs/versions when available):</p>
+<p>Add Jetpath and your schema library to your import map or dependency list (replace with actual URLs/versions when available):</p>
 <pre><code class="language-jsonc"><span class="hljs-comment">// deno.json (example using import map)</span>
 <span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;imports&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
@@ -1372,10 +1372,10 @@ pnpm add zod
 </code></pre>
 <p><strong>(Option B - Direct URL Import)</strong></p>
 <p>Import directly in your TypeScript files (replace with actual URLs when available):</p>
-<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jsr:@jetpath/jetpath@^0.1.0&quot;</span>; <span class="hljs-comment">// Example JSR</span>
+<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Jetpath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jsr:@jetpath/jetpath@^0.1.0&quot;</span>; <span class="hljs-comment">// Example JSR</span>
 <span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;npm:zod@^3.23.0&quot;</span>; <span class="hljs-comment">// Example npm specifier</span>
 <span class="hljs-comment">// OR</span>
-<span class="hljs-comment">// import { JetPath } from &quot;[https://deno.land/x/jetpath@v0.1.0/mod.ts](https://deno.land/x/jetpath@v0.1.0/mod.ts)&quot;;</span>
+<span class="hljs-comment">// import { Jetpath } from &quot;[https://deno.land/x/jetpath@v0.1.0/mod.ts](https://deno.land/x/jetpath@v0.1.0/mod.ts)&quot;;</span>
 <span class="hljs-comment">// import { z } from &quot;[https://deno.land/x/zod@v3.23.0/mod.ts](https://deno.land/x/zod@v3.23.0/mod.ts)&quot;;</span>
 </code></pre>
 <h3>3. For Bun</h3>
@@ -1391,9 +1391,9 @@ pnpm add zod
 <p><strong>1. Folder Structure:</strong></p>
 <p>A common structure looks like this:</p>
 <pre><code>your-project/
-├── src/              # Your JetPath route handlers (.jet.ts files)
+├── src/              # Your Jetpath route handlers (.jet.ts files)
 │   └── index.jet.ts  # Maps to &quot;/&quot;
-├── server.ts         # Your main server entry point (initializes JetPath)
+├── server.ts         # Your main server entry point (initializes Jetpath)
 ├── node_modules/     # (Node.js/Bun)
 ├── package.json      # (Node.js/Bun)
 ├── bun.lockb         # (Bun)
@@ -1436,12 +1436,12 @@ pnpm add zod
 <li>Run your <code>server.ts</code> file using your chosen runtime (node, deno run, bun run).</li>
 <li>Visit <code>http://localhost:3000</code> (or your configured port) in your browser. You should see the welcome message from your root route.</li>
 </ol>
-<p>If you see the welcome message, JetPath is installed and configured correctly!</p>
+<p>If you see the welcome message, Jetpath is installed and configured correctly!</p>
 <hr>
 <h2>Next Steps</h2>
 <ul>
 <li><strong>Quick Start:</strong> Build your first simple API following the <a href="https://www.google.com/search?q=./quick-start.md"><strong>Quick Start</strong></a> guide.</li>
-<li><strong>Core Concepts:</strong> Dive deeper into how JetPath works by reading the <a href="https://www.google.com/search?q=./core-concepts/routing.md"><strong>Core Concepts</strong></a>.</li>
+<li><strong>Core Concepts:</strong> Dive deeper into how Jetpath works by reading the <a href="https://www.google.com/search?q=./core-concepts/routing.md"><strong>Core Concepts</strong></a>.</li>
 </ul>
     </section>
  
@@ -1451,10 +1451,10 @@ pnpm add zod
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">JetPath</div>
+          <div class="footer-logo">Jetpath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1462,7 +1462,7 @@ pnpm add zod
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1470,7 +1470,7 @@ pnpm add zod
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1478,7 +1478,7 @@ pnpm add zod
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -1502,7 +1502,7 @@ pnpm add zod
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank">GitHub</a></li>
             <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
             <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
             <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
@@ -1520,7 +1520,7 @@ pnpm add zod
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2025 JetPath. All rights reserved.</p>
+        <p>&copy; 2025 Jetpath. All rights reserved.</p>
       </div>
     </div>
   </footer>

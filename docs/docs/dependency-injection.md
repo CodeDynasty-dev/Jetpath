@@ -1,14 +1,14 @@
 <docmach type="wrapper" file="doc-fragments/docs.html" replacement="content">
   
-# Dependency Injection in JetPath
+# Dependency Injection in Jetpath
 
-Dependency Injection (DI) is a design pattern used to manage how components (like services, repositories, controllers) get instances of their dependencies (other components they rely on). While JetPath **does not include a built-in, dedicated Dependency Injection container** like frameworks such as NestJS or Angular, it provides effective patterns for managing dependencies, primarily through its **Plugin System**.
+Dependency Injection (DI) is a design pattern used to manage how components (like services, repositories, controllers) get instances of their dependencies (other components they rely on). While Jetpath **does not include a built-in, dedicated Dependency Injection container** like frameworks such as NestJS or Angular, it provides effective patterns for managing dependencies, primarily through its **Plugin System**.
 
 ---
 
-## JetPath's Approach to Dependencies
+## Jetpath's Approach to Dependencies
 
-Instead of relying on a complex DI container, JetPath encourages managing dependencies through:
+Instead of relying on a complex DI container, Jetpath encourages managing dependencies through:
 
 1.  **Plugins:** Encapsulating related functionality and its dependencies within a plugin, making them accessible via the `ctx.plugins` object.
 2.  **Module Scope / Manual Instantiation:** Creating and managing instances of services or clients within specific modules and importing them where needed.
@@ -18,7 +18,7 @@ Instead of relying on a complex DI container, JetPath encourages managing depend
 
 ## 1. Using the Plugin System (Recommended)
 
-The **Plugin System** is the most idiomatic way to manage shared services and dependencies in JetPath.
+The **Plugin System** is the most idiomatic way to manage shared services and dependencies in Jetpath.
 
 * **Concept:** Create a plugin that initializes your dependency (e.g., a database client, an email service, a configuration object) and exposes methods that use that dependency.
 * **How it Works:**
@@ -80,13 +80,13 @@ The **Plugin System** is the most idiomatic way to manage shared services and de
     }
 
     // server.ts
-    import { JetPath } from "jetpath";
+    import { Jetpath } from "jetpath";
     import { createDatabasePlugin } from "./plugins/databasePlugin";
 
     const dbConnectionString = process.env.DATABASE_URL || "postgres://user:pass@host:port/db";
     const databasePlugin = createDatabasePlugin({ connectionString: dbConnectionString });
 
-    const app = new JetPath({ source: "./src" });
+    const app = new Jetpath({ source: "./src" });
     app.use(databasePlugin); // Register the plugin
 
     app.listen();
@@ -164,7 +164,7 @@ This is the standard approach in JavaScript/TypeScript without a dedicated DI co
     ```typescript
     // server.ts (Conceptual)
     // const dbClient = await createDatabaseClient(...);
-    // const app = new JetPath(...);
+    // const app = new Jetpath(...);
     // app.db = dbClient; // Attach directly (Type needs extending if using TS)
     ```
 * **Attaching to `ctx.app`:** As shown earlier, middleware can attach request-scoped data or potentially request-scoped service instances to `ctx.app`. This is suitable if you need a dependency instance unique to each request.
@@ -176,7 +176,7 @@ This is the standard approach in JavaScript/TypeScript without a dedicated DI co
 
 ## Conclusion
 
-JetPath provides flexibility in managing dependencies.
+Jetpath provides flexibility in managing dependencies.
 
 * **For shared services and singleton resources (like database clients, external API clients, configuration services), the Plugin System is the recommended and most idiomatic approach.** It promotes modularity and provides easy access via `ctx.plugins`.
 * **For simpler dependencies or utilities specific to certain routes, standard module imports (Manual Instantiation) offer a direct and explicit way.**

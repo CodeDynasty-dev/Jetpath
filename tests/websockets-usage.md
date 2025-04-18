@@ -37,8 +37,8 @@ export const WS_sockets: JetFunc = (ctx) => {
 // usage
 import { WebSocketServer } from "ws";
 import http from "node:http";
-import { JetPath } from "jetpath";
-const app = new JetPath({ source: "tests" });
+import { Jetpath } from "jetpath";
+const app = new Jetpath({ source: "tests" });
 
 // Spinning the HTTP server and the WebSocket server.
 const server = app.server;

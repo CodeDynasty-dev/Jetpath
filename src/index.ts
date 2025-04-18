@@ -16,7 +16,7 @@ import { AnyExecutor, type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
 import path from "node:path";
 
-export class JetPath {
+export class Jetpath {
   public server: any;
   private listening: boolean = false;
   private options: jetOptions = { port: 8080, APIdisplay: "UI", cors: true };

@@ -2,7 +2,7 @@
  
 # Core Concepts: Routing
 
-Routing in JetPath is designed to be intuitive and fast, primarily relying on **convention over configuration** through a **file-based system**. This means your project's file structure and how you name your exported functions directly determine your API endpoints.
+Routing in Jetpath is designed to be intuitive and fast, primarily relying on **convention over configuration** through a **file-based system**. This means your project's file structure and how you name your exported functions directly determine your API endpoints.
 
 ---
 
@@ -10,14 +10,14 @@ Routing in JetPath is designed to be intuitive and fast, primarily relying on **
 
 ### 1. Source Directory
 
-When you initialize JetPath, you specify a `source` directory. JetPath watches this directory for `.jet.ts` files containing your route handlers.
+When you initialize Jetpath, you specify a `source` directory. Jetpath watches this directory for `.jet.ts` files containing your route handlers.
 
 ```typescript
 // server.ts
-import { JetPath } from "jetpath";
+import { Jetpath } from "jetpath";
 
-const app = new JetPath({
-  source: "./src", // JetPath looks for routes inside the 'src' folder
+const app = new Jetpath({
+  source: "./src", // Jetpath looks for routes inside the 'src' folder
   // ... other options
 });
 
@@ -36,7 +36,7 @@ The path to a `.jet.ts` file within the `source` directory directly maps to the 
 
 ### 3\. Handler Files (`.jet.ts`)
 
-Files ending with `.jet.ts` are scanned by JetPath for exported functions that define route handlers. Other `.ts` or `.js` files in the `source` directory are ignored for routing purposes (but can still be imported by your handlers).
+Files ending with `.jet.ts` are scanned by Jetpath for exported functions that define route handlers. Other `.ts` or `.js` files in the `source` directory are ignored for routing purposes (but can still be imported by your handlers).
 
 ### 4\. Export Naming Convention
 
@@ -137,7 +137,7 @@ To match multiple path segments at the end of a route, use `$$` at the end of a 
     export const GET_pets_search$$: JetFunc<...> = async (ctx) => { ... }; // Maps to GET /pets/search/* [cite: tests/app.jet.ts]
     // The matched part '*' would be available in ctx.params._ (or similar TBC)
     ```
-  * The matched path segments are typically available under a special parameter like `ctx.params._` or `ctx.params.slug`. *(Note: The exact property name for the catch-all parameter should be confirmed from JetPath's implementation details or core documentation).*
+  * The matched path segments are typically available under a special parameter like `ctx.params._` or `ctx.params.slug`. *(Note: The exact property name for the catch-all parameter should be confirmed from Jetpath's implementation details or core documentation).*
 
 ### 8\. WebSocket Routes (`WS_`)
 
@@ -157,7 +157,7 @@ export const WS_live: JetFunc = (ctx) => {
 
 ## Route Precedence
 
-JetPath follows standard routing precedence rules:
+Jetpath follows standard routing precedence rules:
 
 1.  **Static routes** (e.g., `/pets/search`) are matched before dynamic routes (`/pets/:id`).
 2.  **More specific dynamic routes** (e.g., `/pets/by/:id`) are matched before catch-all routes (`/pets/search/$$`).
@@ -193,7 +193,7 @@ export const updatePetStatus = defineHandler({
 
 ### Programmatic Routing
 
-*(This section would detail any API provided by JetPath for adding routes programmatically via `app.addRoute(...)` or similar, if available. This is useful for dynamic route generation or plugin integrations.)*
+*(This section would detail any API provided by Jetpath for adding routes programmatically via `app.addRoute(...)` or similar, if available. This is useful for dynamic route generation or plugin integrations.)*
 
 -----
 

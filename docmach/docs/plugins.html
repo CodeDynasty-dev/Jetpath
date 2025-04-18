@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JetPath - Blazing Fast Backend Framework</title>
+  <title>Jetpath - Blazing Fast Backend Framework</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -409,7 +409,7 @@
       flex-grow: 1;
     }
 
-    /* Why JetPath Section */
+    /* Why Jetpath Section */
     .why-jetpath {
       background: linear-gradient(to bottom, var(--dark), var(--dark-light));
     }
@@ -1119,13 +1119,13 @@
       <div class="flex w-full justify-between">
 
         <div class="logo-container">
-          <a href="/" title="JetPath" class="logo">
+          <a href="/" title="Jetpath" class="logo">
             <div class="flex gap-1">
               <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
-          <span class="logo-text">JetPath</span>
+          <span class="logo-text">Jetpath</span>
         </a>
       </div>
         <button class="mobile-menu-btn">
@@ -1154,7 +1154,7 @@
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
         <a href="/docs/performance" class="nav-link">Performance</a>
         <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
-        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
     </div>
@@ -1313,8 +1313,8 @@
       });
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
-      <h1>Extending JetPath: Plugins</h1>
-<p>Plugins are the primary way to extend JetPath’s core functionality, promote code reuse, and encapsulate complex or shared logic, such as authentication, database interactions, file handling, logging, or connections to third-party services.</p>
+      <h1>Extending Jetpath: Plugins</h1>
+<p>Plugins are the primary way to extend Jetpath’s core functionality, promote code reuse, and encapsulate complex or shared logic, such as authentication, database interactions, file handling, logging, or connections to third-party services.</p>
 <hr>
 <h2>What are Plugins?</h2>
 <p>Think of plugins as self-contained modules that can:</p>
@@ -1325,7 +1325,7 @@
 </ol>
 <hr>
 <h2>Using Plugins</h2>
-<p>Integrating existing plugins (whether official JetPath plugins or community-created ones) is straightforward.</p>
+<p>Integrating existing plugins (whether official Jetpath plugins or community-created ones) is straightforward.</p>
 <h3>1. Installation</h3>
 <p>Install the plugin package using your preferred package manager:</p>
 <pre><code class="language-bash"><span class="hljs-comment"># Example installing an official file upload plugin</span>
@@ -1335,13 +1335,13 @@ bun add @jetpath/plugin-busboy
 <span class="hljs-comment"># or add via import map/URL for Deno</span>
 </code></pre>
 <h3>2. Registration</h3>
-<p>Instantiate the plugin (if necessary, passing configuration options) and register it with your JetPath application instance using <code>app.use()</code>. Registration typically happens in your main server file (<code>server.ts</code>).</p>
+<p>Instantiate the plugin (if necessary, passing configuration options) and register it with your Jetpath application instance using <code>app.use()</code>. Registration typically happens in your main server file (<code>server.ts</code>).</p>
 <pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Jetpath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
 <span class="hljs-comment">// Assuming jetbusboy is the exported plugin factory/instance</span>
 <span class="hljs-keyword">import</span> { jetbusboy } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@jetpath/plugin-busboy&quot;</span>;
 <span class="hljs-keyword">import</span> { createAuthPlugin } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./plugins/authPlugin&quot;</span>; <span class="hljs-comment">// Your custom auth plugin</span>
-<p><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({ <span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span> });</p>
+<p><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Jetpath</span>({ <span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span> });</p>
 <p><span class="hljs-comment">// Instantiate and register plugins</span>
 <span class="hljs-comment">// Official plugin for multipart/form-data handling</span>
 app.<span class="hljs-title function_">use</span>(jetbusboy);</p>
@@ -1383,7 +1383,7 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
 <h2>Creating Plugins</h2>
 <p>Creating your own plugins allows you to structure reusable logic cleanly.</p>
 <h3>The <code>JetPlugin</code> Class</h3>
-<p>JetPath provides a <code>JetPlugin</code> class (or a similar constructor pattern) to structure your plugin.</p>
+<p>Jetpath provides a <code>JetPlugin</code> class (or a similar constructor pattern) to structure your plugin.</p>
 <pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPlugin</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
 <span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">JetContext</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>; <span class="hljs-comment">// For typing ctx if needed</span>
 <p><span class="hljs-comment">// Define the interface for the API your plugin will expose on ctx.plugins</span>
@@ -1482,7 +1482,7 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
 <ul>
 <li><strong>Instantiation:</strong> You create an instance of your plugin, potentially passing configuration options.</li>
 <li><strong>Registration:</strong> You call <code>app.use(pluginInstance)</code>.</li>
-<li><strong>Execution:</strong> The plugin’s <code>executor</code> function runs during the <code>app.use()</code> call. Any asynchronous operations within the <code>executor</code> should complete before the server starts fully listening or handling requests (depending on JetPath’s internal handling, usually <code>app.listen</code> awaits plugin initialization implicitly or explicitly).</li>
+<li><strong>Execution:</strong> The plugin’s <code>executor</code> function runs during the <code>app.use()</code> call. Any asynchronous operations within the <code>executor</code> should complete before the server starts fully listening or handling requests (depending on Jetpath’s internal handling, usually <code>app.listen</code> awaits plugin initialization implicitly or explicitly).</li>
 <li><strong>Runtime:</strong> The methods returned by the <code>executor</code> are available on <code>ctx.plugins</code> for every incoming request handled after the plugin was registered.</li>
 </ul>
 <hr>
@@ -1508,10 +1508,10 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">JetPath</div>
+          <div class="footer-logo">Jetpath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1519,7 +1519,7 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1527,7 +1527,7 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1535,7 +1535,7 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -1559,7 +1559,7 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank">GitHub</a></li>
             <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
             <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
             <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
@@ -1577,7 +1577,7 @@ ctx.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">use
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2025 JetPath. All rights reserved.</p>
+        <p>&copy; 2025 Jetpath. All rights reserved.</p>
       </div>
     </div>
   </footer>

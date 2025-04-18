@@ -3,7 +3,7 @@
 
 # API Reference: Context (`ctx`)
 
-The `Context` object (`ctx`) is passed to every JetPath route handler and middleware function. It serves as the primary interface for interacting with the request, constructing the response, and accessing framework features.
+The `Context` object (`ctx`) is passed to every Jetpath route handler and middleware function. It serves as the primary interface for interacting with the request, constructing the response, and accessing framework features.
 
 *(This reference is based on the `ContextType` interface provided previously and examples in `tests/app.jet.ts`)*
 
@@ -77,13 +77,13 @@ interface ContextType<
 *(Methods returning `never` terminate the request flow)*
 
   * **`eject(): never`**
-      * Detaches JetPath's automatic response handling. Use for manual stream control.
+      * Detaches Jetpath's automatic response handling. Use for manual stream control.
   * **`validate(dataOrSchema?: any): T`**
       * Validates context data (body, query, params) against a schema. Throws on error, returns validated data (`T`) on success.
   * **`sendStream(stream: ReadableStream | any, ContentType: string): never`**
       * Sends a `ReadableStream` as the response body. Set `ContentType`.
   * **`sendResponse(response?: Response): never`**
-      * Sends a pre-constructed standard `Response` object. Bypasses JetPath serialization.
+      * Sends a pre-constructed standard `Response` object. Bypasses Jetpath serialization.
   * **`send(data: unknown, ContentType?: string): never`**
       * Sends a response. Auto-serializes objects/arrays to JSON (`application/json`). Sets `Content-Type` based on data type or argument. Uses `ctx.code` for status.
   * **`throw(codeOrData?, message?): never`**

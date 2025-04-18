@@ -2,7 +2,7 @@
 
 # Testing & Debugging
 
-Ensuring your JetPath application is reliable and maintainable requires effective testing and debugging strategies. JetPath's structure, with its focus on distinct handlers, plugins, and middleware, lends itself well to various testing approaches.
+Ensuring your Jetpath application is reliable and maintainable requires effective testing and debugging strategies. Jetpath's structure, with its focus on distinct handlers, plugins, and middleware, lends itself well to various testing approaches.
 
 ---
 
@@ -73,31 +73,31 @@ A balanced testing approach typically involves a mix of unit, integration, and p
 
 ### 2. Integration Testing
 
-* **Goal:** Test how different parts of *your* application work together, including routing, middleware, handlers, and potentially plugins, usually by making live HTTP requests to a running instance of your JetPath app.
+* **Goal:** Test how different parts of *your* application work together, including routing, middleware, handlers, and potentially plugins, usually by making live HTTP requests to a running instance of your Jetpath app.
 * **What to Test:**
     * **API Endpoints:** Send requests to your routes and assert the response status code, headers, and body content.
     * **Middleware Logic:** Verify that middleware (e.g., auth, logging headers) behaves correctly for different routes.
     * **Validation:** Send requests with invalid data and assert that appropriate error responses (e.g., 400 Bad Request) are returned.
     * **Error Handling:** Test specific error conditions (like requesting a non-existent resource or triggering an intentional error) and assert the standardized error response format. The `GET_error` route in `tests/app.jet.ts` is a good example target for this. [cite: tests/app.jet.ts]
 * **Setup:**
-    * You typically need to run your JetPath server in a test environment.
+    * You typically need to run your Jetpath server in a test environment.
     * Consider using a separate test database or mocking database calls at a higher level if needed.
 * **Tools:**
     * **HTTP Client Libraries:**
-        * `supertest` (Popular for Node.js/Express-like apps, might need adaptation for JetPath's server instance).
+        * `supertest` (Popular for Node.js/Express-like apps, might need adaptation for Jetpath's server instance).
         * Standard `Workspace` API (Available in Node.js, Deno, Bun - often sufficient).
     * **Test Runners:** Vitest, Jest, Deno.test.
 * **Example (Conceptual Integration Test using `Workspace`):**
     ```typescript
     import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-    // Assuming you have a way to start/stop your JetPath app programmatically
+    // Assuming you have a way to start/stop your Jetpath app programmatically
     import { startTestServer, stopTestServer, appInstance } from './test-setup'; // Your test setup helper
 
     describe('Pet API Integration Tests', () => {
       let serverUrl: string;
 
       beforeAll(async () => {
-        serverUrl = await startTestServer(); // Starts JetPath on a random port
+        serverUrl = await startTestServer(); // Starts Jetpath on a random port
       });
 
       afterAll(async () => {
@@ -153,7 +153,7 @@ A balanced testing approach typically involves a mix of unit, integration, and p
 
 ## Debugging Techniques
 
-When things go wrong, here's how to troubleshoot your JetPath application:
+When things go wrong, here's how to troubleshoot your Jetpath application:
 
 ### 1. Console Logging
 
@@ -182,7 +182,7 @@ If requests aren't hitting the handler you expect:
 * **Check Filenames and Paths:** Ensure your `.jet.ts` files and folders exactly match the desired URL structure. Case sensitivity matters on some systems.
 * **Check Export Names:** Verify the `METHOD_` prefix and any `optionalPathSegment` match the HTTP method and expected path. Double-check the use of `$` for parameters and `$$` for catch-alls.
 * **Look for Conflicts:** Ensure you don't have conflicting definitions (e.g., two different files/exports trying to handle the exact same METHOD + Path).
-* **Use a Route Listing Tool:** *(Recommendation)* An official JetPath CLI command like `jetpath routes` would be invaluable here, showing exactly how JetPath mapped files/exports to routes.
+* **Use a Route Listing Tool:** *(Recommendation)* An official Jetpath CLI command like `jetpath routes` would be invaluable here, showing exactly how Jetpath mapped files/exports to routes.
 
 ### 4. Debugging Validation Errors
 

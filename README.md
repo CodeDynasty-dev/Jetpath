@@ -1,28 +1,28 @@
 <br/>
 <p align="center">
-     <img src="icon.png" alt="JetPath" width="190" height="190">
+     <img src="icon.png" alt="Jetpath" width="190" height="190">
 
-<h1 align="center">JetPath</h1>
+<h1 align="center">Jetpath</h1>
 
 <p align="center">
-   JetPath is the fast and minimalist framework for Node, Deno and Bun.
+   Jetpath is the fast and minimalist framework for Node, Deno and Bun.
     <br/>
     <br/>
-    <a href="https://jetpath.codedynasty.dev"><strong>Explore JetPath APIs »</strong></a>
+    <a href="https://jetpath.codedynasty.dev"><strong>Explore Jetpath APIs »</strong></a>
     <br/>
     <br/>
     <a href="https://jetpath.codedynasty.dev">Join Community</a>
     .
-    <a href="https://github.com/codedynasty-dev/JetPath/issues">Report Bug</a>
+    <a href="https://github.com/codedynasty-dev/jetpath/issues">Report Bug</a>
     .
-    <a href="https://github.com/codedynasty-dev/JetPath/issues">Request Feature</a>
+    <a href="https://github.com/codedynasty-dev/jetpath/issues">Request Feature</a>
   </p>
 </p>
 
-![Contributors](https://img.shields.io/github/contributors/codedynasty-dev/JetPath?color=dark-green)
-[![npm Version](https://img.shields.io/npm/v/jetpath.svg)](https://www.npmjs.com/package/JetPath)
-![Forks](https://img.shields.io/github/forks/codedynasty-dev/JetPath?style=social)
-![Stargazers](https://img.shields.io/github/stars/codedynasty-dev/JetPath?style=social)
+![Contributors](https://img.shields.io/github/contributors/codedynasty-dev/jetpath?color=dark-green)
+[![npm Version](https://img.shields.io/npm/v/jetpath.svg)](https://www.npmjs.com/package/jetpath)
+![Forks](https://img.shields.io/github/forks/codedynasty-dev/jetpath?style=social)
+![Stargazers](https://img.shields.io/github/stars/codedynasty-dev/jetpath?style=social)
  
 ## Latest version info
 
@@ -51,9 +51,9 @@ compatibility but pure engine api(s).
 
 ```ts
 // src/index.jet.js
-import { Context, JetFunc, JetPath } from "jetpath";
+import { Context, JetFunc, Jetpath } from "jetpath";
 
-const app = new JetPath({ APIdisplay: "HTTP" });
+const app = new Jetpath({ APIdisplay: "HTTP" });
 
 //? listening for requests
 app.listen();
@@ -78,11 +78,11 @@ export const POST_api_v1_payments: JetFunc = async function (ctx) {
 
 # Rationale - [Docs](https://jetpath.codedynasty.dev/)
 
-JetPath is designed for high performance, security and ease of use, using convention over configuration method, jetpath ensure you spend less time on configuration and more time on the functionalities and concise organization of all your projects.
+Jetpath is designed for high performance, security and ease of use, using convention over configuration method, jetpath ensure you spend less time on configuration and more time on the functionalities and concise organization of all your projects.
 
 [benchmark repo](https://github.com/FridayCandour/jetpath-benchmark)
 
-- JetPath now runs on the runtime you are using, bun or node or deno.
+- Jetpath now runs on the runtime you are using, bun or node or deno.
 - Function names as routing patterns.
 - Middleware and error handler design.
 - Inbuilt Cors, body parser, websocket, cookies and logger handlers.
@@ -115,5 +115,5 @@ code are your original work.
 ### Support
 
 Your contribution(s) is a good force for change anytime you do it, you can
-ensure JetPath's continues growth and improvement by contributing a re-occurring
+ensure Jetpath's continues growth and improvement by contributing a re-occurring
 or fixed donations to our Github sponsors.

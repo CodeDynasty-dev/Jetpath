@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JetPath - Blazing Fast Backend Framework</title>
+  <title>Jetpath - Blazing Fast Backend Framework</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -409,7 +409,7 @@
       flex-grow: 1;
     }
 
-    /* Why JetPath Section */
+    /* Why Jetpath Section */
     .why-jetpath {
       background: linear-gradient(to bottom, var(--dark), var(--dark-light));
     }
@@ -1119,13 +1119,13 @@
       <div class="flex w-full justify-between">
 
         <div class="logo-container">
-          <a href="/" title="JetPath" class="logo">
+          <a href="/" title="Jetpath" class="logo">
             <div class="flex gap-1">
               <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
-          <span class="logo-text">JetPath</span>
+          <span class="logo-text">Jetpath</span>
         </a>
       </div>
         <button class="mobile-menu-btn">
@@ -1154,7 +1154,7 @@
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
         <a href="/docs/performance" class="nav-link">Performance</a>
         <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
-        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
     </div>
@@ -1314,7 +1314,7 @@
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>Deployment</h1>
-<p>Deploying your JetPath application involves packaging your code and dependencies, choosing a hosting environment, and running the application server so it’s accessible to users. JetPath’s flexibility allows you to deploy it across various platforms using Node.js, Deno, or Bun as the runtime.</p>
+<p>Deploying your Jetpath application involves packaging your code and dependencies, choosing a hosting environment, and running the application server so it’s accessible to users. Jetpath’s flexibility allows you to deploy it across various platforms using Node.js, Deno, or Bun as the runtime.</p>
 <hr>
 <h2>General Considerations Before Deployment</h2>
 <p>Regardless of your target platform, consider these points:</p>
@@ -1322,7 +1322,7 @@
 <li>
 <p><strong>Build Step (TypeScript Compilation):</strong></p>
 <ul>
-<li>JetPath applications are typically written in TypeScript (<code>.jet.ts</code>, <code>.ts</code>).</li>
+<li>Jetpath applications are typically written in TypeScript (<code>.jet.ts</code>, <code>.ts</code>).</li>
 <li><strong>Node.js/Bun (often):</strong> You’ll usually need to compile your TypeScript code to JavaScript using <code>tsc</code> (based on your <code>tsconfig.json</code>) or Bun’s built-in bundler/transpiler before deployment. Your <code>server.ts</code> entry point will then run the compiled JavaScript output (e.g., <code>node dist/server.js</code>).</li>
 <li><strong>Deno:</strong> Deno can run TypeScript directly. You might still have a build step for bundling or type checking (<code>deno check server.ts</code>), but compilation to JS isn’t strictly necessary for running.</li>
 <li>Ensure your build output includes all necessary JavaScript files.</li>
@@ -1352,14 +1352,14 @@
 <li>
 <p><strong>Port Binding:</strong></p>
 <ul>
-<li>Your JetPath application listens on a port specified in the <code>JetPath</code> constructor (<code>port: 3000</code>) or potentially via an environment variable (e.g., <code>process.env.PORT</code>).</li>
+<li>Your Jetpath application listens on a port specified in the <code>Jetpath</code> constructor (<code>port: 3000</code>) or potentially via an environment variable (e.g., <code>process.env.PORT</code>).</li>
 <li>Most hosting platforms (PaaS, Containers) automatically route external traffic (on port 80/443) to the port your application listens on internally. Ensure your application respects the <code>PORT</code> environment variable if provided by the platform.</li>
 </ul>
 </li>
 <li>
 <p><strong>Static Files:</strong></p>
 <ul>
-<li>If your application serves static files (CSS, JS, images) using JetPath’s <code>static</code> option, ensure these files are included in your deployment package and the paths are configured correctly. Often, it’s more performant to serve static files directly via a reverse proxy (like Nginx) or a CDN.</li>
+<li>If your application serves static files (CSS, JS, images) using Jetpath’s <code>static</code> option, ensure these files are included in your deployment package and the paths are configured correctly. Often, it’s more performant to serve static files directly via a reverse proxy (like Nginx) or a CDN.</li>
 </ul>
 </li>
 </ol>
@@ -1379,7 +1379,7 @@
 <li>Set environment variables (e.g., using <code>.env</code> files with <code>dotenv</code> or system environment variables).</li>
 <li>Start your application server (e.g., <code>node dist/server.js</code>, <code>deno run --allow-net server.ts</code>, <code>bun run server.ts</code>).</li>
 <li><strong>(Recommended)</strong> Use a process manager (like PM2 for Node.js/Bun, or systemd for any runtime) to automatically restart your app if it crashes and manage logs.</li>
-<li><strong>(Recommended)</strong> Set up a reverse proxy (like Nginx or Caddy) in front of your JetPath app to handle TLS/SSL termination (HTTPS), load balancing (if running multiple instances), basic caching, and potentially serving static files directly.</li>
+<li><strong>(Recommended)</strong> Set up a reverse proxy (like Nginx or Caddy) in front of your Jetpath app to handle TLS/SSL termination (HTTPS), load balancing (if running multiple instances), basic caching, and potentially serving static files directly.</li>
 </ol>
 </li>
 </ul>
@@ -1395,7 +1395,7 @@
 <li>Copy <code>package.json</code>, <code>*.lockb</code>, <code>deno.json</code> etc. and install dependencies (<code>npm install --production</code>, <code>deno cache</code>, <code>bun install --production</code>). Use multi-stage builds to keep the final image small.</li>
 <li>Copy your application source code.</li>
 <li>Perform the build step if necessary (<code>RUN tsc</code> or <code>RUN bun build</code>).</li>
-<li>Expose the port your JetPath application listens on (<code>EXPOSE 3000</code>).</li>
+<li>Expose the port your Jetpath application listens on (<code>EXPOSE 3000</code>).</li>
 <li>Set the command to run your application (<code>CMD [&quot;node&quot;, &quot;dist/server.js&quot;]</code> or <code>CMD [&quot;deno&quot;, &quot;run&quot;, &quot;--allow-net&quot;, &quot;server.ts&quot;]</code> or <code>CMD [&quot;bun&quot;, &quot;run&quot;, &quot;server.ts&quot;]</code>).</li>
 </ul>
 </li>
@@ -1431,15 +1431,15 @@
 <li><strong>Platforms:</strong> AWS Lambda, Google Cloud Functions, Azure Functions, Cloudflare Workers.</li>
 <li><strong>Steps:</strong>
 <ol>
-<li><strong>Adapter/Wrapper:</strong> This is often the trickiest part. Serverless platforms have specific event formats. You typically need an <strong>adapter</strong> layer to translate the platform’s event into a standard <code>Request</code> object that JetPath can understand and convert JetPath’s response back into the format the platform expects. Look for official or community-provided adapters for running generic web frameworks (or specifically JetPath, if available) on your target serverless platform. Without an adapter, significant manual integration is required.</li>
-<li><strong>Packaging:</strong> Bundle your JetPath application code, dependencies (including the adapter), and any build output into a deployment package (e.g., a zip file).</li>
+<li><strong>Adapter/Wrapper:</strong> This is often the trickiest part. Serverless platforms have specific event formats. You typically need an <strong>adapter</strong> layer to translate the platform’s event into a standard <code>Request</code> object that Jetpath can understand and convert Jetpath’s response back into the format the platform expects. Look for official or community-provided adapters for running generic web frameworks (or specifically Jetpath, if available) on your target serverless platform. Without an adapter, significant manual integration is required.</li>
+<li><strong>Packaging:</strong> Bundle your Jetpath application code, dependencies (including the adapter), and any build output into a deployment package (e.g., a zip file).</li>
 <li><strong>Configuration:</strong> Define the function handler (pointing to the adapter’s entry point), memory allocation, timeout, and environment variables.</li>
 <li><strong>API Gateway:</strong> Configure an API Gateway service (like AWS API Gateway or Google Cloud API Gateway) to create an HTTP endpoint that triggers your serverless function.</li>
 </ol>
 </li>
 </ul>
 <hr>
-<h2>JetPath Specifics &amp; Recommendations</h2>
+<h2>Jetpath Specifics &amp; Recommendations</h2>
 <ul>
 <li><strong>Cross-Runtime:</strong> The main advantage is choosing the best platform <em>and</em> runtime combination for your needs. Docker and VMs offer the most flexibility here. PaaS support might vary depending on how well they support Deno and Bun compared to Node.js. Serverless often requires runtime-specific adapters.</li>
 <li><strong>Configuration:</strong> Rely heavily on environment variables for configuration across all deployment types.</li>
@@ -1451,7 +1451,7 @@
 <h2>Next Steps</h2>
 <ul>
 <li>Consult the documentation for your chosen <strong>hosting platform</strong> and <strong>runtime</strong> for detailed, platform-specific instructions.</li>
-<li>Review JetPath’s <a href="./configuration.md"><strong>Configuration</strong></a> options.</li>
+<li>Review Jetpath’s <a href="./configuration.md"><strong>Configuration</strong></a> options.</li>
 <li>Implement robust <a href="#observability"><strong>Logging</strong></a> for monitoring your deployed application. <em>(Assuming an Observability page exists)</em></li>
 </ul>
     </section>
@@ -1462,10 +1462,10 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">JetPath</div>
+          <div class="footer-logo">Jetpath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1473,7 +1473,7 @@
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1481,7 +1481,7 @@
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1489,7 +1489,7 @@
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -1513,7 +1513,7 @@
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank">GitHub</a></li>
             <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
             <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
             <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
@@ -1531,7 +1531,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2025 JetPath. All rights reserved.</p>
+        <p>&copy; 2025 Jetpath. All rights reserved.</p>
       </div>
     </div>
   </footer>

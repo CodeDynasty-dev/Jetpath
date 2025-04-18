@@ -2,7 +2,7 @@
   
 # Core Concepts: Context (`ctx`)
 
-The `Context` object, universally referred to as `ctx` in JetPath, is the central nervous system for handling individual HTTP requests within your application. It acts as a container for request data, a toolkit for crafting responses, an access point for framework features like plugins and validation, and a temporary state holder for the duration of a single request-response cycle. Understanding `ctx` is key to mastering JetPath.
+The `Context` object, universally referred to as `ctx` in Jetpath, is the central nervous system for handling individual HTTP requests within your application. It acts as a container for request data, a toolkit for crafting responses, an access point for framework features like plugins and validation, and a temporary state holder for the duration of a single request-response cycle. Understanding `ctx` is key to mastering Jetpath.
 
 ---
 
@@ -224,7 +224,7 @@ Methods returning `never` indicate they terminate the request flow.
 
 ### `eject(): never`
 
-  * **Description:** Disconnects JetPath's automatic response handling. Use this advanced feature only when you need full manual control over the response stream, often for integrating with libraries that directly pipe to the underlying response (like older versions of `busboy` on Node.js). After `eject()`, JetPath will *not* send any response automatically; your code is entirely responsible.
+  * **Description:** Disconnects Jetpath's automatic response handling. Use this advanced feature only when you need full manual control over the response stream, often for integrating with libraries that directly pipe to the underlying response (like older versions of `busboy` on Node.js). After `eject()`, Jetpath will *not* send any response automatically; your code is entirely responsible.
   * **Example:** *(Refer to specific streaming library documentation for usage after ejecting)*
 
 ### `validate(dataOrSchema?: any): YourValidatedType`
@@ -272,7 +272,7 @@ Methods returning `never` indicate they terminate the request flow.
 
 ### `sendResponse(response?: Response): never`
 
-  * **Description:** Sends a raw Web Standard `Response` object directly. Bypasses JetPath's content negotiation and serialization. Useful for maximal control, especially in Deno/Bun.
+  * **Description:** Sends a raw Web Standard `Response` object directly. Bypasses Jetpath's content negotiation and serialization. Useful for maximal control, especially in Deno/Bun.
   * **Example:**
     ```typescript
     // const headers = new Headers({ 'Cache-Control': 'no-store' });
@@ -290,7 +290,7 @@ Methods returning `never` indicate they terminate the request flow.
     ```
   * **Example 2: Sending HTML**
     ```typescript
-    const html = "<h1>Hello from JetPath!</h1>";
+    const html = "<h1>Hello from Jetpath!</h1>";
     ctx.send(html, "text/html");
     // -> Content-Type: text/html
     ```
@@ -363,7 +363,7 @@ Methods returning `never` indicate they terminate the request flow.
     ```typescript
     ctx.set("Content-Language", "en-US");
     ctx.set("Cache-Control", "public, max-age=3600");
-    ctx.set("X-Powered-By", "JetPath"); // Add a custom header
+    ctx.set("X-Powered-By", "Jetpath"); // Add a custom header
     ```
     *[cite: tests/app.jet.ts (used for X-Request-ID, WWW-Authenticate etc.)]*
 

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JetPath - Blazing Fast Backend Framework</title>
+  <title>Jetpath - Blazing Fast Backend Framework</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -409,7 +409,7 @@
       flex-grow: 1;
     }
 
-    /* Why JetPath Section */
+    /* Why Jetpath Section */
     .why-jetpath {
       background: linear-gradient(to bottom, var(--dark), var(--dark-light));
     }
@@ -1119,13 +1119,13 @@
       <div class="flex w-full justify-between">
 
         <div class="logo-container">
-          <a href="/" title="JetPath" class="logo">
+          <a href="/" title="Jetpath" class="logo">
             <div class="flex gap-1">
               <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
-          <span class="logo-text">JetPath</span>
+          <span class="logo-text">Jetpath</span>
         </a>
       </div>
         <button class="mobile-menu-btn">
@@ -1154,7 +1154,7 @@
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
         <a href="/docs/performance" class="nav-link">Performance</a>
         <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
-        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
     </div>
@@ -1314,7 +1314,7 @@
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>Core Concepts: Middleware</h1>
-<p>Middleware functions are a fundamental part of building applications with JetPath. They allow you to execute code <strong>before</strong> your route handler runs and <strong>after</strong> it completes, enabling you to implement cross-cutting concerns like logging, authentication, data validation, error handling, and response formatting in a clean, reusable way.</p>
+<p>Middleware functions are a fundamental part of building applications with Jetpath. They allow you to execute code <strong>before</strong> your route handler runs and <strong>after</strong> it completes, enabling you to implement cross-cutting concerns like logging, authentication, data validation, error handling, and response formatting in a clean, reusable way.</p>
 <hr>
 <h2>What is Middleware?</h2>
 <p>Think of middleware as functions that sit in the middle of the request-response cycle. They can:</p>
@@ -1327,9 +1327,9 @@
 </ul>
 <hr>
 <h2>Defining Middleware</h2>
-<p>In JetPath, middleware is typically defined by exporting a special function named <code>MIDDLEWARE_</code> from a <code>.jet.ts</code> file.</p>
+<p>In Jetpath, middleware is typically defined by exporting a special function named <code>MIDDLEWARE_</code> from a <code>.jet.ts</code> file.</p>
 <ul>
-<li><strong>Structure:</strong> A JetPath middleware function takes the <code>ctx</code> (Context) object as its argument and <strong>must return another function</strong>. This inner function represents the post-handler logic and receives <code>ctx</code> and an optional <code>err</code> object.</li>
+<li><strong>Structure:</strong> A Jetpath middleware function takes the <code>ctx</code> (Context) object as its argument and <strong>must return another function</strong>. This inner function represents the post-handler logic and receives <code>ctx</code> and an optional <code>err</code> object.</li>
 </ul>
 <pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-keyword">type</span> <span class="hljs-title class_">JetMiddleware</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">JetContext</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
 <p><span class="hljs-comment">// Define expected types for plugins if used in middleware</span>
@@ -1419,7 +1419,7 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
 <hr>
 <h2>Execution Flow &amp; Order</h2>
 <ol>
-<li>JetPath matches the incoming request to a route handler.</li>
+<li>Jetpath matches the incoming request to a route handler.</li>
 <li>The <strong>pre-handler</strong> section of the most relevant <code>MIDDLEWARE_</code> function executes. <em>(See Scoping below)</em>.</li>
 <li><strong>(If not ended early)</strong> The route handler function executes.</li>
 <li>The <strong>post-handler</strong> section (the returned function) of the <code>MIDDLEWARE_</code> function executes, receiving the context and any error that occurred.</li>
@@ -1427,11 +1427,11 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
 <p>If multiple middleware functions apply (e.g., global and folder-level - see Scoping), the pre-handler sections execute from general to specific, and the post-handler sections execute in the reverse order (specific to general).</p>
 <hr>
 <h2>Scoping Middleware</h2>
-<p><em>(Note: The provided example <code>tests/app.jet.ts</code> only explicitly shows a global middleware defined in the main app file. The following describes common patterns for scoping in file-based frameworks, which JetPath might implement or could adopt.)</em></p>
+<p><em>(Note: The provided example <code>tests/app.jet.ts</code> only explicitly shows a global middleware defined in the main app file. The following describes common patterns for scoping in file-based frameworks, which Jetpath might implement or could adopt.)</em></p>
 <p>Middleware can potentially be scoped to apply globally or only to specific parts of your API:</p>
 <ul>
 <li><strong>Global Middleware:</strong> Defining <code>MIDDLEWARE_</code> in your main application entry file (<code>app.jet.ts</code> in the example) or the root <code>src/index.jet.ts</code> likely applies it to <em>all</em> incoming requests.</li>
-<li><strong>Directory/Layout Middleware (Potential Pattern):</strong> Frameworks often allow defining middleware in special files within subdirectories (e.g., <code>src/admin/_middleware.jet.ts</code> or <code>src/admin/_layout.jet.ts</code>). Such middleware would apply only to routes defined within that directory and its subdirectories, executing after global middleware but before the specific route handler. This allows applying specific logic (like admin authentication checks) only where needed. <em>[Confirmation needed from JetPath specifics if this pattern is supported].</em></li>
+<li><strong>Directory/Layout Middleware (Potential Pattern):</strong> Frameworks often allow defining middleware in special files within subdirectories (e.g., <code>src/admin/_middleware.jet.ts</code> or <code>src/admin/_layout.jet.ts</code>). Such middleware would apply only to routes defined within that directory and its subdirectories, executing after global middleware but before the specific route handler. This allows applying specific logic (like admin authentication checks) only where needed. <em>[Confirmation needed from Jetpath specifics if this pattern is supported].</em></li>
 </ul>
 <hr>
 <h2>Common Use Cases</h2>
@@ -1483,10 +1483,10 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">JetPath</div>
+          <div class="footer-logo">Jetpath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1494,7 +1494,7 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1502,7 +1502,7 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1510,7 +1510,7 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -1534,7 +1534,7 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank">GitHub</a></li>
             <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
             <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
             <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
@@ -1552,7 +1552,7 @@ ctx.&lt;span class=&quot;hljs-title function_&quot;&gt;set&lt;/span&gt;(&lt;span
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2025 JetPath. All rights reserved.</p>
+        <p>&copy; 2025 Jetpath. All rights reserved.</p>
       </div>
     </div>
   </footer>

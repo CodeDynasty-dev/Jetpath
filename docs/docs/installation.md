@@ -3,7 +3,7 @@
 
 # Installation
 
-Get ready to build universal JavaScript backends! Installing JetPath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.
+Get ready to build universal JavaScript backends! Installing Jetpath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.
 
 ---
 
@@ -15,7 +15,7 @@ Before you begin, ensure you have the following installed:
     * **Node.js:** Version 18.x or later recommended. ([Download Node.js](https://nodejs.org/))
     * **Deno:** Version 1.30 or later recommended. ([Install Deno](https://deno.land/manual/getting_started/installation))
     * **Bun:** Version 1.0 or later recommended. ([Install Bun](https://bun.sh/docs/installation))
-2.  **TypeScript:** JetPath is built with TypeScript and provides first-class typing support. While you can use it with JavaScript, TypeScript is highly recommended for the best experience.
+2.  **TypeScript:** Jetpath is built with TypeScript and provides first-class typing support. While you can use it with JavaScript, TypeScript is highly recommended for the best experience.
     ```bash
     npm install -g typescript # Or use the version included with Deno/Bun
     ```
@@ -29,7 +29,7 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## Installing JetPath
+## Installing Jetpath
 
 Choose the installation method corresponding to your primary development runtime.
 
@@ -60,11 +60,11 @@ pnpm add zod
 
 ### 2\. For Deno
 
-Deno typically uses direct URL imports. Add JetPath as a dependency in your `deno.json` or `jsr.json` file, or import it directly.
+Deno typically uses direct URL imports. Add Jetpath as a dependency in your `deno.json` or `jsr.json` file, or import it directly.
 
 **(Option A - Using `deno.json` / `jsr.json`)**
 
-Add JetPath and your schema library to your import map or dependency list (replace with actual URLs/versions when available):
+Add Jetpath and your schema library to your import map or dependency list (replace with actual URLs/versions when available):
 
 ```jsonc
 // deno.json (example using import map)
@@ -84,10 +84,10 @@ Add JetPath and your schema library to your import map or dependency list (repla
 Import directly in your TypeScript files (replace with actual URLs when available):
 
 ```typescript
-import { JetPath } from "jsr:@jetpath/jetpath@^0.1.0"; // Example JSR
+import { Jetpath } from "jsr:@jetpath/jetpath@^0.1.0"; // Example JSR
 import { z } from "npm:zod@^3.23.0"; // Example npm specifier
 // OR
-// import { JetPath } from "[https://deno.land/x/jetpath@v0.1.0/mod.ts](https://deno.land/x/jetpath@v0.1.0/mod.ts)";
+// import { Jetpath } from "[https://deno.land/x/jetpath@v0.1.0/mod.ts](https://deno.land/x/jetpath@v0.1.0/mod.ts)";
 // import { z } from "[https://deno.land/x/zod@v3.23.0/mod.ts](https://deno.land/x/zod@v3.23.0/mod.ts)";
 ```
 
@@ -117,9 +117,9 @@ A common structure looks like this:
 
 ```
 your-project/
-├── src/              # Your JetPath route handlers (.jet.ts files)
+├── src/              # Your Jetpath route handlers (.jet.ts files)
 │   └── index.jet.ts  # Maps to "/"
-├── server.ts         # Your main server entry point (initializes JetPath)
+├── server.ts         # Your main server entry point (initializes Jetpath)
 ├── node_modules/     # (Node.js/Bun)
 ├── package.json      # (Node.js/Bun)
 ├── bun.lockb         # (Bun)
@@ -168,14 +168,14 @@ Create a `tsconfig.json` file in your project root. A good starting point:
 2.  Run your `server.ts` file using your chosen runtime (node, deno run, bun run).
 3.  Visit `http://localhost:3000` (or your configured port) in your browser. You should see the welcome message from your root route.
 
-If you see the welcome message, JetPath is installed and configured correctly\!
+If you see the welcome message, Jetpath is installed and configured correctly\!
 
 -----
 
 ## Next Steps
 
   * **Quick Start:** Build your first simple API following the [**Quick Start**](https://www.google.com/search?q=./quick-start.md) guide.
-  * **Core Concepts:** Dive deeper into how JetPath works by reading the [**Core Concepts**](https://www.google.com/search?q=./core-concepts/routing.md).
+  * **Core Concepts:** Dive deeper into how Jetpath works by reading the [**Core Concepts**](https://www.google.com/search?q=./core-concepts/routing.md).
  
  
 

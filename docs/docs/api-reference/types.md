@@ -1,12 +1,12 @@
 <docmach type="wrapper" file="doc-fragments/docs.html" replacement="content">
   # API Reference: Types
 
-This section provides references for core types used within the JetPath framework, as observed in usage examples. For precise definitions, refer to the JetPath source code.
+This section provides references for core types used within the Jetpath framework, as observed in usage examples. For precise definitions, refer to the Jetpath source code.
 
 ## `JetFunc<JetData = any, JetPluginTypes = any>`
 
 * **Type:** Function Signature
-* **Description:** Represents the expected signature for a JetPath route handler function (exported with names like `GET_`, `POST_something`, `WS_live`).
+* **Description:** Represents the expected signature for a Jetpath route handler function (exported with names like `GET_`, `POST_something`, `WS_live`).
 * **Signature (Conceptual):**
     ```typescript
     type JetFunc<JetData = any, JetPluginTypes = any> =
@@ -40,7 +40,7 @@ This section provides references for core types used within the JetPath framewor
 ## `JetMiddleware<AppState = {}, JetPluginTypes = any>`
 
 * **Type:** Function Signature
-* **Description:** Represents the expected signature for a JetPath middleware function (exported as `MIDDLEWARE_`). It receives the context and returns a post-handler function.
+* **Description:** Represents the expected signature for a Jetpath middleware function (exported as `MIDDLEWARE_`). It receives the context and returns a post-handler function.
 * **Signature (Conceptual):**
     ```typescript
     type JetMiddleware<AppState = {}, JetPluginTypes = any> =
@@ -74,11 +74,11 @@ This section provides references for core types used within the JetPath framewor
 * **Type:** Interface / Object
 * **Description:** The main context object passed to handlers and middleware. See the dedicated [**API Reference: Context**](./context.md) page for full details.
 
-## `JetPath`
+## `Jetpath`
 
 * **Type:** Class
-* **Description:** The main class used to create and configure a JetPath application instance.
-* **Constructor:** `new JetPath(options: JetPathOptions)`
+* **Description:** The main class used to create and configure a Jetpath application instance.
+* **Constructor:** `new Jetpath(options: JetPathOptions)`
 * **Key Options (`JetPathOptions` - based on example):**
     * `source: string`: **Required.** Path to the directory containing route handler files (`.jet.ts`).
     * `port?: number`: Port number to listen on (default typically 3000 or 8000).
@@ -93,10 +93,10 @@ This section provides references for core types used within the JetPath framewor
     * `listen(callback?: () => void)`: Starts the HTTP server.
 * **Example:**
     ```typescript
-    import { JetPath } from "jetpath";
+    import { Jetpath } from "jetpath";
     import { myPlugin } from "./plugins";
 
-    const app = new JetPath({
+    const app = new Jetpath({
         source: "./src",
         port: 9000,
         apiDoc: { name: "My API", info: "Docs..." },
@@ -111,7 +111,7 @@ This section provides references for core types used within the JetPath framewor
 ## `JetPlugin`
 
 * **Type:** Class
-* **Description:** The class used to structure plugins for JetPath.
+* **Description:** The class used to structure plugins for Jetpath.
 * **Constructor:** `new JetPlugin({ executor: () => Promise<PluginAPI> | PluginAPI })`
 * **Options:**
     * `executor: () => Promise<PluginAPI> | PluginAPI`: **Required.** A function that runs when the plugin is registered via `app.use()`. It performs initialization and **must return an object**. The properties/methods of the returned object become the plugin's public API, accessible via `ctx.plugins`. Can be `async`.

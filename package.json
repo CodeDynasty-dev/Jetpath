@@ -1,7 +1,7 @@
 {
   "name": "jetpath",
   "version": "1.6.11",
-  "description": "JetPath - A fast, seamless and minimalist framework for Node, Deno and Bun.js. Embrace the speed and elegance of the next-gen server-side experience.",
+  "description": "Jetpath - A fast, seamless and minimalist framework for Node, Deno and Bun.js. Embrace the speed and elegance of the next-gen server-side experience.",
   "main": "dist/index.js",
   "type": "module",
   "files": [

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JetPath - Blazing Fast Backend Framework</title>
+  <title>Jetpath - Blazing Fast Backend Framework</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -409,7 +409,7 @@
       flex-grow: 1;
     }
 
-    /* Why JetPath Section */
+    /* Why Jetpath Section */
     .why-jetpath {
       background: linear-gradient(to bottom, var(--dark), var(--dark-light));
     }
@@ -1119,13 +1119,13 @@
       <div class="flex w-full justify-between">
 
         <div class="logo-container">
-          <a href="/" title="JetPath" class="logo">
+          <a href="/" title="Jetpath" class="logo">
             <div class="flex gap-1">
               <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
-          <span class="logo-text">JetPath</span>
+          <span class="logo-text">Jetpath</span>
         </a>
       </div>
         <button class="mobile-menu-btn">
@@ -1154,7 +1154,7 @@
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
         <a href="/docs/performance" class="nav-link">Performance</a>
         <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
-        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
     </div>
@@ -1314,11 +1314,11 @@
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>API Reference: Types</h1>
-<p>This section provides references for core types used within the JetPath framework, as observed in usage examples. For precise definitions, refer to the JetPath source code.</p>
+<p>This section provides references for core types used within the Jetpath framework, as observed in usage examples. For precise definitions, refer to the Jetpath source code.</p>
 <h2><code>JetFunc&lt;JetData = any, JetPluginTypes = any&gt;</code></h2>
 <ul>
 <li><strong>Type:</strong> Function Signature</li>
-<li><strong>Description:</strong> Represents the expected signature for a JetPath route handler function (exported with names like <code>GET_</code>, <code>POST_something</code>, <code>WS_live</code>).</li>
+<li><strong>Description:</strong> Represents the expected signature for a Jetpath route handler function (exported with names like <code>GET_</code>, <code>POST_something</code>, <code>WS_live</code>).</li>
 <li><strong>Signature (Conceptual):</strong><pre><code class="language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">JetFunc</span>&lt;<span class="hljs-title class_">JetData</span> = <span class="hljs-built_in">any</span>, <span class="hljs-title class_">JetPluginTypes</span> = <span class="hljs-built_in">any</span>&gt; =
   <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">ctx</span>: <span class="hljs-title class_">JetContext</span>&lt;<span class="hljs-title class_">JetData</span>, <span class="hljs-title class_">JetPluginTypes</span>&gt;</span>) =&gt;</span> <span class="hljs-built_in">void</span> | <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
 </code></pre>
@@ -1349,7 +1349,7 @@ ctx.<span class="hljs-title function_">send</span>(<span class="hljs-string">&qu
 <h2><code>JetMiddleware&lt;AppState = {}, JetPluginTypes = any&gt;</code></h2>
 <ul>
 <li><strong>Type:</strong> Function Signature</li>
-<li><strong>Description:</strong> Represents the expected signature for a JetPath middleware function (exported as <code>MIDDLEWARE_</code>). It receives the context and returns a post-handler function.</li>
+<li><strong>Description:</strong> Represents the expected signature for a Jetpath middleware function (exported as <code>MIDDLEWARE_</code>). It receives the context and returns a post-handler function.</li>
 <li><strong>Signature (Conceptual):</strong><pre><code class="language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">JetMiddleware</span>&lt;<span class="hljs-title class_">AppState</span> = {}, <span class="hljs-title class_">JetPluginTypes</span> = <span class="hljs-built_in">any</span>&gt; =
   <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">ctx</span>: <span class="hljs-title class_">JetContext</span>&lt;<span class="hljs-title class_">AppState</span>, <span class="hljs-title class_">JetPluginTypes</span>&gt;</span>) =&gt;</span>
     <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">ctx</span>: <span class="hljs-title class_">JetContext</span>&lt;<span class="hljs-title class_">AppState</span>, <span class="hljs-title class_">JetPluginTypes</span>&gt;, <span class="hljs-attr">err</span>?: <span class="hljs-title class_">Error</span></span>) =&gt;</span> <span class="hljs-built_in">void</span> | <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
@@ -1381,11 +1381,11 @@ ctx.<span class="hljs-title function_">send</span>(<span class="hljs-string">&qu
 <li><strong>Type:</strong> Interface / Object</li>
 <li><strong>Description:</strong> The main context object passed to handlers and middleware. See the dedicated <a href="./context.md"><strong>API Reference: Context</strong></a> page for full details.</li>
 </ul>
-<h2><code>JetPath</code></h2>
+<h2><code>Jetpath</code></h2>
 <ul>
 <li><strong>Type:</strong> Class</li>
-<li><strong>Description:</strong> The main class used to create and configure a JetPath application instance.</li>
-<li><strong>Constructor:</strong> <code>new JetPath(options: JetPathOptions)</code></li>
+<li><strong>Description:</strong> The main class used to create and configure a Jetpath application instance.</li>
+<li><strong>Constructor:</strong> <code>new Jetpath(options: JetPathOptions)</code></li>
 <li><strong>Key Options (<code>JetPathOptions</code> - based on example):</strong>
 <ul>
 <li><code>source: string</code>: <strong>Required.</strong> Path to the directory containing route handler files (<code>.jet.ts</code>).</li>
@@ -1404,9 +1404,9 @@ ctx.<span class="hljs-title function_">send</span>(<span class="hljs-string">&qu
 <li><code>listen(callback?: () =&gt; void)</code>: Starts the HTTP server.</li>
 </ul>
 </li>
-<li><strong>Example:</strong><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
+<li><strong>Example:</strong><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Jetpath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
 <span class="hljs-keyword">import</span> { myPlugin } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./plugins&quot;</span>;
-<p><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
+<p><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Jetpath</span>({
 <span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>,
 <span class="hljs-attr">port</span>: <span class="hljs-number">9000</span>,
 <span class="hljs-attr">apiDoc</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;My API&quot;</span>, <span class="hljs-attr">info</span>: <span class="hljs-string">&quot;Docs…&quot;</span> },
@@ -1420,7 +1420,7 @@ app.<span class="hljs-title function_">listen</span>(<span class="hljs-function"
 <h2><code>JetPlugin</code></h2>
 <ul>
 <li><strong>Type:</strong> Class</li>
-<li><strong>Description:</strong> The class used to structure plugins for JetPath.</li>
+<li><strong>Description:</strong> The class used to structure plugins for Jetpath.</li>
 <li><strong>Constructor:</strong> <code>new JetPlugin({ executor: () =&gt; Promise&lt;PluginAPI&gt; | PluginAPI })</code></li>
 <li><strong>Options:</strong>
 <ul>
@@ -1452,10 +1452,10 @@ app.<span class="hljs-title function_">listen</span>(<span class="hljs-function"
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">JetPath</div>
+          <div class="footer-logo">Jetpath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1463,7 +1463,7 @@ app.<span class="hljs-title function_">listen</span>(<span class="hljs-function"
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1471,7 +1471,7 @@ app.<span class="hljs-title function_">listen</span>(<span class="hljs-function"
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1479,7 +1479,7 @@ app.<span class="hljs-title function_">listen</span>(<span class="hljs-function"
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -1503,7 +1503,7 @@ app.<span class="hljs-title function_">listen</span>(<span class="hljs-function"
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank">GitHub</a></li>
             <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
             <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
             <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
@@ -1521,7 +1521,7 @@ app.<span class="hljs-title function_">listen</span>(<span class="hljs-function"
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2025 JetPath. All rights reserved.</p>
+        <p>&copy; 2025 Jetpath. All rights reserved.</p>
       </div>
     </div>
   </footer>

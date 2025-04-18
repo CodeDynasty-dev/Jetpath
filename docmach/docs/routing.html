@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JetPath - Blazing Fast Backend Framework</title>
+  <title>Jetpath - Blazing Fast Backend Framework</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -409,7 +409,7 @@
       flex-grow: 1;
     }
 
-    /* Why JetPath Section */
+    /* Why Jetpath Section */
     .why-jetpath {
       background: linear-gradient(to bottom, var(--dark), var(--dark-light));
     }
@@ -1119,13 +1119,13 @@
       <div class="flex w-full justify-between">
 
         <div class="logo-container">
-          <a href="/" title="JetPath" class="logo">
+          <a href="/" title="Jetpath" class="logo">
             <div class="flex gap-1">
               <img src="/icon-transparent.webp" class="h-[88px]" alt="">
           </div>
         </a>
         <a href="/" class="logo">
-          <span class="logo-text">JetPath</span>
+          <span class="logo-text">Jetpath</span>
         </a>
       </div>
         <button class="mobile-menu-btn">
@@ -1154,7 +1154,7 @@
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
         <a href="/docs/performance" class="nav-link">Performance</a>
         <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
-        <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="btn btn-outline">GitHub</a>
+        <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
     </div>
@@ -1314,15 +1314,15 @@
     </script>
     <section class="max-w-4xl mx-auto my-8 mt-[15rem]" >
       <h1>Core Concepts: Routing</h1>
-<p>Routing in JetPath is designed to be intuitive and fast, primarily relying on <strong>convention over configuration</strong> through a <strong>file-based system</strong>. This means your project’s file structure and how you name your exported functions directly determine your API endpoints.</p>
+<p>Routing in Jetpath is designed to be intuitive and fast, primarily relying on <strong>convention over configuration</strong> through a <strong>file-based system</strong>. This means your project’s file structure and how you name your exported functions directly determine your API endpoints.</p>
 <hr>
 <h2>Key Concepts</h2>
 <h3>1. Source Directory</h3>
-<p>When you initialize JetPath, you specify a <code>source</code> directory. JetPath watches this directory for <code>.jet.ts</code> files containing your route handlers.</p>
+<p>When you initialize Jetpath, you specify a <code>source</code> directory. Jetpath watches this directory for <code>.jet.ts</code> files containing your route handlers.</p>
 <pre><code class="language-typescript"><span class="hljs-comment">// server.ts</span>
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">JetPath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
-<p><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JetPath</span>({
-<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>, <span class="hljs-comment">// JetPath looks for routes inside the 'src' folder</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Jetpath</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;jetpath&quot;</span>;
+<p><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Jetpath</span>({
+<span class="hljs-attr">source</span>: <span class="hljs-string">&quot;./src&quot;</span>, <span class="hljs-comment">// Jetpath looks for routes inside the 'src' folder</span>
 <span class="hljs-comment">// … other options</span>
 });</p>
 <p>app.<span class="hljs-title function_">listen</span>();
@@ -1337,7 +1337,7 @@
 <li><code>src/auth/login.jet.ts</code> maps to <code>/auth/login</code></li>
 </ul>
 <h3>3. Handler Files (<code>.jet.ts</code>)</h3>
-<p>Files ending with <code>.jet.ts</code> are scanned by JetPath for exported functions that define route handlers. Other <code>.ts</code> or <code>.js</code> files in the <code>source</code> directory are ignored for routing purposes (but can still be imported by your handlers).</p>
+<p>Files ending with <code>.jet.ts</code> are scanned by Jetpath for exported functions that define route handlers. Other <code>.ts</code> or <code>.js</code> files in the <code>source</code> directory are ignored for routing purposes (but can still be imported by your handlers).</p>
 <h3>4. Export Naming Convention</h3>
 <p>The core convention lies in the names of the <strong>exported functions</strong> within your <code>.jet.ts</code> files.</p>
 <ul>
@@ -1424,7 +1424,7 @@
 <span class="hljs-comment">// The matched part &#x27;*&#x27; would be available in ctx.params._ (or similar TBC)</span>
 </code></pre>
 </li>
-<li>The matched path segments are typically available under a special parameter like <code>ctx.params._</code> or <code>ctx.params.slug</code>. <em>(Note: The exact property name for the catch-all parameter should be confirmed from JetPath’s implementation details or core documentation).</em></li>
+<li>The matched path segments are typically available under a special parameter like <code>ctx.params._</code> or <code>ctx.params.slug</code>. <em>(Note: The exact property name for the catch-all parameter should be confirmed from Jetpath’s implementation details or core documentation).</em></li>
 </ul>
 <h3>8. WebSocket Routes (<code>WS_</code>)</h3>
 <p>Define WebSocket handlers using the <code>WS_</code> prefix in the export name.</p>
@@ -1438,7 +1438,7 @@
 </code></pre>
 <hr>
 <h2>Route Precedence</h2>
-<p>JetPath follows standard routing precedence rules:</p>
+<p>Jetpath follows standard routing precedence rules:</p>
 <ol>
 <li><strong>Static routes</strong> (e.g., <code>/pets/search</code>) are matched before dynamic routes (<code>/pets/:id</code>).</li>
 <li><strong>More specific dynamic routes</strong> (e.g., <code>/pets/by/:id</code>) are matched before catch-all routes (<code>/pets/search/$</code>).</li>
@@ -1466,7 +1466,7 @@
 });
 </code></pre></p>
 <h3>Programmatic Routing</h3>
-<p><em>(This section would detail any API provided by JetPath for adding routes programmatically via <code>app.addRoute(...)</code> or similar, if available. This is useful for dynamic route generation or plugin integrations.)</em></p>
+<p><em>(This section would detail any API provided by Jetpath for adding routes programmatically via <code>app.addRoute(...)</code> or similar, if available. This is useful for dynamic route generation or plugin integrations.)</em></p>
 <hr>
 <h2>Next Steps</h2>
 <ul>
@@ -1481,10 +1481,10 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">JetPath</div>
+          <div class="footer-logo">Jetpath</div>
           <p class="footer-tagline">the granular, fast and minimalist framework for Node, Deno and Bun. Embrace new standards!</p>
           <div class="footer-social">
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1492,7 +1492,7 @@
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -1500,7 +1500,7 @@
                 </path>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -1508,7 +1508,7 @@
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank" class="footer-social-link">
+            <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -1532,7 +1532,7 @@
         <div class="footer-links-group">
           <h4 class="footer-heading">Community</h4>
           <ul class="footer-links">
-            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/JetPath" target="_blank">GitHub</a></li>
+            <li class="footer-link"><a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank">GitHub</a></li>
             <li class="footer-link"><a href="https://discord.com/invite/CodeDynasty" target="_blank">Discord</a></li>
             <li class="footer-link"><a href="https://twitter.com/CodeDynastyDev" target="_blank">Twitter</a></li>
             <li class="footer-link"><a href="https://blog.coddynasty.com" target="_blank">Blog</a></li>
@@ -1550,7 +1550,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2025 JetPath. All rights reserved.</p>
+        <p>&copy; 2025 Jetpath. All rights reserved.</p>
       </div>
     </div>
   </footer>

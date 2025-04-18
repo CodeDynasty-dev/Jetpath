@@ -1,13 +1,13 @@
 /**
- * PetShop API - A comprehensive demonstration of JetPath framework capabilities
+ * PetShop API - A comprehensive demonstration of Jetpath framework capabilities
  * 
- * This application showcases best practices for building robust APIs with JetPath,
+ * This application showcases best practices for building robust APIs with Jetpath,
  * including proper error handling, validation, authentication, logging, 
  * file uploads, real-time communication, and more.
  */
 import { writeFile } from "node:fs/promises";
 import {
-  JetPath,
+  Jetpath,
   JetPathErrors,
   type JetFunc,
   type JetMiddleware,
@@ -24,7 +24,7 @@ import { resolve } from "node:path";
  * The configuration includes API documentation settings, server configuration,
  * static file serving, and global headers that will be applied to all responses.
  */
-const app = new JetPath({
+const app = new Jetpath({
   apiDoc: {
     name: "PetShop API",
     info: `

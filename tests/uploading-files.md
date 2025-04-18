@@ -1,4 +1,4 @@
-uploading files with JetPath
+uploading files with Jetpath
 
 ## Node
 

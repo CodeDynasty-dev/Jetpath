@@ -1,8 +1,8 @@
 <docmach type="wrapper" file="doc-fragments/docs.html" replacement="content">
 
-# Extending JetPath: Plugins
+# Extending Jetpath: Plugins
 
-Plugins are the primary way to extend JetPath's core functionality, promote code reuse, and encapsulate complex or shared logic, such as authentication, database interactions, file handling, logging, or connections to third-party services.
+Plugins are the primary way to extend Jetpath's core functionality, promote code reuse, and encapsulate complex or shared logic, such as authentication, database interactions, file handling, logging, or connections to third-party services.
 
 ---
 
@@ -18,7 +18,7 @@ Think of plugins as self-contained modules that can:
 
 ## Using Plugins
 
-Integrating existing plugins (whether official JetPath plugins or community-created ones) is straightforward.
+Integrating existing plugins (whether official Jetpath plugins or community-created ones) is straightforward.
 
 ### 1. Installation
 
@@ -34,16 +34,16 @@ bun add @jetpath/plugin-busboy
 
 ### 2\. Registration
 
-Instantiate the plugin (if necessary, passing configuration options) and register it with your JetPath application instance using `app.use()`. Registration typically happens in your main server file (`server.ts`).
+Instantiate the plugin (if necessary, passing configuration options) and register it with your Jetpath application instance using `app.use()`. Registration typically happens in your main server file (`server.ts`).
 
 ```typescript
 // server.ts
-import { JetPath } from "jetpath";
+import { Jetpath } from "jetpath";
 // Assuming jetbusboy is the exported plugin factory/instance
 import { jetbusboy } from "@jetpath/plugin-busboy";
 import { createAuthPlugin } from "./plugins/authPlugin"; // Your custom auth plugin
 
-const app = new JetPath({ source: "./src" });
+const app = new Jetpath({ source: "./src" });
 
 // Instantiate and register plugins
 // Official plugin for multipart/form-data handling
@@ -103,7 +103,7 @@ Creating your own plugins allows you to structure reusable logic cleanly.
 
 ### The `JetPlugin` Class
 
-JetPath provides a `JetPlugin` class (or a similar constructor pattern) to structure your plugin.
+Jetpath provides a `JetPlugin` class (or a similar constructor pattern) to structure your plugin.
 
 ```typescript
 import { JetPlugin } from "jetpath";
@@ -219,7 +219,7 @@ export function createAuthPlugin(options: AuthPluginOptions): JetPlugin {
 
   * **Instantiation:** You create an instance of your plugin, potentially passing configuration options.
   * **Registration:** You call `app.use(pluginInstance)`.
-  * **Execution:** The plugin's `executor` function runs during the `app.use()` call. Any asynchronous operations within the `executor` should complete before the server starts fully listening or handling requests (depending on JetPath's internal handling, usually `app.listen` awaits plugin initialization implicitly or explicitly).
+  * **Execution:** The plugin's `executor` function runs during the `app.use()` call. Any asynchronous operations within the `executor` should complete before the server starts fully listening or handling requests (depending on Jetpath's internal handling, usually `app.listen` awaits plugin initialization implicitly or explicitly).
   * **Runtime:** The methods returned by the `executor` are available on `ctx.plugins` for every incoming request handled after the plugin was registered.
 
 -----

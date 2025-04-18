@@ -205,14 +205,14 @@ export const UTILS = {
     let server_else;
     if (UTILS.runtime["node"]) {
       server = createServer((x: any, y: any) => {
-        JetPath(x, y);
+        Jetpath(x, y);
       });
     }
     if (UTILS.runtime["deno"]) {
       server = {
         listen(port: number) {
           // @ts-expect-error
-          server_else = Deno.serve({ port: port }, JetPath);
+          server_else = Deno.serve({ port: port }, Jetpath);
         },
         edge: false,
       };
@@ -225,7 +225,7 @@ export const UTILS = {
             server_else = Bun.serve({
               port,
               // @ts-expect-error
-              fetch: JetPath,
+              fetch: Jetpath,
               websocket: {
                 message(...p) {
                   p[1] = {
@@ -254,7 +254,7 @@ export const UTILS = {
             server_else = Bun.serve({
               port,
               // @ts-expect-error
-              fetch: JetPath,
+              fetch: Jetpath,
             });
           },
           edge: false,
@@ -276,7 +276,7 @@ export const UTILS = {
           server: (!UTILS.runtime["node"] ? server_else! : server!) as any,
           runtime: UTILS.runtime as any,
           routesObject: _JetPath_paths,
-          JetPath_app: JetPath as any,
+          JetPath_app: Jetpath as any,
         });
         Object.assign(decorations, decs);
         //? setting the jet server from the plugin
@@ -293,7 +293,7 @@ export const UTILS = {
         server: !UTILS.runtime["node"] ? server_else! : server!,
         runtime: UTILS.runtime as any,
         routesObject: _JetPath_paths,
-        JetPath_app: JetPath as any,
+        JetPath_app: Jetpath as any,
       });
       Object.assign(decorations, decs);
     }
@@ -403,7 +403,7 @@ const createResponse = (
   return undefined;
 };
 
-const JetPath = async (
+const Jetpath = async (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
@@ -859,17 +859,17 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
 
   return UI.replace("{ JETPATH }", `\`${api}\``)
     .replaceAll("{ JETPATHGH }", `${JSON.stringify(globalHeaders)}`)
-    .replaceAll("{NAME}", options?.apiDoc?.name || "JetPath API Doc")
+    .replaceAll("{NAME}", options?.apiDoc?.name || "Jetpath API Doc")
     .replaceAll("JETPATHCOLOR", options?.apiDoc?.color || "#4285f4")
     .replaceAll(
       "{LOGO}",
       options?.apiDoc?.logo ||
-        "https://raw.githubusercontent.com/Uiedbook/JetPath/main/icon-transparent.webp",
+        "https://raw.githubusercontent.com/Uiedbook/Jetpath/main/icon-transparent.webp",
     )
     .replaceAll(
       "{INFO}",
       options?.apiDoc?.info?.replaceAll("\n", "<br>") ||
-        "This is a JetPath api preview.",
+        "This is a Jetpath api preview.",
     );
 };
 
