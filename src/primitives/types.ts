@@ -238,6 +238,7 @@ export type JetMiddleware<
     error: unknown,
   ) => Promise<any> | any)
   | undefined
+  | Promise<undefined>
   | Promise<void>
   | void;
 
