@@ -83,7 +83,10 @@ export interface ContextType<
   /**
    * Parses the request body
    */
-  parse(): Promise<Record<string, any>>;
+  parse(options?: {
+    maxBodySize?: number;
+    contentType?: string;
+}): Promise<JetData["body"]>
 
   /**
    * get original request
