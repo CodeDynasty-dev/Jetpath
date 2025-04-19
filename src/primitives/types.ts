@@ -84,10 +84,10 @@ export interface ContextType<
   /**
    * Parses the request body
    */
-  getCookie(name: string): string | undefined
-  getCookies(): Record<string, string>
-  setCookie(name: string, value: string, options: CookieOptions): void
-  clearCookie(name: string, options: CookieOptions): void
+  getCookie(name: string): string | undefined;
+  getCookies(): Record<string, string>;
+  setCookie(name: string, value: string, options: CookieOptions): void;
+  clearCookie(name: string, options: CookieOptions): void;
   parse(options?: {
     maxBodySize?: number;
     contentType?: string;

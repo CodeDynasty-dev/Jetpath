@@ -1277,7 +1277,7 @@ export async function parseRequest(
   const { maxBodySize = 5 * 1024 * 1024 } = options;
   let contentType = options.contentType || "";
   let rawBody: Uint8Array;
-  
+
   if (typeof req.arrayBuffer === "function") {
     if (!contentType && req.headers && typeof req.headers.get === "function") {
       contentType = req.headers.get("content-type") || "";

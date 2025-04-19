@@ -84,7 +84,7 @@ export interface CookieOptions {
   domain?: string;
   secure?: boolean;
   httpOnly?: boolean;
-  sameSite?: 'strict' | 'lax' | 'none';
+  sameSite?: "strict" | "lax" | "none";
   maxAge?: number;
   expires?: Date;
 }
@@ -92,33 +92,43 @@ export interface CookieOptions {
 class Cookie {
   private static parseCookieHeader(header: string): Record<string, string> {
     return header
-      .split('; ')
-      .map(pair => pair.split('='))
+      .split("; ")
+      .map((pair) => pair.split("="))
       .reduce((acc, [key, value]) => ({
         ...acc,
-        [key.trim()]: value ? decodeURIComponent(value) : '',
+        [key.trim()]: value ? decodeURIComponent(value) : "",
       }), {});
   }
 
-  private static serializeCookie(name: string, value: string, options: CookieOptions): string {
+  private static serializeCookie(
+    name: string,
+    value: string,
+    options: CookieOptions,
+  ): string {
     const parts = [`${encodeURIComponent(name)}=${encodeURIComponent(value)}`];
 
     if (options.path) parts.push(`Path=${encodeURIComponent(options.path)}`);
-    if (options.domain) parts.push(`Domain=${encodeURIComponent(options.domain)}`);
-    if (options.secure) parts.push('Secure');
-    if (options.httpOnly) parts.push('HttpOnly');
+    if (options.domain) {
+      parts.push(`Domain=${encodeURIComponent(options.domain)}`);
+    }
+    if (options.secure) parts.push("Secure");
+    if (options.httpOnly) parts.push("HttpOnly");
     if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
     if (options.maxAge) parts.push(`Max-Age=${options.maxAge}`);
     if (options.expires) parts.push(`Expires=${options.expires.toUTCString()}`);
 
-    return parts.join('; ');
+    return parts.join("; ");
   }
 
   static parse(cookies: string): Record<string, string> {
     return Cookie.parseCookieHeader(cookies);
   }
 
-  static serialize(name: string, value: string, options: CookieOptions = {}): string {
+  static serialize(
+    name: string,
+    value: string,
+    options: CookieOptions = {},
+  ): string {
     return Cookie.serializeCookie(name, value, options);
   }
 }
@@ -192,12 +202,12 @@ export class Context {
           this._1 = data ? String(data) : "";
           break;
       }
-    } 
+    }
   }
 
   redirect(url: string) {
     this.code = 301;
-    this._2["Location"] = url; 
+    this._2["Location"] = url;
   }
 
   throw(code: unknown = 404, message: unknown = "Not Found") {
@@ -221,7 +231,7 @@ export class Context {
         this._2["Content-Type"] = "application/json";
         this._1 = JSON.stringify(code);
         break;
-    } 
+    }
   }
 
   get(field: string) {
@@ -242,10 +252,10 @@ export class Context {
   }
 
   getCookie(name: string): string | undefined {
-    const cookieHeader = UTILS.runtime["node"] 
-      ? (this.request as IncomingMessage).headers.cookie 
-      : (this.request as Request).headers.get('cookie');
-    
+    const cookieHeader = UTILS.runtime["node"]
+      ? (this.request as IncomingMessage).headers.cookie
+      : (this.request as Request).headers.get("cookie");
+
     if (cookieHeader) {
       const cookies = Cookie.parse(cookieHeader);
       return cookies[name];
@@ -254,23 +264,25 @@ export class Context {
   }
 
   getCookies(): Record<string, string> {
-    const cookieHeader = UTILS.runtime["node"] 
-      ? (this.request as IncomingMessage).headers.cookie 
-      : (this.request as Request).headers.get('cookie');
-    
+    const cookieHeader = UTILS.runtime["node"]
+      ? (this.request as IncomingMessage).headers.cookie
+      : (this.request as Request).headers.get("cookie");
+
     return cookieHeader ? Cookie.parse(cookieHeader) : {};
   }
 
   setCookie(name: string, value: string, options: CookieOptions = {}): void {
     const cookie = Cookie.serialize(name, value, options);
-    const existingCookies = this._2['set-cookie'] || '';
-    const cookies = existingCookies ? existingCookies.split(',').map(c => c.trim()) : [];
+    const existingCookies = this._2["set-cookie"] || "";
+    const cookies = existingCookies
+      ? existingCookies.split(",").map((c) => c.trim())
+      : [];
     cookies.push(cookie);
-    this._2['set-cookie'] = cookies.join(', ');
+    this._2["set-cookie"] = cookies.join(", ");
   }
 
   clearCookie(name: string, options: CookieOptions = {}): void {
-    this.setCookie(name, '', { ...options, maxAge: 0 });
+    this.setCookie(name, "", { ...options, maxAge: 0 });
   }
 
   sendStream(stream: Stream | string, ContentType: string) {
@@ -293,12 +305,12 @@ export class Context {
     }
 
     this._2["Content-Type"] = ContentType;
-    this._3 = stream as Stream; 
+    this._3 = stream as Stream;
   }
   // Only for deno and bun
   sendResponse(Response?: Response) {
     // @ts-ignore
-    this._6 = Response; 
+    this._6 = Response;
   }
 
   async parse<Type extends any = Record<string, any>>(options?: {
