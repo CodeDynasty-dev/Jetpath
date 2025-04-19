@@ -225,24 +225,19 @@ export type JetMiddleware<
 > = (
   ctx: ContextType<JetData, JetPluginTypes>,
 ) =>
-  | undefined
-  | Promise<undefined>
-  | Promise<void>
   | void
-  | Promise<
-    (
-      ctx: ContextType<JetData, JetPluginTypes>,
-      error: unknown,
-    ) => Promise<any> | any
-  >
+  | Promise<void>
   | ((
     ctx: ContextType<JetData, JetPluginTypes>,
     error: unknown,
-  ) => Promise<any> | any)
-  | undefined
-  | Promise<undefined>
-  | Promise<void>
-  | void;
+  ) => void | Promise<void>)
+  | Promise<
+    ((
+      ctx: ContextType<JetData, JetPluginTypes>,
+      error: unknown,
+    ) => void | Promise<void>) | undefined
+  >
+  | undefined;
 
 export type JetFunc<
   JetData extends {
