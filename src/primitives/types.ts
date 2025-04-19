@@ -1,5 +1,6 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths } from "./functions.js";
+import { CookieOptions } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,
@@ -83,10 +84,14 @@ export interface ContextType<
   /**
    * Parses the request body
    */
+  getCookie(name: string): string | undefined
+  getCookies(): Record<string, string>
+  setCookie(name: string, value: string, options: CookieOptions): void
+  clearCookie(name: string, options: CookieOptions): void
   parse(options?: {
     maxBodySize?: number;
     contentType?: string;
-}): Promise<JetData["body"]>
+  }): Promise<JetData["body"]>;
 
   /**
    * get original request

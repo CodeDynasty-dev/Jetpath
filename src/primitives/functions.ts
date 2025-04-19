@@ -170,16 +170,7 @@ export const _jet_middleware: Record<
   (ctx: Context, err?: unknown) => void | Promise<void>
 > = {};
 
-// export class JetPathErrors extends Error {
-//   constructor(message: string) {
-//     super(message);
-//   }
-// }
-
-// export const _DONE = new JetPathErrors("done");
-
 export const UTILS = {
-  // wsFuncs: [],
   ctxPool: [] as Context[],
   middlewares: {},
   ae(cb: { (): any; (): any; (): void }) {
@@ -197,7 +188,6 @@ export const UTILS = {
     this.runtime = { bun, deno, node: !bun && !deno };
   },
   runtime: null as unknown as Record<string, boolean>,
-  // validators: {} as Record<string, JetSchema>,
   server(
     plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[],
   ): { listen: any; edge: boolean } | void {
@@ -317,7 +307,7 @@ export const UTILS = {
 // ? setting up the runtime check
 UTILS.set();
 
-const createCTX = (
+const getCtx = (
   req: IncomingMessage | Request,
   path: string,
   route: JetFunc,
@@ -343,7 +333,7 @@ const createCTX = (
   return ctx;
 };
 
-const createResponse = (
+const makeRes = (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
@@ -410,14 +400,21 @@ const Jetpath = async (
   },
 ) => {
   if (req.method === "OPTIONS") {
-    return createResponse(res, optionsCtx as Context);
+    return makeRes(res, optionsCtx as Context);
   }
-  const parsedR = URL_PARSER(req as any, res);
+  const responder = get_responder(req as any, res);
   let ctx: Context;
   let returned: (Function | void)[] | undefined;
-  if (parsedR) {
-    const r = parsedR[0];
-    ctx = createCTX(req, parsedR[3], r, parsedR[1], parsedR[2], parsedR[4]);
+  if (responder) {
+    const r = responder[0];
+    ctx = getCtx(
+      req,
+      responder[3],
+      r,
+      responder[1],
+      responder[2],
+      responder[4],
+    );
     try {
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
@@ -427,23 +424,23 @@ const Jetpath = async (
       await r(ctx as any);
       //? post-request middlewares here
       returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
-      return createResponse(res, ctx);
+      return makeRes(res, ctx);
     } catch (error) {
-      // if (error instanceof JetPathErrors) {
-      //   return createResponse(res, ctx);
-      // } else {
-        try {
-          //? report error to error middleware
-          returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
-        } catch (error) {
-          Log.error(`Unhandled error in middleware: ${String(error)} \nAffecting ${ctx.path}`);
-        } finally {
-          return createResponse(res, ctx);
-        }
+      try {
+        //? report error to error middleware
+        returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
+      } catch (error) {
+        Log.error(
+          `Unhandled error in middleware: ${
+            String(error)
+          } \nAffecting ${ctx.path}`,
+        );
+      } finally {
+        return makeRes(res, ctx);
       }
-    // }
+    }
   }
-  return createResponse(res, createCTX(req, "", null as any), true);
+  return makeRes(res, getCtx(req, "", null as any), true);
 };
 
 const handlersPath = (path: string) => {
@@ -653,7 +650,7 @@ export function validator<T extends Record<string, any>>(
       } else {
         if (typeof value !== type) {
           if (type === "file" && typeof value === "object") {
-                out[key as keyof T] = value;
+            out[key as keyof T] = value;
             continue;
           }
           errors.push(`${key} must be of type ${type}`);
@@ -710,7 +707,7 @@ parse wildcard
  * @param url - The URL to parse
  * @returns ? [handler, params, query, path]
  */
-const URL_PARSER = (
+const get_responder = (
   req: { method: methods; url: string; headers: Record<string, string> },
   res?: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
@@ -1280,8 +1277,7 @@ export async function parseRequest(
   const { maxBodySize = 5 * 1024 * 1024 } = options;
   let contentType = options.contentType || "";
   let rawBody: Uint8Array;
-
-  // Check for Fetch-compatible objects (Deno, Bun, browsers)
+  
   if (typeof req.arrayBuffer === "function") {
     if (!contentType && req.headers && typeof req.headers.get === "function") {
       contentType = req.headers.get("content-type") || "";
