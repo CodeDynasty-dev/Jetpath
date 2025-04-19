@@ -236,7 +236,9 @@ export type JetMiddleware<
   | ((
     ctx: ContextType<JetData, JetPluginTypes>,
     error: unknown,
-  ) => Promise<any> | any);
+  ) => Promise<any> | any)
+  | undefined
+  | void;
 
 export type JetFunc<
   JetData extends {
