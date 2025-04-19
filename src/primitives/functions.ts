@@ -170,13 +170,13 @@ export const _jet_middleware: Record<
   (ctx: Context, err?: unknown) => void | Promise<void>
 > = {};
 
-export class JetPathErrors extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
+// export class JetPathErrors extends Error {
+//   constructor(message: string) {
+//     super(message);
+//   }
+// }
 
-export const _DONE = new JetPathErrors("done");
+// export const _DONE = new JetPathErrors("done");
 
 export const UTILS = {
   // wsFuncs: [],
@@ -429,21 +429,20 @@ const Jetpath = async (
       returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
       return createResponse(res, ctx);
     } catch (error) {
-      if (error instanceof JetPathErrors) {
-        return createResponse(res, ctx);
-      } else {
+      // if (error instanceof JetPathErrors) {
+      //   return createResponse(res, ctx);
+      // } else {
         try {
           //? report error to error middleware
           returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
         } catch (error) {
-          console.error(error);
+          Log.error(`Unhandled error in middleware: ${String(error)} \nAffecting ${ctx.path}`);
         } finally {
           return createResponse(res, ctx);
         }
       }
-    }
+    // }
   }
-
   return createResponse(res, createCTX(req, "", null as any), true);
 };
 

@@ -241,4 +241,4 @@ export type {
   JetPluginExecutorInitParams,
 } from "./primitives/types.js";
 export { JetPlugin } from "./primitives/classes.js";
-export { JetPathErrors } from "./primitives/functions.js";
+// export { JetPathErrors } from "./primitives/functions.js";

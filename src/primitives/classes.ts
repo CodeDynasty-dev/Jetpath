@@ -2,7 +2,7 @@ import { createReadStream } from "node:fs";
 import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
 import {
-  _DONE,
+  // _DONE,
   _JetPath_paths,
   parseRequest,
   UTILS,
@@ -163,7 +163,7 @@ export class Context {
     }
     this._2["Content-Type"] = ctype;
     this._4 = true;
-    throw _DONE;
+    // throw _DONE;
   }
 
   redirect(url: string) {
@@ -174,7 +174,7 @@ export class Context {
     this._2["Location"] = url;
     this._1 = undefined;
     this._4 = true;
-    throw _DONE;
+    // throw _DONE;
   }
 
   throw(code: unknown = 404, message: unknown = "Not Found") {
@@ -206,7 +206,7 @@ export class Context {
       }
     }
     this._4 = true;
-    throw _DONE;
+    // throw _DONE;
   }
 
   get(field: string) {
@@ -254,14 +254,14 @@ export class Context {
     this._2["Content-Type"] = ContentType;
     this._3 = stream as Stream;
     this._4 = true;
-    throw _DONE;
+    // throw _DONE;
   }
   // Only for deno and bun
   sendResponse(Response?: Response) {
     // @ts-ignore
     this._6 = Response;
     this._4 = true;
-    throw _DONE;
+    // throw _DONE;
   }
 
   async parse<Type extends any = Record<string, any>>(options?: {
