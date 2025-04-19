@@ -71,7 +71,7 @@ const app = new Jetpath({
 jetlogger.setConfig({
   level: process.env.NODE_ENV === "production" ? "info" : "debug",
   format: "json",
-  filename: "./tests/petshop-api.log"
+  filename: "./usage/petshop-api-log.log"
 
 })
 app.use(jetlogger);
