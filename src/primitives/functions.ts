@@ -436,6 +436,14 @@ const Jetpath = async (
           } \nAffecting ${ctx.path}`,
         );
       } finally {
+        if (!returned) {
+          ctx.code = 500;
+          Log.error(
+            `Unhandled error in middleware: ${
+              String(error)
+            } \nAffecting ${ctx.path}`,
+          );
+        }
         return makeRes(res, ctx);
       }
     }
