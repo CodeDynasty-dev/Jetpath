@@ -225,6 +225,8 @@ export type JetMiddleware<
 > = (
   ctx: ContextType<JetData, JetPluginTypes>,
 ) =>
+  | undefined
+  | Promise<undefined>
   | Promise<void>
   | void
   | Promise<
