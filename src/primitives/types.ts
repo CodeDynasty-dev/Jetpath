@@ -51,28 +51,25 @@ export interface ContextType<
    * send a stream
    */
   // sendStream(stream: Stream | string, ContentType: string): never;
-  sendStream(stream: any | string, ContentType: string): never;
+  sendStream(stream: any | string, ContentType: string): void;
   /**
    * send a direct response
    * *Only for deno and bun
    */
   // sendStream(stream: Stream | string, ContentType: string): never;
-  sendResponse(response?: Response): never;
+  sendResponse(response?: Response): void;
   /**
    * reply the request
    */
-  send(data: unknown, ContentType?: string): never;
+  send(data: unknown, ContentType?: string): void;
   /**
    * end the request with an error
    */
-  throw(
-    code?: number | string | Record<string, any> | unknown,
-    message?: string | Record<string, any>,
-  ): never;
+  throw(code?: unknown, message?: unknown): never;
   /**
    * redirect the request
    */
-  redirect(url: string): never;
+  redirect(url: string): void;
   /**
    * get request header values
    */

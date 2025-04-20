@@ -210,8 +210,8 @@ export class Context {
     this._2["Location"] = url;
   }
 
-  throw(code: unknown = 404, message: unknown = "Not Found") {
-    this.code = 400;
+  throw(code: unknown = 404, message: unknown = "Not Found"): never {
+    this.code = code as number || 400;
     switch (typeof code) {
       case "number":
         this.code = code;
@@ -232,6 +232,7 @@ export class Context {
         this._1 = JSON.stringify(code);
         break;
     }
+    throw new Error(this._1);
   }
 
   get(field: string) {
