@@ -8,12 +8,14 @@ import { type IncomingMessage, type ServerResponse } from "node:http";
 import {
   type allowedMethods,
   AnyExecutor,
+  compilerType,
   type HTTPBody,
   type JetFunc,
   type jetOptions,
   type methods,
+  ValidationOptions,
 } from "./types.js";
-import { Context, type JetPlugin, JetSocket, Log } from "./classes.js";
+import { ArraySchema, BooleanSchema, Context, DateSchema, FileSchema, type JetPlugin, JetSocket, Log, NumberSchema, ObjectSchema, SchemaBuilder, SchemaCompiler, StringSchema } from "./classes.js";
 
 /**
  * an inbuilt CORS post middleware
@@ -1121,7 +1123,7 @@ export function parseFormData(
   const fields: Record<string, string | string[]> = {};
   const files: Record<
     string,
-    { fileName: string; content: Uint8Array; mimeType: string }
+    { fileName: string; content: Uint8Array; mimeType: string, size: number }
   > = {};
 
   const parts = splitBuffer(rawBody, boundaryBytes).slice(1, -1); // remove preamble and epilogue
@@ -1158,7 +1160,7 @@ export function parseFormData(
 
     if (fileName) {
       const mimeType = headers["content-type"] || "application/octet-stream";
-      files[fieldName] = { fileName, content: body, mimeType };
+      files[fieldName] = { fileName, content: body, mimeType, size: body.length };
     } else {
       const value = decoder.decode(body);
       if (fieldName in fields) {
@@ -1320,4 +1322,123 @@ export async function parseRequest(
     bodyText = decoder.decode(rawBody);
     return { parsed: bodyText };
   }
+}
+
+export const v = {
+  string: (options?: ValidationOptions) => new StringSchema(options),
+  number: (options?: ValidationOptions) => new NumberSchema(options),
+  boolean: () => new BooleanSchema(),
+  array: (itemType?: SchemaBuilder) => new ArraySchema(itemType),
+  object: (shape?: Record<string, SchemaBuilder>) => new ObjectSchema(shape),
+  date: () => new DateSchema(),
+  file: () => new FileSchema(),
+};
+
+function createSchema<T extends Record<string, any>>(
+  schemaDefinition: (t: typeof v) => Record<string, SchemaBuilder>
+): HTTPBody<T> {
+  const rawSchema = schemaDefinition(v);
+  return SchemaCompiler.compile(rawSchema);
+}
+
+/**
+ * Configures the endpoint with API documentation and validation
+ * @param endpoint - The endpoint function to configure
+ * @returns The current compiler object
+ */
+export function use<
+  JetData extends {
+    body?: Record<string, any>;
+    params?: Record<string, any>;
+    query?: Record<string, any>;
+    response?: Record<string, any>;
+  },
+  JetPluginTypes extends Record<string, unknown>[] = []
+>(endpoint: JetFunc<JetData, JetPluginTypes>): compilerType<JetData, JetPluginTypes> {
+  const compiler = {
+    /**
+     * Sets the API documentation body for the endpoint
+     */
+    body: function (
+      schemaFn: (
+        t: typeof v
+      ) => Partial<
+        Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>
+      >
+    ) { 
+      endpoint.body = createSchema(schemaFn as any) as any;
+      return compiler;
+    },
+    /**
+     * Sets the API documentation headers for the endpoint
+     * @param {Object} headers - The API documentation headers
+     */
+    headers: function (headers: Record<string, string>) {
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
+      }
+      endpoint.headers = headers;
+      return compiler;
+    },
+    /**
+     * Sets the API documentation info for the endpoint
+     * @param {string} info - The API documentation info
+     */
+    info: function (info: string) {
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
+      }
+      endpoint.info = info;
+      return compiler;
+    },
+    /**
+     * Sets the API documentation params for the endpoint
+     */
+    params: function (
+      schemaFn: (
+        t: typeof v
+      ) => Partial<
+        Record<keyof HTTPBody<NonNullable<JetData["params"]>>, SchemaBuilder>
+      >
+    ) {
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
+      }
+      endpoint.params = createSchema(schemaFn as any) as any;
+      return compiler;
+    },
+    /**
+     * Sets the API documentation query for the endpoint
+     */
+    query: function (
+      schemaFn: (
+        t: typeof v
+      ) => Partial<
+        Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>
+      >
+    ) {
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
+      }
+      endpoint.query = createSchema(schemaFn as any) as any;
+      return compiler;
+    },
+    /**
+     * Sets the API documentation response for the endpoint
+     */
+    response: function (
+      schemaFn: (
+        t: typeof v
+      ) => Partial<
+        Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
+      >
+    ) {
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
+      }
+      endpoint.response = createSchema(schemaFn as any) as any;
+      return compiler;
+    },
+  };
+  return compiler;
 }

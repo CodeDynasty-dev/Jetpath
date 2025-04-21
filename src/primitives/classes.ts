@@ -4,9 +4,13 @@ import { Stream } from "node:stream";
 import { _JetPath_paths, parseRequest, UTILS, validator } from "./functions.js";
 import type {
   AnyExecutor,
+  HTTPBody,
   JetFunc,
   JetPluginExecutorInitParams,
   methods,
+  SchemaDefinition,
+  SchemaType,
+  ValidationOptions,
 } from "./types.js";
 import { resolve } from "node:path";
 
@@ -352,3 +356,242 @@ export class JetSocket {
     }
   }
 }
+
+/**
+ * Schema builder classes
+ */
+export class SchemaBuilder{
+  protected def: SchemaDefinition;
+
+  constructor(type: SchemaType, options: ValidationOptions = {}) {
+    this.def = { type, required: false, ...options };
+  }
+
+  required(err?: string): this {
+    this.def.required = true;
+    if (err) this.def.err = err;
+    return this;
+  }
+
+  default(value: any): this {
+    this.def.inputDefaultValue = value;
+    return this;
+  }
+
+  validate(fn: (value: any) => boolean | string): this {
+    this.def.validator = fn;
+    return this;
+  }
+
+  regex(pattern: RegExp, err?: string): this {
+    this.def.RegExp = pattern;
+    if (err) this.def.err = err;
+    return this;
+  }
+
+  getDefinition(): SchemaDefinition {
+    return this.def;
+  }
+}
+
+export class StringSchema extends SchemaBuilder  {
+  constructor(options: ValidationOptions = {}) {
+    // @ts-expect-error
+    options.inputType = "string";
+    super("string", options);
+  }
+
+  email(err?: string): this {
+    return this.regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, err || "Invalid email");
+  }
+
+  min(length: number, err?: string): this {
+    return this.validate(
+      (value) => value.length >= length || err || `Minimum length is ${length}`
+    );
+  }
+
+  max(length: number, err?: string): this {
+    return this.validate(
+      (value) => value.length <= length || err || `Maximum length is ${length}`
+    );
+  }
+
+  url(err?: string): this {
+    return this.regex(
+      /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+      err || "Invalid URL"
+    );
+  }
+}
+
+export class NumberSchema extends SchemaBuilder {
+  constructor(options: ValidationOptions = {}) {
+    // @ts-expect-error
+    options.inputType = "number";
+    super("number", options);
+  }
+
+  min(value: number, err?: string): this {
+    return this.validate(
+      (val) => val >= value || err || `Minimum value is ${value}`
+    );
+  }
+
+  max(value: number, err?: string): this {
+    return this.validate(
+      (val) => val <= value || err || `Maximum value is ${value}`
+    );
+  }
+
+  integer(err?: string): this {
+    return this.validate(
+      (val) => Number.isInteger(val) || err || "Must be an integer"
+    );
+  }
+
+  positive(err?: string): this {
+    return this.validate((val) => val > 0 || err || "Must be positive");
+  }
+
+  negative(err?: string): this {
+    return this.validate((val) => val < 0 || err || "Must be negative");
+  }
+}
+
+export class BooleanSchema extends SchemaBuilder {
+  constructor() {
+    super("boolean");
+  }
+}
+
+export class ArraySchema extends SchemaBuilder {
+  constructor(elementSchema?: SchemaBuilder) {
+    super("array");
+    if (elementSchema) {
+      const elementDef = elementSchema.getDefinition();
+      if (elementDef.type === "object" && elementDef.objectSchema) {
+        this.def.arrayType = "object";
+        this.def.objectSchema = elementDef.objectSchema;
+      } else {
+        this.def.arrayType = elementDef.type;
+      }
+    }
+  }
+
+  min(length: number, err?: string): this {
+    return this.validate(
+      (value) =>
+        (Array.isArray(value) && value.length >= length) ||
+        err ||
+        `Minimum length is ${length}`
+    );
+  }
+
+  max(length: number, err?: string): this {
+    return this.validate(
+      (value) =>
+        (Array.isArray(value) && value.length <= length) ||
+        err ||
+        `Maximum length is ${length}`
+    );
+  }
+
+  nonempty(err?: string): this {
+    return this.min(1, err || "Array cannot be empty");
+  }
+}
+
+export class ObjectSchema extends SchemaBuilder {
+  constructor(shape?: Record<string, SchemaBuilder>) {
+    super("object");
+    if (shape) {
+      this.def.objectSchema = {};
+      for (const [key, builder] of Object.entries(shape)) {
+        this.def.objectSchema[key] = builder.getDefinition();
+      }
+    }
+  }
+
+  shape(shape: Record<string, SchemaBuilder>): this {
+    this.def.objectSchema = {};
+    for (const [key, builder] of Object.entries(shape)) {
+      this.def.objectSchema[key] = builder.getDefinition();
+    }
+    return this;
+  }
+}
+
+export class DateSchema extends SchemaBuilder {
+  constructor() {
+    super("date");
+  }
+
+  min(date: Date | string, err?: string): this {
+    const minDate = new Date(date);
+    return this.validate(
+      (value) =>
+        new Date(value) >= minDate || err || `Date must be after ${minDate}`
+    );
+  }
+
+  max(date: Date | string, err?: string): this {
+    const maxDate = new Date(date);
+    return this.validate(
+      (value) =>
+        new Date(value) <= maxDate || err || `Date must be before ${maxDate}`
+    );
+  }
+
+  future(err?: string): this {
+    return this.validate(
+      (value) =>
+        new Date(value) > new Date() || err || "Date must be in the future"
+    );
+  }
+
+  past(err?: string): this {
+    return this.validate(
+      (value) =>
+        new Date(value) < new Date() || err || "Date must be in the past"
+    );
+  }
+}
+
+export class FileSchema extends SchemaBuilder {
+  constructor() {
+    super("file");
+  }
+
+  maxSize(bytes: number, err?: string): this {
+    return this.validate(
+      (value) =>
+        value.size <= bytes ||
+        err ||
+        `File size must be less than ${bytes} bytes`
+    );
+  }
+
+  mimeType(types: string | string[], err?: string): this {
+    const allowedTypes = Array.isArray(types) ? types : [types];
+    return this.validate(
+      (value) =>
+        allowedTypes.includes(value.mimeType) ||
+        err ||
+        `File type must be one of: ${allowedTypes.join(", ")}`
+    );
+  }
+}
+
+export class SchemaCompiler {
+  static compile(
+    schema: Record<string, SchemaBuilder>
+  ): HTTPBody<any> {
+    const compiled: Record<string, SchemaDefinition> = {};
+    for (const [key, builder] of Object.entries(schema)) {
+      compiled[key] = builder.getDefinition();
+    }
+    return compiled as HTTPBody<any>;
+  }
+}
+ 

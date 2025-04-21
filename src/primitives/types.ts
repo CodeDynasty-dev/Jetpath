@@ -1,6 +1,6 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
-import type { _JetPath_paths } from "./functions.js";
-import { CookieOptions } from "./classes.js";
+import type { _JetPath_paths, v } from "./functions.js";
+import { CookieOptions, SchemaBuilder } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,
@@ -98,7 +98,7 @@ export interface ContextType<
   _2?: Record<string, string>;
   _3?: any; //Stream | undefined; // Stream
   _4?: boolean | undefined;
-  _5?: (() => never) | undefined;
+  _5?: JetFunc | undefined;
   _6?: Response | false;
 }
 
@@ -184,15 +184,15 @@ export type jetOptions = {
 export type HTTPBody<Obj extends Record<string, any>> = {
   [x in keyof Obj]: {
     err?: string;
-    type?: "string" | "number" | "file" | "object" | "boolean" | "array";
+    type?: "string"|"number"|"file"|"object"|"boolean"|"array"|"date";
     arrayType?:
       | "string"
       | "number"
       | "file"
       | "object"
       | "boolean"
-      | "object"
-      | "array";
+      | "array"
+      | "date";
     RegExp?: RegExp;
     inputAccept?: string;
     inputType?:
@@ -207,7 +207,7 @@ export type HTTPBody<Obj extends Record<string, any>> = {
       | "url";
     inputDefaultValue?: string | number | boolean;
     required?: boolean;
-    validator?: (value: any) => boolean;
+    validator?: (value: any) => boolean | string;
     objectSchema?: HTTPBody<Record<string, any>>;
   };
 };
@@ -241,7 +241,8 @@ export type JetFunc<
     body?: Record<string, any>;
     params?: Record<string, any>;
     query?: Record<string, any>;
-  } = { body: {}; params: {}; query: {} },
+    response?: Record<string, any>;
+  } = { body: {}; params: {}; query: {}; response: {}, info: "", method: "", path: "", jet_middleware: [] },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
   (ctx: ContextType<JetData, JetPluginTypes>): Promise<void> | void;
@@ -250,7 +251,10 @@ export type JetFunc<
   info?: string;
   method?: string;
   path?: string;
-  jet_middleware?: JetMiddleware[];
+    jet_middleware?: JetMiddleware[];
+    params?: HTTPBody<JetData["params"] & Record<string, any>>;
+    query?: HTTPBody<JetData["query"] & Record<string, any>>;
+  response?: HTTPBody<JetData["response"] & Record<string, any>>;
 };
 
 interface jet_socket {
@@ -265,3 +269,55 @@ export type JetFile = {
   content: Uint8Array;
   mimeType: string;
 };
+
+
+ 
+export type SchemaType =
+  | "string"
+  | "number"
+  | "boolean"
+  | "array"
+  | "object"
+  | "date"
+  | "file";
+
+export interface ValidationOptions {
+  err?: string;
+  RegExp?: RegExp;
+  validator?: (value: any) => boolean | string;
+  inputDefaultValue?: any;
+  required?: boolean;
+}
+
+export interface ArrayOptions extends ValidationOptions {
+  arrayType?: SchemaType | "object";
+  objectSchema?: HTTPBody<any>;
+}
+
+export interface ObjectOptions extends ValidationOptions {
+  objectSchema?: HTTPBody<any>;
+}
+
+export type SchemaDefinition = {
+  type: SchemaType;
+} & ValidationOptions &
+  ArrayOptions &
+  ObjectOptions;
+ 
+
+  export type compilerType<
+    JetData extends {
+      body?: Record<string, any>;
+      params?: Record<string, any>;
+      query?: Record<string, any>;
+      response?: Record<string, any>;
+    },
+    JetPluginTypes extends Record<string, unknown>[] = [],
+  > = {
+    body: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
+    headers: (headers: Record<string, string>) => compilerType<JetData, JetPluginTypes>;
+    info: (info: string) => compilerType<JetData, JetPluginTypes>;
+    params: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["params"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
+    query: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
+    response: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
+  };  

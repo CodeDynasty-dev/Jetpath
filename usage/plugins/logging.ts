@@ -1,5 +1,5 @@
 import { appendFileSync } from "node:fs";
-import { JetPlugin, type JetPluginExecutorInitParams, type AnyExecutor } from "../../dist/index.js";
+import { JetPlugin } from "../../dist/index.js";
 import { resolve } from "node:path";
 
 
@@ -81,7 +81,7 @@ export class FileTransport implements Transport {
 /**
  * Creates a JetPlugin with structured logging capabilities
  */
-export const jetlogger = new JetPlugin({
+export const jetLogger = new JetPlugin({
     executor() {
         const { level = 'info', format = 'json', filename, getRequestId, transports: customTransports } = this.config;
         // Determine transports: custom, or build from filename/console defaults
@@ -149,4 +149,4 @@ export const jetlogger = new JetPlugin({
 });
 
 
-export type jetloggerType = ReturnType<typeof jetlogger.executor>
+export type jetLoggerType = ReturnType<typeof jetLogger.executor>

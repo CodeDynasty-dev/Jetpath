@@ -941,7 +941,7 @@
           return div({ className: "data-input" },
             span(key + ": ", {
               ["data-" + type]: true,
-              "data-holder": holder
+              "data-holder": holder||""
             }),
             input({
               type: /(file|number|string|date|datetime|time|email|url|tel|password|checkbox|radio|select|textarea|hidden|button|submit|reset|image|file|color|month|week|)/.test(value) ? value : "text",

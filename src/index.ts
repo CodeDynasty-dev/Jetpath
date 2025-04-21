@@ -37,7 +37,7 @@ export class Jetpath {
       });
     }
   }
-  use(plugin: {
+  addPlugin(plugin: {
     _setup: (init: any) => any;
     hasServer?: boolean;
     executor: any;
@@ -112,8 +112,8 @@ export class Jetpath {
           if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
             const authHeader = ctx.get("authorization");
             if (authHeader && authHeader.startsWith("Basic ")) {
-              const [authType, encodedCreds] = authHeader.trim().split(" ");
-              if (authType !== "Basic" || !encodedCreds) {
+              const [authType, encodedToken] = authHeader.trim().split(" ");
+              if (authType !== "Basic" || !encodedToken) {
                 ctx.code = 401;
                 ctx.set(
                   "WWW-Authenticate",
@@ -127,10 +127,10 @@ export class Jetpath {
               }
               let username, password;
               try {
-                const decodedCreds = new TextDecoder().decode(
-                  Uint8Array.from(atob(encodedCreds), (c) => c.charCodeAt(0)),
+                const decodedToken = new TextDecoder().decode(
+                  Uint8Array.from(atob(encodedToken), (c) => c.charCodeAt(0)),
                 );
-                [username, password] = decodedCreds.split(":");
+                [username, password] = decodedToken.split(":");
               } catch (error) {
                 ctx.code = 401;
                 ctx.set(
@@ -241,3 +241,4 @@ export type {
   JetPluginExecutorInitParams,
 } from "./primitives/types.js";
 export { JetPlugin } from "./primitives/classes.js";
+export { use } from "./primitives/functions.js";

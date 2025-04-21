@@ -51,7 +51,7 @@ compatibility but pure engine api(s).
 
 ```ts
 // src/index.jet.js
-import { type JetFunc, Jetpath } from "jetpath";
+import { type JetFunc, Jetpath, use } from "jetpath";
 
 const app = new Jetpath({ APIdisplay: "HTTP" });
 
@@ -74,6 +74,15 @@ export const POST_api_v1_payments: JetFunc = async function (ctx) {
     ctx.plugin.charge({ amount, currency, account });
     ctx.send({ success: true, message: "Payment successful" });
 };
+
+use(POST_api_v1_payments).body((t)=>{
+ return {
+    amount: t.number().required(),
+    currency: t.string().required(),
+    account: t.string().required()
+ }   
+})
+.info("Charge a user's account");
 ```
 
 # Rationale - [Docs](https://jetpath.codedynasty.dev/)

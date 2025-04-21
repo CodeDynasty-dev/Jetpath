@@ -7,13 +7,14 @@
  */
 import { writeFile } from "node:fs/promises";
 import {
+  JetFile,
   Jetpath,
-  JetPathErrors,
+  use, 
   type JetFunc,
   type JetMiddleware,
 } from "../dist/index.js";
 import { authPlugin, type AuthPluginType } from "./plugins/auth.ts";
-import { jetlogger, type jetloggerType } from "./plugins/logging.ts";
+import { jetLogger, type jetLoggerType } from "./plugins/logging.ts";
 import { resolve } from "node:path";
 
 
@@ -68,14 +69,13 @@ const app = new Jetpath({
 });
 
 
-jetlogger.setConfig({
+jetLogger.setConfig({
   level: process.env.NODE_ENV === "production" ? "info" : "debug",
   format: "json",
-  filename: "./usage/petshop-api-log.log"
-
+  filename: "./usage/pet-shop-api-log.log"
 })
-app.use(jetlogger);
-app.use(authPlugin);
+app.addPlugin(jetLogger);
+app.addPlugin(authPlugin);
 
 // Equivalent to: { name: string; age: number; }
 
@@ -88,7 +88,7 @@ app.use(authPlugin);
 /**
  * Global middleware for request processing and error handling
  * 
- * This here's deatiled API sample of framework2 actually called jetpathiddleware runs for all routes and handles:
+ * This here's detailed API sample of framework2 actually called jetpath middleware runs for all routes and handles:
  * - Request logging
  * - Authentication verification (when needed)
  * - Error processing
@@ -97,7 +97,7 @@ app.use(authPlugin);
  * @param {Object} ctx - The request context
  * @returns {Function} The post-handler middleware
  */
-export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetloggerType]> = (ctx) => {
+export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (ctx) => {
   const startTime = Date.now();
   const requestId = `req-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   ctx.plugins.info(ctx);
@@ -375,12 +375,12 @@ export const POST_auth_login: JetFunc<{ body: { username: string; password: stri
   });
 };
 
-POST_auth_login.body = {
-  username: { type: "string", required: true, err: "Username is required", inputDefaultValue: "admin" },
-  password: { type: "string", required: true, err: "Password is required", inputDefaultValue: "admin123" }
-};
-
-POST_auth_login.info = "Authenticate a user and receive an access token";
+use(POST_auth_login).body((t) => {
+  return {
+    username: t.string({ err: "Username is required", inputDefaultValue: "admin" }).required(),
+    password: t.string({ err: "Password is required", inputDefaultValue: "admin123" }).required()
+  }
+}).info("Authenticate a user and receive an access token");
 
 // =============================================================================
 // PET MANAGEMENT ROUTES
@@ -613,75 +613,26 @@ export const POST_pets: JetFunc<{
   });
 };
 
-POST_pets.body = {
-  name: {
-    type: "string",
-    required: true,
-    err: "Pet name is required"
-  },
-  species: {
-    type: "string",
-    required: true,
-    err: "Pet species is required"
-  },
-  breed: {
-    type: "string",
-    required: true,
-    err: "Pet breed is required"
-  },
-  age: {
-    type: "number",
-    required: true,
-    err: "Pet age is required",
-    inputType: "number"
-  },
-  gender: {
-    type: "string",
-    required: true,
-    err: "Pet gender is required"
-  },
-  color: {
-    type: "string",
-    required: true,
-    err: "Pet color is required"
-  },
-  description: {
-    type: "string",
-    required: true,
-    err: "Pet description is required"
-  },
-  price: {
-    type: "number",
-    required: true,
-    err: "Pet price is required",
-    inputType: "number"
-  },
-  available: {
-    type: "boolean",
-    required: false
-  },
-  image: {
-    type: "string",
-    required: false
-  },
-  tags: {
-    type: "array",
-    arrayType: "string",
-    required: false
-  },
-  health: {
-    type: "object",
-    required: false,
-    objectSchema: {
-      vaccinated: { type: "boolean" },
-      neutered: { type: "boolean" },
-      medicalHistory: { type: "array", arrayType: "string" }
-    }
-  },
-
-};
-
-POST_pets.info = "Add a new pet to the inventory (admin only)";
+use(POST_pets).body((t) => {
+  return {
+    name: t.string({ err: "Pet name is required" }).required(),
+    species: t.string({ err: "Pet species is required" }).required(),
+    breed: t.string({ err: "Pet breed is required" }).required(),
+    age: t.number({ err: "Pet age is required",   }).required(),
+    gender: t.string({ err: "Pet gender is required" }).required(),
+    color: t.string({ err: "Pet color is required" }).required(),
+    description: t.string({ err: "Pet description is required" }).required(),
+    image: t.file() ,
+    price: t.number({ err: "Pet price is required",   }).required(),
+    available: t.boolean() ,
+    tags: t.array(t.string()) ,
+    health: t.object({
+      vaccinated: t.boolean() ,
+      neutered: t.boolean() ,
+      medicalHistory: t.array(t.string()) 
+    }) 
+  }
+}).info("Add a new pet to the inventory (admin only)");
 
 /**
  * Update an existing pet
@@ -746,28 +697,27 @@ export const PUT_petBy$id: JetFunc<{
   });
 };
 
-PUT_petBy$id.body = {
-  name: { type: "string", required: false },
-  species: { type: "string", required: false },
-  breed: { type: "string", required: false },
-  age: { type: "number", required: false, inputType: "number" },
-  gender: { type: "string", required: false },
-  color: { type: "string", required: false },
-  description: { type: "string", required: false },
-  price: { type: "number", required: false, inputType: "number" },
-  available: { type: "boolean", required: false },
-  image: { type: "string", required: false },
-  tags: { type: "array", arrayType: "string", required: false },
-  health: {
-    type: "object",
-    required: false,
-    objectSchema: {
-      vaccinated: { type: "boolean" },
-      neutered: { type: "boolean" },
-      medicalHistory: { type: "array", arrayType: "string" }
-    }
+
+use(PUT_petBy$id).body((t) => {
+  return {
+    name: t.string({ err: "Pet name is required" }).required(),
+    species: t.string({ err: "Pet species is required" }).required(),
+    breed: t.string({ err: "Pet breed is required" }).required(),
+    age: t.number({ err: "Pet age is required",   }).required(),
+    gender: t.string({ err: "Pet gender is required" }).required(),
+    color: t.string({ err: "Pet color is required" }).required(),
+    description: t.string({ err: "Pet description is required" }).required(),
+    price: t.number({ err: "Pet price is required",   }).required(),
+    available: t.boolean() ,
+    image: t.file() ,
+    tags: t.array(t.string()) ,
+    health: t.object({
+      vaccinated: t.boolean() ,
+      neutered: t.boolean() ,
+      medicalHistory: t.array(t.string()) 
+    })
   }
-};
+})
 
 PUT_petBy$id.info = "Update an existing pet's information (admin only)";
 
@@ -1197,21 +1147,12 @@ export const POST_petBy$id_reviews: JetFunc<{
   });
 };
 
-POST_petBy$id_reviews.body = {
-  rating: {
-    type: "number",
-    required: true,
-    err: "Rating is required (1-5)",
-    inputType: "number"
-  },
-  comment: {
-    type: "string",
-    required: true,
-    err: "Review comment is required"
+use(POST_petBy$id_reviews).body((t) => {
+  return {
+    rating: t.number({ err: "Rating is required (1-5)",   }).required(),
+    comment: t.string({ err: "Review comment is required" }).required()
   }
-};
-
-POST_petBy$id_reviews.info = "Add a review for a specific pet";
+}).info("Add a review for a specific pet");
 
 /**
  * Delete a review
@@ -1280,7 +1221,7 @@ export const DELETE_reviews$reviewId: JetFunc<{
   });
 };
 
-DELETE_reviews$reviewId.info = "Delete a review (admin or review owner only)";
+use(DELETE_reviews$reviewId).info("Delete a review (admin or review owner only)");
 
 // =============================================================================
 // STATISTICS AND REPORTS
@@ -1342,7 +1283,7 @@ export const GET_stats: JetFunc<{}, [AuthPluginType]> = function (ctx) {
   });
 };
 
-GET_stats.info = "Get shop statistics (admin only)";
+use(GET_stats).info("Get shop statistics (admin only)");
 
 // =============================================================================
 // REAL-TIME COMMUNICATIONS
@@ -1434,7 +1375,7 @@ export const WS_live: JetFunc = (ctx) => {
   }
 };
 
-WS_live.info = "WebSocket for real-time inventory updates and notifications";
+use(WS_live).info("WebSocket for real-time inventory updates and notifications");
 
 // =============================================================================
 // FILE UPLOADS AND FORMS
@@ -1445,7 +1386,15 @@ WS_live.info = "WebSocket for real-time inventory updates and notifications";
  * @route POST /upload
  * @access Authenticated (Admin only)
  */
-export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (ctx) => {
+export const POST_upload: JetFunc<{
+  body: {
+    image: JetFile;
+    document: File;
+    title: string;
+    description: string;
+    tags: string[];
+  }
+}, [AuthPluginType, jetLoggerType]> = async (ctx) => {
   // Check if user is an admin
   if (!ctx.plugins.isAdmin(ctx)) {
     ctx.code = 403;
@@ -1458,7 +1407,7 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
 
   try {
     // Parse form data
-    const form = await ctx.parse();
+    const form = await ctx.parse()  
     const results: Record<string, any> = {};
 
     // Process each file in the form
@@ -1501,8 +1450,7 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
       data: results
     });
 
-  } catch (error: any) {
-    if(error instanceof JetPathErrors)  return 
+  } catch (error: any) { 
     ctx.plugins.error(ctx, {
       action: "file_upload_error",
       error: error.message
@@ -1516,15 +1464,17 @@ export const POST_upload: JetFunc<{}, [AuthPluginType, jetloggerType]> = async (
   
 };
 
-POST_upload.body = {
-  image: { type: "file", inputType: "file", required: false },
-  document: { type: "file", inputType: "file", required: true },
-  title: { type: "string", required: false },
-  description: { type: "string", required: false },
-  tags: { type: "string", required: false }
-};
-
-POST_upload.info = "Upload files with metadata (admin only)";
+ 
+use(POST_upload).body((t) => {
+  return {
+    image: t.file(),
+    document: t.file(),
+    title: t.string(),
+    description: t.string(),
+    tags: t.array(t.string()),
+    lll: t.string()
+  }
+}).info("Upload files with metadata (admin only)")
 
 // =============================================================================
 // ERROR HANDLING AND TESTING
@@ -1539,7 +1489,7 @@ export const GET_error: JetFunc = function (_ctx) {
   throw new Error("This is an intentional error for testing error handling");
 };
 
-GET_error.info = "Route that intentionally throws an error (for testing)";
+use(GET_error).info("Route that intentionally throws an error (for testing)");
 
 /**
  * Health check endpoint
@@ -1566,7 +1516,7 @@ export const GET_health: JetFunc = function (ctx) {
   });
 };
 
-GET_health.info = "API health check endpoint";
+use(GET_health).info("API health check endpoint");
 interface ApiInfo {
   name: string;
   version: string;
@@ -1691,7 +1641,7 @@ export const GET_export_docs$format: JetFunc<{
   }
 };
 
-GET_export_docs$format.info = "Export API documentation in different formats (json, yaml, markdown)";
+use(GET_export_docs$format).info("Export API documentation in different formats (json, yaml, markdown)");
 
 
 
