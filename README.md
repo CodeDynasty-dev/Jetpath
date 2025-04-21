@@ -120,6 +120,7 @@ Open sourced And Free.
 If you contribute code to this project, you are implicitly allowing your code to
 be distributed under the Apache 2.0 license. You are also implicitly verifying that all
 code are your original work.
+See our [contributing guide](https://github.com/CodeDynasty-dev/Jetpath/blob/main/contributing.md)
 
 ### Support
 

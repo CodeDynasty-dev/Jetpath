@@ -1,7 +1,6 @@
 
 # JetPath  Contributing Guide
 
-## Welcome
 
 Welcome to the JetPath Contributing Guide, and thank you for your interest.
 
@@ -37,10 +36,8 @@ Refer to the following channels to connect with fellow contributors or to stay u
 ## Before you start
 
 Before you start contributing, ensure you have the following:
-* For developers: The latest version of Node.js, Bon.js, Deno.js. 
-* For writers: The lastest version of Node.js.
-
-
+* For developers: The latest version of Node.js, Bon.js, Deno.js.{ Link} 
+* For writers: The lastest version of Node.js.{Link}
 
 
 ## Environment setup
@@ -49,23 +46,19 @@ To set up your environment, perform the following actions:
 
 ### Developer
 
-1. Fork the Repository
-Click the Fork button at the top right of the repository page to create a copy under your GitHub account. This allows you to freely make changes without affecting the original project.
+1. Fork the Repository: Click the **Fork** button at the top right of the repository page to create a copy under your GitHub account.
 
-2. Clone Your Fork Locally
-Clone your forked repository to your computer using the command below. Replace <yourusername> with your GitHub username:
+2. Clone your forked repository to your computer using the command below. Replace `yourusername` with your GitHub username:
 
 ```bash
 git clone https://github.com/<yourusername>/JetPath.git
 ```
-3. Navigate to the Project Directory
-Change into the project folder:
+3. Navigate to the Project Directory: Change into the project folder using the command below.
 
 ```bash
 cd JetPath
 ```
-4. Install Dependencies
-Install all necessary packages with npm:
+4. Install Dependencies: Install all necessary packages with npm:
 
 ```bash
 npm install
@@ -73,136 +66,198 @@ npm install
 ```
 This will download and set up all libraries the project depends on.
 
-5. Run the Development Server
-Start the local server to preview your changes in real-time:
+5. Create a new branch for your feature or fix
+```bash
+git checkout -b your-feature-branch
+```
+6. Run the Development Server: Start the local server to preview your changes
 
 ```bash
 npm run dev
 ```
-Open your browser and go to the URL shown in the terminal (usually http://localhost:4000).
+Open your browser and click the URL shown in the terminal (usually http://localhost:4000).
 
-6. Compile the Project
-When you’re ready to build the project for production, run:
+7. Compile the Project: Run the following command to  build the project for production
 
 ```bash
 npm run compile
 ```
-This compiles and optimizes the code for deployment.
-
-> Additional Tips
-
-* Create a new branch for your changes before you start working:
-
-```bash
-git checkout -b your-feature-branch
-```
-* Commit often with clear, descriptive messages.
-
-* Push your branch to your fork and open a Pull Request to the main repository.
-
+8. Push your branch to your fork and open a Pull Request to the main repository.
 Feel free to ask questions or open an issue if you need help!
 
 
 ### Writers
 
 
-1. Fork the Repository
-Click the Fork button at the top right of the repository page to create a copy under your GitHub account. This allows you to freely make changes without affecting the original project.
+1. Fork the Repository: Click the **Fork** button at the top right of the repository page to create a copy under your GitHub account.
 
-2. Clone Your Fork Locally
-Clone your forked repository to your computer using the command below. Replace <yourusername> with your GitHub username:
+2. Clone your forked repository to your computer using the command below. Replace <yourusername> with your GitHub username:
 
 ```bash
 git clone https://github.com/<yourusername>/JetPath.git
 ```
-3. Navigate to the Project Directory
-Change into the project folder:
+3. Navigate to the Project Directory: Change into the project folder using the command below.
 
 ```bash
 cd JetPath
 ```
 4. Install Dependencies
-Install all necessary packages with npm:
-
 ```bash
 npm install
 
 ```
-This will download and set up all libraries the project depends on.
 
-5. Preview your changes with this command below
+5. Create a new branch
+
+```bash
+git checkout -b your-feature-branch
+```
+6. Preview your changes with this command below
 
 ```bash
 npx docmach 
 ```
 
-Open your browser and go to the URL shown in the terminal (usually http://localhost:4000).
+7. Push your branch to your fork and open a Pull Request to the main repository.
 
-> Additional Tips
+Open your browser and click the URL shown in the terminal (usually http://localhost:4000).
 
-* Create a new branch for your changes before you start working:
 
-```bash
-git checkout -b your-feature-branch
-```
-* Commit often with clear, descriptive messages.
-
-* Push your branch to your fork and open a Pull Request to the main repository.
-
-Feel free to ask questions or open an issue if you need help!
 
 ### Troubleshoot
 
 If you encounter issues as you set up your environment,
-reach out to the team @fridaycandour @NickyShe
-
+reach out to the team @fridaycandour for development and @NickyShe for documentation.
 
 
 ## Best practices
 
-Our project has adopted the following best practices for contributing:
-
+Our project  uses the [Google Typescript coding style guide](https://github.com/google/gts) as our parent guide for best practices. Reference the guide to familiarize yourself with the best practices we want contributors to follow
 ### Developers
 
 * Organize your code properly
-* run your test
-
-
-Our project uses the [Google Typescript coding style guide](https://github.com/google/gts) as our parent guide for best practices. Reference the guide to familiarize yourself with the best practices we want contributors to follow.
+* Always run your test before pushing any code
 
 ### Writers
 
-Read the [Google developers documentation writing style guide](https://developers.google.com/style) to understand our guidelines for writing and formatting documents. The purpose of the style guide is to ensure consistency in the tone, voice, and structure of our documentation.
+Read the [Google developers documentation writing style guide](https://developers.google.com/style) to understand the guidelines for writing and formatting documents. The purpose of the style guide is to ensure consistency in the tone, voice, and structure of our documentation.
 
 ## Contribution workflow
 
 ### Report issues and bugs
 
-{Provide instructions on how to report problems.}
+To help us improve JetPath, please report any issues or bugs you encounter. Here’s how you can do it:
 
-### Issue management
+1. **Check existing issues**: Before creating a new issue, search the issue tracker to see if someone else has already reported the problem.
+2. **Create a new issue**: If you can’t find an existing issue, click the **New issue** button and fill out the template provided. Make sure to include:
+* Summarize the issue in a few words.
+* Explain the problem, including any error messages or unexpected behavior.
+* List the steps you took that led to the issue.
+* Describe what you expected to happen and what actually happened.
+* Attach any relevant screenshots or log files if applicable.
 
-{Provide instructions on how to create, tag, and assign issues.}
+3. **Provide context**: If relevant, mention your environment for example, operating system, browser, version of JetPath.
+
+4. **Use Labels**: Apply labels to categorize issues by type for eexample,bug, feature request, documentation.
+5. **Prioritize**: Use priority labels for example, high, medium, low to indicate the urgency of the issue.
+
+6. **Comment and discuss**: Use the issue comments to discuss the problem and potential solutions with other contributors.
+
+By following these steps, we can efficiently track and resolve issues, ensuring JetPath continues to improve for everyone.
 
 ### Commit messages
+Here are the types and description of commit messages
 
-{Provide instructions on how to format commit messages.}
+| Type     | Description | 
+|----------|------------ |
+| feat     | New feature |
+| fix      | Bug fix     | 
+| docs     | Documentation changes |
+| chore    | Maintenance / build tasks |
+| refactor | Code refactoring without feature change |
+
+Example Commit message
+
+```bash
+feat: add support for Deno.js runtime environment detection
+fix: resolve issue with npm run compile failing on Windows
+docs: update contributing guide with branch naming conventions
+chore: upgrade dependencies to latest stable versions
+refactor: reorganize src/utils for better modularity
+
+```
 
 ### Branch creation
 
-{Provide instructions on how to create and/or name a branch.}
+To keep our repository organized and make collaboration easier, please follow these guidelines when creating and naming branches:
+
+Use a consistent prefix to indicate the type of work:
+
+* feature/ for new features
+
+* bugfix/ for bug fixes
+
+* hotfix/ for urgent or critical fixes
+
+* release/ for release preparation
+
+* docs/ for documentation updates
+
+Example: 
+```bash
+git checkout -b feature/add-user-authentication
+git checkout -b bugfix/fix-login-error
+git checkout -b docs/update-contributing-guide
+git checkout -b release/1.0.0
+
+```
+Sticking to these conventions helps everyone quickly understand the purpose of each branch and keeps our workflow efficient
 
 ### Pull requests
 
-{Provide instructions on how to submit a pull request. Share a link to an example pull request or include the pull request template you want contributors to use within this section.}
+When your changes are ready, submit a pull request (PR) to propose merging your branch into the main repository. Please follow these steps:
+
+1. Push your branch to your forked repository:
+
+```bash
+git push -u origin your-branch-name
+```
+2. Open a pull request on GitHub: 
+
+* Navigate to the main repository on GitHub.
+
+* Click "Compare & pull request" next to your branch.
+
+* Ensure the base branch is main (or the appropriate target branch).
+
+3. Fill out the pull request template:
+
+* Provide a clear title and description.
+
+* List the main changes and the motivation behind them.
+
+* Reference any related issues by number (e.g., fixes #42).
+
+Pull Request Template Example:
+```
+## Description
+Briefly describe the purpose of this pull request.
+
+## Changes
+- List key changes here
+
+## Additional Information
+Add any extra context, screenshots, or testing instructions.
+
+## Checklist
+- [ ] Tests passed
+- [ ] Documentation updated
+```
 
 ### Releases
 
 {Provide a description of the release process and cadence for the project, such as the source code.}
 
-### Text formats
-
-{Provide information on what you need contributors to know and use to edit and create documents.}
 
 ---
  
