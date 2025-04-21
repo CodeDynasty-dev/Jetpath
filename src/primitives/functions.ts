@@ -32,12 +32,14 @@ let cors: (ctx: Context) => void;
 const optionsCtx = {
   _1: undefined,
   _2: {},
+  _6: false,
   code: 204,
   set(field: string, value: string) {
     if (field && value) {
       (this._2 as Record<string, string>)[field] = value;
     }
   },
+  request:{method:"OPTIONS"}
 };
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
@@ -99,6 +101,8 @@ export function corsMiddleware(options: {
       ctx.set("Access-Control-Allow-Origin", options.origin.join(","));
     }
     if (ctx.request!.method !== "OPTIONS") {
+      // ? add ctx to ctx pool
+      UTILS.ctxPool.push(ctx);``
       if (options.secureContext) {
         ctx.set(
           "Cross-Origin-Opener-Policy",
@@ -344,8 +348,7 @@ const makeRes = (
 ) => {
   //? add cors headers
   cors?.(ctx);
-  // ? add ctx to ctx pool
-  UTILS.ctxPool.push(ctx);
+  
   // ? prepare response
   if (!UTILS.runtime["node"]) {
     // redirect
