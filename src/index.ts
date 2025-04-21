@@ -233,12 +233,11 @@ export class Jetpath {
 
 //? exports
 export type {
-  JetFunc,
-  JetFile,
   AnyExecutor,
   ContextType,
+  JetFile,
+  JetFunc,
   JetMiddleware,
   JetPluginExecutorInitParams,
 } from "./primitives/types.js";
 export { JetPlugin } from "./primitives/classes.js";
-export { JetPathErrors } from "./primitives/functions.js";

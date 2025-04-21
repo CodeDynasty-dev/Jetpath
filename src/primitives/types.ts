@@ -1,5 +1,6 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths } from "./functions.js";
+import { CookieOptions } from "./classes.js";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,
@@ -50,28 +51,25 @@ export interface ContextType<
    * send a stream
    */
   // sendStream(stream: Stream | string, ContentType: string): never;
-  sendStream(stream: any | string, ContentType: string): never;
+  sendStream(stream: any | string, ContentType: string): void;
   /**
    * send a direct response
    * *Only for deno and bun
    */
   // sendStream(stream: Stream | string, ContentType: string): never;
-  sendResponse(response?: Response): never;
+  sendResponse(response?: Response): void;
   /**
    * reply the request
    */
-  send(data: unknown, ContentType?: string): never;
+  send(data: unknown, ContentType?: string): void;
   /**
    * end the request with an error
    */
-  throw(
-    code?: number | string | Record<string, any> | unknown,
-    message?: string | Record<string, any>,
-  ): never;
+  throw(code?: unknown, message?: unknown): never;
   /**
    * redirect the request
    */
-  redirect(url: string): never;
+  redirect(url: string): void;
   /**
    * get request header values
    */
@@ -83,7 +81,14 @@ export interface ContextType<
   /**
    * Parses the request body
    */
-  parse(): Promise<Record<string, any>>;
+  getCookie(name: string): string | undefined;
+  getCookies(): Record<string, string>;
+  setCookie(name: string, value: string, options: CookieOptions): void;
+  clearCookie(name: string, options: CookieOptions): void;
+  parse(options?: {
+    maxBodySize?: number;
+    contentType?: string;
+  }): Promise<JetData["body"]>;
 
   /**
    * get original request
@@ -217,18 +222,19 @@ export type JetMiddleware<
 > = (
   ctx: ContextType<JetData, JetPluginTypes>,
 ) =>
-  | Promise<void>
   | void
-  | Promise<
-    (
-      ctx: ContextType<JetData, JetPluginTypes>,
-      error: unknown,
-    ) => Promise<any> | any
-  >
+  | Promise<void>
   | ((
     ctx: ContextType<JetData, JetPluginTypes>,
     error: unknown,
-  ) => Promise<any> | any);
+  ) => void | Promise<void>)
+  | Promise<
+    ((
+      ctx: ContextType<JetData, JetPluginTypes>,
+      error: unknown,
+    ) => void | Promise<void>) | undefined
+  >
+  | undefined;
 
 export type JetFunc<
   JetData extends {

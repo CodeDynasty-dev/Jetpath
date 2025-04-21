@@ -1,13 +1,7 @@
 import { createReadStream } from "node:fs";
 import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
-import {
-  _DONE,
-  _JetPath_paths,
-  parseRequest,
-  UTILS,
-  validator,
-} from "./functions.js";
+import { _JetPath_paths, parseRequest, UTILS, validator } from "./functions.js";
 import type {
   AnyExecutor,
   JetFunc,
@@ -85,6 +79,60 @@ export class Log {
   }
 }
 
+export interface CookieOptions {
+  path?: string;
+  domain?: string;
+  secure?: boolean;
+  httpOnly?: boolean;
+  sameSite?: "strict" | "lax" | "none";
+  maxAge?: number;
+  expires?: Date;
+}
+
+class Cookie {
+  private static parseCookieHeader(header: string): Record<string, string> {
+    return header
+      .split("; ")
+      .map((pair) => pair.split("="))
+      .reduce((acc, [key, value]) => ({
+        ...acc,
+        [key.trim()]: value ? decodeURIComponent(value) : "",
+      }), {});
+  }
+
+  private static serializeCookie(
+    name: string,
+    value: string,
+    options: CookieOptions,
+  ): string {
+    const parts = [`${encodeURIComponent(name)}=${encodeURIComponent(value)}`];
+
+    if (options.path) parts.push(`Path=${encodeURIComponent(options.path)}`);
+    if (options.domain) {
+      parts.push(`Domain=${encodeURIComponent(options.domain)}`);
+    }
+    if (options.secure) parts.push("Secure");
+    if (options.httpOnly) parts.push("HttpOnly");
+    if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
+    if (options.maxAge) parts.push(`Max-Age=${options.maxAge}`);
+    if (options.expires) parts.push(`Expires=${options.expires.toUTCString()}`);
+
+    return parts.join("; ");
+  }
+
+  static parse(cookies: string): Record<string, string> {
+    return Cookie.parseCookieHeader(cookies);
+  }
+
+  static serialize(
+    name: string,
+    value: string,
+    options: CookieOptions = {},
+  ): string {
+    return Cookie.serializeCookie(name, value, options);
+  }
+}
+
 export class Context {
   code = 200;
   request: Request | IncomingMessage | undefined;
@@ -99,11 +147,9 @@ export class Context {
   //? load
   _1?: string = undefined;
   // ? header of response
-  _2?: Record<string, string> = {};
+  _2: Record<string, string> = {};
   // //? stream
   _3?: Stream = undefined;
-  //? used to know if the request has ended
-  _4: boolean = false;
   //? used to know if the request has been offloaded
   _5: JetFunc | null = null;
   //? response
@@ -129,8 +175,6 @@ export class Context {
     this._2 = {};
     // //? stream
     this._3 = undefined;
-    //? used to know if the request has ended
-    this._4 = false;
     //? the route handler
     this._5 = route;
     //? custom response
@@ -140,73 +184,55 @@ export class Context {
   }
 
   send(data: unknown, contentType?: string) {
-    let ctype;
-    switch (typeof data) {
-      case "string":
-        ctype = "text/plain";
-        this._1 = data;
-        break;
-      case "object":
-        ctype = "application/json";
-        this._1 = JSON.stringify(data);
-        break;
-      default:
-        ctype = "text/plain";
-        this._1 = data ? String(data) : "";
-        break;
-    }
     if (contentType) {
-      ctype = contentType;
+      this._2["Content-Type"] = contentType;
+      this._1 = String(data);
+    } else {
+      switch (typeof data) {
+        case "string":
+          this._2["Content-Type"] = "text/plain";
+          this._1 = data;
+          break;
+        case "object":
+          this._2["Content-Type"] = "application/json";
+          this._1 = JSON.stringify(data);
+          break;
+        default:
+          this._2["Content-Type"] = "text/plain";
+          this._1 = data ? String(data) : "";
+          break;
+      }
     }
-    if (!this._2) {
-      this._2 = {};
-    }
-    this._2["Content-Type"] = ctype;
-    this._4 = true;
-    throw _DONE;
   }
 
   redirect(url: string) {
     this.code = 301;
-    if (!this._2) {
-      this._2 = {};
-    }
     this._2["Location"] = url;
-    this._1 = undefined;
-    this._4 = true;
-    throw _DONE;
   }
 
-  throw(code: unknown = 404, message: unknown = "Not Found") {
-    // ? could be a success but a wrong throw, so we check
-    if (!this._2) {
-      this._2 = {};
-    }
-    if (!this._4) {
-      this.code = 400;
-      switch (typeof code) {
-        case "number":
-          this.code = code;
-          if (typeof message === "object") {
-            this._2["Content-Type"] = "application/json";
-            this._1 = JSON.stringify(message);
-          } else if (typeof message === "string") {
-            this._2["Content-Type"] = "text/plain";
-            this._1 = message;
-          }
-          break;
-        case "string":
-          this._2["Content-Type"] = "text/plain";
-          this._1 = code;
-          break;
-        case "object":
+  throw(code: unknown = 404, message: unknown = "Not Found"): never {
+    this.code = code as number || 400;
+    switch (typeof code) {
+      case "number":
+        this.code = code;
+        if (typeof message === "object") {
           this._2["Content-Type"] = "application/json";
-          this._1 = JSON.stringify(code);
-          break;
-      }
+          this._1 = JSON.stringify(message);
+        } else if (typeof message === "string") {
+          this._2["Content-Type"] = "text/plain";
+          this._1 = message;
+        }
+        break;
+      case "string":
+        this._2["Content-Type"] = "text/plain";
+        this._1 = code;
+        break;
+      case "object":
+        this._2["Content-Type"] = "application/json";
+        this._1 = JSON.stringify(code);
+        break;
     }
-    this._4 = true;
-    throw _DONE;
+    throw new Error(this._1);
   }
 
   get(field: string) {
@@ -221,18 +247,46 @@ export class Context {
   }
 
   set(field: string, value: string) {
-    if (!this._2) {
-      this._2 = {};
-    }
     if (field && value) {
       this._2[field] = value;
     }
   }
 
-  sendStream(stream: Stream | string, ContentType: string) {
-    if (!this._2) {
-      this._2 = {};
+  getCookie(name: string): string | undefined {
+    const cookieHeader = UTILS.runtime["node"]
+      ? (this.request as IncomingMessage).headers.cookie
+      : (this.request as Request).headers.get("cookie");
+
+    if (cookieHeader) {
+      const cookies = Cookie.parse(cookieHeader);
+      return cookies[name];
     }
+    return undefined;
+  }
+
+  getCookies(): Record<string, string> {
+    const cookieHeader = UTILS.runtime["node"]
+      ? (this.request as IncomingMessage).headers.cookie
+      : (this.request as Request).headers.get("cookie");
+
+    return cookieHeader ? Cookie.parse(cookieHeader) : {};
+  }
+
+  setCookie(name: string, value: string, options: CookieOptions = {}): void {
+    const cookie = Cookie.serialize(name, value, options);
+    const existingCookies = this._2["set-cookie"] || "";
+    const cookies = existingCookies
+      ? existingCookies.split(",").map((c) => c.trim())
+      : [];
+    cookies.push(cookie);
+    this._2["set-cookie"] = cookies.join(", ");
+  }
+
+  clearCookie(name: string, options: CookieOptions = {}): void {
+    this.setCookie(name, "", { ...options, maxAge: 0 });
+  }
+
+  sendStream(stream: Stream | string, ContentType: string) {
     if (typeof stream === "string") {
       this._2["Content-Disposition"] = `inline; filename="${
         stream.split("/").at(-1) || "unnamed.bin"
@@ -253,15 +307,11 @@ export class Context {
 
     this._2["Content-Type"] = ContentType;
     this._3 = stream as Stream;
-    this._4 = true;
-    throw _DONE;
   }
   // Only for deno and bun
   sendResponse(Response?: Response) {
     // @ts-ignore
     this._6 = Response;
-    this._4 = true;
-    throw _DONE;
   }
 
   async parse<Type extends any = Record<string, any>>(options?: {
