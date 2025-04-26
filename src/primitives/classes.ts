@@ -290,15 +290,14 @@ export class Context {
 
   sendStream(stream: Stream | string, ContentType: string) {
     if (typeof stream === "string") {
-      this._2["Content-Disposition"] = `inline; filename="${
-        stream.split("/").at(-1) || "unnamed.bin"
-      }"`;
+      this._2["Content-Disposition"] = `inline; filename="${stream.split("/").at(-1) || "unnamed.bin"
+        }"`;
       if (UTILS.runtime["bun"]) {
         // @ts-expect-error
         stream = Bun.file(stream);
       } else if (UTILS.runtime["deno"]) {
         // @ts-expect-error
-        const file = Deno.open(stream).catch(() => {});
+        const file = Deno.open(stream).catch(() => { });
         stream = file;
       } else {
         stream = createReadStream(resolve(stream) as string, {
@@ -310,6 +309,7 @@ export class Context {
     this._2["Content-Type"] = ContentType;
     this._3 = stream as Stream;
   }
+
   // Only for deno and bun
   sendResponse(Response?: Response) {
     // @ts-ignore
@@ -366,7 +366,6 @@ export class Context {
     if (this._5!.body) {
       this.body = validator(this._5!.body, this.body);
     }
-    // validate here;
     return this.body as Promise<Type>;
   }
 }
@@ -460,6 +459,7 @@ export class StringSchema extends SchemaBuilder {
       err || "Invalid URL",
     );
   }
+
 }
 
 export class NumberSchema extends SchemaBuilder {
@@ -644,15 +644,12 @@ class TrieNode {
   wildcardChild: TrieNode | null;
   // ? route handler
   handler: JetFunc | null;
-  // ? original route path
-  originalPath: string | null;
   constructor() {
     this.children = new Map();
     this.parameterChild = null;
     this.paramName = null;
     this.wildcardChild = null;
     this.handler = null;
-    this.originalPath = null;
   }
 }
 
@@ -662,6 +659,7 @@ class TrieNode {
 export class Trie {
   root: TrieNode;
   method: string;
+  hashmap: Map<string, JetFunc> = new Map();
   constructor(
     method:
       | "GET"
@@ -681,8 +679,12 @@ export class Trie {
   /**
    * Inserts a route path and its associated handler into the Trie.
    */
-  insert(path: string, handler: JetFunc) {
+  insert(path: string, handler: JetFunc): void {
     // ? remove leading/trailing slashes, handle empty path
+    if (!/(\*|:)+/.test(path)) {
+      this.hashmap.set(path, handler);
+      return;
+    }
     let normalizedPath = path.trim();
     if (normalizedPath.startsWith("/")) {
       normalizedPath = normalizedPath.slice(1);
@@ -699,13 +701,11 @@ export class Trie {
         );
       }
       this.root.handler = handler;
-      this.root.originalPath = path;
       return;
     }
 
     const segments = normalizedPath.split("/");
-    let currentNode: TrieNode = this.root;
-    // const paramNames: string[] = []; // To store the names of parameters in this path
+    let currentNode: TrieNode = this.root; 
 
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
@@ -741,7 +741,6 @@ export class Trie {
           currentNode.parameterChild = newNode;
           currentNode = newNode;
         }
-        //  paramNames.push(paramName); // Add parameter name to the list for this route
       } // ? Check for wildcard segment (*) - typically only allowed at the end
       else if (segment === "*") {
         if (i !== segments.length - 1) {
@@ -793,17 +792,19 @@ export class Trie {
     }
     if (currentNode.handler) {
       console.warn(
-        `Warning: Duplicate route definition for path '${path}' in ${this.method} ${path}.`,
+        `Warning: Duplicate route definition for path '${path}'.`,
       );
     }
     //? Set the handler and original path
     currentNode.handler = handler;
-    currentNode.originalPath = path;
   }
 
   get_responder(path: string):
-    | [JetFunc, Record<string, any>, Record<string, any>, string, boolean]
+    | [JetFunc, Record<string, any>, Record<string, any>, string]
     | undefined {
+    if (this.hashmap.has(path)) {
+      return [this.hashmap.get(path)!, {}, {}, path];
+    }
     let normalizedPath = path;
     if (!UTILS.runtime["node"]) {
       const pathStart = normalizedPath.indexOf("/", 7);
@@ -819,7 +820,7 @@ export class Trie {
     }
     if (normalizedPath === "") {
       if (this.root.handler) {
-        return [this.root.handler, {}, {}, path, false];
+        return [this.root.handler, {}, {}, path];
       }
     }
     const segments = normalizedPath.split("/");
@@ -833,7 +834,7 @@ export class Trie {
       queryParams.forEach((value, key) => {
         query[key] = value;
       });
-    } 
+    }
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       if (currentNode.children.has(segment)) {
@@ -856,7 +857,7 @@ export class Trie {
     }
     if (currentNode.handler) {
       // ? Route found
-      return [currentNode.handler, params, query, path, false];
+      return [currentNode.handler, params, query, path];
     }
   }
 }

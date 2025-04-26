@@ -35,13 +35,9 @@ import {
 
 /**
  * an inbuilt CORS post middleware
- *
- * @param {Object} [options] cors options
  *    @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer/Planned_changes
  *  - {Boolean} privateNetworkAccess handle `Access-Control-Request-Private-Network` request by return `Access-Control-Allow-Private-Network`, default to false
  *    @see https://wicg.github.io/private-network-access/
- * @return {Function} cors post middleware
- * @public
  */
 
 let cors: (ctx: Context) => void;
@@ -396,8 +392,7 @@ const Jetpath = async (
   if (req.method === "OPTIONS") {
     return makeRes(res, optionsCtx as Context);
   }
-  // const responder = get_responder(req as any);
-  const responder = _JetPath_paths_trie[req.method as methods].get_responder(
+  const responder = _JetPath_paths_trie[req.method as methods]?.get_responder(
     req.url!,
   );
   let ctx: Context;
