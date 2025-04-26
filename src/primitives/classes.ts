@@ -215,26 +215,12 @@ export class Context {
   }
 
   throw(code: unknown = 404, message: unknown = "Not Found"): never {
-    this.code = code as number || 400;
-    switch (typeof code) {
-      case "number":
-        this.code = code;
-        if (typeof message === "object") {
-          this._2["Content-Type"] = "application/json";
-          this._1 = JSON.stringify(message);
-        } else if (typeof message === "string") {
-          this._2["Content-Type"] = "text/plain";
-          this._1 = message;
-        }
-        break;
-      case "string":
-        this._2["Content-Type"] = "text/plain";
-        this._1 = code;
-        break;
-      case "object":
-        this._2["Content-Type"] = "application/json";
-        this._1 = JSON.stringify(code);
-        break;
+    if (typeof code !== "number") {
+      this.code = 400;
+      this.send(message||"", "text/plain");
+    } else {
+      this.code = code;
+      this.send(message||code);
     }
     throw new Error(this._1);
   }
