@@ -290,14 +290,15 @@ export class Context {
 
   sendStream(stream: Stream | string, ContentType: string) {
     if (typeof stream === "string") {
-      this._2["Content-Disposition"] = `inline; filename="${stream.split("/").at(-1) || "unnamed.bin"
-        }"`;
+      this._2["Content-Disposition"] = `inline; filename="${
+        stream.split("/").at(-1) || "unnamed.bin"
+      }"`;
       if (UTILS.runtime["bun"]) {
         // @ts-expect-error
         stream = Bun.file(stream);
       } else if (UTILS.runtime["deno"]) {
         // @ts-expect-error
-        const file = Deno.open(stream).catch(() => { });
+        const file = Deno.open(stream).catch(() => {});
         stream = file;
       } else {
         stream = createReadStream(resolve(stream) as string, {
@@ -459,7 +460,6 @@ export class StringSchema extends SchemaBuilder {
       err || "Invalid URL",
     );
   }
-
 }
 
 export class NumberSchema extends SchemaBuilder {
@@ -705,7 +705,7 @@ export class Trie {
     }
 
     const segments = normalizedPath.split("/");
-    let currentNode: TrieNode = this.root; 
+    let currentNode: TrieNode = this.root;
 
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];

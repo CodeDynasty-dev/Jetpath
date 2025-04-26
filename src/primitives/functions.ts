@@ -677,7 +677,7 @@ export function validator<T extends Record<string, any>>(
 
   return out as T;
 }
- 
+
 export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
   const globalHeaders = JSON.stringify(
@@ -715,7 +715,7 @@ export const compileAPI = (options: jetOptions): [number, string] => {
       _JetPath_paths[method as methods],
     ).map((value) => _JetPath_paths[method as methods][value])).filter((
       value,
-    ) => value.length > 0); 
+    ) => value.length > 0);
 
     if (routesOfMethod && Object.keys(routesOfMethod).length) {
       for (const route of routesOfMethod) {
@@ -821,7 +821,9 @@ export function assignMiddleware(
   for (const method in _JetPath_paths) {
     const routes: JetFunc[] = (Object.keys(
       _JetPath_paths[method as methods],
-    ).map((value) => _JetPath_paths[method as methods][value])).filter((value) => value.length > 0);
+    ).map((value) => _JetPath_paths[method as methods][value])).filter((
+      value,
+    ) => value.length > 0);
     for (const route of routes) {
       if (!Array.isArray(route.jet_middleware)) {
         route.jet_middleware = [];
