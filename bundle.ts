@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
 
 console.log("Jetpath: compiling...");
-const html = await readFile("src/primitives/api-doc.html", {
+const html = await readFile("src/assets/api-doc.html", {
   encoding: "utf-8",
 });
 const code = await readFile("dist/index.js", {

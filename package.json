@@ -7,11 +7,12 @@
   "files": [
     "dist/index.d.ts",
     "dist/primitives",
+    "dist/extracts",
     "dist/index.js"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fridaycandour/jetpath.git"
+    "url": "git+https://github.com/codedynasty-dev/jetpath.git"
   },
   "keywords": [
     "web",
@@ -23,14 +24,15 @@
     "denojs",
     "expressive",
     "server",
-    "http"
+    "http",
+    "convention"
   ],
-  "author": "fridaycandour fridaycandours@gmail.com",
+  "author": "friday candour fridaycandours@gmail.com",
   "license": "Apache",
   "bugs": {
-    "url": "https://github.com/fridaycandour/jetpath/issues"
+    "url": "https://github.com/codedynasty-dev/jetpath/issues"
   },
-  "homepage": "https://github.com/fridaycandour/jetpath#readme",
+  "homepage": "https://github.com/codedynasty-dev/jetpath#readme",
   "scripts": {
     "compile": "./pack",
     "deno": "deno run --allow-all tests/app.jet.ts",
@@ -54,17 +56,12 @@
   "private": false,
   "devDependencies": {
     "@types/bun": "^1.1.8",
-    "@types/busboy": "^1.5.4",
     "@types/node": "^22.7.5",
-    "busboy": "^1.6.0",
     "docmach": "^1.0.16",
     "gts": "^6.0.2",
     "mitata": "^1.0.34",
     "typescript": "^5.6.3",
     "ws": "^8.17.0"
-  },
-  "dependencies": {
-    "mime": "^4.0.1"
   },
   "docmach": {
     "docs-directory": "docs",

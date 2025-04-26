@@ -1,4 +1,4 @@
-import mime from "mime/lite";
+import { mime } from "./extracts/mimejs-extract.js";
 
 import { writeFile } from "node:fs/promises";
 import {
