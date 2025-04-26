@@ -217,7 +217,7 @@ export class Context {
   throw(code: unknown = 404, message: unknown = "Not Found"): never {
     if (typeof code !== "number") {
       this.code = 400;
-      this.send(message||"", "text/plain");
+      this.send(message||"");
     } else {
       this.code = code;
       this.send(message||code);
