@@ -26,3 +26,136 @@
 {"timestamp":"2025-04-26T07:45:29.919Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
 {"timestamp":"2025-04-26T07:45:31.070Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
 {"timestamp":"2025-04-26T07:45:31.070Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:29:00.313Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:29:00.319Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:30:06.697Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:30:06.702Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:30:20.186Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:30:34.652Z","level":"info","method":"POST","url":"http://localhost:9000/auth/login"}
+{"timestamp":"2025-04-26T12:30:34.661Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/auth/login"}
+{"timestamp":"2025-04-26T12:30:50.933Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:30:50.934Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:03.099Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:03.100Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.190Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.191Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.421Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.421Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.659Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.659Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.881Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:04.881Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:12.868Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:12.871Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:13.527Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:13.528Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:13.877Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:13.877Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:46.439Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:31:46.441Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:32:42.763Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:32:54.516Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:32:59.834Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:32:59.835Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:09.087Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:09.088Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:10.268Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:10.269Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:10.440Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:10.441Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:10.644Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:33:10.644Z","level":"error","message":"Error: Invalid upgrade header","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:38:34.328Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:38:34.338Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:38:53.861Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:40:12.911Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:40:12.915Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:40:47.093Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:00.124Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:00.956Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:01.558Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:01.873Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:08.372Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:09.459Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:10.028Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:10.389Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:44.040Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:44.044Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:55.547Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:41:55.549Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:42:28.022Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:42:28.025Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:42:31.276Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:42:31.282Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:45:56.051Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:45:56.057Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:46:10.143Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:46:10.148Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:46:10.576Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:46:10.579Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:46:43.422Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:46:43.427Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:47:06.050Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:47:06.052Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:47:06.159Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:47:06.160Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:48:09.447Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:48:09.457Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:48:11.048Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:48:11.052Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:48:42.037Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:48:42.039Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:48:42.173Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:48:42.174Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:12.028Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:12.031Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:12.059Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:12.060Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:12.076Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:12.077Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:58.328Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:58.331Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:59.048Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:59.049Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:59.059Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:50:59.060Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:51:46.968Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:51:46.973Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T12:57:45.052Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:57:45.054Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:57:45.065Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:57:45.067Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:57:45.080Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:57:45.080Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:30.911Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:30.912Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:31.139Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:31.140Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:33.859Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:33.859Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:33.960Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:33.961Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:34.690Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:34.690Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:34.769Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:34.769Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:40.137Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:40.137Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:40.808Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:40.809Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:49.679Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:49.680Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:49.736Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:49.737Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:54.845Z","level":"info","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:54.845Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/assets/chat.html"}
+{"timestamp":"2025-04-26T12:58:54.933Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T12:58:54.935Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T13:03:00.263Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T13:03:00.265Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T13:03:12.988Z","level":"info","method":"GET","url":"http://localhost:9000/"}
+{"timestamp":"2025-04-26T13:03:12.989Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/"}
+{"timestamp":"2025-04-26T13:03:21.335Z","level":"info","method":"PUT","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T13:03:21.336Z","level":"error","message":"TypeError: ctx.plugins.isAdmin is not a function. (In 'ctx.plugins.isAdmin(ctx)', 'ctx.plugins.isAdmin' is undefined)","method":"PUT","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T13:08:44.590Z","level":"info","method":"PUT","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T13:08:44.593Z","level":"error","message":"Error: available must be of type boolean, image must be of type file, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"PUT","url":"http://localhost:9000/petBy/:id"}

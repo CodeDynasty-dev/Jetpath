@@ -6,7 +6,8 @@
 // usage go to ws://localhost:8000/sockets
 
 //  for deno and bun only
-export const WS_sockets: JetFunc = (ctx) => {
+export const GET_sockets: JetFunc = (ctx) => {
+  ctx.upgrade(); 
   const conn = ctx.connection!;
   try {
     conn.addEventListener("open", (socket) => {

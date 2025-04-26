@@ -86,7 +86,7 @@ export class Jetpath {
         );
         const ext = path.extname(filePath).slice(1);
         const contentType = mime.getType(ext) || "application/octet-stream";
-        ctx.sendStream(filePath, contentType);
+        return ctx.sendStream(filePath, contentType);
       };
       _JetPath_paths["GET"].wildcard[name].method = "GET";
       _JetPath_paths["GET"].wildcard[name].path = name;
@@ -221,6 +221,9 @@ export class Jetpath {
       }
     }
     // ? kickoff server
+    if (this.options?.upgrade === true) {
+      UTILS.upgrade = true;
+    }
     this.server = UTILS.server(this.plugs);
     //
     assignMiddleware(_JetPath_paths, _jet_middleware);

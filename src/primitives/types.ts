@@ -18,7 +18,7 @@ export interface ContextType<
   /**
    * an object you can set values to per request
    */
-  app: Record<string, any>;
+  state: Record<string, any>;
   /**
    * an object you can set values to per request
    */
@@ -89,7 +89,10 @@ export interface ContextType<
     maxBodySize?: number;
     contentType?: string;
   }): Promise<JetData["body"]>;
-
+  /**
+   * Upgrade the request to a WebSocket connection
+   */
+  upgrade(): void | never;
   /**
    * get original request
    */
@@ -137,6 +140,7 @@ export type methods =
 export type allowedMethods = methods[];
 
 export type jetOptions = {
+  upgrade?: boolean;
   globalHeaders?: Record<string, string>;
   apiDoc?: {
     name?: string;
@@ -174,17 +178,19 @@ export type jetOptions = {
       origin?: string[];
     }
     | boolean;
-  websocket?:
-    | {
-      idleTimeout?: number;
-    }
-    | boolean;
 };
 
 export type HTTPBody<Obj extends Record<string, any>> = {
   [x in keyof Obj]: {
     err?: string;
-    type?: "string"|"number"|"file"|"object"|"boolean"|"array"|"date";
+    type?:
+      | "string"
+      | "number"
+      | "file"
+      | "object"
+      | "boolean"
+      | "array"
+      | "date";
     arrayType?:
       | "string"
       | "number"
@@ -242,7 +248,16 @@ export type JetFunc<
     params?: Record<string, any>;
     query?: Record<string, any>;
     response?: Record<string, any>;
-  } = { body: {}; params: {}; query: {}; response: {}, info: "", method: "", path: "", jet_middleware: [] },
+  } = {
+    body: {};
+    params: {};
+    query: {};
+    response: {};
+    info: "";
+    method: "";
+    path: "";
+    jet_middleware: [];
+  },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
   (ctx: ContextType<JetData, JetPluginTypes>): Promise<void> | void;
@@ -251,9 +266,9 @@ export type JetFunc<
   info?: string;
   method?: string;
   path?: string;
-    jet_middleware?: JetMiddleware[];
-    params?: HTTPBody<JetData["params"] & Record<string, any>>;
-    query?: HTTPBody<JetData["query"] & Record<string, any>>;
+  jet_middleware?: JetMiddleware[];
+  params?: HTTPBody<JetData["params"] & Record<string, any>>;
+  query?: HTTPBody<JetData["query"] & Record<string, any>>;
   response?: HTTPBody<JetData["response"] & Record<string, any>>;
 };
 
@@ -270,8 +285,6 @@ export type JetFile = {
   mimeType: string;
 };
 
-
- 
 export type SchemaType =
   | "string"
   | "number"
@@ -298,26 +311,53 @@ export interface ObjectOptions extends ValidationOptions {
   objectSchema?: HTTPBody<any>;
 }
 
-export type SchemaDefinition = {
-  type: SchemaType;
-} & ValidationOptions &
-  ArrayOptions &
-  ObjectOptions;
- 
+export type SchemaDefinition =
+  & {
+    type: SchemaType;
+  }
+  & ValidationOptions
+  & ArrayOptions
+  & ObjectOptions;
 
-  export type compilerType<
-    JetData extends {
-      body?: Record<string, any>;
-      params?: Record<string, any>;
-      query?: Record<string, any>;
-      response?: Record<string, any>;
-    },
-    JetPluginTypes extends Record<string, unknown>[] = [],
-  > = {
-    body: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
-    headers: (headers: Record<string, string>) => compilerType<JetData, JetPluginTypes>;
-    info: (info: string) => compilerType<JetData, JetPluginTypes>;
-    params: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["params"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
-    query: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
-    response: (schemaFn: (t: typeof v) => Partial<Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>>) => compilerType<JetData, JetPluginTypes>;
-  };  
+export type compilerType<
+  JetData extends {
+    body?: Record<string, any>;
+    params?: Record<string, any>;
+    query?: Record<string, any>;
+    response?: Record<string, any>;
+  },
+  JetPluginTypes extends Record<string, unknown>[] = [],
+> = {
+  body: (
+    schemaFn: (
+      t: typeof v,
+    ) => Partial<
+      Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>
+    >,
+  ) => compilerType<JetData, JetPluginTypes>;
+  headers: (
+    headers: Record<string, string>,
+  ) => compilerType<JetData, JetPluginTypes>;
+  info: (info: string) => compilerType<JetData, JetPluginTypes>;
+  params: (
+    schemaFn: (
+      t: typeof v,
+    ) => Partial<
+      Record<keyof HTTPBody<NonNullable<JetData["params"]>>, SchemaBuilder>
+    >,
+  ) => compilerType<JetData, JetPluginTypes>;
+  query: (
+    schemaFn: (
+      t: typeof v,
+    ) => Partial<
+      Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>
+    >,
+  ) => compilerType<JetData, JetPluginTypes>;
+  response: (
+    schemaFn: (
+      t: typeof v,
+    ) => Partial<
+      Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
+    >,
+  ) => compilerType<JetData, JetPluginTypes>;
+};

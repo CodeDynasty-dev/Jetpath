@@ -15,7 +15,21 @@ import {
   type methods,
   ValidationOptions,
 } from "./types.js";
-import { ArraySchema, BooleanSchema, Context, DateSchema, FileSchema, type JetPlugin, JetSocket, Log, NumberSchema, ObjectSchema, SchemaBuilder, SchemaCompiler, StringSchema } from "./classes.js";
+import {
+  ArraySchema,
+  BooleanSchema,
+  Context,
+  DateSchema,
+  FileSchema,
+  type JetPlugin,
+  JetSocket,
+  Log,
+  NumberSchema,
+  ObjectSchema,
+  SchemaBuilder,
+  SchemaCompiler,
+  StringSchema,
+} from "./classes.js";
 
 /**
  * an inbuilt CORS post middleware
@@ -39,7 +53,7 @@ const optionsCtx = {
       (this._2 as Record<string, string>)[field] = value;
     }
   },
-  request:{method:"OPTIONS"}
+  request: { method: "OPTIONS" },
 };
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
@@ -102,7 +116,8 @@ export function corsMiddleware(options: {
     }
     if (ctx.request!.method !== "OPTIONS") {
       // ? add ctx to ctx pool
-      UTILS.ctxPool.push(ctx);``
+      UTILS.ctxPool.push(ctx);
+      ``;
       if (options.secureContext) {
         ctx.set(
           "Cross-Origin-Opener-Policy",
@@ -116,60 +131,58 @@ export function corsMiddleware(options: {
     }
   };
 }
-const JetSocketInstance = new JetSocket();
+export const JetSocketInstance = new JetSocket();
 
 export let _JetPath_paths: Record<
   methods,
   Record<
-    "direct" | "wildcard" | "parameter" | "query",
+    "direct" | "wildcard" | "parameter",
     Record<string, JetFunc>
   >
 > = {
   GET: {
     direct: {},
     parameter: {},
-    query: {},
+
     wildcard: {},
   },
   POST: {
     direct: {},
     parameter: {},
-    query: {},
+
     wildcard: {},
   },
   HEAD: {
     direct: {},
     parameter: {},
-    query: {},
+
     wildcard: {},
   },
   PUT: {
     direct: {},
     parameter: {},
-    query: {},
+
     wildcard: {},
   },
   PATCH: {
     direct: {},
     parameter: {},
-    query: {},
+
     wildcard: {},
   },
   DELETE: {
     direct: {},
     parameter: {},
-    query: {},
+
     wildcard: {},
   },
   OPTIONS: {
     direct: {},
     parameter: {},
-    query: {},
+
     wildcard: {},
   },
 };
-
-let _JetPath_WS_HANDLER: JetFunc = undefined as any;
 
 export const _jet_middleware: Record<
   string,
@@ -177,6 +190,7 @@ export const _jet_middleware: Record<
 > = {};
 
 export const UTILS = {
+  upgrade: false,
   ctxPool: [] as Context[],
   middlewares: {},
   ae(cb: { (): any; (): any; (): void }) {
@@ -213,9 +227,8 @@ export const UTILS = {
         edge: false,
       };
     }
-    if (UTILS.runtime["bun"]) {
-      // @ts-ignore
-      if (_JetPath_WS_HANDLER) {
+    if (UTILS.runtime["bun"]) { 
+      if (UTILS.upgrade) {
         server = {
           listen(port: number) {
             server_else = Bun.serve({
@@ -315,27 +328,21 @@ UTILS.set();
 
 const getCtx = (
   req: IncomingMessage | Request,
+  res: any,
   path: string,
   route: JetFunc,
   params?: Record<string, any>,
   query?: Record<string, any>,
-  socket?: boolean,
 ): Context => {
   if (UTILS.ctxPool.length) {
     const ctx = UTILS.ctxPool.shift()!;
-    ctx._7(req as Request, path, route, params, query);
-    if (socket) {
-      ctx.connection = JetSocketInstance;
-    }
+    ctx._7(req as Request, res, path, route, params, query);
     return ctx;
   }
   const ctx = new Context();
   // ? add middlewares to the plugins object
   Object.assign(ctx.plugins, UTILS.middlewares);
-  ctx._7(req as Request, path, route, params, query);
-  if (socket) {
-    ctx.connection = JetSocketInstance;
-  }
+  ctx._7(req as Request, res, path, route, params, query);
   return ctx;
 };
 
@@ -348,7 +355,7 @@ const makeRes = (
 ) => {
   //? add cors headers
   cors?.(ctx);
-  
+
   // ? prepare response
   if (!UTILS.runtime["node"]) {
     // redirect
@@ -407,18 +414,18 @@ const Jetpath = async (
   if (req.method === "OPTIONS") {
     return makeRes(res, optionsCtx as Context);
   }
-  const responder = get_responder(req as any, res);
+  const responder = get_responder(req as any);
   let ctx: Context;
   let returned: (Function | void)[] | undefined;
   if (responder) {
     const r = responder[0];
     ctx = getCtx(
       req,
+      res,
       responder[3],
       r,
       responder[1],
       responder[2],
-      responder[4],
     );
     try {
       //? pre-request middlewares here
@@ -453,7 +460,7 @@ const Jetpath = async (
       }
     }
   }
-  return makeRes(res, getCtx(req, "", null as any), true);
+  return makeRes(res, getCtx(req, res, "", null as any), true);
 };
 
 const handlersPath = (path: string) => {
@@ -461,23 +468,22 @@ const handlersPath = (path: string) => {
   if (path.includes("$")) {
     if (path.includes("$0")) {
       type = "wildcard";
-    } else if (path.includes("$$")) {
-      type = "query";
     } else {
       type = "parameter";
     }
   }
   let [method, ...segments] = path.split("_");
   let route = "/" + segments.join("/");
-  route = route.replace(/\$\$/g, "/?") // Convert optional segments
+  route = route
     .replace(/\$0/g, "/*") // Convert wildcard
     .replace(/\$/g, "/:") // Convert params
-    .replaceAll(/\/\//g, "/"); // change normalize akk extra / to /
-  return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE|WS)$/.test(method)
+    .replaceAll(/\/\//g, "/"); // change normalize akk extra /(s) to just /
+  return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE|HEAD|CONNECT|TRACE)$/
+      .test(method)
     ? [method, route, type] as [
       string,
       string,
-      "direct" | "wildcard" | "parameter" | "query",
+      "direct" | "wildcard" | "parameter",
     ]
     : undefined;
 };
@@ -534,10 +540,6 @@ export async function getHandlers(
               } else {
                 // ! HTTP handler
                 if (typeof params !== "string") {
-                  if (params[0] === "WS") {
-                    _JetPath_WS_HANDLER = module[p] as JetFunc;
-                    continue;
-                  }
                   // ? set the method
                   module[p]!.method = params[0];
                   // ? set the path
@@ -721,12 +723,9 @@ parse wildcard
  * @returns ? [handler, params, query, path]
  */
 const get_responder = (
-  req: { method: methods; url: string; headers: Record<string, string> },
-  res?: ServerResponse<IncomingMessage> & {
-    req: IncomingMessage;
-  },
+  req: { method: methods; url: string; headers: Record<string, string> }
 ):
-  | [JetFunc, Record<string, any>, Record<string, any>, string, boolean]
+  | [JetFunc, Record<string, any>, Record<string, any>, string]
   | undefined => {
   const routes = _JetPath_paths[req.method];
   let url: string = req.url;
@@ -738,111 +737,61 @@ const get_responder = (
 
   //  Direct route lookup - O(1) operation
   if (routes.direct[url]) {
-    return [routes.direct[url], {}, {}, url, false];
+    return [routes.direct[url], {}, {}, url];
   }
 
   let path = url;
-  let queryIndex = url.indexOf("?");
-
+  const query: Record<string, string> = {};
+  
+  const queryIndex = url.indexOf("?");
   if (queryIndex > -1) {
-    const query: Record<string, string> = {};
     path = url.slice(0, queryIndex + 1);
-    if (routes.query[path]) {
-      if (url.includes("=")) {
-        const queryParams = new URLSearchParams(url.slice(queryIndex));
-        queryParams.forEach((value, key) => {
-          query[key] = value;
-        });
-      }
-      return [routes.query[path], {}, query, path, false];
-    }
+    const queryParams = new URLSearchParams(url.slice(queryIndex));
+    queryParams.forEach((value, key) => {
+      query[key] = value;
+    });
   }
 
   // Parameter routes
   for (const pathR in routes.parameter) {
     // Quick check to avoid unnecessary processing
-    if (pathR.includes(":")) {
-      // Cache split results to avoid redundant operations
-      const urlFixtures = url.split("/");
-      const pathFixtures = pathR.split("/");
+    const urlFixtures = url.split("/");
+    const pathFixtures = pathR.split("/");
 
-      // Fast length check before deeper comparison
-      if (urlFixtures.length !== pathFixtures.length) {
-        continue;
-      }
-
-      // Use break flag for early exit
-      let breaked = false;
-      for (let i = 0; i < pathFixtures.length; i++) {
-        if (
-          !pathFixtures[i].includes(":") && urlFixtures[i] !== pathFixtures[i]
-        ) {
-          breaked = true;
-          break;
-        }
-      }
-      if (breaked) {
-        continue;
-      }
-
-      // Only process parameters after confirming a match
-      const params: Record<string, string> = {};
-      for (let i = 0; i < pathFixtures.length; i++) {
-        const px = pathFixtures[i];
-        if (px.includes(":")) {
-          // Avoid repeated split operations by storing the paramName
-          const paramName = px.split(":")[1];
-          params[paramName] = urlFixtures[i];
-        }
-      }
-
-      return [routes.parameter[pathR], params, {}, pathR, false];
+    // Fast length check before deeper comparison
+    if (urlFixtures.length !== pathFixtures.length) {
+      continue;
     }
+
+    // Use break flag for early exit
+    let cancelled = false;
+    // Check each fixture for a match
+    for (let i = 0; i < pathFixtures.length; i++) {
+      if (
+        !pathFixtures[i].includes(":") && urlFixtures[i] !== pathFixtures[i]
+      ) {
+        cancelled = true;
+        break;
+      }
+    }
+    if (cancelled) {
+      continue;
+    }
+
+    // Only process parameters after confirming a match
+    const params: Record<string, string> = {};
+    for (let i = 0; i < pathFixtures.length; i++) {
+      const px = pathFixtures[i];
+      if (px.includes(":")) {
+        // Avoid repeated split operations by storing the paramName
+        const paramName = px.split(":")[1];
+        params[paramName] = urlFixtures[i];
+      }
+    }
+
+    return [routes.parameter[pathR], params, {}, pathR];
   }
 
-  // @ts-expect-error
-  const conn = req.headers?.["connection"] || req.headers?.get?.("connection");
-  if (conn?.includes("Upgrade") && _JetPath_WS_HANDLER) {
-    return [
-      (ctx) => {
-        if (ctx.get("upgrade") != "websocket") {
-          ctx.throw();
-        }
-        if (UTILS.runtime["deno"]) {
-          // @ts-expect-error
-          const { socket, response } = Deno.upgradeWebSocket(req);
-          // @ts-expect-error
-          socket.addEventListener("open", (...p) => {
-            JetSocketInstance.__binder("open", [socket, ...p]);
-          });
-          // @ts-expect-error
-          socket.addEventListener("message", (...p) => {
-            JetSocketInstance.__binder("message", [socket, ...p]);
-          });
-          // @ts-expect-error
-          socket.addEventListener("drain", (...p) => {
-            JetSocketInstance.__binder("drain", [socket, ...p]);
-          });
-          // @ts-expect-error
-          socket.addEventListener("close", (...p) => {
-            JetSocketInstance.__binder("close", [socket, ...p]);
-          });
-          _JetPath_WS_HANDLER(ctx);
-          ctx.sendResponse(response);
-        }
-        // @ts-expect-error
-        if (res?.upgrade?.(req)) {
-          _JetPath_WS_HANDLER(ctx);
-          ctx.sendResponse(undefined);
-        }
-        ctx.throw(400);
-      },
-      {},
-      {},
-      path,
-      true,
-    ];
-  }
   // Wildcard routes
   for (const pathR in routes.wildcard) {
     if (pathR.includes("*")) {
@@ -851,7 +800,7 @@ const get_responder = (
         const params: Record<string, any> = {
           extraPath: path.slice(baseRoute.length),
         };
-        return [routes.wildcard[pathR], params, {}, pathR, false];
+        return [routes.wildcard[pathR], params, {}, pathR];
       }
     }
   }
@@ -873,7 +822,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     .replaceAll(
       "{LOGO}",
       options?.apiDoc?.logo ||
-        "https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/icon.png",
+        "https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/icon-transparent.png",
     )
     .replaceAll(
       "{INFO}",
@@ -1126,7 +1075,7 @@ export function parseFormData(
   const fields: Record<string, string | string[]> = {};
   const files: Record<
     string,
-    { fileName: string; content: Uint8Array; mimeType: string, size: number }
+    { fileName: string; content: Uint8Array; mimeType: string; size: number }
   > = {};
 
   const parts = splitBuffer(rawBody, boundaryBytes).slice(1, -1); // remove preamble and epilogue
@@ -1163,7 +1112,12 @@ export function parseFormData(
 
     if (fileName) {
       const mimeType = headers["content-type"] || "application/octet-stream";
-      files[fieldName] = { fileName, content: body, mimeType, size: body.length };
+      files[fieldName] = {
+        fileName,
+        content: body,
+        mimeType,
+        size: body.length,
+      };
     } else {
       const value = decoder.decode(body);
       if (fieldName in fields) {
@@ -1338,7 +1292,7 @@ export const v = {
 };
 
 function createSchema<T extends Record<string, any>>(
-  schemaDefinition: (t: typeof v) => Record<string, SchemaBuilder>
+  schemaDefinition: (t: typeof v) => Record<string, SchemaBuilder>,
 ): HTTPBody<T> {
   const rawSchema = schemaDefinition(v);
   return SchemaCompiler.compile(rawSchema);
@@ -1356,19 +1310,21 @@ export function use<
     query?: Record<string, any>;
     response?: Record<string, any>;
   },
-  JetPluginTypes extends Record<string, unknown>[] = []
->(endpoint: JetFunc<JetData, JetPluginTypes>): compilerType<JetData, JetPluginTypes> {
+  JetPluginTypes extends Record<string, unknown>[] = [],
+>(
+  endpoint: JetFunc<JetData, JetPluginTypes>,
+): compilerType<JetData, JetPluginTypes> {
   const compiler = {
     /**
      * Sets the API documentation body for the endpoint
      */
     body: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
         Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>
-      >
-    ) { 
+      >,
+    ) {
       endpoint.body = createSchema(schemaFn as any) as any;
       return compiler;
     },
@@ -1399,10 +1355,10 @@ export function use<
      */
     params: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
         Record<keyof HTTPBody<NonNullable<JetData["params"]>>, SchemaBuilder>
-      >
+      >,
     ) {
       if (typeof endpoint !== "function") {
         throw new Error("Endpoint must be a function");
@@ -1415,10 +1371,10 @@ export function use<
      */
     query: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
         Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>
-      >
+      >,
     ) {
       if (typeof endpoint !== "function") {
         throw new Error("Endpoint must be a function");
@@ -1431,10 +1387,10 @@ export function use<
      */
     response: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
         Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
-      >
+      >,
     ) {
       if (typeof endpoint !== "function") {
         throw new Error("Endpoint must be a function");

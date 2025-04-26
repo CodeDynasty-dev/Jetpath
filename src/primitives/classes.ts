@@ -1,7 +1,13 @@
 import { createReadStream } from "node:fs";
 import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
-import { _JetPath_paths, parseRequest, UTILS, validator } from "./functions.js";
+import {
+  _JetPath_paths,
+  JetSocketInstance,
+  parseRequest,
+  UTILS,
+  validator,
+} from "./functions.js";
 import type {
   AnyExecutor,
   HTTPBody,
@@ -147,7 +153,7 @@ export class Context {
   connection?: JetSocket;
   plugins = {};
   // ?
-  app: Record<string, any> = {};
+  state: Record<string, any> = {};
   //? load
   _1?: string = undefined;
   // ? header of response
@@ -159,18 +165,23 @@ export class Context {
   //? response
   _6: boolean = false;
   method: methods | undefined;
+  //? original response
+  res?: any;
   // ? reset the COntext to default state
   _7(
     req: Request,
+    res: Response,
     path: string,
     route: JetFunc,
     params?: Record<string, any>,
     query?: Record<string, any>,
   ) {
+    this.state = {};
     this.request = req;
+    this.res = res;
     this.method = req.method as "GET";
-    this.params = params || {};
-    this.query = query || {};
+    this.params = params  ;
+    this.query = query  ;
     this.path = path;
     this.body = undefined;
     //? load
@@ -303,6 +314,45 @@ export class Context {
     // @ts-ignore
     this._6 = Response;
   }
+  // Only for deno and bun
+  upgrade(): void|never {
+    const req = this.request as any;
+    const conn = req.headers?.["connection"] ||
+      req.headers?.get?.("connection");
+    if (conn?.includes("Upgrade")) {
+      if (this.get("upgrade") != "websocket") {
+        throw new Error("Invalid upgrade header");
+      }
+      if (UTILS.runtime["deno"]) {
+        // @ts-expect-error
+        const { socket, response } = Deno.upgradeWebSocket(req);
+        // @ts-expect-error
+        socket.addEventListener("open", (...p) => {
+          JetSocketInstance.__binder("open", [socket, ...p]);
+        });
+        // @ts-expect-error
+        socket.addEventListener("message", (...p) => {
+          JetSocketInstance.__binder("message", [socket, ...p]);
+        });
+        // @ts-expect-error
+        socket.addEventListener("drain", (...p) => {
+          JetSocketInstance.__binder("drain", [socket, ...p]);
+        });
+        // @ts-expect-error
+        socket.addEventListener("close", (...p) => {
+          JetSocketInstance.__binder("close", [socket, ...p]);
+        });
+        this.connection = JetSocketInstance;
+        return this.sendResponse(response);
+      }
+      if (this.res?.upgrade?.(req)) {
+        this.connection = JetSocketInstance;
+        return this.sendResponse(undefined);
+      }
+      this.throw(400);
+    }
+    throw new Error("Invalid upgrade headers");
+  }
 
   async parse<Type extends any = Record<string, any>>(options?: {
     maxBodySize?: number;
@@ -346,7 +396,7 @@ export class JetSocket {
 /**
  * Schema builder classes
  */
-export class SchemaBuilder{
+export class SchemaBuilder {
   protected def: SchemaDefinition;
 
   constructor(type: SchemaType, options: ValidationOptions = {}) {
@@ -380,7 +430,7 @@ export class SchemaBuilder{
   }
 }
 
-export class StringSchema extends SchemaBuilder  {
+export class StringSchema extends SchemaBuilder {
   constructor(options: ValidationOptions = {}) {
     // @ts-expect-error
     options.inputType = "string";
@@ -393,20 +443,20 @@ export class StringSchema extends SchemaBuilder  {
 
   min(length: number, err?: string): this {
     return this.validate(
-      (value) => value.length >= length || err || `Minimum length is ${length}`
+      (value) => value.length >= length || err || `Minimum length is ${length}`,
     );
   }
 
   max(length: number, err?: string): this {
     return this.validate(
-      (value) => value.length <= length || err || `Maximum length is ${length}`
+      (value) => value.length <= length || err || `Maximum length is ${length}`,
     );
   }
 
   url(err?: string): this {
     return this.regex(
       /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
-      err || "Invalid URL"
+      err || "Invalid URL",
     );
   }
 }
@@ -420,19 +470,19 @@ export class NumberSchema extends SchemaBuilder {
 
   min(value: number, err?: string): this {
     return this.validate(
-      (val) => val >= value || err || `Minimum value is ${value}`
+      (val) => val >= value || err || `Minimum value is ${value}`,
     );
   }
 
   max(value: number, err?: string): this {
     return this.validate(
-      (val) => val <= value || err || `Maximum value is ${value}`
+      (val) => val <= value || err || `Maximum value is ${value}`,
     );
   }
 
   integer(err?: string): this {
     return this.validate(
-      (val) => Number.isInteger(val) || err || "Must be an integer"
+      (val) => Number.isInteger(val) || err || "Must be an integer",
     );
   }
 
@@ -470,7 +520,7 @@ export class ArraySchema extends SchemaBuilder {
       (value) =>
         (Array.isArray(value) && value.length >= length) ||
         err ||
-        `Minimum length is ${length}`
+        `Minimum length is ${length}`,
     );
   }
 
@@ -479,7 +529,7 @@ export class ArraySchema extends SchemaBuilder {
       (value) =>
         (Array.isArray(value) && value.length <= length) ||
         err ||
-        `Maximum length is ${length}`
+        `Maximum length is ${length}`,
     );
   }
 
@@ -517,7 +567,7 @@ export class DateSchema extends SchemaBuilder {
     const minDate = new Date(date);
     return this.validate(
       (value) =>
-        new Date(value) >= minDate || err || `Date must be after ${minDate}`
+        new Date(value) >= minDate || err || `Date must be after ${minDate}`,
     );
   }
 
@@ -525,21 +575,21 @@ export class DateSchema extends SchemaBuilder {
     const maxDate = new Date(date);
     return this.validate(
       (value) =>
-        new Date(value) <= maxDate || err || `Date must be before ${maxDate}`
+        new Date(value) <= maxDate || err || `Date must be before ${maxDate}`,
     );
   }
 
   future(err?: string): this {
     return this.validate(
       (value) =>
-        new Date(value) > new Date() || err || "Date must be in the future"
+        new Date(value) > new Date() || err || "Date must be in the future",
     );
   }
 
   past(err?: string): this {
     return this.validate(
       (value) =>
-        new Date(value) < new Date() || err || "Date must be in the past"
+        new Date(value) < new Date() || err || "Date must be in the past",
     );
   }
 }
@@ -554,7 +604,7 @@ export class FileSchema extends SchemaBuilder {
       (value) =>
         value.size <= bytes ||
         err ||
-        `File size must be less than ${bytes} bytes`
+        `File size must be less than ${bytes} bytes`,
     );
   }
 
@@ -564,14 +614,14 @@ export class FileSchema extends SchemaBuilder {
       (value) =>
         allowedTypes.includes(value.mimeType) ||
         err ||
-        `File type must be one of: ${allowedTypes.join(", ")}`
+        `File type must be one of: ${allowedTypes.join(", ")}`,
     );
   }
 }
 
 export class SchemaCompiler {
   static compile(
-    schema: Record<string, SchemaBuilder>
+    schema: Record<string, SchemaBuilder>,
   ): HTTPBody<any> {
     const compiled: Record<string, SchemaDefinition> = {};
     for (const [key, builder] of Object.entries(schema)) {
@@ -580,4 +630,3 @@ export class SchemaCompiler {
     return compiled as HTTPBody<any>;
   }
 }
- 

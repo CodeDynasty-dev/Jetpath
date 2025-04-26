@@ -20,3 +20,5 @@ usage/uploads
 usage/petshop-api-log.log
 usage/val.ts
 usage/ws.jet.ts
+tbench.ts
+trie.ts

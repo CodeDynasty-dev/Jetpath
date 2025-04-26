@@ -56,16 +56,17 @@ const app = new Jetpath({
   source: "./usage", // Organized routes directory
   APIdisplay: "UI", // Interactive API documentation UI
   port: 9000,
-  // static: { 
-  //   dir: "./public", 
-  //   route: "/assets" 
-  // }, 
-  // globalHeaders: {
-  //   "X-Pet-API-Version": "1.0.0",
-  //   "Access-Control-Allow-Origin": "*",
-  //   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  //   "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  // }, 
+  upgrade: true,
+  static: { 
+    dir: "./usage", 
+    route: "/assets" 
+  }, 
+  globalHeaders: {
+    "X-Pet-API-Version": "1.0.0",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  }, 
 });
 
 
@@ -126,8 +127,7 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
     }
 
     // Attach user info to context for use in route handlers
-    // Attach user info to context for use in route handlers
-    ctx.app["user"] = auth.user;
+    ctx.state["user"] = auth.user;
   }
 
   return (ctx, err: any) => {
@@ -601,7 +601,7 @@ export const POST_pets: JetFunc<{
   ctx.plugins?.["logger"]?.info({
     action: "create_pet",
     petId: newPet.id,
-    adminId: ctx.app["user"]?.id || "unknown"
+    adminId: ctx.state["user"]?.id || "unknown"
   });
 
   ctx.code = 201; // Created
@@ -685,7 +685,7 @@ export const PUT_petBy$id: JetFunc<{
   ctx.plugins?.["logger"]?.info({
     action: "update_pet",
     petId: updatedPet.id,
-    adminId: ctx.app["user"]?.id || "unknown",
+    adminId: ctx.state["user"]?.id || "unknown",
     changes: Object.keys(updatedPetData).join(", ")
   });
 
@@ -769,7 +769,7 @@ export const DELETE_petBy$id: JetFunc<{
   ctx.plugins?.["logger"]?.info({
     action: "delete_pet",
     petId: deletedPet.id,
-    adminId: ctx.app["user"]?.id || "unknown"
+    adminId: ctx.state["user"]?.id || "unknown"
   });
 
   ctx.send({
@@ -954,7 +954,7 @@ export const POST_petImage$id: JetFunc<{
       action: "upload_pet_image",
       petId,
       imageUrl,
-      adminId: ctx.app["user"]?.id || "unknown"
+      adminId: ctx.state["user"]?.id || "unknown"
     });
 
     ctx.send({
@@ -1293,14 +1293,15 @@ use(GET_stats).info("Get shop statistics (admin only)");
  * @route WS /live
  * @access Public
  */
-export const WS_live: JetFunc = (ctx) => {
+const sockets = new Set<any>();
+export const GET_live: JetFunc = (ctx) => { 
+  ctx.upgrade(); 
   const conn = ctx.connection!;
-
   if (!conn) {
     ctx.code = 500;
     ctx.send({
       status: "error",
-      message: "WebSocket connection failed"
+      message: "WebSocket connection failed!!!"
     });
     return;
   }
@@ -1308,8 +1309,8 @@ export const WS_live: JetFunc = (ctx) => {
   try {
     // Handle new connections
     conn.addEventListener("open", (socket) => {
+      sockets.add(socket);
       console.log("New client connected to live updates");
-
       // Send welcome message with current stats
       const availablePets = pets.filter(pet => pet.available).length;
       socket.send(JSON.stringify({
@@ -1324,48 +1325,22 @@ export const WS_live: JetFunc = (ctx) => {
     });
 
     // Handle incoming messages
-    conn.addEventListener("message", (socket, event) => {
-      try {
-        const message = JSON.parse(event.data);
-
+    conn.addEventListener("message", (_sending_socket, event) => {
+      const message = event.data; 
         // Handle subscription requests
-        if (message.type === "subscribe") {
-          if (message.topic === "inventory") {
-            socket.send(JSON.stringify({
-              type: "subscribed",
-              topic: "inventory",
-              message: "Subscribed to inventory updates"
-            }));
-          } else if (message.topic === "reviews") {
-            socket.send(JSON.stringify({
-              type: "subscribed",
-              topic: "reviews",
-              message: "Subscribed to review updates"
-            }));
-          } else {
-            socket.send(JSON.stringify({
-              type: "error",
-              message: "Unknown subscription topic"
-            }));
-          }
-        } else if (message.type === "ping") {
+        if (message === "ping") {
           // Handle ping-pong for connection health checks
-          socket.send(JSON.stringify({
-            type: "pong",
-            timestamp: new Date().toISOString()
-          }));
+          const m = ("pong " + new Date().toISOString());
+          sockets.forEach(s => s.send(m));
+          return
         }
-      } catch (error) {
-        // Handle invalid JSON
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "Invalid message format"
-        }));
-      }
+        const m = (`All your ${message} are belong to us`);
+        sockets.forEach(s => s.send(m));
     });
 
     // Handle connection close
-    conn.addEventListener("close", () => {
+    conn.addEventListener("close", (socket) => {
+      sockets.delete(socket);
       console.log("Client disconnected from live updates");
     });
 
@@ -1374,7 +1349,7 @@ export const WS_live: JetFunc = (ctx) => {
   }
 };
 
-use(WS_live).info("WebSocket for real-time inventory updates and notifications");
+use(GET_live).info("WebSocket for real-time inventory updates and notifications");
 
 // =============================================================================
 // FILE UPLOADS AND FORMS
@@ -1439,7 +1414,7 @@ export const POST_upload: JetFunc<{
 
     ctx.plugins.info(ctx, {
       action: "file_upload",
-      userId: ctx.app["user"]?.id || "unknown",
+      userId: ctx.state["user"]?.id || "unknown",
       files: Object.keys(results).filter(key => results[key].url)
     });
 
