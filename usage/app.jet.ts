@@ -131,7 +131,6 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
   }
 
   return (ctx, err: any) => {
-    console.log(err);
     ctx.plugins.error(ctx, String(err));
     const duration = Date.now() - startTime;
 

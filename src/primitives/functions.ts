@@ -873,7 +873,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     .replaceAll(
       "{LOGO}",
       options?.apiDoc?.logo ||
-        "https://raw.githubusercontent.com/Uiedbook/Jetpath/main/icon-transparent.webp",
+        "https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/icon.png",
     )
     .replaceAll(
       "{INFO}",
