@@ -140,8 +140,6 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
     // Handle errors
     if (err) {
       ctx.code = ctx.code >= 400 ? ctx.code : 500;
-
-      // Log the error
       // Log the error
       ctx.plugins?.["logger"]?.error({
         requestId,

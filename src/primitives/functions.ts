@@ -227,7 +227,7 @@ export const UTILS = {
         edge: false,
       };
     }
-    if (UTILS.runtime["bun"]) { 
+    if (UTILS.runtime["bun"]) {
       if (UTILS.upgrade) {
         server = {
           listen(port: number) {
@@ -723,7 +723,7 @@ parse wildcard
  * @returns ? [handler, params, query, path]
  */
 const get_responder = (
-  req: { method: methods; url: string; headers: Record<string, string> }
+  req: { method: methods; url: string; headers: Record<string, string> },
 ):
   | [JetFunc, Record<string, any>, Record<string, any>, string]
   | undefined => {
@@ -742,7 +742,7 @@ const get_responder = (
 
   let path = url;
   const query: Record<string, string> = {};
-  
+
   const queryIndex = url.indexOf("?");
   if (queryIndex > -1) {
     path = url.slice(0, queryIndex + 1);

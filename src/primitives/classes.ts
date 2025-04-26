@@ -180,8 +180,8 @@ export class Context {
     this.request = req;
     this.res = res;
     this.method = req.method as "GET";
-    this.params = params  ;
-    this.query = query  ;
+    this.params = params;
+    this.query = query;
     this.path = path;
     this.body = undefined;
     //? load
@@ -315,7 +315,7 @@ export class Context {
     this._6 = Response;
   }
   // Only for deno and bun
-  upgrade(): void|never {
+  upgrade(): void | never {
     const req = this.request as any;
     const conn = req.headers?.["connection"] ||
       req.headers?.get?.("connection");
