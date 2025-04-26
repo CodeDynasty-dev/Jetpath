@@ -220,3 +220,21 @@
 {"timestamp":"2025-04-26T14:56:23.533Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
 {"timestamp":"2025-04-26T14:56:23.694Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"http://localhost:9000/upload"}
 {"timestamp":"2025-04-26T14:56:23.695Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T15:04:43.399Z","level":"info","method":"GET","url":"http://localhost:9000/health"}
+{"timestamp":"2025-04-26T15:04:43.400Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/health"}
+{"timestamp":"2025-04-26T15:04:47.623Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T15:04:47.624Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T15:04:55.353Z","level":"info","method":"DELETE","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T15:04:55.355Z","level":"error","message":"null","method":"DELETE","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T15:05:02.151Z","level":"info","method":"GET","url":"http://localhost:9000/petBy/:id/gallery"}
+{"timestamp":"2025-04-26T15:05:02.151Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/petBy/:id/gallery"}
+{"timestamp":"2025-04-26T15:05:07.092Z","level":"info","method":"DELETE","url":"http://localhost:9000/reviews/:reviewId"}
+{"timestamp":"2025-04-26T15:05:07.093Z","level":"error","message":"null","method":"DELETE","url":"http://localhost:9000/reviews/:reviewId"}
+{"timestamp":"2025-04-26T15:05:13.550Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T15:05:18.252Z","level":"info","method":"POST","url":"http://localhost:9000/petImage/:id"}
+{"timestamp":"2025-04-26T15:20:56.810Z","level":"info","method":"POST","url":"http://localhost:9000/petImage/:id"}
+{"timestamp":"2025-04-26T15:21:02.447Z","level":"info","method":"PUT","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T15:21:08.139Z","level":"info","method":"GET","url":"http://localhost:9000/"}
+{"timestamp":"2025-04-26T15:21:30.826Z","level":"info","method":"GET","url":"http://localhost:9000/"}
+{"timestamp":"2025-04-26T15:21:31.305Z","level":"info","method":"GET","url":"http://localhost:9000/"}
+{"timestamp":"2025-04-26T15:21:31.505Z","level":"info","method":"GET","url":"http://localhost:9000/"}

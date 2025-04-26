@@ -30,8 +30,8 @@ import {
   SchemaBuilder,
   SchemaCompiler,
   StringSchema,
+  Trie,
 } from "./classes.js";
-import { Trie } from "./trie.js";
 
 /**
  * an inbuilt CORS post middleware
@@ -133,69 +133,22 @@ export function corsMiddleware(options: {
     }
   };
 }
+
 export const JetSocketInstance = new JetSocket();
 
 export let _JetPath_paths: Record<
   methods,
-  Record<
-    "direct" | "wildcard" | "parameter",
-    Record<string, JetFunc>
-  >
+  Record<string, JetFunc>
 > = {
-  GET: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  POST: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  HEAD: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  PUT: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  PATCH: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  DELETE: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  OPTIONS: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  CONNECT: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
-  TRACE: {
-    direct: {},
-    parameter: {},
-
-    wildcard: {},
-  },
+  GET: {},
+  POST: {},
+  HEAD: {},
+  PUT: {},
+  PATCH: {},
+  DELETE: {},
+  OPTIONS: {},
+  CONNECT: {},
+  TRACE: {},
 };
 
 export let _JetPath_paths_trie: Record<
@@ -496,14 +449,6 @@ const Jetpath = async (
 };
 
 const handlersPath = (path: string) => {
-  let type = "direct";
-  if (path.includes("$")) {
-    if (path.includes("$0")) {
-      type = "wildcard";
-    } else {
-      type = "parameter";
-    }
-  }
   let [method, ...segments] = path.split("_");
   let route = "/" + segments.join("/");
   route = route
@@ -512,10 +457,9 @@ const handlersPath = (path: string) => {
     .replaceAll(/\/\//g, "/"); // change normalize akk extra /(s) to just /
   return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE|HEAD|CONNECT|TRACE)$/
       .test(method)
-    ? [method, route, type] as [
+    ? [method, route] as [
       string,
       string,
-      "direct" | "wildcard" | "parameter",
     ]
     : undefined;
 };
@@ -577,10 +521,9 @@ export async function getHandlers(
                   module[p]!.method = params[0];
                   // ? set the path
                   module[p]!.path = params[1];
-                  _JetPath_paths[params[0] as methods][params[2]][params[1]] =
-                    module[
-                      p
-                    ] as JetFunc;
+                  _JetPath_paths[params[0] as methods][params[1]] = module[
+                    p
+                  ] as JetFunc;
                   _JetPath_paths_trie[params[0] as methods].insert(
                     params[1],
                     module[p] as JetFunc,
@@ -739,112 +682,7 @@ export function validator<T extends Record<string, any>>(
 
   return out as T;
 }
-
-/*
-url parser
-
-order of operations
-
-parse direct match
-parse placeholder
-parse query
-parse wildcard
-
-*/
-
-/**
- * Parses the URL and returns the corresponding handler, parameters, query parameters, and path.
- *
- * @param method - The HTTP method (e.g., GET, POST, etc.)
- * @param url - The URL to parse
- * @returns ? [handler, params, query, path]
- */
-// @ts-ignore
-const get_responder = (
-  req: { method: methods; url: string },
-):
-  | [JetFunc, Record<string, any>, Record<string, any>, string]
-  | undefined => {
-  const routes = _JetPath_paths[req.method];
-  let url: string = req.url;
-  // Fast path normalization
-  if (!UTILS.runtime["node"]) {
-    const pathStart = url.indexOf("/", 7);
-    url = pathStart >= 0 ? url.slice(pathStart) : url;
-  }
-
-  //  Direct route lookup - O(1) operation
-  if (routes.direct[url]) {
-    return [routes.direct[url], {}, {}, url];
-  }
-
-  let path = url;
-  const query: Record<string, string> = {};
-
-  const queryIndex = url.indexOf("?");
-  if (queryIndex > -1) {
-    path = url.slice(0, queryIndex + 1);
-    const queryParams = new URLSearchParams(url.slice(queryIndex));
-    queryParams.forEach((value, key) => {
-      query[key] = value;
-    });
-  }
-
-  // Parameter routes
-  for (const pathR in routes.parameter) {
-    // Quick check to avoid unnecessary processing
-    const urlFixtures = url.split("/");
-    const pathFixtures = pathR.split("/");
-
-    // Fast length check before deeper comparison
-    if (urlFixtures.length !== pathFixtures.length) {
-      continue;
-    }
-
-    // Use break flag for early exit
-    let cancelled = false;
-    // Check each fixture for a match
-    for (let i = 0; i < pathFixtures.length; i++) {
-      if (
-        !pathFixtures[i].includes(":") && urlFixtures[i] !== pathFixtures[i]
-      ) {
-        cancelled = true;
-        break;
-      }
-    }
-    if (cancelled) {
-      continue;
-    }
-
-    // Only process parameters after confirming a match
-    const params: Record<string, string> = {};
-    for (let i = 0; i < pathFixtures.length; i++) {
-      const px = pathFixtures[i];
-      if (px.includes(":")) {
-        // Avoid repeated split operations by storing the paramName
-        const paramName = px.split(":")[1];
-        params[paramName] = urlFixtures[i];
-      }
-    }
-
-    return [routes.parameter[pathR], params, {}, pathR];
-  }
-
-  // Wildcard routes
-  for (const pathR in routes.wildcard) {
-    if (pathR.includes("*")) {
-      const baseRoute = pathR.slice(0, pathR.length - 1);
-      if (path.startsWith(baseRoute)) {
-        const params: Record<string, any> = {
-          extraPath: path.slice(baseRoute.length),
-        };
-        return [routes.wildcard[pathR], params, {}, pathR];
-      }
-    }
-  }
-  return undefined;
-};
-
+ 
 export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
   const globalHeaders = JSON.stringify(
@@ -878,11 +716,11 @@ export const compileAPI = (options: jetOptions): [number, string] => {
   // ? loop through apis
   for (const method in _JetPath_paths) {
     // ? get all api paths from router for each method;
-    const routesOfMethod: JetFunc[] = Object.values(
+    const routesOfMethod: JetFunc[] = (Object.keys(
       _JetPath_paths[method as methods],
-    ).map(
-      (value) => Object.keys(value).map((key) => (value[key])),
-    ).flat(2).filter((value) => value.length > 0);
+    ).map((value) => _JetPath_paths[method as methods][value])).filter((
+      value,
+    ) => value.length > 0); 
 
     if (routesOfMethod && Object.keys(routesOfMethod).length) {
       for (const route of routesOfMethod) {
@@ -986,11 +824,9 @@ export function assignMiddleware(
 ): void {
   // Iterate over each HTTP method's routes.
   for (const method in _JetPath_paths) {
-    const routes: JetFunc[] = Object.values(_JetPath_paths[method as methods])
-      .map(
-        (value) => Object.keys(value).map((key) => (value[key])),
-      ).flat(2).filter((value) => value.length > 0);
-
+    const routes: JetFunc[] = (Object.keys(
+      _JetPath_paths[method as methods],
+    ).map((value) => _JetPath_paths[method as methods][value])).filter((value) => value.length > 0);
     for (const route of routes) {
       if (!Array.isArray(route.jet_middleware)) {
         route.jet_middleware = [];

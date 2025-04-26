@@ -633,3 +633,230 @@ export class SchemaCompiler {
     return compiled as HTTPBody<any>;
   }
 }
+
+class TrieNode {
+  // ? child nodes
+  children: Map<any, any>;
+  // ? parameter node
+  parameterChild: TrieNode | null;
+  paramName: string | null;
+  // ? wildcard node
+  wildcardChild: TrieNode | null;
+  // ? route handler
+  handler: JetFunc | null;
+  // ? original route path
+  originalPath: string | null;
+  constructor() {
+    this.children = new Map();
+    this.parameterChild = null;
+    this.paramName = null;
+    this.wildcardChild = null;
+    this.handler = null;
+    this.originalPath = null;
+  }
+}
+
+/**
+ * Represents the Trie data structure for storing and matching URL routes.
+ */
+export class Trie {
+  root: TrieNode;
+  method: string;
+  constructor(
+    method:
+      | "GET"
+      | "POST"
+      | "PUT"
+      | "DELETE"
+      | "PATCH"
+      | "OPTIONS"
+      | "HEAD"
+      | "CONNECT"
+      | "TRACE",
+  ) {
+    this.root = new TrieNode();
+    this.method = method;
+  }
+
+  /**
+   * Inserts a route path and its associated handler into the Trie.
+   */
+  insert(path: string, handler: JetFunc) {
+    // ? remove leading/trailing slashes, handle empty path
+    let normalizedPath = path.trim();
+    if (normalizedPath.startsWith("/")) {
+      normalizedPath = normalizedPath.slice(1);
+    }
+    if (normalizedPath.endsWith("/") && normalizedPath.length > 0) {
+      normalizedPath = normalizedPath.slice(0, -1);
+    }
+
+    // ? Handle the root path explicitly
+    if (normalizedPath === "") {
+      if (this.root.handler) {
+        console.warn(
+          `Warning: Duplicate route definition for path ${this.method} ${path}`,
+        );
+      }
+      this.root.handler = handler;
+      this.root.originalPath = path;
+      return;
+    }
+
+    const segments = normalizedPath.split("/");
+    let currentNode: TrieNode = this.root;
+    // const paramNames: string[] = []; // To store the names of parameters in this path
+
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+
+      // ? Check for parameter segment (starts with :)
+      if (segment.startsWith(":")) {
+        const paramName = segment.slice(1);
+        if (!paramName) {
+          throw new Error(
+            `Invalid route path: Parameter segment in ${this.method} ${path} '${segment}' is missing a name.`,
+          );
+        }
+
+        // ? Check if a parameter node already exists at this level
+        if (currentNode.parameterChild) {
+          if (currentNode.parameterChild.paramName !== paramName) {
+            console.warn(
+              `Warning: Route path conflict at segment '${segment}' in ${this.method} ${path}. Parameter ': ${currentNode.parameterChild.paramName}' already defined at this level.`,
+            );
+          }
+          currentNode = currentNode.parameterChild;
+        } else if (currentNode.children.has(segment)) {
+          throw new Error(
+            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`,
+          );
+        } else if (currentNode.wildcardChild) {
+          throw new Error(
+            `Invalid route path: Parameter segment '${segment}' cannot follow a wildcard '*' at the same level in ${this.method} ${path}.`,
+          );
+        } else {
+          const newNode = new TrieNode();
+          newNode.paramName = paramName;
+          currentNode.parameterChild = newNode;
+          currentNode = newNode;
+        }
+        //  paramNames.push(paramName); // Add parameter name to the list for this route
+      } // ? Check for wildcard segment (*) - typically only allowed at the end
+      else if (segment === "*") {
+        if (i !== segments.length - 1) {
+          throw new Error(
+            `Invalid route path: Wildcard '*' is only allowed at the end of a path pattern in ${this.method} ${path}.`,
+          );
+        }
+        if (currentNode.wildcardChild) {
+          console.warn(
+            `Warning: Duplicate wildcard definition at segment '${segment}' in ${this.method} ${path}.`,
+          );
+          currentNode = currentNode.wildcardChild;
+        } else if (currentNode.parameterChild) {
+          throw new Error(
+            `Invalid route path: Wildcard '*' cannot follow a parameter at the same level in ${this.method} ${path}.`,
+          );
+        } else if (currentNode.children.has(segment)) {
+          throw new Error(
+            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`,
+          );
+        } else {
+          const newNode = new TrieNode();
+          currentNode.wildcardChild = newNode;
+          currentNode = newNode;
+        }
+        //? No need to process further segments after a wildcard
+        break;
+      } //? Handle fixed segment
+      else {
+        if (currentNode.parameterChild) {
+          throw new Error(
+            `Route path conflict: Fixed segment '${segment}' conflicts with existing parameter ': ${currentNode.parameterChild.paramName}' at this level in ${this.method} ${path}.`,
+          );
+        }
+        if (currentNode.wildcardChild) {
+          throw new Error(
+            `Route path conflict: Fixed segment '${segment}' conflicts with existing wildcard '*' at this level in ${this.method} ${path}.`,
+          );
+        }
+
+        // Check if the fixed child node already exists
+        if (!currentNode.children.has(segment)) {
+          // Create a new node for the fixed segment
+          currentNode.children.set(segment, new TrieNode());
+        }
+        // Move to the next node
+        currentNode = currentNode.children.get(segment)!;
+      }
+    }
+    if (currentNode.handler) {
+      console.warn(
+        `Warning: Duplicate route definition for path '${path}' in ${this.method} ${path}.`,
+      );
+    }
+    //? Set the handler and original path
+    currentNode.handler = handler;
+    currentNode.originalPath = path;
+  }
+
+  get_responder(path: string):
+    | [JetFunc, Record<string, any>, Record<string, any>, string, boolean]
+    | undefined {
+    let normalizedPath = path;
+    if (!UTILS.runtime["node"]) {
+      const pathStart = normalizedPath.indexOf("/", 7);
+      normalizedPath = pathStart >= 0
+        ? normalizedPath.slice(pathStart)
+        : normalizedPath;
+    }
+    if (normalizedPath.startsWith("/")) {
+      normalizedPath = normalizedPath.slice(1);
+    }
+    if (normalizedPath.endsWith("/") && normalizedPath.length > 0) {
+      normalizedPath = normalizedPath.slice(0, -1);
+    }
+    if (normalizedPath === "") {
+      if (this.root.handler) {
+        return [this.root.handler, {}, {}, path, false];
+      }
+    }
+    const segments = normalizedPath.split("/");
+    let currentNode = this.root;
+    const params: Record<string, string> = {};
+    const query: Record<string, string> = {};
+    //? Handle query parameters
+    const queryIndex = normalizedPath.indexOf("?");
+    if (queryIndex > -1) {
+      const queryParams = new URLSearchParams(normalizedPath.slice(queryIndex));
+      queryParams.forEach((value, key) => {
+        query[key] = value;
+      });
+    } 
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      if (currentNode.children.has(segment)) {
+        // ? fixed segment match
+        currentNode = currentNode.children.get(segment)!;
+      } else if (currentNode.parameterChild) {
+        // ? parameter segment match
+        const name = currentNode.parameterChild.paramName!;
+        params[name] = segment;
+        currentNode = currentNode.parameterChild;
+      } else if (currentNode.wildcardChild) {
+        // ? wildcard segment match
+        params["extraPath"] = segments.slice(i).join("/");
+        currentNode = currentNode.wildcardChild;
+        break;
+      } else {
+        // ? No match
+        return undefined;
+      }
+    }
+    if (currentNode.handler) {
+      // ? Route found
+      return [currentNode.handler, params, query, path, false];
+    }
+  }
+}

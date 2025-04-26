@@ -303,7 +303,7 @@ export interface ValidationOptions {
   inputDefaultValue?: any;
   required?: boolean;
 }
-export interface FileOptions  {
+export interface FileOptions {
   inputAccept?: string;
 }
 
