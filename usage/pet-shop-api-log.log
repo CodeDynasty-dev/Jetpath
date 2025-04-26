@@ -1,0 +1,12 @@
+{"timestamp":"2025-04-26T07:27:32.689Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:27:32.691Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:27:43.539Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:27:43.542Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:32.603Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:32.603Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:33.036Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:33.037Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:33.437Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:33.437Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:34.013Z","level":"info","method":"GET","url":"http://localhost:9000/api-doc"}
+{"timestamp":"2025-04-26T07:28:34.014Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/api-doc"}

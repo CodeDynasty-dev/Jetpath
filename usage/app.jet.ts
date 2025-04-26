@@ -53,7 +53,7 @@ const app = new Jetpath({
     username: "admin",
     password: "1234",
   },
-  source: "./tests", // Organized routes directory
+  source: "./usage", // Organized routes directory
   APIdisplay: "UI", // Interactive API documentation UI
   port: 9000,
   // static: { 
