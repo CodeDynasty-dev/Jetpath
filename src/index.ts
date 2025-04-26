@@ -4,6 +4,7 @@ import { writeFile } from "node:fs/promises";
 import {
   _jet_middleware,
   _JetPath_paths,
+  _JetPath_paths_trie,
   assignMiddleware,
   compileAPI,
   compileUI,
@@ -70,7 +71,25 @@ export class Jetpath {
       const name =
         (this.options.static.route === "/" ? "" : this.options.static.route) +
         "/*";
-      _JetPath_paths["GET"].wildcard[name] = async (ctx) => {
+      // _JetPath_paths["GET"].wildcard[name] = async (ctx) => {
+      //   const extraPathRaw =
+      //     decodeURI((ctx.params as any)?.["extraPath"] || "").split("?")[0];
+      //   //? sanitize path
+      //   //? remove any .. from the path
+      //   //? and replace it with /
+      //   const safeExtraPath = path.normalize(extraPathRaw).replace(
+      //     /^(\.\.(\/|\\|$))+/,
+      //     "",
+      //   );
+      //   const filePath = path.join(
+      //     this.options?.static?.dir || "/",
+      //     safeExtraPath,
+      //   );
+      //   const ext = path.extname(filePath).slice(1);
+      //   const contentType = mime.getType(ext) || "application/octet-stream";
+      //   return ctx.sendStream(filePath, contentType);
+      // };
+      _JetPath_paths_trie["GET"].insert(name, async (ctx: any) => {
         const extraPathRaw =
           decodeURI((ctx.params as any)?.["extraPath"] || "").split("?")[0];
         //? sanitize path
@@ -87,9 +106,9 @@ export class Jetpath {
         const ext = path.extname(filePath).slice(1);
         const contentType = mime.getType(ext) || "application/octet-stream";
         return ctx.sendStream(filePath, contentType);
-      };
-      _JetPath_paths["GET"].wildcard[name].method = "GET";
-      _JetPath_paths["GET"].wildcard[name].path = name;
+      })
+      // _JetPath_paths["GET"].wildcard[name].method = "GET";
+      // _JetPath_paths["GET"].wildcard[name].path = name;
     }
 
     //? setting up api viewer
@@ -106,7 +125,68 @@ export class Jetpath {
       if (this.options?.APIdisplay === "UI") {
         UI = compileUI(UI, this.options, compiledAPI);
         const name = this.options?.apiDoc?.path || "/api-doc";
-        _JetPath_paths["GET"].direct[name] = (
+        // _JetPath_paths["GET"].direct[name] = (
+        //   ctx,
+        // ) => {
+        //   if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
+        //     const authHeader = ctx.get("authorization");
+        //     if (authHeader && authHeader.startsWith("Basic ")) {
+        //       const [authType, encodedToken] = authHeader.trim().split(" ");
+        //       if (authType !== "Basic" || !encodedToken) {
+        //         ctx.code = 401;
+        //         ctx.set(
+        //           "WWW-Authenticate",
+        //           `Basic realm=Jetpath API Doc`,
+        //         );
+        //         ctx.send(
+        //           `<h1>401 Unauthorized</h1>`,
+        //           "text/html",
+        //         );
+        //         return;
+        //       }
+        //       let username, password;
+        //       try {
+        //         const decodedToken = new TextDecoder().decode(
+        //           Uint8Array.from(atob(encodedToken), (c) => c.charCodeAt(0)),
+        //         );
+        //         [username, password] = decodedToken.split(":");
+        //       } catch (error) {
+        //         ctx.code = 401;
+        //         ctx.set(
+        //           "WWW-Authenticate",
+        //           `Basic realm=Jetpath API Doc`,
+        //         );
+        //         ctx.send(
+        //           `<h1>401 Unauthorized</h1>`,
+        //           "text/html",
+        //         );
+        //         return;
+        //       }
+        //       if (
+        //         password === this.options?.apiDoc?.password ||
+        //         username === this.options?.apiDoc?.username
+        //       ) {
+        //         ctx.send(UI, "text/html");
+        //         return;
+        //       }
+        //     } else {
+        //       ctx.code = 401;
+        //       ctx.set(
+        //         "WWW-Authenticate",
+        //         `Basic realm=Jetpath API Doc`,
+        //       );
+        //       ctx.send(
+        //         `<h1>401 Unauthorized</h1>`,
+        //         "text/html",
+        //       );
+        //       return;
+        //     }
+        //   } else {
+        //     ctx.send(UI, "text/html");
+        //     return;
+        //   }
+        // };
+        _JetPath_paths_trie["GET"].insert(name, (
           ctx,
         ) => {
           if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
@@ -166,9 +246,9 @@ export class Jetpath {
             ctx.send(UI, "text/html");
             return;
           }
-        };
-        _JetPath_paths["GET"].direct[name].method = "GET";
-        _JetPath_paths["GET"].direct[name].path = name;
+        })
+        // _JetPath_paths["GET"].direct[name].method = "GET";
+        // _JetPath_paths["GET"].direct[name].path = name;
         Log.success(
           `✅ Processed routes ${handlersCount} handlers in ${
             Math.round(

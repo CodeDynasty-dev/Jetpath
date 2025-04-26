@@ -10,6 +10,7 @@ import {
 } from "./functions.js";
 import type {
   AnyExecutor,
+  FileOptions,
   HTTPBody,
   JetFunc,
   JetPluginExecutorInitParams,
@@ -595,8 +596,10 @@ export class DateSchema extends SchemaBuilder {
 }
 
 export class FileSchema extends SchemaBuilder {
-  constructor() {
-    super("file");
+  constructor(options: FileOptions = {}) {
+    // @ts-expect-error
+    options.inputType = "file";
+    super("file", options as ValidationOptions);
   }
 
   maxSize(bytes: number, err?: string): this {

@@ -9,6 +9,7 @@ import {
   type allowedMethods,
   AnyExecutor,
   compilerType,
+  FileOptions,
   type HTTPBody,
   type JetFunc,
   type jetOptions,
@@ -30,6 +31,7 @@ import {
   SchemaCompiler,
   StringSchema,
 } from "./classes.js";
+import { Trie } from "./trie.js";
 
 /**
  * an inbuilt CORS post middleware
@@ -182,6 +184,33 @@ export let _JetPath_paths: Record<
 
     wildcard: {},
   },
+  CONNECT: {
+    direct: {},
+    parameter: {},
+
+    wildcard: {},
+  },
+  TRACE: {
+    direct: {},
+    parameter: {},
+
+    wildcard: {},
+  },
+};
+
+export let _JetPath_paths_trie: Record<
+  methods,
+  Trie
+> = {
+  GET: new Trie("GET"),
+  POST: new Trie("POST"),
+  HEAD: new Trie("HEAD"),
+  PUT: new Trie("PUT"),
+  PATCH: new Trie("PATCH"),
+  DELETE: new Trie("DELETE"),
+  OPTIONS: new Trie("OPTIONS"),
+  TRACE: new Trie("TRACE"),
+  CONNECT: new Trie("CONNECT"),
 };
 
 export const _jet_middleware: Record<
@@ -414,7 +443,10 @@ const Jetpath = async (
   if (req.method === "OPTIONS") {
     return makeRes(res, optionsCtx as Context);
   }
-  const responder = get_responder(req as any);
+  // const responder = get_responder(req as any);
+  const responder = _JetPath_paths_trie[req.method as methods].get_responder(
+    req.url!,
+  );
   let ctx: Context;
   let returned: (Function | void)[] | undefined;
   if (responder) {
@@ -498,6 +530,7 @@ const getModule = async (src: string, name: string) => {
     return String(error);
   }
 };
+
 export async function getHandlers(
   source: string,
   print: boolean,
@@ -548,6 +581,10 @@ export async function getHandlers(
                     module[
                       p
                     ] as JetFunc;
+                  _JetPath_paths_trie[params[0] as methods].insert(
+                    params[1],
+                    module[p] as JetFunc,
+                  );
                 }
               }
             }
@@ -722,8 +759,9 @@ parse wildcard
  * @param url - The URL to parse
  * @returns ? [handler, params, query, path]
  */
+// @ts-ignore
 const get_responder = (
-  req: { method: methods; url: string; headers: Record<string, string> },
+  req: { method: methods; url: string },
 ):
   | [JetFunc, Record<string, any>, Record<string, any>, string]
   | undefined => {
@@ -1288,7 +1326,7 @@ export const v = {
   array: (itemType?: SchemaBuilder) => new ArraySchema(itemType),
   object: (shape?: Record<string, SchemaBuilder>) => new ObjectSchema(shape),
   date: () => new DateSchema(),
-  file: () => new FileSchema(),
+  file: (options?: FileOptions) => new FileSchema(options),
 };
 
 function createSchema<T extends Record<string, any>>(

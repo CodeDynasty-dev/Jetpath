@@ -135,6 +135,8 @@ export type methods =
   | "DELETE"
   | "HEAD"
   | "PUT"
+  | "CONNECT"
+  | "TRACE"
   | "PATCH";
 
 export type allowedMethods = methods[];
@@ -300,6 +302,9 @@ export interface ValidationOptions {
   validator?: (value: any) => boolean | string;
   inputDefaultValue?: any;
   required?: boolean;
+}
+export interface FileOptions  {
+  inputAccept?: string;
 }
 
 export interface ArrayOptions extends ValidationOptions {

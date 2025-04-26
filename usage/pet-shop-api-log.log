@@ -159,3 +159,64 @@
 {"timestamp":"2025-04-26T13:03:21.336Z","level":"error","message":"TypeError: ctx.plugins.isAdmin is not a function. (In 'ctx.plugins.isAdmin(ctx)', 'ctx.plugins.isAdmin' is undefined)","method":"PUT","url":"http://localhost:9000/petBy/:id"}
 {"timestamp":"2025-04-26T13:08:44.590Z","level":"info","method":"PUT","url":"http://localhost:9000/petBy/:id"}
 {"timestamp":"2025-04-26T13:08:44.593Z","level":"error","message":"Error: available must be of type boolean, image must be of type file, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"PUT","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T14:35:42.851Z","level":"info","method":"PUT","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T14:35:48.567Z","level":"info","method":"DELETE","url":"http://localhost:9000/petBy/:id"}
+{"timestamp":"2025-04-26T14:35:54.131Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-26T14:36:55.607Z","level":"info","method":"POST","url":"http://localhost:9000/auth/login"}
+{"timestamp":"2025-04-26T14:36:55.611Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/auth/login"}
+{"timestamp":"2025-04-26T14:37:16.581Z","level":"info","method":"GET","url":"http://localhost:9000/error"}
+{"timestamp":"2025-04-26T14:37:16.582Z","level":"error","message":"Error: This is an intentional error for testing error handling","method":"GET","url":"http://localhost:9000/error"}
+{"timestamp":"2025-04-26T14:37:30.409Z","level":"info","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:37:30.410Z","level":"error","message":"Error: image must be of type file, available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:37:56.866Z","level":"info","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:37:56.870Z","level":"error","message":"Error: image must be of type file, available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:39:48.856Z","level":"info","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:39:48.860Z","level":"error","message":"Error: image must be of type file, available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:40:12.117Z","level":"info","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:40:12.117Z","level":"error","message":"Error: image must be of type file, available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:40:13.463Z","level":"info","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:40:13.464Z","level":"error","message":"Error: image must be of type file, available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:40:13.696Z","level":"info","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:40:13.696Z","level":"error","message":"Error: image must be of type file, available must be of type boolean, health: Error: vaccinated must be of type boolean, neutered must be of type boolean, medicalHistory must be an array","method":"POST","url":"http://localhost:9000/pets"}
+{"timestamp":"2025-04-26T14:40:26.267Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:40:26.270Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"image must be of type file, document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:40:26.270Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:41:43.461Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:41:43.467Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"image must be of type file, document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:41:43.468Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:48:00.863Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:48:00.867Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[]}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:48:00.867Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:31.158Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:31.161Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[]}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:31.162Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:44.676Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:44.683Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file, tags must be an array\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:44.683Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:51.406Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:51.412Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"tags must be an array\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:51:51.412Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:52:04.778Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:52:04.780Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"tags must be an array\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:52:04.780Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:09.704Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:09.713Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"tags must be an array\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:09.714Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:16.687Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:16.690Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"tags must be an array\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:16.690Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:55.696Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:55.713Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"ENOENT: no such file or directory, open '/home/friday/Desktop/opensource/jetpath/tests/uploads/1745679235711-logo.webp'\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:53:55.713Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:54:41.582Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:54:41.628Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:54:41.630Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:55:26.046Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:55:26.111Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:55:26.112Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:55:46.127Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:55:46.292Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"Payload Too Large\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:55:46.292Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:56:23.533Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:56:23.694Z","level":"info","message":"{\"action\":\"file_upload\",\"userId\":\"1\",\"files\":[\"image\",\"document\"]}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-26T14:56:23.695Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}

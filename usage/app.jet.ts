@@ -61,12 +61,12 @@ const app = new Jetpath({
     dir: "./usage", 
     route: "/assets" 
   }, 
-  globalHeaders: {
-    "X-Pet-API-Version": "1.0.0",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  }, 
+  // globalHeaders: {
+  //   "X-Pet-API-Version": "1.0.0",
+  //   "Access-Control-Allow-Origin": "*",
+  //   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  //   "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  // }, 
 });
 
 
@@ -153,7 +153,7 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
       // Send error response
       ctx.send({
         status: "error",
-        message: ctx.code === 500 ? "Internal server error" : err.message,
+        message: err.message || "Internal server error",
         requestId,
         timestamp: new Date().toISOString()
       });
@@ -784,7 +784,7 @@ DELETE_petBy$id.info = "Remove a pet from the inventory (admin only)";
  * @route GET /pets/search
  * @access Public
  */
-export const GET_pets_search$$: JetFunc<{
+export const GET_pets_search: JetFunc<{
   query: {
     name?: string;
     species?: string;
@@ -870,7 +870,7 @@ export const GET_pets_search$$: JetFunc<{
   };
 }
 
-GET_pets_search$$.info = "Advanced search for pets by various criteria";
+GET_pets_search.info = "Advanced search for pets by various criteria";
 
 // =============================================================================
 // PET IMAGE MANAGEMENT
@@ -1379,23 +1379,24 @@ export const POST_upload: JetFunc<{
 
   try {
     // Parse form data
-    const form = await ctx.parse()  
+    const form = await ctx.parse({
+      maxBodySize: 20 * 1024 * 1024 // 10MB
+    })  
     const results: Record<string, any> = {};
-
+    console.log(form);
     // Process each file in the form
     for (const fieldName in form) {
       const field = form[fieldName];
       // Check if field is a file
       if (field && field.fileName) {
         console.log(field);  
-        
         // Generate unique filename to prevent overwrites
         const timestamp = Date.now();
         const uniqueFilename = `${timestamp}-${field.fileName}`;
         // Save file to appropriate directory based on mimetype
-        let saveDir = "./tests/uploads";
+        let saveDir = "./usage/uploads";
         // Save the file
-        await writeFile(resolve(saveDir, uniqueFilename), field.content, { encoding: "latin1" });
+        await writeFile(resolve(saveDir, uniqueFilename), field.content);
         // Store result information
         results[fieldName] = {
           fileName: field.fileName,
@@ -1439,12 +1440,11 @@ export const POST_upload: JetFunc<{
  
 use(POST_upload).body((t) => {
   return {
-    image: t.file(),
+    image: t.file({inputAccept: "image/*"}),
     document: t.file(),
     title: t.string(),
     description: t.string(),
-    tags: t.array(t.string()),
-    lll: t.string()
+    tags: (t.string()),
   }
 }).info("Upload files with metadata (admin only)")
 
