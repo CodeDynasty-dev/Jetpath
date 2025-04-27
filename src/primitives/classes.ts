@@ -149,7 +149,7 @@ export class Context {
   request: Request | IncomingMessage | undefined;
   params: Record<string, any> | undefined;
   query: Record<string, any> | undefined;
-  body: Record<string, any> = {};
+  body?: Record<string, any>;
   path: string | undefined;
   connection?: JetSocket;
   plugins = {};
@@ -184,7 +184,6 @@ export class Context {
     this.params = params;
     this.query = query;
     this.path = path;
-    this.body = {};
     //? load
     this._1 = undefined;
     // ? header of response
