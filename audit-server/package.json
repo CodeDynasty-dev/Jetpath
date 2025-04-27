@@ -1,0 +1,23 @@
+{
+  "name": "audit-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch --experimental-strip-types src/index.jet.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "jetpath": "^1.7.6",
+    "safetoken": "^2.0.2",
+    "sqlitebruv": "^1.1.16"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
+    "@types/node": "^22.15.2"
+  }
+}

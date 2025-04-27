@@ -1,0 +1,30 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "audit-server",
+      "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "jetpath": "^1.7.6",
+        "safetoken": "^2.0.2",
+        "sqlitebruv": "^1.1.16",
+      },
+      "devDependencies": {
+        "@types/node": "^22.15.2",
+      },
+    },
+  },
+  "packages": {
+    "@types/node": ["@types/node@22.15.2", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-uKXqKN9beGoMdBfcaTY1ecwz6ctxuJAcUlwE55938g0ZJ8lRxwAZqRz2AJ4pzpt5dHdTPMB863UZ0ESiFUcP7A=="],
+
+    "bcryptjs": ["bcryptjs@3.0.2", "", { "bin": { "bcrypt": "bin/bcrypt" } }, "sha512-k38b3XOZKv60C4E2hVsXTolJWfkGRMbILBIe2IBITXciy5bOsTKot5kDrf3ZfufQtQOUN5mXceUEpU1rTl9Uog=="],
+
+    "jetpath": ["jetpath@1.7.6", "", {}, "sha512-aL5lVCFJZs90YVlodAsWGeg5krIbJ8/PTifa2Y73g324eT4KluFpnWhwOEEOzlEcbSXj5HZuNmN0YxRegsMauw=="],
+
+    "safetoken": ["safetoken@2.0.2", "", {}, "sha512-YXH8yT9rvQifR5avAPRrkSSw9fLdTWtEuC7d+Ca96n0IpQueOgIJMAvFXOgHngISJLDZ0TdUJZoOFH9Yd+ar6Q=="],
+
+    "sqlitebruv": ["sqlitebruv@1.1.16", "", {}, "sha512-tFNbrMNnB/OiNXQcEQl3l1JfPGGmQggdizWmUmXtEuvdOI/IFRIjYhXHgyOrcZG02d6V2ELKW4gw6c7wcj5A5A=="],
+
+    "undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+  }
+}
