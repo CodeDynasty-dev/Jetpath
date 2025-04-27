@@ -149,7 +149,7 @@ export class Context {
   request: Request | IncomingMessage | undefined;
   params: Record<string, any> | undefined;
   query: Record<string, any> | undefined;
-  body: Record<string, any> | undefined;
+  body: Record<string, any> = {};
   path: string | undefined;
   connection?: JetSocket;
   plugins = {};
@@ -184,7 +184,7 @@ export class Context {
     this.params = params;
     this.query = query;
     this.path = path;
-    this.body = undefined;
+    this.body = {};
     //? load
     this._1 = undefined;
     // ? header of response
@@ -810,21 +810,21 @@ export class Trie {
         : normalizedPath;
     }
     // ? Check if route is cached
-    if (this.hashmap.has(path)) {
-      return [this.hashmap.get(path)!, {}, {}, path];
+    if (this.hashmap.has(normalizedPath)) {
+      return [this.hashmap.get(normalizedPath)!, {}, {}, path];
     }
     const query: Record<string, string> = {};
     //? Handle query parameters
     const queryIndex = normalizedPath.indexOf("?");
     if (queryIndex > -1) {
       // ? Extract query parameters
-      normalizedPath = normalizedPath.slice(0, queryIndex);
       const queryParams = new URLSearchParams(normalizedPath.slice(queryIndex));
       queryParams.forEach((value, key) => {
         query[key] = value;
       });
-      if (this.hashmap.has(path)) {
-        return [this.hashmap.get(path)!, {}, {}, path];
+      normalizedPath = normalizedPath.slice(0, queryIndex);
+      if (this.hashmap.has(normalizedPath)) {
+        return [this.hashmap.get(normalizedPath)!, {}, query, path];
       }
     }
     // ? Handle leading and trailing slashes
@@ -838,7 +838,7 @@ export class Trie {
     // ? Handle empty path
     if (normalizedPath === "") {
       if (this.root.handler) {
-        return [this.root.handler, {}, {}, path];
+        return [this.root.handler, {}, query, path];
       }
     }
     let currentNode = this.root;
