@@ -636,20 +636,19 @@ export class SchemaCompiler {
 
 class TrieNode {
   // ? child nodes
-  children: Map<any, any>;
+  children: Map<any, any> = new Map();
   // ? parameter node
-  parameterChild: TrieNode | null;
-  paramName: string | null;
+  parameterChild?: TrieNode;
+  paramName?: string;
   // ? wildcard node
-  wildcardChild: TrieNode | null;
+  wildcardChild?: TrieNode;
   // ? route handler
-  handler: JetFunc | null;
-  constructor() {
-    this.children = new Map();
-    this.parameterChild = null;
-    this.paramName = null;
-    this.wildcardChild = null;
-    this.handler = null;
+  handler?: JetFunc;
+  constructor() { 
+    this.parameterChild = undefined;
+    this.paramName = undefined;
+    this.wildcardChild = undefined;
+    this.handler = undefined;
   }
 }
 
@@ -802,39 +801,49 @@ export class Trie {
   get_responder(path: string):
     | [JetFunc, Record<string, any>, Record<string, any>, string]
     | undefined {
-    if (this.hashmap.has(path)) {
-      return [this.hashmap.get(path)!, {}, {}, path];
-    }
     let normalizedPath = path;
+    // ? Handle absolute paths in non-node environments
     if (!UTILS.runtime["node"]) {
       const pathStart = normalizedPath.indexOf("/", 7);
       normalizedPath = pathStart >= 0
         ? normalizedPath.slice(pathStart)
         : normalizedPath;
     }
+    // ? Check if route is cached
+    if (this.hashmap.has(path)) {
+      return [this.hashmap.get(path)!, {}, {}, path];
+    }
+    const query: Record<string, string> = {};
+    //? Handle query parameters
+    const queryIndex = normalizedPath.indexOf("?");
+    if (queryIndex > -1) {
+      // ? Extract query parameters
+      normalizedPath = normalizedPath.slice(0, queryIndex);
+      const queryParams = new URLSearchParams(normalizedPath.slice(queryIndex));
+      queryParams.forEach((value, key) => {
+        query[key] = value;
+      });
+      if (this.hashmap.has(path)) {
+        return [this.hashmap.get(path)!, {}, {}, path];
+      }
+    }
+    // ? Handle leading and trailing slashes
     if (normalizedPath.startsWith("/")) {
       normalizedPath = normalizedPath.slice(1);
     }
+    // ? Handle trailing slash
     if (normalizedPath.endsWith("/") && normalizedPath.length > 0) {
       normalizedPath = normalizedPath.slice(0, -1);
     }
+    // ? Handle empty path
     if (normalizedPath === "") {
       if (this.root.handler) {
         return [this.root.handler, {}, {}, path];
       }
     }
-    const segments = normalizedPath.split("/");
     let currentNode = this.root;
     const params: Record<string, string> = {};
-    const query: Record<string, string> = {};
-    //? Handle query parameters
-    const queryIndex = normalizedPath.indexOf("?");
-    if (queryIndex > -1) {
-      const queryParams = new URLSearchParams(normalizedPath.slice(queryIndex));
-      queryParams.forEach((value, key) => {
-        query[key] = value;
-      });
-    }
+    const segments = normalizedPath.split("/");
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       if (currentNode.children.has(segment)) {
@@ -847,7 +856,7 @@ export class Trie {
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
         // ? wildcard segment match
-        params["extraPath"] = segments.slice(i).join("/");
+        params["*"] = segments.slice(i).join("/");
         currentNode = currentNode.wildcardChild;
         break;
       } else {

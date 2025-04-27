@@ -73,7 +73,7 @@ export class Jetpath {
         "/*";
       _JetPath_paths_trie["GET"].insert(name, async (ctx: any) => {
         const extraPathRaw =
-          decodeURI((ctx.params as any)?.["extraPath"] || "").split("?")[0];
+          decodeURI((ctx.params as any)?.["*"] || "").split("?")[0];
         //? sanitize path
         //? remove any .. from the path
         //? and replace it with /
