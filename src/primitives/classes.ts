@@ -184,6 +184,7 @@ export class Context {
     this.params = params;
     this.query = query;
     this.path = path;
+    this.body = undefined; // ? very important.
     //? load
     this._1 = undefined;
     // ? header of response
