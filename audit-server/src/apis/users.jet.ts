@@ -241,3 +241,53 @@ use(PATCH_user_use_voucher).body((t) => {
         code: t.string().required()
     }
 }).info("Use voucher");
+
+ 
+const sockets = new Set<any>();
+export const GET_live_room_chat: JetFunc = (ctx) => {
+  ctx.upgrade(); 
+  const conn = ctx.connection!;
+  if (!conn) {
+    ctx.code = 500;
+    ctx.send({
+      status: "error",
+      message: "WebSocket connection failed!!!"
+    });
+    return;
+  }
+ 
+    // Handle new connections
+    conn.addEventListener("open", (socket) => {
+      sockets.add(socket);
+      console.log("New client connected to live updates"); 
+      socket.send("Welcome to live updates");
+    });
+
+    // Handle incoming messages
+    conn.addEventListener("message", (_sending_socket, event) => {
+      const message = event.data; 
+        // Handle subscription requests
+        if (message === "ping") {
+          // Handle ping-pong for connection health checks
+          const m = ("pong " + new Date().toISOString());
+          sockets.forEach(s => s.send(m));
+          return
+        }
+        const m = (`All your ${message} are belong to us`);
+        sockets.forEach(s => s.send(m));
+    });
+
+    // Handle connection close
+    conn.addEventListener("close", (socket) => {
+      sockets.delete(socket);
+      console.log("Client disconnected from live updates");
+    });
+};
+
+use(GET_live_room_chat).info("Websocket chatting room");
+
+export const GET_chat: JetFunc = (ctx) => {
+    ctx.sendStream("./chat.html", "text/html");
+};
+
+use(GET_chat).info("Chat page");

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern WebSocket Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-url: url('https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1729&q=80'); /* Example background */
+            --blur-intensity: 10px;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --border-color: rgba(255, 255, 255, 0.3);
+            --text-color: #f0f0f0;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --message-bg-received: rgba(0, 0, 0, 0.2);
+            --message-bg-sent: rgba(0, 123, 255, 0.3);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.4);
+            --scrollbar-track: transparent;
+            --status-connected: #28a745;
+            --status-disconnected: #dc3545;
+            --status-connecting: #ffc107;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: var(--background-url);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-intensity));
+            -webkit-backdrop-filter: blur(var(--blur-intensity)); /* Safari */
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            display: flex;
+            flex-direction: column;
+            height: 70vh; /* Adjust height as needed */
+            max-height: 700px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chat-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--status-disconnected); /* Default */
+            transition: background-color 0.3s ease;
+        }
+
+        .status-indicator.connected { background-color: var(--status-connected); }
+        .status-indicator.connecting { background-color: var(--status-connecting); }
+        .status-indicator.disconnected { background-color: var(--status-disconnected); }
+
+
+        .messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px; /* Space for scrollbar */
+            margin-bottom: 15px;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        .messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .messages::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 3px;
+        }
+        .messages::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+        .messages::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.received {
+            background-color: var(--message-bg-received);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.sent {
+            background-color: var(--message-bg-sent);
+            align-self: flex-end;
+            margin-left: auto; /* Push to the right */
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.system {
+            font-style: italic;
+            font-size: 12px;
+            text-align: center;
+            color: rgba(240, 240, 240, 0.7);
+            background: none;
+            padding: 5px 0;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative; /* For emoji picker positioning */
+        }
+
+        #messageInput {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-color);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        #messageInput::placeholder {
+            color: rgba(240, 240, 240, 0.6);
+        }
+        #messageInput:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .action-button {
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            transition: background-color 0.3s ease;
+            font-size: 18px; /* Icon size */
+        }
+        .action-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #sendButton {
+            background-color: var(--primary-color);
+            border: none;
+        }
+        #sendButton:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Emoji Picker */
+        .emoji-picker {
+            position: absolute;
+            bottom: 55px; /* Position above the input area */
+            right: 50px; /* Align near the emoji button */
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-intensity));
+            -webkit-backdrop-filter: blur(var(--blur-intensity));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: none; /* Hidden by default */
+            grid-template-columns: repeat(6, 1fr); /* Adjust columns as needed */
+            gap: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .emoji-picker.active {
+            display: grid;
+        }
+        .emoji-picker span {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 20px;
+            transition: background-color 0.2s ease;
+        }
+        .emoji-picker span:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Emoji picker scrollbar */
+        .emoji-picker::-webkit-scrollbar { width: 5px; }
+        .emoji-picker::-webkit-scrollbar-track { background: transparent; }
+        .emoji-picker::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 3px; }
+
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>WebSocket Chat</h1>
+            <div class="connection-status">
+                <div id="statusIndicator" class="status-indicator"></div>
+                <span id="statusText">Disconnected</span>
+            </div>
+        </div>
+
+        <div id="messages" class="messages"> 
+        </div>
+
+        <div class="emoji-picker" id="emojiPicker"> 
+        </div>
+
+        <div class="input-area">
+            <button id="emojiButton" class="action-button">😀</button>
+            <input type="text" id="messageInput" placeholder="Type your message..." />
+            <button id="sendButton" class="action-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                    <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.001.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let wsUri = "ws://" + location.host + "/live/room/chat"
+        let ws;
+        const messagesDiv = document.getElementById("messages");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+        const emojiButton = document.getElementById("emojiButton");
+        const emojiPicker = document.getElementById("emojiPicker");
+        const statusIndicator = document.getElementById("statusIndicator");
+        const statusText = document.getElementById("statusText");
+        const emojis = ['😀', '😂', '😍', '🤔', '😎', '😭', '👍', '👎', '❤️', '🔥', '🎉', '🚀', '💡', '✨', '👋', '🙏'];
+        let isReconnecting = false;
+
+        function initWebSocket() {
+            console.log("Attempting to connect to WebSocket...");
+            updateStatus('connecting', 'Connecting...');
+            ws = new WebSocket(wsUri);
+
+            ws.onopen = (event) => { console.log("WebSocket connection opened:", event);
+                addSystemMessage("Connection opened");
+                updateStatus('connected', 'Connected');
+            };
+            ws.onmessage = (event) => {
+                console.log("Message from server:", event.data);
+                addMessage(event.data, 'received');
+            };
+
+            ws.onclose = (event) => {
+                console.log("WebSocket connection closed:", event);
+                addSystemMessage(`Connection closed (Code: ${event.code}, Reason: ${event.reason || 'No reason specified'})`);
+                updateStatus('disconnected', 'Disconnected');
+                reconnect();
+            };
+            ws.onerror = (event) => {
+                console.error("WebSocket error:", event);
+                addSystemMessage("Connection error occurred"); 
+                updateStatus('disconnected', 'Error');
+                reconnect();
+            };
+        }
+
+        function reconnect() {
+            if (isReconnecting) return;
+            isReconnecting = true;
+            setTimeout(() => {
+                console.log("Attempting to reconnect...");
+                initWebSocket();
+                isReconnecting = false;
+            }, 2000);
+            };
+
+
+        function updateStatus(statusClass, text) {
+            statusIndicator.className = `status-indicator ${statusClass}`;
+            statusText.textContent = text;
+        }
+
+        function addMessage(text, type = 'received') {
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message", type);
+            messageElement.textContent = text;
+            messagesDiv.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        function addSystemMessage(text) {
+            addMessage(text, 'system');
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(message);
+                addMessage(message, 'sent');
+                messageInput.value = "";
+                emojiPicker.classList.remove('active');
+            } else if (!ws || ws.readyState !== WebSocket.OPEN) {
+                addSystemMessage("Cannot send message: Not connected.");
+            }
+        }
+
+        function scrollToBottom() {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function populateEmojiPicker() {
+            emojis.forEach(emoji => {
+                const emojiSpan = document.createElement('span');
+                emojiSpan.textContent = emoji;
+                emojiSpan.addEventListener('click', () => {
+                    messageInput.value += emoji;
+                    messageInput.focus();
+                });
+                emojiPicker.appendChild(emojiSpan);
+            });
+        }
+ 
+        sendButton.addEventListener("click", sendMessage);
+
+        messageInput.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") { sendMessage(); }
+        });
+
+        emojiButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            emojiPicker.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!emojiPicker.contains(event.target) && !emojiButton.contains(event.target)) {
+                emojiPicker.classList.remove('active'); 
+            }
+        });
+ 
+        populateEmojiPicker();
+        initWebSocket();  
+    </script>
+</body>
+</html>
