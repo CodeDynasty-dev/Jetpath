@@ -274,7 +274,7 @@
     </div>
 
     <script>
-        let wsUri = "ws://" + location.host + "/live/room/chat"
+        let wsUri = origin.replace("http", "ws") + "/live/room/chat"
         let ws;
         const messagesDiv = document.getElementById("messages");
         const messageInput = document.getElementById("messageInput");
