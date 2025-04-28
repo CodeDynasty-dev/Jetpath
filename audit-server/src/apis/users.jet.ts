@@ -260,21 +260,19 @@ export const GET_live_room_chat: JetFunc = (ctx) => {
     conn.addEventListener("open", (socket) => {
       sockets.add(socket);
       console.log("New client connected to live updates"); 
-      socket.send("Welcome to live updates");
+      socket.send("All your messages are belong to us");
     });
 
     // Handle incoming messages
-    conn.addEventListener("message", (_sending_socket, event) => {
+    conn.addEventListener("message", (socket, event) => {
       const message = event.data; 
         // Handle subscription requests
         if (message === "ping") {
-          // Handle ping-pong for connection health checks
-          const m = ("pong " + new Date().toISOString());
-          sockets.forEach(s => s.send(m));
+          // Handle ping-pong for connection health checks 
+          Array.from(sockets).filter(s => s !== socket).forEach(s => s.send("pong"));
           return
-        }
-        const m = (`All your ${message} are belong to us`);
-        sockets.forEach(s => s.send(m));
+        } 
+        Array.from(sockets).filter(s => s !== socket).forEach(s => s.send(message));
     });
 
     // Handle connection close
