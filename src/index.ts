@@ -20,13 +20,13 @@ import path from "node:path";
 export class Jetpath {
   public server: any;
   private listening: boolean = false;
-  private options: jetOptions = { port: 8080, APIdisplay: "UI", cors: true };
+  private options: jetOptions = { port: 8080, APIdisplay: "UI", cors: false };
   private plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[] = [];
   constructor(options?: jetOptions) {
     Object.assign(this.options, options || {});
     if (!this.options.port) this.options.port = 8080;
     // ? setting up app configs
-    if (this.options.cors !== false) {
+    if (this.options.cors === true) {
       corsMiddleware({
         exposeHeaders: [],
         allowMethods: ["DELETE", "GET", "HEAD", "PATCH", "POST", "PUT"],

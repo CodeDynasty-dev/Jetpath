@@ -40,7 +40,6 @@ import {
  *    @see https://wicg.github.io/private-network-access/
  */
 
-let cors: (ctx: Context) => void;
 const optionsCtx = {
   _1: undefined,
   _2: {},
@@ -53,6 +52,7 @@ const optionsCtx = {
   },
   request: { method: "OPTIONS" },
 };
+const cachedCorsHeaders: Record<string, string> = {};
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
   allowMethods?: allowedMethods;
@@ -102,32 +102,30 @@ export function corsMiddleware(options: {
       );
     }
   }
-
-  cors = (ctx: Context) => {
-    //? Add Vary header to indicate response varies based on the Origin header
-    ctx.set("Vary", "Origin");
-    if (options.credentials === true) {
-      ctx.set("Access-Control-Allow-Credentials", "true");
-    }
-    if (Array.isArray(options.origin)) {
-      ctx.set("Access-Control-Allow-Origin", options.origin.join(","));
-    }
-    if (ctx.request!.method !== "OPTIONS") {
-      // ? add ctx to ctx pool
-      UTILS.ctxPool.push(ctx);
-      ``;
-      if (options.secureContext) {
-        ctx.set(
-          "Cross-Origin-Opener-Policy",
-          options.secureContext["Cross-Origin-Embedder-Policy"],
-        );
-        ctx.set(
-          "Cross-Origin-Embedder-Policy",
-          options.secureContext["Cross-Origin-Embedder-Policy"],
-        );
-      }
-    }
-  };
+  optionsCtx.set("Vary", "Origin");
+  if (options.credentials === true) {
+    optionsCtx.set("Access-Control-Allow-Credentials", "true");
+  }
+  if (Array.isArray(options.origin)) {
+    optionsCtx.set("Access-Control-Allow-Origin", options.origin.join(","));
+  }
+  // ? Pre-popular normal response headers.
+  //? Add Vary header to indicate response varies based on the Origin header
+  cachedCorsHeaders["Vary"] = "Origin";
+  if (options.credentials === true) {
+    cachedCorsHeaders["Access-Control-Allow-Credentials"] = "true";
+  }
+  if (Array.isArray(options.origin)) {
+    cachedCorsHeaders["Access-Control-Allow-Origin"] = options.origin.join(",");
+  }
+  if (options.secureContext) {
+    cachedCorsHeaders[
+      "Cross-Origin-Opener-Policy"
+    ] = options.secureContext["Cross-Origin-Embedder-Policy"];
+    cachedCorsHeaders[
+      "Cross-Origin-Embedder-Policy"
+    ] = options.secureContext["Cross-Origin-Embedder-Policy"];
+  }
 }
 
 export const JetSocketInstance = new JetSocket();
@@ -167,10 +165,10 @@ export const _jet_middleware: Record<
   (ctx: Context, err?: unknown) => void | Promise<void>
 > = {};
 
+export const ctxPool: Context[] = [];
 export const UTILS = {
   upgrade: false,
-  ctxPool: [] as Context[],
-  middlewares: {},
+  plugins: {},
   ae(cb: { (): any; (): any; (): void }) {
     try {
       cb();
@@ -222,7 +220,7 @@ export const UTILS = {
                   JetSocketInstance.__binder("message", p);
                 },
                 close(...p) {
-                  JetSocketInstance.__binder("close", p.slice(1));
+                  JetSocketInstance.__binder("close", p);
                 },
                 drain(...p) {
                   JetSocketInstance.__binder("drain", p);
@@ -286,8 +284,8 @@ export const UTILS = {
     }
     // ? adding ctx plugin bindings
     for (const key in decorations) {
-      if (!(UTILS.middlewares as any)[key]) {
-        (UTILS.middlewares as any)[key] = decorations[key];
+      if (!(UTILS.plugins as any)[key]) {
+        (UTILS.plugins as any)[key] = decorations[key];
       }
     }
     if (!server) {
@@ -303,7 +301,7 @@ export const UTILS = {
 };
 // ? setting up the runtime check
 UTILS.set();
-
+export const isNode = UTILS.runtime["node"];
 const getCtx = (
   req: IncomingMessage | Request,
   res: any,
@@ -312,76 +310,125 @@ const getCtx = (
   params?: Record<string, any>,
   query?: Record<string, any>,
 ): Context => {
-  if (UTILS.ctxPool.length) {
-    const ctx = UTILS.ctxPool.shift()!;
-    ctx._7(req as Request, res, path, route, params, query);
+  if (ctxPool.length) { 
+    const ctx = ctxPool.shift()!;
+    // ? reset the COntext to default state
+    ctx.state["__state__"] = true;
+    ctx.request = req;
+    ctx.res = res;
+    ctx.method = req.method as "GET";
+    ctx.params = params;
+    ctx.query = query;
+    ctx.path = path;
+    ctx.body = undefined; // ? very important.
+    //? load
+    ctx._1 = undefined;
+    // ? header of response
+    ctx._2 = cachedCorsHeaders;
+    // //? stream
+    ctx._3 = undefined;
+    //? the route handler
+    ctx._5 = route;
+    //? custom response
+    ctx._6 = false;
+    // ? code
+    ctx.code = 200;
     return ctx;
   }
   const ctx = new Context();
   // ? add middlewares to the plugins object
-  Object.assign(ctx.plugins, UTILS.middlewares);
-  ctx._7(req as Request, res, path, route, params, query);
+  ctx.request = req;
+  ctx.res = res;
+  ctx._2 = cachedCorsHeaders;
+  ctx.method = req.method as "GET";
+  ctx.params = params;
+  ctx.query = query;
+  ctx.path = path;
+  ctx._5 = route;
   return ctx;
 };
 
-const makeRes = (
+let makeRes: (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
   ctx: Context,
-  four04?: boolean,
-) => {
-  //? add cors headers
-  cors?.(ctx);
+) => any;
 
+const makeResBunAndDeno = (
+  _res: any,
+  ctx: Context,
+) => {
   // ? prepare response
-  if (!UTILS.runtime["node"]) {
-    // redirect
-    if (ctx?.code === 301 && ctx._2?.["Location"]) {
-      // @ts-ignore
-      return Response.redirect(ctx._2?.["Location"]);
-    }
-    // ? streaming with ctx.sendStream
-    if (ctx?._3) {
-      // handle deno promise.
+  // redirect
+  if (ctx?.code === 301 && ctx._2?.["Location"]) {
+    ctxPool.push(ctx);
+    // @ts-ignore
+    return Response.redirect(ctx._2?.["Location"]);
+  }
+  // ? streaming with ctx.sendStream
+  if (ctx?._3) {
+    // handle deno promise.
+    // @ts-expect-error
+    if (UTILS.runtime["deno"] && ctx._3.then) {
+      ctxPool.push(ctx);
       // @ts-expect-error
-      if (UTILS.runtime["deno"] && ctx._3.then) {
-        // @ts-expect-error
-        return ctx._3.then((stream: any) => {
-          return new Response(stream?.readable, {
-            status: (four04 && 404) || ctx.code,
-            headers: ctx?._2,
-          });
+      return ctx._3.then((stream: any) => {
+        return new Response(stream?.readable, {
+          status: ctx.code,
+          headers: ctx?._2,
         });
-      }
-      return new Response(ctx?._3 as unknown as undefined, {
-        status: 200,
-        headers: ctx?._2,
       });
     }
-    if (ctx._6 !== false) return ctx?._6;
-    // normal response
-    return new Response(ctx?._1 || (four04 ? "Not found" : undefined), {
-      status: (four04 && 404) || ctx.code,
+    ctxPool.push(ctx);
+    return new Response(ctx?._3 as unknown as undefined, {
+      status: ctx.code,
       headers: ctx?._2,
     });
   }
+  if (ctx._6 !== false) {
+    ctxPool.push(ctx);
+    return ctx?._6;
+  }
+  // normal response
+  ctxPool.push(ctx);
+  return new Response(ctx?._1, {
+    status: ctx.code,
+    headers: ctx?._2,
+  });
+};
+const makeResNode = (
+  res: ServerResponse<IncomingMessage> & {
+    req: IncomingMessage;
+  },
+  ctx: Context,
+) => {
+  // ? prepare response
   if (ctx?._3) {
     res.writeHead(ctx?.code, ctx?._2);
     ctx?._3.on("error", (_err) => {
       res.statusCode;
       res.end("File not found");
     });
-    return ctx._3.pipe(res);
+    ctx._3.pipe(res);
+    ctxPool.push(ctx);
+    return undefined;
   }
 
   res.writeHead(
-    (four04 && 404) || ctx.code,
+    ctx.code,
     ctx?._2 || { "Content-Type": "text/plain" },
   );
-  res.end(ctx?._1 || (four04 ? "Not found" : undefined));
+  res.end(ctx?._1);
+  ctxPool.push(ctx);
   return undefined;
 };
+
+if (isNode) {
+  makeRes = makeResNode;
+} else {
+  makeRes = makeResBunAndDeno;
+}
 
 const Jetpath = async (
   req: IncomingMessage,
@@ -390,6 +437,7 @@ const Jetpath = async (
   },
 ) => {
   if (req.method === "OPTIONS") {
+    optionsCtx.code = 200;
     return makeRes(res, optionsCtx as Context);
   }
   const responder = _JetPath_paths_trie[req.method as methods]?.get_responder(
@@ -407,6 +455,7 @@ const Jetpath = async (
       responder[1],
       responder[2],
     );
+    
     try {
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
@@ -418,29 +467,21 @@ const Jetpath = async (
       returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
       return makeRes(res, ctx);
     } catch (error) {
+      console.log(error);
       try {
         //? report error to error middleware
         returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
-      } catch (error) {
-        Log.error(
-          `Unhandled error in middleware: ${
-            String(error)
-          } \nAffecting ${ctx.path}`,
-        );
       } finally {
-        if (!returned) {
+        if (!returned && ctx.code < 400) {
           ctx.code = 500;
-          Log.error(
-            `Unhandled error in middleware: ${
-              String(error)
-            } \nAffecting ${ctx.path}`,
-          );
         }
         return makeRes(res, ctx);
       }
     }
   }
-  return makeRes(res, getCtx(req, res, "", null as any), true);
+  const ctx404 = optionsCtx;
+  ctx404.code = 404;
+  return makeRes(res, ctx404 as Context);
 };
 
 const handlersPath = (path: string) => {

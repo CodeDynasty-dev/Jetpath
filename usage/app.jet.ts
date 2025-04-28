@@ -123,7 +123,7 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
         message: "Authentication failed",
         url: ctx.request.url
       });
-      ctx.throw("Unauthorized: Valid authentication is required");
+      // ctx.throw("Unauthorized: Valid authentication is required");
     }
 
     // Attach user info to context for use in route handlers
@@ -1292,8 +1292,9 @@ use(GET_stats).info("Get shop statistics (admin only)");
  * @access Public
  */
 const sockets = new Set<any>();
-export const GET_live: JetFunc = (ctx) => { 
+export const GET_live: JetFunc = (ctx) => {  
   ctx.upgrade(); 
+  
   const conn = ctx.connection!;
   if (!conn) {
     ctx.code = 500;
@@ -1308,32 +1309,31 @@ export const GET_live: JetFunc = (ctx) => {
     // Handle new connections
     conn.addEventListener("open", (socket) => {
       sockets.add(socket);
-      console.log("New client connected to live updates");
       // Send welcome message with current stats
       const availablePets = pets.filter(pet => pet.available).length;
-      socket.send(JSON.stringify({
-        type: "welcome",
-        message: "Connected to PetShop live updates",
-        stats: {
-          totalPets: pets.length,
-          availablePets
-        },
-        timestamp: new Date().toISOString()
-      }));
+      socket.send(
+        `
+        Connected to PetShop live updates
+        total pets: ${pets.length}
+        available pets: ${availablePets}
+        timestamp: ${new Date().toISOString()}
+        `
+      ); 
+      Array.from(sockets.values()).filter(s => s !== socket).forEach(s => s.send("We have a new member!"));
     });
 
     // Handle incoming messages
-    conn.addEventListener("message", (_sending_socket, event) => {
+    conn.addEventListener("message", (socket, event) => {
       const message = event.data; 
         // Handle subscription requests
         if (message === "ping") {
           // Handle ping-pong for connection health checks
           const m = ("pong " + new Date().toISOString());
-          sockets.forEach(s => s.send(m));
+          socket.send(m);
           return
         }
-        const m = (`All your ${message} are belong to us`);
-        sockets.forEach(s => s.send(m));
+        const m = message
+       Array.from(sockets.values()).filter(s => s !== socket).forEach(s => s.send(m));
     });
 
     // Handle connection close

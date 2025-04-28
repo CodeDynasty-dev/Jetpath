@@ -3,6 +3,7 @@ import { IncomingMessage } from "node:http";
 import { Stream } from "node:stream";
 import {
   _JetPath_paths,
+  isNode,
   JetSocketInstance,
   parseRequest,
   UTILS,
@@ -144,6 +145,28 @@ class Cookie {
   }
 }
 
+class ctxState {
+  state: Record<string, any> = {};
+  public get value(): Record<string, any> {
+    if (this.state["__state__"] === true) {
+      for (const key in this.state) {
+        delete this.state[key];
+      }
+      this.state["__state__"] = false;
+    }
+    return this.state;
+  }
+  public set value(value: Record<string, any>) {
+    if (this.state["__state__"] === true) {
+      for (const key in this.state) {
+        delete this.state[key];
+      }
+      this.state["__state__"] = false;
+    }
+    this.state = value;
+  }
+} 
+
 export class Context {
   code = 200;
   request: Request | IncomingMessage | undefined;
@@ -152,9 +175,17 @@ export class Context {
   body?: Record<string, any>;
   path: string | undefined;
   connection?: JetSocket;
-  plugins = {};
-  // ?
-  state: Record<string, any> = {};
+  method: methods | undefined;
+  get plugins() {
+    return UTILS.plugins;
+  }
+  // ? state
+ get state() : Record<string, any> {
+   return this._7.value;
+ }
+ set state(value: Record<string, any>) {
+   this._7.value = value;
+  }
   //? load
   _1?: string = undefined;
   // ? header of response
@@ -165,40 +196,9 @@ export class Context {
   _5: JetFunc | null = null;
   //? response
   _6: boolean = false;
-  method: methods | undefined;
   //? original response
+  _7: ctxState = new ctxState();
   res?: any;
-  // ? reset the COntext to default state
-  _7(
-    req: Request,
-    res: Response,
-    path: string,
-    route: JetFunc,
-    params?: Record<string, any>,
-    query?: Record<string, any>,
-  ) {
-    this.state = {};
-    this.request = req;
-    this.res = res;
-    this.method = req.method as "GET";
-    this.params = params;
-    this.query = query;
-    this.path = path;
-    this.body = undefined; // ? very important.
-    //? load
-    this._1 = undefined;
-    // ? header of response
-    this._2 = {};
-    // //? stream
-    this._3 = undefined;
-    //? the route handler
-    this._5 = route;
-    //? custom response
-    this._6 = false;
-    // ? code
-    this.code = 200;
-  }
-
   send(data: unknown, contentType?: string) {
     if (contentType) {
       this._2["Content-Type"] = contentType;
@@ -372,24 +372,24 @@ export class Context {
 }
 
 export class JetSocket {
-  private listeners = { "message": [], "close": [], "drain": [], "open": [] };
+  private listeners: Record<string, Function | null> = {
+    "message": null,
+    "close": null,
+    "drain": null,
+    "open": null,
+  };
   addEventListener(
     event: "message" | "close" | "drain" | "open",
     listener: (...param: any[]) => void,
   ): void {
-    if (!this.listeners[event]) {
-      this.listeners[event] = [];
-    }
-    this.listeners[event].push(listener as never);
+    this.listeners[event] = listener as never;
   }
   /**
    * @internal
    */
   __binder(eventName: "message" | "close" | "drain" | "open", data: any) {
     if (this.listeners[eventName]) {
-      this.listeners[eventName].forEach((listener: any) => {
-        listener(...data);
-      });
+      this.listeners[eventName]?.(...data);
     }
   }
 }
@@ -644,7 +644,7 @@ class TrieNode {
   wildcardChild?: TrieNode;
   // ? route handler
   handler?: JetFunc;
-  constructor() { 
+  constructor() {
     this.parameterChild = undefined;
     this.paramName = undefined;
     this.wildcardChild = undefined;
@@ -658,7 +658,7 @@ class TrieNode {
 export class Trie {
   root: TrieNode;
   method: string;
-  hashmap: Map<string, JetFunc> = new Map();
+  hashmap: Record<string, JetFunc> = {};
   constructor(
     method:
       | "GET"
@@ -681,7 +681,7 @@ export class Trie {
   insert(path: string, handler: JetFunc): void {
     // ? remove leading/trailing slashes, handle empty path
     if (!/(\*|:)+/.test(path)) {
-      this.hashmap.set(path, handler);
+      this.hashmap[path] = handler;
       return;
     }
     let normalizedPath = path.trim();
@@ -803,15 +803,15 @@ export class Trie {
     | undefined {
     let normalizedPath = path;
     // ? Handle absolute paths in non-node environments
-    if (!UTILS.runtime["node"]) {
+    if (!isNode) {
       const pathStart = normalizedPath.indexOf("/", 7);
       normalizedPath = pathStart >= 0
         ? normalizedPath.slice(pathStart)
         : normalizedPath;
     }
     // ? Check if route is cached
-    if (this.hashmap.has(normalizedPath)) {
-      return [this.hashmap.get(normalizedPath)!, {}, {}, path];
+    if (this.hashmap[normalizedPath]) {
+      return [this.hashmap[normalizedPath]!, {}, {}, path];
     }
     const query: Record<string, string> = {};
     //? Handle query parameters
@@ -823,8 +823,8 @@ export class Trie {
         query[key] = value;
       });
       normalizedPath = normalizedPath.slice(0, queryIndex);
-      if (this.hashmap.has(normalizedPath)) {
-        return [this.hashmap.get(normalizedPath)!, {}, query, path];
+      if (this.hashmap[normalizedPath]) {
+        return [this.hashmap[normalizedPath]!, {}, query, path];
       }
     }
     // ? Handle leading and trailing slashes
