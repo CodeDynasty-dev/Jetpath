@@ -51,7 +51,7 @@ const optionsCtx = {
     }
   },
   request: { method: "OPTIONS" },
-};
+  };
 const cachedCorsHeaders: Record<string, string> = {};
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
@@ -391,7 +391,7 @@ const makeResBunAndDeno = (
     return ctx?._6;
   }
   // normal response
-  ctxPool.push(ctx);
+ ctx.__jet_pool && ctxPool.push(ctx);
   return new Response(ctx?._1, {
     status: ctx.code,
     headers: ctx?._2,
@@ -420,7 +420,7 @@ const makeResNode = (
     ctx?._2 || { "Content-Type": "text/plain" },
   );
   res.end(ctx?._1);
-  ctxPool.push(ctx);
+  ctx.__jet_pool && ctxPool.push(ctx);
   return undefined;
 };
 

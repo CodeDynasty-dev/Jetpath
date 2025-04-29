@@ -24,8 +24,8 @@ export class Jetpath {
     cors: false,
   };
   private plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[] = [];
-  constructor(options?: jetOptions) {
-    Object.assign(this.options, options || {});
+  constructor(options: jetOptions={}) {
+    Object.assign(this.options, options);
     if (!this.options.port) this.options.port = 8080;
     // ? setting up app configs
     if (this.options.cors === true) {

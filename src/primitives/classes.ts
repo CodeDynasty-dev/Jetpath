@@ -160,6 +160,7 @@ export class Context {
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
+  __jet_pool = true;
   get plugins() {
     return UTILS.plugins;
   }
@@ -299,6 +300,8 @@ export class Context {
         if (!normalizedTarget.startsWith(normalizedBase + sep)) {
           throw new Error("Path traversal detected!");
         }
+      } else {
+        stream = resolve(stream);
       }
       ContentType = mime.getType(stream) || ContentType;
       this._2["Content-Disposition"] = `inline; filename="${
