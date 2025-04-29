@@ -25,3 +25,4 @@ trie.ts
 usage/pet-shop-api-log.log
 audit-server
 usage/pet-shop-api-log.log
+apis-types.d.ts
