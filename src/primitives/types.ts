@@ -1,6 +1,8 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths, v } from "./functions.js";
 import { CookieOptions, SchemaBuilder } from "./classes.js";
+import { type BunFile } from "bun";
+import type Stream from "node:stream";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
   x: infer I,
@@ -49,14 +51,34 @@ export interface ContextType<
   code: number;
   /**
    * send a stream
+   * @param stream - The stream or file path to send
+   * @param folder - The folder to save the stream to
+   * @param ContentType - The content type of the stream
+   *
+   * PLEASE PROVIDE A VALID FOLDER PATH FOR SECURITY REASONS
    */
-  // sendStream(stream: Stream | string, ContentType: string): never;
-  sendStream(stream: any | string, ContentType: string): void;
+  sendStream(
+    stream: Stream | string | BunFile,
+    folder?: string,
+    ContentType?: string,
+  ): void | never;
+  /**
+   * send a file for download
+   * @param stream - The file path to send
+   * @param folder - The folder to save the stream to
+   * @param ContentType - The content type of the stream
+   *
+   * PLEASE PROVIDE A VALID FOLDER PATH FOR SECURITY REASONS
+   */
+  download(
+    stream: string | BunFile,
+    folder?: string,
+    ContentType?: string,
+  ): void;
   /**
    * send a direct response
    * *Only for deno and bun
    */
-  // sendStream(stream: Stream | string, ContentType: string): never;
   sendResponse(response?: Response): void;
   /**
    * reply the request
@@ -143,8 +165,11 @@ export type allowedMethods = methods[];
 
 export type jetOptions = {
   upgrade?: boolean;
+  source?: string;
   globalHeaders?: Record<string, string>;
+  generateTypes?: boolean;
   apiDoc?: {
+    display?: "UI" | "HTTP" | false;
     name?: string;
     info?: string;
     color?: string;
@@ -153,14 +178,11 @@ export type jetOptions = {
     password?: string;
     username?: string;
   };
-  source?: string;
   credentials?: {
     cert: string;
     key: string;
   };
-  APIdisplay?: "UI" | "HTTP" | false;
   port?: number;
-  static?: { route: string; dir: string };
   cors?:
     | {
       allowMethods?: allowedMethods;

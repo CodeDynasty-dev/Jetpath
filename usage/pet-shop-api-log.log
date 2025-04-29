@@ -1026,3 +1026,777 @@
 {"timestamp":"2025-04-28T17:34:56.592Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
 {"timestamp":"2025-04-28T17:34:57.537Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
 {"timestamp":"2025-04-28T17:34:57.538Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-28T21:58:06.590Z","level":"info","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-28T21:58:06.593Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"http://localhost:9000/live"}
+{"timestamp":"2025-04-28T21:58:26.807Z","level":"info","method":"GET","url":"http://localhost:9000/export/docs/:format"}
+{"timestamp":"2025-04-28T21:58:26.808Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/export/docs/:format"}
+{"timestamp":"2025-04-28T21:58:42.450Z","level":"info","method":"GET","url":"http://localhost:9000/export/docs/json"}
+{"timestamp":"2025-04-28T21:58:42.450Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/export/docs/json"}
+{"timestamp":"2025-04-28T21:58:56.355Z","level":"info","method":"GET","url":"http://localhost:9000/export/docs/yaml"}
+{"timestamp":"2025-04-28T21:58:56.356Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/export/docs/yaml"}
+{"timestamp":"2025-04-28T21:59:09.832Z","level":"info","method":"GET","url":"http://localhost:9000/export/docs/yamld"}
+{"timestamp":"2025-04-28T21:59:09.832Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/export/docs/yamld"}
+{"timestamp":"2025-04-28T21:59:20.783Z","level":"info","method":"GET","url":"http://localhost:9000/export/docs/markdown"}
+{"timestamp":"2025-04-28T21:59:20.783Z","level":"error","message":"null","method":"GET","url":"http://localhost:9000/export/docs/markdown"}
+{"timestamp":"2025-04-28T22:00:10.183Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:00:10.185Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:00:16.241Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:00:16.241Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:00:51.413Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:00:51.427Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:00:51.428Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:01:15.767Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:01:15.776Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:01:15.777Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:24.841Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:24.849Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:24.850Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:45.356Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:45.365Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:45.366Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:49.178Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:49.180Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:02:49.180Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:18.897Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:18.898Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:18.898Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.163Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.165Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.165Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.392Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.394Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.394Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.596Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.597Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.597Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.798Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.800Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:19.800Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:20.003Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:20.004Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:03:20.004Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:05.185Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:05.194Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:05.194Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:10.954Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:10.955Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:10.955Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.400Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.401Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.401Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.604Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.605Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.605Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.793Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.794Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.794Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.983Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.985Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:24.985Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.187Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.189Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.189Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.391Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.392Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.392Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.572Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.573Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:04:25.573Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:22.293Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:22.301Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:22.302Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:27.921Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:27.923Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:27.923Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.093Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.094Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.094Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.271Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.273Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.273Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.665Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.669Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.669Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.843Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.845Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:28.845Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:29.065Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:29.067Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:29.067Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:45.357Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:11:45.360Z","level":"error","message":"TypeError: Attempted to assign to readonly property.","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:12:41.205Z","level":"info","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:12:41.214Z","level":"error","message":"{\"action\":\"file_upload_error\",\"error\":\"document must be of type file\"}","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-28T22:12:41.215Z","level":"error","message":"null","method":"POST","url":"http://localhost:9000/upload"}
+{"timestamp":"2025-04-29T16:16:34.626Z","level":"info","method":"GET","url":"http://localhost:9000/assets/*"}
+{"timestamp":"2025-04-29T16:16:34.631Z","level":"error","message":"Error: ENOENT: no such file or directory, lstat '/home/friday/Desktop/opensource/jetpath/text/html/*'","method":"GET","url":"http://localhost:9000/assets/*"}
+{"timestamp":"2025-04-29T16:21:34.067Z","level":"info","method":"GET","url":"http://localhost:9000/assets/*"}
+{"timestamp":"2025-04-29T16:21:34.070Z","level":"error","message":"Error: ENOENT: no such file or directory, lstat '/home/friday/Desktop/opensource/jetpath/text/html/*'","method":"GET","url":"http://localhost:9000/assets/*"}
+{"timestamp":"2025-04-29T16:22:04.786Z","level":"info","method":"GET","url":"http://localhost:9000/assets/*"}
+{"timestamp":"2025-04-29T16:22:04.818Z","level":"error","message":"NotFound: No such file or directory (os error 2): realpath '/home/friday/Desktop/opensource/jetpath/text/html/*': No such file or directory (os error 2): realpath '/home/friday/Desktop/opensource/jetpath/text/html/*': No such file or directory (os error 2)","method":"GET","url":"http://localhost:9000/assets/*"}
+{"timestamp":"2025-04-29T16:26:25.129Z","level":"info","method":"GET","url":"/assets/*"}
+{"timestamp":"2025-04-29T16:26:25.136Z","level":"error","message":"Error: File not found!","method":"GET","url":"/assets/*"}
+{"timestamp":"2025-04-29T16:27:46.110Z","level":"info","method":"GET","url":"/assets/*"}
+{"timestamp":"2025-04-29T16:27:46.112Z","level":"error","message":"Error: File not found!","method":"GET","url":"/assets/*"}
+{"timestamp":"2025-04-29T16:27:52.654Z","level":"info","method":"GET","url":"/assets/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:27:52.655Z","level":"error","message":"Error: File not found!","method":"GET","url":"/assets/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:30:33.015Z","level":"info","method":"GET","url":"/assets/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:30:33.032Z","level":"error","message":"null","method":"GET","url":"/assets/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:34:25.125Z","level":"info","method":"GET","url":"/assets/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:34:25.129Z","level":"error","message":"null","method":"GET","url":"/assets/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:40:30.586Z","level":"info","method":"GET","url":"/static/*"}
+{"timestamp":"2025-04-29T16:40:30.588Z","level":"error","message":"null","method":"GET","url":"/static/*"}
+{"timestamp":"2025-04-29T16:40:40.119Z","level":"info","method":"GET","url":"/serve/*"}
+{"timestamp":"2025-04-29T16:40:40.119Z","level":"error","message":"null","method":"GET","url":"/serve/*"}
+{"timestamp":"2025-04-29T16:40:46.989Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:40:46.990Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:40:59.432Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:40:59.432Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:00.489Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:00.490Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:05.528Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:05.529Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:09.343Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:09.344Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:10.384Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:10.384Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:16.668Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:16.669Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:42.740Z","level":"info","method":"GET","url":"/serve/*"}
+{"timestamp":"2025-04-29T16:41:42.741Z","level":"error","message":"null","method":"GET","url":"/serve/*"}
+{"timestamp":"2025-04-29T16:41:56.895Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:41:56.896Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:42:44.264Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:42:44.266Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:42:50.959Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:42:50.960Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:02.519Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:02.520Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:05.744Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:05.745Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:10.782Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:10.783Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:16.469Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:16.470Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:48.423Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:48.424Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:56.188Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:43:56.190Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:44:26.366Z","level":"info","method":"GET","url":"/static/usage/chat.html"}
+{"timestamp":"2025-04-29T16:44:26.367Z","level":"error","message":"null","method":"GET","url":"/static/usage/chat.html"}
+{"timestamp":"2025-04-29T16:45:11.889Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:45:11.890Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:45:12.017Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:12.023Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:14.089Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:14.090Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:16.096Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:16.097Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:18.104Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:18.106Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:20.119Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:20.120Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:22.134Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:22.134Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:22.387Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:45:22.388Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:45:22.509Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:22.511Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:24.542Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:24.543Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:26.586Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:26.587Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:28.721Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:28.722Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:29.498Z","level":"info","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:45:29.499Z","level":"error","message":"null","method":"GET","url":"/static/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:45:31.779Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:31.779Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:34.925Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:34.926Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:38.196Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:38.197Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:41.294Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:41.296Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:41.448Z","level":"info","method":"GET","url":"/static/usage/chat.html"}
+{"timestamp":"2025-04-29T16:45:41.448Z","level":"error","message":"null","method":"GET","url":"/static/usage/chat.html"}
+{"timestamp":"2025-04-29T16:45:44.567Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:44.568Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:49.338Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:49.339Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:53.850Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:53.851Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:59.111Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:45:59.112Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:02.537Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:02.537Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:04.695Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:04.695Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:10.426Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:10.430Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:10.641Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:10.641Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:10.843Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:10.843Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:46:11.514Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:11.519Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:17.123Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:17.124Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:24.222Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:24.223Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:29.549Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:29.549Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:35.737Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:35.738Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:41.033Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:41.034Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:48.321Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:48.322Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:52.008Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:52.009Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:56.092Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:46:56.093Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:02.573Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:02.574Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:08.223Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:08.223Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:12.824Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:12.825Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:17.647Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:17.648Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:24.342Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:24.343Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:31.017Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:31.017Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:37.168Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:37.169Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:44.112Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:44.113Z","level":"error","message":"Error: Not Found","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:49.936Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:49.992Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:51.596Z","level":"info","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:47:51.597Z","level":"error","message":"null","method":"GET","url":"/serve/usage/app.jet.ts"}
+{"timestamp":"2025-04-29T16:47:57.097Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:47:57.099Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:03.291Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:03.296Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:06.321Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:06.323Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:11.246Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:11.247Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:17.765Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:17.766Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:23.426Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:23.428Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:26.358Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:48:26.363Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:48:28.039Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:28.040Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:30.257Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:30.259Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:32.826Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:32.827Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:38.753Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:38.757Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:41.923Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:41.924Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:46.866Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:46.866Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:51.898Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:51.899Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:57.258Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:48:57.259Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:02.569Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:02.570Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:08.372Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:08.386Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:15.364Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:15.367Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:19.811Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:19.813Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:24.642Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:24.646Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:28.168Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:28.177Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:31.547Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:31.549Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:34.766Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:34.773Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:40.381Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:40.384Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:44.948Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:44.971Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:48.111Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:48.113Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:53.969Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:49:53.974Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:00.395Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:00.396Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:04.555Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:04.561Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:08.977Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:08.979Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:16.002Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:16.003Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:22.087Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:22.088Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:27.162Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:27.165Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:33.741Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:33.743Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:38.178Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:38.183Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:43.206Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:43.215Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:46.983Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:46.998Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:51.303Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:51.319Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:57.399Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:50:57.408Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:02.787Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:02.788Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:06.053Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:06.054Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:11.023Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:11.034Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:13.073Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:13.079Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:15.102Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:15.103Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:17.120Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:17.123Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:19.162Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:19.165Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:21.207Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:21.210Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:23.249Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:23.250Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:25.311Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:25.314Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:27.350Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:27.350Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:29.413Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:29.414Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:31.529Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:31.531Z","level":"error","message":"Error: Invalid upgrade headers","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:35.993Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:36.003Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:38.609Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:38.610Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:41.482Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:41.483Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:44.509Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:44.510Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:49.165Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:49.166Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:55.544Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:51:55.544Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:01.454Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:01.455Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:06.294Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:06.295Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:10.226Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:10.228Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:13.394Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:13.395Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:18.705Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:18.706Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:23.191Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:23.192Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:24.598Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:52:24.600Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:52:27.030Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:27.031Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:31.848Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:31.849Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:35.058Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:35.059Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:40.803Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:40.804Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:45.653Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:45.655Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:49.215Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:52:49.217Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:52:50.135Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:50.139Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:52.423Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:52.424Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:57.647Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:52:57.650Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:53:02.038Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:53:02.039Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:53:05.626Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:53:05.627Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:53:06.102Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:53:06.103Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:55:44.639Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:55:44.657Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:55:55.198Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:55:55.199Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:55:56.880Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:55:56.897Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:55:58.941Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:55:58.942Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:55:59.039Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:55:59.041Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:55:59.212Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:55:59.217Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:01.245Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:01.246Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:03.259Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:03.259Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:05.276Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:05.278Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:07.297Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:07.299Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:09.330Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:09.331Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:11.373Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:11.378Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:13.416Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:13.418Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:15.561Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:15.561Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:17.857Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:17.859Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:20.218Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:20.219Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:22.822Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:22.822Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:26.495Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:26.498Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:32.109Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:32.115Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:36.635Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:36.646Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:43.544Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:43.547Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:46.771Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:46.772Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:51.175Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:56:51.184Z","level":"error","message":"Error: File not found!","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:56:53.502Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:53.503Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:56:55.362Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:56:55.363Z","level":"error","message":"Error: File not found!","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T16:57:28.071Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:57:28.074Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:57:28.808Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:57:28.809Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:58:08.113Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:58:08.118Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T16:58:08.334Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:08.344Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:10.386Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:10.387Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:12.399Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:12.400Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:14.418Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:14.421Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:16.443Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:16.444Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:18.471Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:18.478Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:20.505Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:20.506Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:22.537Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:22.539Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:24.573Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:24.574Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:26.653Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:26.656Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:28.823Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:28.832Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:30.947Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:30.951Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:33.312Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:33.324Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:35.950Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:35.953Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:38.870Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:38.871Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:44.742Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:44.743Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:48.326Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:48.343Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:52.092Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:52.093Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:55.418Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:55.419Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:57.459Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:57.461Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:59.523Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:58:59.533Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:01.598Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:01.602Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:03.672Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:03.680Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:05.728Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:05.733Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:07.814Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:07.825Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:09.924Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:09.925Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:12.029Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:12.041Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:16.251Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:16.267Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:18.430Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:18.446Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:20.666Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:20.668Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:23.354Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:23.357Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:26.415Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:26.417Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:29.038Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:29.046Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:35.526Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:35.536Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:41.799Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:41.802Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:47.677Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:47.696Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:53.454Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:53.465Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:57.611Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T16:59:57.629Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:03.342Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:03.359Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:07.144Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:07.145Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:10.433Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:00:10.443Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:00:12.647Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:12.653Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:14.322Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:14.329Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:19.730Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:19.731Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:26.510Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:26.511Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:29.571Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:29.572Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:34.622Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:34.623Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:38.464Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:38.465Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:42.052Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:42.053Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:45.439Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:45.440Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:48.593Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:48.594Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:55.107Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:55.108Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:59.777Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:00:59.777Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:03.923Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:03.924Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:07.280Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:07.281Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:12.101Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:12.101Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:17.744Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:17.745Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:20.865Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:20.866Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:25.115Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:25.121Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:29.129Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:29.130Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:41.500Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:41.508Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:48.018Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:48.019Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:53.294Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:53.296Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:57.698Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:01:57.699Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:03.360Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:03.362Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:07.039Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:07.040Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:11.678Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:11.679Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:17.169Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:17.170Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:22.166Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:22.168Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:26.953Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:26.953Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:33.904Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:33.905Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:40.385Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:40.386Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:45.704Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:45.705Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:49.111Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:49.114Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:53.216Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:53.216Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:59.696Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:02:59.697Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:04.083Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:04.084Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:07.106Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:07.107Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:08.056Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:03:08.062Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:03:11.286Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:11.286Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:18.213Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:18.214Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:23.369Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:23.370Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:29.090Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:29.091Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:35.010Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:35.010Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:39.127Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:39.128Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:44.149Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:44.149Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:50.002Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:50.003Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:56.975Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:03:57.000Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:03.658Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:03.660Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:09.612Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:09.613Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:13.836Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:13.837Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:19.020Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:19.021Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:26.393Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:26.394Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:30.087Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:30.088Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:35.813Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:35.814Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:40.298Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:40.299Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:44.315Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:44.316Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:47.816Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:47.817Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:52.189Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:52.190Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:57.014Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:57.014Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:59.681Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:04:59.682Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:02.682Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:02.682Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:05.681Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:05.681Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:08.682Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:08.683Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:11.682Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:11.683Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:14.685Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:14.686Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:17.684Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:17.685Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:20.695Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:20.696Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:23.691Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:23.692Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:26.713Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:26.714Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:29.743Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:29.744Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:32.885Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:32.886Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:35.964Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:35.965Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:39.291Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:39.292Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:42.460Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:42.460Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:47.419Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:47.421Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:52.000Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:52.001Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:57.018Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:05:57.019Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:01.170Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:01.171Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:05.492Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:05.493Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:11.599Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:11.603Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:15.665Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:15.666Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:19.194Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:19.195Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:23.822Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:23.823Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:31.574Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:31.575Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:38.532Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:38.533Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:41.906Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:41.907Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:48.395Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:48.408Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:51.990Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:51.991Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:59.051Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:06:59.052Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:01.715Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:01.723Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:04.688Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:04.698Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:07.697Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:07.705Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:10.735Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:10.752Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:12.828Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:12.830Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:13.390Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:13.400Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:15.067Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:15.069Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:16.284Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:16.285Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:16.647Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:16.648Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:16.979Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:16.979Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:17.381Z","level":"info","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:17.383Z","level":"error","message":"null","method":"GET","url":"/serve/chat.html"}
+{"timestamp":"2025-04-29T17:07:34.194Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T17:07:34.196Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T17:07:34.373Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:34.378Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:35.414Z","level":"info","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T17:07:35.415Z","level":"error","message":"null","method":"GET","url":"/serve/usage/chat.html"}
+{"timestamp":"2025-04-29T17:07:35.595Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:35.599Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:37.638Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:37.641Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:39.680Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:39.683Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:41.769Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:41.774Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:43.933Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:43.934Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:46.190Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:46.191Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:48.701Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:48.702Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:51.917Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:51.919Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:54.455Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:07:54.459Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:00.880Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:00.881Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:21.825Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:21.870Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:27.380Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:27.381Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:34.143Z","level":"info","method":"GET","url":"/live"}
+{"timestamp":"2025-04-29T17:08:34.144Z","level":"error","message":"Error: No current websocket support for Nodejs! run with bun or deno.","method":"GET","url":"/live"}

@@ -1,6 +1,6 @@
-import { createReadStream } from "node:fs";
+import { createReadStream, realpathSync } from "node:fs";
 import { IncomingMessage } from "node:http";
-import { Stream } from "node:stream";
+import { type Stream } from "node:stream";
 import {
   _JetPath_paths,
   isNode,
@@ -20,7 +20,9 @@ import type {
   SchemaType,
   ValidationOptions,
 } from "./types.js";
-import { resolve } from "node:path";
+import { resolve, sep } from "node:path";
+import { mime } from "../extracts/mimejs-extract.js";
+import { BunFile } from "bun";
 
 export class JetPlugin<
   C extends Record<string, unknown> = Record<string, unknown>,
@@ -147,25 +149,7 @@ class Cookie {
 
 class ctxState {
   state: Record<string, any> = {};
-  public get value(): Record<string, any> {
-    if (this.state["__state__"] === true) {
-      for (const key in this.state) {
-        delete this.state[key];
-      }
-      this.state["__state__"] = false;
-    }
-    return this.state;
-  }
-  public set value(value: Record<string, any>) {
-    if (this.state["__state__"] === true) {
-      for (const key in this.state) {
-        delete this.state[key];
-      }
-      this.state["__state__"] = false;
-    }
-    this.state = value;
-  }
-} 
+}
 
 export class Context {
   code = 200;
@@ -180,11 +164,14 @@ export class Context {
     return UTILS.plugins;
   }
   // ? state
- get state() : Record<string, any> {
-   return this._7.value;
- }
- set state(value: Record<string, any>) {
-   this._7.value = value;
+  get state(): Record<string, any> {
+    // ? auto clean up state object
+    if (this._7.state["__state__"] === true) {
+      for (const key in this._7.state) {
+        delete this._7.state[key];
+      }
+    }
+    return this._7.state;
   }
   //? load
   _1?: string = undefined;
@@ -197,8 +184,12 @@ export class Context {
   //? response
   _6: boolean = false;
   //? original response
-  _7: ctxState = new ctxState();
   res?: any;
+  //? state
+  _7: ctxState;
+  constructor() {
+    this._7 = new ctxState();
+  }
   send(data: unknown, contentType?: string) {
     if (contentType) {
       this._2["Content-Type"] = contentType;
@@ -288,13 +279,32 @@ export class Context {
     this.setCookie(name, "", { ...options, maxAge: 0 });
   }
 
-  sendStream(stream: Stream | string, ContentType: string) {
+  sendStream(
+    stream: Stream | string | BunFile,
+    folder?: string,
+    ContentType: string = "application/octet-stream",
+  ) {
     if (typeof stream === "string") {
+      if (folder) {
+        let normalizedTarget: string;
+        let normalizedBase: string;
+        try {
+          stream = resolve(folder, stream);
+          normalizedTarget = realpathSync(stream);
+          normalizedBase = realpathSync(folder);
+        } catch (error) {
+          throw new Error("File not found!");
+        }
+        // ? prevent path traversal
+        if (!normalizedTarget.startsWith(normalizedBase + sep)) {
+          throw new Error("Path traversal detected!");
+        }
+      }
+      ContentType = mime.getType(stream) || ContentType;
       this._2["Content-Disposition"] = `inline; filename="${
         stream.split("/").at(-1) || "unnamed.bin"
       }"`;
       if (UTILS.runtime["bun"]) {
-        // @ts-expect-error
         stream = Bun.file(stream);
       } else if (UTILS.runtime["deno"]) {
         // @ts-expect-error
@@ -310,7 +320,16 @@ export class Context {
     this._2["Content-Type"] = ContentType;
     this._3 = stream as Stream;
   }
-
+  download(
+    stream: string | BunFile,
+    folder?: string,
+    ContentType: string = "application/octet-stream",
+  ) {
+    this.sendStream(stream, folder, ContentType);
+    this._2["Content-Disposition"] = `attachment; filename="${
+      (stream as string).split("/").at(-1) || "unnamed.bin"
+    }"`;
+  }
   // Only for deno and bun
   sendResponse(Response?: Response) {
     // @ts-ignore
@@ -347,11 +366,17 @@ export class Context {
         this.connection = JetSocketInstance;
         return this.sendResponse(response);
       }
-      if (this.res?.upgrade?.(req)) {
-        this.connection = JetSocketInstance;
-        return this.sendResponse(undefined);
+      if (UTILS.runtime["bun"]) {
+        if (this.res?.upgrade?.(req)) {
+          this.connection = JetSocketInstance;
+          return this.sendResponse(undefined);
+        }
       }
-      this.throw(400);
+      if (UTILS.runtime["node"]) {
+        throw new Error(
+          "No current websocket support for Nodejs! run with bun or deno.",
+        );
+      }
     }
     throw new Error("Invalid upgrade headers");
   }
@@ -695,7 +720,7 @@ export class Trie {
     // ? Handle the root path explicitly
     if (normalizedPath === "") {
       if (this.root.handler) {
-        console.warn(
+        Log.warn(
           `Warning: Duplicate route definition for path ${this.method} ${path}`,
         );
       }
@@ -721,7 +746,7 @@ export class Trie {
         // ? Check if a parameter node already exists at this level
         if (currentNode.parameterChild) {
           if (currentNode.parameterChild.paramName !== paramName) {
-            console.warn(
+            Log.warn(
               `Warning: Route path conflict at segment '${segment}' in ${this.method} ${path}. Parameter ': ${currentNode.parameterChild.paramName}' already defined at this level.`,
             );
           }
@@ -748,7 +773,7 @@ export class Trie {
           );
         }
         if (currentNode.wildcardChild) {
-          console.warn(
+          Log.warn(
             `Warning: Duplicate wildcard definition at segment '${segment}' in ${this.method} ${path}.`,
           );
           currentNode = currentNode.wildcardChild;
@@ -790,7 +815,7 @@ export class Trie {
       }
     }
     if (currentNode.handler) {
-      console.warn(
+      Log.warn(
         `Warning: Duplicate route definition for path '${path}'.`,
       );
     }

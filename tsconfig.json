@@ -6,7 +6,7 @@
     "module": "NodeNext",
     "moduleDetection": "force",
     "allowJs": true,
-    "removeComments": true,
+    // "removeComments": true,
 
     // Bundler mode
     // "moduleResolution": "nodenext",
@@ -27,6 +27,9 @@
     "noPropertyAccessFromIndexSignature": true,
     "outDir": "./dist", 
   }, 
-"include": ["src/**/*"],
+"include": ["src/**/*", 
+
+ "apis-types.d.ts" //? generated type file
+],
   "exclude": ["node_modules"]
 }

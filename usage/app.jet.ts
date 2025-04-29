@@ -7,9 +7,9 @@
  */
 import { writeFile } from "node:fs/promises";
 import {
-  JetFile,
   Jetpath,
   use, 
+  type JetFile,
   type JetFunc,
   type JetMiddleware,
 } from "../dist/index.js";
@@ -26,7 +26,9 @@ import { resolve } from "node:path";
  * static file serving, and global headers that will be applied to all responses.
  */
 const app = new Jetpath({
+  generateTypes: true,
   apiDoc: {
+    display: "UI",
     name: "PetShop API",
     info: `
     # PetShop API Documentation
@@ -53,14 +55,9 @@ const app = new Jetpath({
     username: "admin",
     password: "1234",
   },
-  source: "./usage", // Organized routes directory
-  APIdisplay: "UI", // Interactive API documentation UI
+  // source: "./usage", // Organized routes directory
   port: 9000,
   upgrade: true,
-  static: { 
-    dir: "./usage", 
-    route: "/assets" 
-  }, 
   // globalHeaders: {
   //   "X-Pet-API-Version": "1.0.0",
   //   "Access-Control-Allow-Origin": "*",
@@ -115,15 +112,14 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
   // Verify authentication for protected routes
   if (!isPublicRoute && ctx.request.url !== "/" && !ctx.request.url.includes("/docs")) {
     const auth = ctx.plugins.verifyAuth(ctx);
-    if (!auth.authenticated) {
-      ctx.code = 401;
+    if (!auth.authenticated) { 
       ctx.set("WWW-Authenticate", "Bear");
       ctx.plugins?.["logger"]?.warn({
         requestId,
         message: "Authentication failed",
         url: ctx.request.url
       });
-      // ctx.throw("Unauthorized: Valid authentication is required");
+      // ctx.throw(401,"Unauthorized: Valid authentication is required");
     }
 
     // Attach user info to context for use in route handlers
@@ -1368,14 +1364,14 @@ export const POST_upload: JetFunc<{
   }
 }, [AuthPluginType, jetLoggerType]> = async (ctx) => {
   // Check if user is an admin
-  if (!ctx.plugins.isAdmin(ctx)) {
-    ctx.code = 403;
-    ctx.send({
-      status: "error",
-      message: "Only administrators can upload files"
-    });
-    return;
-  }
+  // if (!ctx.plugins.isAdmin(ctx)) {
+  //   ctx.code = 403;
+  //   ctx.send({
+  //     status: "error",
+  //     message: "Only administrators can upload files"
+  //   });
+  //   return;
+  // }
 
   try {
     // Parse form data
@@ -1617,3 +1613,9 @@ use(GET_export_docs$format).info("Export API documentation in different formats 
 
 
 
+export const GET_serve$0: JetFunc<{params: {"*": string}}> = function (ctx) {
+  ctx.sendStream(ctx.params["*"] || "./usage");
+};
+export const GET_static$0: JetFunc<{params: {"*": string}}> = function (ctx) {
+  ctx.download(ctx.params["*"] || "./usage");
+};

@@ -1,6 +1,6 @@
 // compatible node imports
-import { opendir } from "node:fs/promises";
-import path from "node:path";
+import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
+import path, { resolve } from "node:path";
 import { cwd } from "node:process";
 import { createServer } from "node:http";
 // type imports
@@ -88,11 +88,11 @@ export function corsMiddleware(options: {
     if (options.secureContext) {
       optionsCtx.set(
         "Cross-Origin-Opener-Policy",
-        options.secureContext["Cross-Origin-Embedder-Policy"],
+        options.secureContext["Cross-Origin-Embedder-Policy"] || "unsafe-none",
       );
       optionsCtx.set(
         "Cross-Origin-Embedder-Policy",
-        options.secureContext["Cross-Origin-Embedder-Policy"],
+        options.secureContext["Cross-Origin-Embedder-Policy"] || "unsafe-none",
       );
     }
     if (options.allowHeaders) {
@@ -310,7 +310,7 @@ const getCtx = (
   params?: Record<string, any>,
   query?: Record<string, any>,
 ): Context => {
-  if (ctxPool.length) { 
+  if (ctxPool.length) {
     const ctx = ctxPool.shift()!;
     // ? reset the COntext to default state
     ctx.state["__state__"] = true;
@@ -455,7 +455,7 @@ const Jetpath = async (
       responder[1],
       responder[2],
     );
-    
+
     try {
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
@@ -802,7 +802,7 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         // ? combine api infos into .http format
         const api = `\n
 ${method} ${
-          options?.APIdisplay === "UI"
+          options?.apiDoc?.display === "UI"
             ? "[--host--]"
             : "http://localhost:" + (options?.port || 8080)
         }${route.path} HTTP/1.1
@@ -916,52 +916,13 @@ export function isIdentical<T extends object, U extends object>(
     ) {
       return false;
     }
-  } else {
-    const protoKeysA = Object.getOwnPropertyNames(protoA);
-    const protoKeysB = Object.getOwnPropertyNames(protoB);
-    // Filter out constructor as it's handled separately
-    const filteredProtoKeysA = protoKeysA.filter((k) => k !== "constructor")
-      .sort();
-    const filteredProtoKeysB = protoKeysB.filter((k) => k !== "constructor")
-      .sort();
-    if (filteredProtoKeysA.length !== filteredProtoKeysB.length) {
-      return false;
-    }
-    for (let i = 0; i < filteredProtoKeysA.length; i++) {
-      if (filteredProtoKeysA[i] !== filteredProtoKeysB[i]) {
-        return false;
-      }
-      const descriptorA = Object.getOwnPropertyDescriptor(
-        protoA,
-        filteredProtoKeysA[i],
-      );
-      const descriptorB = Object.getOwnPropertyDescriptor(
-        protoB,
-        filteredProtoKeysB[i],
-      );
-      const valA = descriptorA?.value;
-      const valB = descriptorB?.value;
-      if (typeof valA === "function" && typeof valB === "function") {
-        if (valA.length !== valB.length) {
-          return false;
-        }
-      } else if (typeof valA !== typeof valB) {
-        return false;
-      }
-    }
   }
 
   if (instanceA.constructor && instanceB.constructor) {
     if (instanceA.constructor.length !== instanceB.constructor.length) {
       return false;
     }
-  } else if (instanceA.constructor !== instanceB.constructor) {
-    console.error(
-      `Shape mismatch: One instance lacks a constructor while the other has one.`,
-    );
-    return false;
   }
-
   return true;
 }
 
@@ -1312,4 +1273,84 @@ export function use<
     },
   };
   return compiler;
+}
+
+export async function generateRouteTypes(ROUTES_DIR: string) {
+  //? Regex to find exported const variables
+  const ROUTE_EXPORT_REGEX = /export\s+const\s+([A-Z]+_[a-zA-Z0-9_$]+)\s*[:=]/g;
+  const METHOD_PATH_REGEX = /^([A-Z]+)_[a-zA-Z0-9_$]+$/;
+  const OUTPUT_FILE = path.resolve(cwd(), "apis-types.d.ts");
+  const declarations: string[] = [];
+
+  async function walkDir(currentDir: string) {
+    try {
+      const entries = await readdir(currentDir, {
+        withFileTypes: true,
+      });
+
+      for (const entry of entries) {
+        const fullPath = path.join(currentDir, entry.name);
+
+        if (entry.isDirectory()) {
+          if (!entry.name.startsWith(".")) {
+            await walkDir(fullPath);
+          }
+        } else if (entry.isFile() && entry.name.endsWith(".jet.ts")) {
+          const relativePath = path.relative(cwd(), fullPath);
+          const modulePath = relativePath.replace(/\\/g, "/");
+
+          try {
+            const fileContent = await readFile(fullPath, "utf-8");
+            const foundExports = [];
+            let match;
+
+            while ((match = ROUTE_EXPORT_REGEX.exec(fileContent)) !== null) {
+              const exportName = match[1];
+              if (METHOD_PATH_REGEX.test(exportName)) {
+                foundExports.push(exportName);
+              }
+            }
+
+            if (foundExports.length > 0) {
+              //? Generate the declare module block for this file
+              let moduleDeclaration = `declare module '${modulePath}' {\n`;
+              //? Add declarations for each found route export
+              for (const exportName of foundExports) {
+                //? Declare the export with the basic JetFunc<any, any> type
+                moduleDeclaration +=
+                  `    export const ${exportName}: JetFunc<any, any>;\n`;
+              }
+              moduleDeclaration += `}\n`;
+              declarations.push(moduleDeclaration);
+            }
+          } catch (error) {
+            console.error(
+              `Error reading or parsing file ${fullPath}: ${error}`,
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`Error reading directory ${currentDir}: ${error}`);
+    }
+  }
+  await walkDir(resolve(cwd(),ROUTES_DIR));
+  //? Generate the final .d.ts file content
+  let outputContent =
+    `//? This file is auto-generated by Jetpath. DO NOT MODIFY!\n\n`;
+  outputContent += `import { type JetFunc } from 'jetpath';\n\n`;
+
+  //? Add all the generated module declarations
+  outputContent += declarations.join("\n");
+
+  try {
+    await writeFile(OUTPUT_FILE, outputContent, "utf-8");
+    Log.info(`Type definitions saved to apis-types.d.ts\nadd this file to your tsconfig.json\n
+"include": [
+    "${ROUTES_DIR}/**/*.ts", //? your source files
+    "apis-types.d.ts" //? generated type file
+],`);
+  } catch (error) {
+    Log.error(`Error writing output file apis-types.d.ts: ${error}`);
+  }
 }
