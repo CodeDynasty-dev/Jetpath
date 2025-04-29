@@ -23,7 +23,7 @@ The purpose of the JetPath is to streamline your development process while offer
 
 ## Ground rules
 
-Before contributing, read our {link to the Code of Conduct} to learn more about our community guidelines and expectations.
+Before contributing, read our [Code of Conduct](https://github.com/CodeDynasty-dev/Jetpath?tab=coc-ov-file) to learn more about our community guidelines and expectations.
 
 ## Community engagement
 
@@ -36,8 +36,8 @@ Refer to the following channels to connect with fellow contributors or to stay u
 ## Before you start
 
 Before you start contributing, ensure you have the following:
-* For developers: The latest version of Node.js, Bon.js, Deno.js.{ Link} 
-* For writers: The lastest version of Node.js.{Link}
+* For developers: The latest version of [Node.js](https://nodejs.org/en/download), [Bon.js](https://bun.sh/), [Deno.js](https://deno.com/).
+* For writers: The lastest version of [Node.js](https://nodejs.org/en/download).
 
 
 ## Environment setup
@@ -180,9 +180,13 @@ Example Commit message
 
 ```bash
 feat: add support for Deno.js runtime environment detection
+
 fix: resolve issue with npm run compile failing on Windows
+
 docs: update contributing guide with branch naming conventions
+
 chore: upgrade dependencies to latest stable versions
+
 refactor: reorganize src/utils for better modularity
 
 ```
