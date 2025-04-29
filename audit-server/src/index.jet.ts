@@ -46,8 +46,8 @@ export const app = new Jetpath({
     color: "#7e57c2", // Choose a color!
     password: "grey11",
     username: "admin",
-  },
-  APIdisplay: "UI",
+    display: "UI",
+  }, 
   upgrade: true
 });
 

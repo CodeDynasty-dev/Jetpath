@@ -5,7 +5,7 @@
       "name": "audit-server",
       "dependencies": {
         "bcryptjs": "^3.0.2",
-        "jetpath": "^1.7.7",
+        "jetpath": "^1.7.9",
         "safetoken": "^2.0.2",
         "sqlitebruv": "^1.1.16",
       },
@@ -100,7 +100,7 @@
 
     "jake": ["jake@10.9.2", "", { "dependencies": { "async": "^3.2.3", "chalk": "^4.0.2", "filelist": "^1.0.4", "minimatch": "^3.1.2" }, "bin": { "jake": "bin/cli.js" } }, "sha512-2P4SQ0HrLQ+fw6llpLnOaGAvN2Zu6778SJMrCUwns4fOoG9ayrTiZk3VV8sCPkVZF8ab0zksVpS8FDY5pRCNBA=="],
 
-    "jetpath": ["jetpath@1.7.7", "", {}, "sha512-GDX2SCKtUP4MzjTT1ZR/Pqz7lof7120/ucDxumQvTFi8SNDUhjCh8AJiaDIx3hBeYoCZZGJd0ZjiXUcRRbxDcw=="],
+    "jetpath": ["jetpath@1.7.9", "", {}, "sha512-h7B+rfh2c5lACyF3nPO5uZmWxup+kbt2rAOiw3pVJnMZS6cXvfDPDpQQNi3dwiVr3m8shnnlQoEGWk2Kf3D+Cg=="],
 
     "minimatch": ["minimatch@3.1.2", "", { "dependencies": { "brace-expansion": "^1.1.7" } }, "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw=="],
 

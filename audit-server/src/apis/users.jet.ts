@@ -95,7 +95,7 @@ export const POST_user_upload: JetFunc<{ body: { fileHere: JetFile } }> = async 
         await writeFile(filePath, fileHere.content);
         await file.query.insert({
             name: fileHere.fileName,
-            path: filePath,
+            path: filePath.replace("./files", ""),
             size: fileHere.content.length,
             createdAt: Date.now(),
             userId: ctx.state.id,
@@ -130,13 +130,13 @@ export const GET_user_file$0: JetFunc<{params:{ "*": string }}> = async (ctx) =>
         });
         return;
     }
-    ctx.sendStream(fileHere.path, fileHere.mimeType);
+    ctx.sendStream(fileHere.path, "./files", fileHere.mimeType);
 }
 
 use(GET_user_file$0).info("Get file by path");
 
 export const GET_static$0: JetFunc<{params:{ "*": string }}> = async (ctx) => {
-    ctx.sendStream(ctx.params["*"], "text/plain");
+    ctx.sendStream(ctx.params["*"], "./files");
 }
 
 use(GET_static$0).info("Get file by path");
@@ -285,7 +285,7 @@ export const GET_live_room_chat: JetFunc = (ctx) => {
 use(GET_live_room_chat).info("Websocket chatting room");
 
 export const GET_chat: JetFunc = (ctx) => {
-    ctx.sendStream("./chat.html", "text/html");
+    ctx.sendStream("chat.html");
 };
 
 use(GET_chat).info("Chat page");
