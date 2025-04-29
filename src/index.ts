@@ -13,7 +13,7 @@ import {
   UTILS,
 } from "./primitives/functions.js";
 import { AnyExecutor, type jetOptions } from "./primitives/types.js";
-import { JetPlugin, Log } from "./primitives/classes.js"; 
+import { JetPlugin, Log } from "./primitives/classes.js";
 
 export class Jetpath {
   public server: any;
@@ -24,7 +24,7 @@ export class Jetpath {
     cors: false,
   };
   private plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[] = [];
-  constructor(options: jetOptions={}) {
+  constructor(options: jetOptions = {}) {
     Object.assign(this.options, options);
     if (!this.options.port) this.options.port = 8080;
     // ? setting up app configs
