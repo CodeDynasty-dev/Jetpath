@@ -221,6 +221,6 @@ export type {
   JetMiddleware,
   JetPluginExecutorInitParams,
 } from "./primitives/types.js";
-export { JetPlugin } from "./primitives/classes.js";
+export { JetPlugin, JetMockServer } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";
 export { mime } from "./extracts/mimejs-extract.js";

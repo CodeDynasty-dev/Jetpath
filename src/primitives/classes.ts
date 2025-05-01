@@ -1,8 +1,9 @@
 import { createReadStream, realpathSync } from "node:fs";
 import { IncomingMessage } from "node:http";
-import { type Stream } from "node:stream";
+import { Readable, type Stream } from "node:stream";
 import {
   _JetPath_paths,
+  getCtx,
   isNode,
   JetSocketInstance,
   parseRequest,
@@ -14,6 +15,7 @@ import type {
   FileOptions,
   HTTPBody,
   JetFunc,
+  jetOptions,
   JetPluginExecutorInitParams,
   methods,
   SchemaDefinition,
@@ -895,6 +897,79 @@ export class Trie {
     if (currentNode.handler) {
       // ? Route found
       return [currentNode.handler, params, query, path];
+    }
+  }
+}
+ 
+
+class MockRequest  {
+  method: string;
+  url: string;
+  headers: Record<string, string>;
+  body: string | null; 
+  statusCode: number;
+  statusMessage: string;
+  bodyUsed: boolean;
+
+  constructor(options: { method?: string; url?: string; headers?: Record<string, string>; body?: string | null; } = {}) {
+    this.method = options.method || 'GET';
+    this.url = options.url || '/';
+    this.headers = options.headers || {};
+    this.body = options.body || null;   
+    this.statusCode = 200;
+    this.statusMessage = 'OK';
+    this.bodyUsed = false;
+  } 
+}
+
+export class JetMockServer {
+  options: jetOptions & { useMiddleware?: boolean };
+  constructor(options: jetOptions & { useMiddleware?: boolean }) {
+    this.options = options;
+  }
+  async runBare(func: JetFunc): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+    let returned: (Function | void)[] | undefined;
+    const r = func;
+    const ctx = getCtx(
+      new MockRequest({
+        method: r.method!,  
+        url: r.path!,
+        headers: {},
+        body: null,
+      }) as any,
+      {},
+      r.path!,
+      r,
+      {},
+      {},
+    );
+
+    try {
+      //? pre-request middlewares here
+      returned = this.options.useMiddleware && r.jet_middleware?.length
+        ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
+        : undefined;
+      //? route handler call
+      await r(ctx as any);
+      //? post-request middlewares here
+      returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
+ //
+    } catch (error) {
+      console.log(error);
+      try {
+        //? report error to error middleware
+        returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
+      } finally {
+        if (!returned && ctx.code < 400) {
+          ctx.code = 500;
+        }
+      // 
+      }
+    }
+    return {
+      code: ctx.code,
+      body: ctx._1,
+      headers: ctx._2,
     }
   }
 }

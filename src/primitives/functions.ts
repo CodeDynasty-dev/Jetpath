@@ -302,7 +302,7 @@ export const UTILS = {
 // ? setting up the runtime check
 UTILS.set();
 export const isNode = UTILS.runtime["node"];
-const getCtx = (
+export const getCtx = (
   req: IncomingMessage | Request,
   res: any,
   path: string,
