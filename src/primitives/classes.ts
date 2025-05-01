@@ -1,6 +1,6 @@
 import { createReadStream, realpathSync } from "node:fs";
 import { IncomingMessage } from "node:http";
-import { Readable, type Stream } from "node:stream";
+import { type Stream } from "node:stream";
 import {
   _JetPath_paths,
   getCtx,
