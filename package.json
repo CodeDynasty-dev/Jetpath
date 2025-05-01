@@ -45,7 +45,7 @@
     "lint": "gts lint",
     "clean": "gts clean",
     "fix": "gts fix",
-    "prepare": "npm run compile",
+    "prepare": "tsc && bun bundle && npm run build",
     "pretest": "npm run build",
     "posttest": "npm run lint"
   },

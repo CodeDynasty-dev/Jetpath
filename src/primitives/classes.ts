@@ -12,6 +12,7 @@ import {
 } from "./functions.js";
 import type {
   AnyExecutor,
+  ContextType,
   FileOptions,
   HTTPBody,
   JetFunc,
@@ -923,18 +924,22 @@ class MockRequest  {
 }
 
 export class JetMockServer {
-  options: jetOptions & { useMiddleware?: boolean };
-  constructor(options: jetOptions & { useMiddleware?: boolean }) {
-    this.options = options;
+  options: jetOptions   = {};
+  constructor(options: jetOptions ) {
+    Object.assign(this.options, options);
   }
-  async runBare(func: JetFunc): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+  /*
+  internal method
+  */
+  async _run(func: JetFunc, ctx?: ContextType<any, any>): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     let returned: (Function | void)[] | undefined;
     const r = func;
-    const ctx = getCtx(
-      new MockRequest({
-        method: r.method!,  
-        url: r.path!,
-        headers: {},
+    if (!ctx) {
+      ctx = getCtx(
+        new MockRequest({
+          method: r.method!,  
+          url: r.path!,
+          headers: {},
         body: null,
       }) as any,
       {},
@@ -942,11 +947,11 @@ export class JetMockServer {
       r,
       {},
       {},
-    );
-
+    ) as any;
+    }
     try {
       //? pre-request middlewares here
-      returned = this.options.useMiddleware && r.jet_middleware?.length
+      returned = r.jet_middleware?.length
         ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
         : undefined;
       //? route handler call
@@ -960,16 +965,22 @@ export class JetMockServer {
         //? report error to error middleware
         returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
       } finally {
-        if (!returned && ctx.code < 400) {
-          ctx.code = 500;
+        if (!returned && ctx!.code < 400) {
+          ctx!.code = 500;
         }
       // 
       }
     }
     return {
-      code: ctx.code,
-      body: ctx._1,
-      headers: ctx._2,
+      code: ctx!.code,
+      body: ctx!._1,
+      headers: ctx!._2!,
     }
+  }
+  runBare(func: JetFunc): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+    return this._run(func);
+  }
+  runWithCtx(func: JetFunc, ctx: ContextType<any, any>): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+    return this._run(func, ctx);
   }
 }
