@@ -906,16 +906,16 @@ export class Trie {
 class MockRequest  {
   method: string;
   url: string;
-  headers: Record<string, string>;
+  headers: Map<string, string>;
   body: string | null; 
   statusCode: number;
   statusMessage: string;
   bodyUsed: boolean;
 
-  constructor(options: { method?: string; url?: string; headers?: Record<string, string>; body?: string | null; } = {}) {
+  constructor(options: { method?: string; url?: string; headers?:any; body?: string | null; } = {}) {
     this.method = options.method || 'GET';
     this.url = options.url || '/';
-    this.headers = options.headers || {};
+    this.headers = options.headers || new Map();
     this.body = options.body || null;   
     this.statusCode = 200;
     this.statusMessage = 'OK';
@@ -925,8 +925,8 @@ class MockRequest  {
 
 export class JetMockServer {
   options: jetOptions   = {};
-  constructor(options: jetOptions ) {
-    Object.assign(this.options, options);
+  constructor(options?: jetOptions ) {
+    Object.assign(this.options, options || {});
   }
   /*
   internal method
@@ -939,9 +939,9 @@ export class JetMockServer {
         new MockRequest({
           method: r.method!,  
           url: r.path!,
-          headers: {},
-        body: null,
-      }) as any,
+          headers: new Map()  ,
+          body: null,
+        }) as any,
       {},
       r.path!,
       r,
@@ -973,7 +973,7 @@ export class JetMockServer {
     }
     return {
       code: ctx!.code,
-      body: ctx!._1,
+      body: typeof ctx!._1 !== "string" ? ctx!._1 : JSON.parse(ctx!._1),
       headers: ctx!._2!,
     }
   }
