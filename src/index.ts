@@ -7,13 +7,15 @@ import {
   compileAPI,
   compileUI,
   corsMiddleware,
-  generateRouteTypes,
+  // generateRouteTypes,
   getHandlers,
+  getLocalIP,
   isIdentical,
   UTILS,
 } from "./primitives/functions.js";
 import { AnyExecutor, type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
+import { sep } from "node:path"; 
 
 export class Jetpath {
   public server: any;
@@ -72,17 +74,18 @@ export class Jetpath {
       );
     }
     // ? {-view-} here is replaced at build time to html
-    let UI = `{{view}}`; //! could be loaded only when needed
-    Log.info("♻️  Compiling routes...");
+    let UI = `{{view}}`;
+    Log.info("Compiling...");
     const startTime = performance.now();
     //? generate types
-    if (this.options?.generateTypes === true) {
-      generateRouteTypes(this.options.source || ".");
-    }
+    // TODO: Refactor this
+    // if (this.options?.generateTypes === true) {
+    //   generateRouteTypes(this.options.source || ".");
+    // }
     // ? Load all jetpath functions described in user code
     const errorsCount = await getHandlers(this.options?.source!, true);
     const endTime = performance.now();
-    Log.info("Compiled!");
+    // Log.info("Compiled!");
     //? compile API
     const [handlersCount, compiledAPI] = compileAPI(this.options);
     // ? render API in UI
@@ -161,30 +164,30 @@ export class Jetpath {
           return;
         }
       });
-      Log.success(
-        `✅ Processed routes ${handlersCount} handlers in ${
+      Log.info(
+        `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
             endTime - startTime,
           )
         }ms`,
       );
-      Log.success(
-        `🚀 Visit http://localhost:${this.options.port}${
+      Log.info(
+        `APIs: Viewable at http://localhost:${this.options.port}${
           this.options?.apiDoc?.path || "/api-doc"
-        } to see the displayed routes in UI`,
+        }`,
       );
     } else if (this.options?.apiDoc?.display === "HTTP") {
       // ? render API in a .HTTP file
       await writeFile("api-doc.http", compiledAPI);
-      Log.success(
-        `✅ Processed routes ${handlersCount} handlers in ${
+      Log.info(
+        `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
             endTime - startTime,
           )
         }ms`,
       );
-      Log.success(
-        `🚀 Check http file ./api-doc.http to test the routes Visual Studio rest client extension`,
+      Log.info(
+        `APIs: written to ${sep}api-doc.http`,
       );
     }
     if (errorsCount) {
@@ -208,9 +211,10 @@ export class Jetpath {
     // ? start server
     this.listening = true;
     this.server.listen(this.options.port);
-    Log.success(`🔥 Listening on http://localhost:${this.options.port}`);
+    Log.info(`Open http://localhost:${this.options.port}`);
+    Log.info(`External: http://${getLocalIP()}:${this.options.port}`);
   }
-}
+} 
 
 //? exports
 export type {

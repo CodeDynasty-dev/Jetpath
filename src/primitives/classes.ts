@@ -441,6 +441,12 @@ export class SchemaBuilder {
     return this;
   }
 
+  optional(err?: string): this {
+    this.def.required = false;
+    if (err) this.def.err = err;
+    return this;
+  }
+
   default(value: any): this {
     this.def.inputDefaultValue = value;
     return this;

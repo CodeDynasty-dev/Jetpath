@@ -1,6 +1,6 @@
 // compatible node imports
 import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
-import path, { resolve } from "node:path";
+import path, { resolve, sep } from "node:path";
 import { cwd } from "node:process";
 import { createServer } from "node:http";
 // type imports
@@ -32,6 +32,7 @@ import {
   StringSchema,
   Trie,
 } from "./classes.js";
+import { networkInterfaces } from "node:os"; 
 
 /**
  * an inbuilt CORS post middleware
@@ -538,7 +539,7 @@ export async function getHandlers(
     ) {
       if (print) {
         Log.info(
-          "Loading routes at ." + source.replace(curr_d, "") + "/" +
+          "Loading " + source.replace(curr_d + "/", "") + sep+
             dirent.name,
         );
       }
@@ -1356,3 +1357,18 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
     Log.error(`Error writing output file apis-types.d.ts: ${error}`);
   }
 }
+
+
+
+export function getLocalIP() {
+  const interfaces: Record<string, any> = networkInterfaces()||[];
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {         
+      if ('IPv4' !== iface.family || iface.internal !== false) {
+        continue;
+      }
+      return iface.address;
+    }
+  }
+}
+ 
