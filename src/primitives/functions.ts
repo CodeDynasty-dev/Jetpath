@@ -32,7 +32,7 @@ import {
   StringSchema,
   Trie,
 } from "./classes.js";
-import { networkInterfaces } from "node:os"; 
+import { networkInterfaces } from "node:os";
 
 /**
  * an inbuilt CORS post middleware
@@ -539,7 +539,7 @@ export async function getHandlers(
     ) {
       if (print) {
         Log.info(
-          "Loading " + source.replace(curr_d + "/", "") + sep+
+          "Loading " + source.replace(curr_d + "/", "") + sep +
             dirent.name,
         );
       }
@@ -1358,17 +1358,14 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
   }
 }
 
-
-
 export function getLocalIP() {
-  const interfaces: Record<string, any> = networkInterfaces()||[];
+  const interfaces: Record<string, any> = networkInterfaces() || [];
   for (const name of Object.keys(interfaces)) {
-    for (const iface of interfaces[name]) {         
-      if ('IPv4' !== iface.family || iface.internal !== false) {
+    for (const iface of interfaces[name]) {
+      if ("IPv4" !== iface.family || iface.internal !== false) {
         continue;
       }
       return iface.address;
     }
   }
 }
- 

@@ -907,53 +907,62 @@ export class Trie {
     }
   }
 }
- 
 
-class MockRequest  {
+class MockRequest {
   method: string;
   url: string;
   headers: Map<string, string>;
-  body: string | null; 
+  body: string | null;
   statusCode: number;
   statusMessage: string;
   bodyUsed: boolean;
 
-  constructor(options: { method?: string; url?: string; headers?:any; body?: string | null; } = {}) {
-    this.method = options.method || 'GET';
-    this.url = options.url || '/';
+  constructor(
+    options: {
+      method?: string;
+      url?: string;
+      headers?: any;
+      body?: string | null;
+    } = {},
+  ) {
+    this.method = options.method || "GET";
+    this.url = options.url || "/";
     this.headers = options.headers || new Map();
-    this.body = options.body || null;   
+    this.body = options.body || null;
     this.statusCode = 200;
-    this.statusMessage = 'OK';
+    this.statusMessage = "OK";
     this.bodyUsed = false;
-  } 
+  }
 }
 
 export class JetMockServer {
-  options: jetOptions   = {};
-  constructor(options?: jetOptions ) {
+  options: jetOptions = {};
+  constructor(options?: jetOptions) {
     Object.assign(this.options, options || {});
   }
   /*
   internal method
   */
-  async _run(func: JetFunc, ctx?: ContextType<any, any>): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+  async _run(
+    func: JetFunc,
+    ctx?: ContextType<any, any>,
+  ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     let returned: (Function | void)[] | undefined;
     const r = func;
     if (!ctx) {
       ctx = getCtx(
         new MockRequest({
-          method: r.method!,  
+          method: r.method!,
           url: r.path!,
-          headers: new Map()  ,
+          headers: new Map(),
           body: null,
         }) as any,
-      {},
-      r.path!,
-      r,
-      {},
-      {},
-    ) as any;
+        {},
+        r.path!,
+        r,
+        {},
+        {},
+      ) as any;
     }
     try {
       //? pre-request middlewares here
@@ -964,7 +973,7 @@ export class JetMockServer {
       await r(ctx as any);
       //? post-request middlewares here
       returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
- //
+      //
     } catch (error) {
       console.log(error);
       try {
@@ -974,19 +983,24 @@ export class JetMockServer {
         if (!returned && ctx!.code < 400) {
           ctx!.code = 500;
         }
-      // 
+        //
       }
     }
     return {
       code: ctx!.code,
       body: typeof ctx!._1 !== "string" ? ctx!._1 : JSON.parse(ctx!._1),
       headers: ctx!._2!,
-    }
+    };
   }
-  runBare(func: JetFunc): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+  runBare(
+    func: JetFunc,
+  ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func);
   }
-  runWithCtx(func: JetFunc, ctx: ContextType<any, any>): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+  runWithCtx(
+    func: JetFunc,
+    ctx: ContextType<any, any>,
+  ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func, ctx);
   }
 }

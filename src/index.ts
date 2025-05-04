@@ -15,7 +15,7 @@ import {
 } from "./primitives/functions.js";
 import { AnyExecutor, type jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
-import { sep } from "node:path"; 
+import { sep } from "node:path";
 
 export class Jetpath {
   public server: any;
@@ -214,7 +214,7 @@ export class Jetpath {
     Log.info(`Open http://localhost:${this.options.port}`);
     Log.info(`External: http://${getLocalIP()}:${this.options.port}`);
   }
-} 
+}
 
 //? exports
 export type {
@@ -225,6 +225,6 @@ export type {
   JetMiddleware,
   JetPluginExecutorInitParams,
 } from "./primitives/types.js";
-export { JetPlugin, JetMockServer } from "./primitives/classes.js";
+export { JetMockServer, JetPlugin } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";
 export { mime } from "./extracts/mimejs-extract.js";
