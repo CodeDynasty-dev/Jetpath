@@ -178,7 +178,7 @@ export class Context {
     return this._7.state;
   }
   //? load
-  _1?: string = undefined;
+  payload ?: string = undefined;
   // ? header of response
   _2: Record<string, string> = {};
   // //? stream
@@ -197,20 +197,20 @@ export class Context {
   send(data: unknown, contentType?: string) {
     if (contentType) {
       this._2["Content-Type"] = contentType;
-      this._1 = String(data);
+      this.payload = String(data);
     } else {
       switch (typeof data) {
         case "string":
           this._2["Content-Type"] = "text/plain";
-          this._1 = data;
+          this.payload = data;
           break;
         case "object":
           this._2["Content-Type"] = "application/json";
-          this._1 = JSON.stringify(data);
+          this.payload = JSON.stringify(data);
           break;
         default:
           this._2["Content-Type"] = "text/plain";
-          this._1 = data ? String(data) : "";
+          this.payload = data ? String(data) : "";
           break;
       }
     }
@@ -229,7 +229,7 @@ export class Context {
       this.code = code;
       this.send(message);
     }
-    throw new Error(this._1);
+    throw new Error(this.payload);
   }
 
   get(field: string) {
@@ -988,7 +988,7 @@ export class JetMockServer {
     }
     return {
       code: ctx!.code,
-      body: typeof ctx!._1 !== "string" ? ctx!._1 : JSON.parse(ctx!._1),
+      body: typeof ctx!.payload !== "string" ? ctx!.payload : JSON.parse(ctx!.payload),
       headers: ctx!._2!,
     };
   }

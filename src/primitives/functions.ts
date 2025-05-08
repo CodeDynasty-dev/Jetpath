@@ -42,7 +42,7 @@ import { networkInterfaces } from "node:os";
  */
 
 const optionsCtx = {
-  _1: undefined,
+  payload: undefined,
   _2: {},
   _6: false,
   code: 204,
@@ -323,7 +323,7 @@ export const getCtx = (
     ctx.path = path;
     ctx.body = undefined; // ? very important.
     //? load
-    ctx._1 = undefined;
+    ctx.payload = undefined;
     // ? header of response
     ctx._2 = cachedCorsHeaders;
     // //? stream
@@ -393,7 +393,7 @@ const makeResBunAndDeno = (
   }
   // normal response
   ctx.__jet_pool && ctxPool.push(ctx);
-  return new Response(ctx?._1, {
+  return new Response(ctx?.payload, {
     status: ctx.code,
     headers: ctx?._2,
   });
@@ -420,7 +420,7 @@ const makeResNode = (
     ctx.code,
     ctx?._2 || { "Content-Type": "text/plain" },
   );
-  res.end(ctx?._1);
+  res.end(ctx?.payload);
   ctx.__jet_pool && ctxPool.push(ctx);
   return undefined;
 };

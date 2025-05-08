@@ -119,7 +119,7 @@ export interface ContextType<
    * get original request
    */
   path: string;
-  _1?: string | undefined;
+  payload?: string;
   _2?: Record<string, string>;
   _3?: any; //Stream | undefined; // Stream
   _4?: boolean | undefined;

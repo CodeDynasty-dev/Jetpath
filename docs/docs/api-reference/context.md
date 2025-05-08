@@ -3,33 +3,35 @@
 
 # API Reference: Context (`ctx`)
 
-The `Context` object (`ctx`) is passed to every Jetpath route handler and middleware function. It serves as the primary interface for interacting with the request, constructing the response, and accessing framework features.
+The `Context` object (`ctx`) is passed to every Jetpath route handler and middleware function. It serves as the primary interface for interacting with the request and response lifecycle.
 
-*(This reference is based on the `ContextType` interface provided previously and examples in `tests/app.jet.ts`)*
 
-## Interface Signature
+## // Context Reference
 
-```typescript
-interface ContextType<
-  JetData extends {
-    body?: Record<string, any>;
-    params?: Record<string, any>;
-    query?: Record<string, any>;
-  },
-  JetPluginTypes extends Record<string, unknown>[]
-> {
-  // Properties
-  app: {};
-  plugins: UnionToIntersection<JetPluginTypes[number]> & Record<string, any>;
-  body: JetData["body"];
-  query: JetData["query"];
-  params: JetData["params"];
-  connection: jet_socket; // WebSocket connection object
-  request: Request; // Standard Request object
-  code: number; // HTTP status code
-  path: string; // Request pathname
+```Context``` 
 
-  // Methods
+### // Properties
+
+  ```state: {};```| **`The object for transfering data between middleware/handlers`**
+
+  ```plugins:;```| **`The object containing methods exposed by registered plugins`**
+
+  ```body: any;```| **`The parsed request body`**
+
+  ```query: any;```| **`The parsed query string parameters`**
+
+  ```params: any;```| **`The parsed parameters from dynamic route segments`**
+
+  ```connection: JetSocket;```| **`The WebSocket connection object, availabe after calling ctx.upgrade()`**
+
+  ```request: Request;```| **`The standard Web Request object`**
+
+  ```code: number;```| **`HTTP status code`**
+
+  ```path: string;```| **`Request pathname`**
+
+  ```payload?: string;```| **`Raw request payload`**
+// Methods
   eject(): never;
   validate(data?: any): JetData["body"]; // Type might vary based on usage
   sendStream(stream: any | string, ContentType: string): never;
@@ -40,18 +42,31 @@ interface ContextType<
   get(field: string): string | undefined;
   set(field: string, value: string): void;
   json(): Promise<Record<string, any>>;
+  payload?: string;
 
-  // Internal Properties (Likely not for direct use)
-  _1?: string | undefined;
-  _2?: Record<string, string>;
-  _3?: any; // Stream?
-  _4?: boolean | undefined;
-  _5?: (() => never) | undefined;
-  _6?: Response | false;
-}
-````
 
-## Properties Reference
+### // Methods Reference
+
+  * **`sendStream(stream: ReadableStream | any, ContentType: string): never`**
+      * Sends a `ReadableStream` as the response body. Set `ContentType`.
+  * **`sendResponse(response?: Response): never`**
+      * Sends a pre-constructed standard `Response` object. Bypasses Jetpath serialization.
+  * **`send(data: unknown, ContentType?: string): never`**
+      * Sends a response. Auto-serializes objects/arrays to JSON (`application/json`). Sets `Content-Type` based on data type or argument. Uses `ctx.code` for status.
+  * **`throw(codeOrData?, message?)`**
+      * Signals an HTTP error, interrupting flow. Caught by middleware. See [Error Handling](https://www.google.com/search?q=./error-handling.md).
+  * **`redirect(url: string, code?: number): never`**
+      * Sends an HTTP redirect response (default status 302). Sets `Location` header.
+  * **`get(field: string): string | undefined`**    
+      * Gets a request header value (case-insensitive).
+  * **`set(field: string, value: string): void`**
+      * Sets a response header value.
+  * **`json(): Promise<Record<string, any>>`**
+      * Asynchronously parses the request body as JSON and assigns it to `ctx.body`. Throws on invalid JSON or if body already consumed.
+  * **`payload?: string`**
+      * The raw request payload.
+
+### // Context Properties Reference
 
   * **`app: {}`**
       * Request-scoped object for sharing state between middleware/handlers. Type defined by `JetMiddleware` generic `AppState`.
@@ -71,8 +86,10 @@ interface ContextType<
       * Get/Set the HTTP status code for the response (default: 200).
   * **`path: string`**
       * The pathname part of the request URL.
+  * **`payload?: string`**
+      * The raw request payload.
 
-## Methods Reference
+## // Methods Reference
 
 *(Methods returning `never` terminate the request flow)*
 
@@ -90,13 +107,13 @@ interface ContextType<
       * Signals an HTTP error, interrupting flow. Caught by middleware. See [Error Handling](https://www.google.com/search?q=./error-handling.md).
   * **`redirect(url: string, code: number = 302): never`**
       * Sends an HTTP redirect response (default status 302). Sets `Location` header.
-  * **`get(field: string): string | undefined`**
+  * **`get(field: string): string | undefined`**    
       * Gets a request header value (case-insensitive).
   * **`set(field: string, value: string): void`**
       * Sets a response header value.
   * **`json(): Promise<Record<string, any>>`**
       * Asynchronously parses the request body as JSON and assigns it to `ctx.body`. Throws on invalid JSON or if body already consumed.
-
+      *  
 *(For more detailed examples and usage context, please refer to the [Core Concepts: Context](https://www.google.com/search?q=./context.md) page.)*
  
 </docmach>
