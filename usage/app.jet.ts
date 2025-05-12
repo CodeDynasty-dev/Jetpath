@@ -51,9 +51,16 @@ const app = new Jetpath({
 
 
     `,
-    color: "#4287f5", // Professional blue color scheme
+    color: "#c95050", // Professional blue color scheme
     username: "admin",
     password: "1234",
+
+  },
+  globalHeaders:{
+    "X-Pet-API-Version": "1.0.0",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
   },
   // source: "./usage", // Organized routes directory
   port: 9000,

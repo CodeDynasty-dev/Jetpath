@@ -7,8 +7,9 @@ const html = await readFile("src/assets/api-doc.html", {
 const code = await readFile("dist/index.js", {
   encoding: "utf-8",
 }); 
-
-await writeFile("dist/index.js", code.replace("{{view}}", html));
+const view = html.replaceAll(/`/g, "\\`")
+    .replaceAll(/\${/g, "\\${"); 
+await writeFile("dist/index.js", code.replace("{{view}}", view));
 console.log("Jetpath: compiled!");
 
 // [X] npm pack will call npm run prepare which will run this file

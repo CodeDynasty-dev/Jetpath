@@ -728,8 +728,8 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     },
   );
 
-  return UI.replace("{ JETPATH }", `\`${api}\``)
-    .replaceAll("{ JETPATHGH }", `${JSON.stringify(globalHeaders)}`)
+  return UI.replace("`{ JETPATH }`", `\`${api}\``)
+    .replaceAll("`{ JETPATHGH }`", `${JSON.stringify(globalHeaders)}`)
     .replaceAll("{NAME}", options?.apiDoc?.name || "Jetpath API Doc")
     .replaceAll("JETPATHCOLOR", options?.apiDoc?.color || "#4285f4")
     .replaceAll(
