@@ -361,6 +361,7 @@ const types: { [key: string]: string[] } = {
   "video/ogg": ["ogv"],
   "video/quicktime": ["qt", "mov"],
   "video/webm": ["webm"],
+  "application/vnd.apple.mpegurl": ["m3u8"],
 };
 Object.freeze(types);
 
