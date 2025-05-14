@@ -352,53 +352,116 @@ function parsePayload(packer: HTMLElement) {
   if (!isSet) return;
   return result;
 }
-function parsePayloadData(packer: HTMLElement) {
-  if (!packer) return;
-  const result: any = {};
-  let isSet = false;
-  const dataInputs = Array.from(packer.querySelectorAll(".data-input"));
-  dataInputs.forEach((div: any) => {
-    isSet = true;
-    const keySpans: any[] = Array.from(
-      div.querySelectorAll("span[data-key-name]"),
-    );
-    const isArray = div.dataset.arr === "true";
-    const isObject = div.dataset.obj === "true";
-    const subOrdinate = div.dataset.holder;
-    for (const keySpan of keySpans) {
-      const key = keySpan.dataset.keyName;
-      const inputEl = keySpan.nextElementSibling;
-      if (!inputEl) continue;
-      let value;
-      if (inputEl.type === "file") value = inputEl.files[0];
-      else if (inputEl.type === "number") value = Number(inputEl.value);
-      else if (inputEl.type === "checkbox") value = inputEl.checked;
-      else if (
-        inputEl.type === "text" && inputEl.placeholder &&
-        inputEl.placeholder.includes("comma-separated")
-      ) {
-        value = inputEl.value.split(",").map((s: string) => s.trim()).filter((
-          s: string,
-        ) => s);
-      } else value = inputEl.value;
-      if (isObject) {
-        result[subOrdinate] = result[subOrdinate] || {};
-        result[subOrdinate][key] = value;
-      } else if (isArray) {
-        const position = div.dataset.pos ? Number(div.dataset.pos) : null;
-        result[subOrdinate] = result[subOrdinate] || [];
-        if (typeof position === "number" && typeof value === "object") {
-          result[subOrdinate][position] = result[subOrdinate][position] || {};
-          Object.assign(result[subOrdinate][position], { [key]: value });
-        } else if (typeof position === "number") {
-          result[subOrdinate][position] = result[subOrdinate][position] || {};
-          result[subOrdinate][position][key] = value;
-        } else result[subOrdinate].push(value);
-      } else result[key] = value;
+
+function getInputValue(inputEl: HTMLInputElement) {
+  if (!inputEl) return undefined;
+  if (inputEl.type === "file") {
+    return inputEl.files && inputEl.files.length > 0
+      ? inputEl.files[0]
+      : undefined;
+  }
+  if (inputEl.type === "number") {
+    return inputEl.value === "" ? undefined : Number(inputEl.value);
+  }
+  if (inputEl.type === "checkbox") return inputEl.checked;
+  const val = inputEl.value;
+  if (val === "true") return true;
+  if (val === "false") return false;
+  return val;
+}
+
+function parsePayloadData(bodyPackElement: HTMLElement) {
+  if (!bodyPackElement) return {};
+
+  function processNode(node: HTMLElement) {
+    // Case 1: Simple field (form-group wrapper which is also a data-input for structure)
+    if (node.matches(".form-group.data-input")) {
+      const inputEl = node.querySelector(
+        'input:not([type="button"]), select, textarea',
+      ) as HTMLInputElement;
+      return getInputValue(inputEl);
+    } // Case 2: Object container
+    else if (node.dataset?.["obj"] === "true" && node.matches(".data-input")) {
+      const objectData: any = {};
+      // Children are either .form-group.data-input (simple props) or .data-input (nested obj/arr)
+      Array.from(node.children as HTMLCollectionOf<HTMLElement>).forEach(
+        (childNode) => {
+          if (childNode.matches(".form-group.data-input, .data-input")) {
+            // Key is from data-key-name on the span within form-group, or data-holder for nested obj/arr containers
+            const key =
+              (childNode.querySelector("span[data-key-name]") as HTMLElement)
+                ?.dataset?.["keyName"] ||
+              (childNode as HTMLElement).dataset?.["holder"];
+            if (key) {
+              objectData[key] = processNode(childNode);
+            }
+          }
+        },
+      );
+      return objectData;
+    } // Case 3: Array container
+    else if (node.dataset?.["arr"] === "true" && node.matches(".data-input")) {
+      const arrayData: any = [];
+      const arrayItemsContainer = node.querySelector(".array-cont");
+      if (arrayItemsContainer) { // Array of objects
+        Array.from(arrayItemsContainer.children).filter((item) =>
+          item.matches(".array-item")
+        ).forEach((itemElement) => {
+          const itemObject: any = {};
+          // Each field within itemElement is a .form-group.data-input or .data-input (for nested)
+          Array.from(itemElement.children as HTMLCollectionOf<HTMLElement>)
+            .forEach((fieldNode) => {
+              if (fieldNode.matches(".form-group.data-input, .data-input")) {
+                const key = (fieldNode.querySelector(
+                  "span[data-key-name]",
+                ) as HTMLElement)?.dataset?.["keyName"] ||
+                  (fieldNode as HTMLElement).dataset?.["holder"];
+                if (key) {
+                  itemObject[key] = processNode(fieldNode);
+                }
+              }
+            });
+          arrayData.push(itemObject);
+        });
+      } else { // Simple array (comma-separated)
+        const simpleArrayInput = node.querySelector(
+          'input[type="text"][placeholder*="comma-separated"]',
+        ) as HTMLInputElement;
+        if (simpleArrayInput) {
+          const val = getInputValue(simpleArrayInput);
+          if (val && typeof val === "string" && val.trim() !== "") {
+            arrayData.push(
+              ...val.split(",").map((s) => s.trim()).filter((s) => s),
+            );
+          } else if (val !== undefined && val !== "" && val !== null) {
+            arrayData.push(val);
+          }
+        }
+      }
+      return arrayData;
     }
-  });
-  if (!isSet) return;
-  return result;
+    return undefined;
+  }
+
+  const assembledPayload: any = {};
+  Array.from(bodyPackElement.children as HTMLCollectionOf<HTMLElement>).forEach(
+    (topLevelNode) => {
+      // Each topLevelNode is a direct field/object/array from the schema root
+      // It should be a .form-group.data-input (simple) or .data-input (complex)
+      if (topLevelNode.matches(".form-group.data-input, .data-input")) {
+        const key =
+          (topLevelNode.querySelector("span[data-key-name]") as HTMLElement)
+            ?.dataset?.["keyName"] ||
+          (topLevelNode as HTMLElement).dataset?.["holder"];
+        if (key) {
+          assembledPayload[key] = processNode(topLevelNode);
+        }
+        // @ts-ignore
+        console.log(key, assembledPayload[key]);
+      }
+    },
+  );
+  return assembledPayload;
 }
 function parsePayloadStructure(
   apiSchema: any,

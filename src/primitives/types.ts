@@ -139,7 +139,9 @@ export type JetPluginExecutorInitParams = {
 };
 
 // A helper type for “any function of the right shape”
-export type AnyExecutor<C extends Record<string, unknown> = Record<string, unknown>> = (
+export type AnyExecutor<
+  C extends Record<string, unknown> = Record<string, unknown>,
+> = (
   this: JetPlugin<C>,
   init: JetPluginExecutorInitParams,
   config: C,

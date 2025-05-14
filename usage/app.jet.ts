@@ -1,27 +1,25 @@
 /**
  * PetShop API - A comprehensive demonstration of Jetpath framework capabilities
- * 
+ *
  * This application showcases best practices for building robust APIs with Jetpath,
- * including proper error handling, validation, authentication, logging, 
+ * including proper error handling, validation, authentication, logging,
  * file uploads, real-time communication, and more.
  */
 import { writeFile } from "node:fs/promises";
 import {
-  Jetpath,
-  use, 
   type JetFile,
   type JetFunc,
   type JetMiddleware,
+  Jetpath,
+  use,
 } from "../dist/index.js";
 import { authPlugin, type AuthPluginType } from "./plugins/auth.ts";
 import { jetLogger, type jetLoggerType } from "./plugins/logging.ts";
 import { resolve } from "node:path";
 
-
-
 /**
  * Configuration for the PetShop API application
- * 
+ *
  * The configuration includes API documentation settings, server configuration,
  * static file serving, and global headers that will be applied to all responses.
  */
@@ -30,7 +28,7 @@ const app = new Jetpath({
   apiDoc: {
     display: "UI",
     name: "PetShop API",
-    
+
     info: `
     # PetShop API Documentation
     
@@ -55,9 +53,8 @@ const app = new Jetpath({
     color: "#7e57c2", // Professional blue color scheme
     username: "admin",
     password: "1234",
-
   },
-  globalHeaders:{
+  globalHeaders: {
     "X-Pet-API-Version": "1.0.0",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -71,15 +68,14 @@ const app = new Jetpath({
   //   "Access-Control-Allow-Origin": "*",
   //   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   //   "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  // }, 
+  // },
 });
-
 
 jetLogger.setConfig({
   level: process.env.NODE_ENV === "production" ? "info" : "debug",
   format: "json",
-  filename: "./usage/pet-shop-api-log.log"
-})
+  filename: "./usage/pet-shop-api-log.log",
+});
 app.addPlugin(jetLogger);
 app.addPlugin(authPlugin);
 
@@ -93,17 +89,19 @@ app.addPlugin(authPlugin);
 
 /**
  * Global middleware for request processing and error handling
- * 
+ *
  * This here's detailed API sample of framework2 actually called jetpath middleware runs for all routes and handles:
  * - Request logging
  * - Authentication verification (when needed)
  * - Error processing
  * - Response formatting
- * 
+ *
  * @param {Object} ctx - The request context
  * @returns {Function} The post-handler middleware
  */
-export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (ctx) => {
+export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
+  ctx,
+) => {
   const startTime = Date.now();
   const requestId = `req-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   ctx.plugins.info(ctx);
@@ -118,14 +116,17 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
     (ctx.request.url === "/" && ctx.request.method === "GET");
 
   // Verify authentication for protected routes
-  if (!isPublicRoute && ctx.request.url !== "/" && !ctx.request.url.includes("/docs")) {
+  if (
+    !isPublicRoute && ctx.request.url !== "/" &&
+    !ctx.request.url.includes("/docs")
+  ) {
     const auth = ctx.plugins.verifyAuth(ctx);
-    if (!auth.authenticated) { 
+    if (!auth.authenticated) {
       ctx.set("WWW-Authenticate", "Bear");
       ctx.plugins?.["logger"]?.warn({
         requestId,
         message: "Authentication failed",
-        url: ctx.request.url
+        url: ctx.request.url,
       });
       // ctx.throw(401,"Unauthorized: Valid authentication is required");
     }
@@ -151,7 +152,7 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
         stack: err.stack,
         code: ctx.code,
         url: ctx.request.url,
-        duration
+        duration,
       });
 
       // Send error response
@@ -159,7 +160,7 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
         status: "error",
         message: err.message || "Internal server error",
         requestId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       return;
     }
@@ -170,14 +171,14 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
         requestId,
         message: "Resource not found",
         url: ctx.request.url,
-        duration
+        duration,
       });
 
       ctx.send({
         status: "error",
         message: "The requested resource was not found",
         requestId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       return;
     }
@@ -188,7 +189,7 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
       requestId,
       status: ctx.code,
       duration,
-      url: ctx.request.url
+      url: ctx.request.url,
     });
   };
 };
@@ -277,8 +278,8 @@ const pets: PetType[] = [
     health: {
       vaccinated: true,
       neutered: true,
-      medicalHistory: ["Regular checkup - 2023-05-01"]
-    }
+      medicalHistory: ["Regular checkup - 2023-05-01"],
+    },
   },
   {
     id: "pet-2",
@@ -288,7 +289,8 @@ const pets: PetType[] = [
     age: 2,
     gender: "Female",
     color: "Cream with brown points",
-    description: "Elegant Siamese cat with striking blue eyes and a playful personality",
+    description:
+      "Elegant Siamese cat with striking blue eyes and a playful personality",
     image: "/assets/images/luna.jpg",
     price: 350,
     available: true,
@@ -298,9 +300,9 @@ const pets: PetType[] = [
     health: {
       vaccinated: true,
       neutered: true,
-      medicalHistory: ["Regular checkup - 2023-06-15"]
-    }
-  }
+      medicalHistory: ["Regular checkup - 2023-06-15"],
+    },
+  },
 ];
 
 /**
@@ -315,8 +317,8 @@ const reviews = [
     username: "user",
     rating: 5,
     comment: "Max is such a wonderful companion! Highly recommend this breed.",
-    createdAt: "2023-08-20T09:45:00Z"
-  }
+    createdAt: "2023-08-20T09:45:00Z",
+  },
 ];
 
 // Start the server and listen for incoming requests
@@ -340,8 +342,8 @@ export const GET_: JetFunc = function (ctx) {
     endpoints: {
       documentation: "/docs",
       pets: "/pets",
-      authentication: "/auth/login"
-    }
+      authentication: "/auth/login",
+    },
   });
 };
 
@@ -352,7 +354,10 @@ GET_.info = "Returns API information and status";
  * @route POST /auth/login
  * @access Public
  */
-export const POST_auth_login: JetFunc<{ body: { username: string; password: string } }, [AuthPluginType]> = async function (ctx) {
+export const POST_auth_login: JetFunc<
+  { body: { username: string; password: string } },
+  [AuthPluginType]
+> = async function (ctx) {
   await ctx.parse();
   const { username, password } = ctx.body;
 
@@ -371,16 +376,22 @@ export const POST_auth_login: JetFunc<{ body: { username: string; password: stri
     user: {
       id: authResult.user?.id,
       username: authResult.user?.username,
-      role: authResult.user?.role
-    }
+      role: authResult.user?.role,
+    },
   });
 };
 
 use(POST_auth_login).body((t) => {
   return {
-    username: t.string({ err: "Username is required", inputDefaultValue: "admin" }).required(),
-    password: t.string({ err: "Password is required", inputDefaultValue: "admin123" }).required()
-  }
+    username: t.string({
+      err: "Username is required",
+      inputDefaultValue: "admin",
+    }).required(),
+    password: t.string({
+      err: "Password is required",
+      inputDefaultValue: "admin123",
+    }).required(),
+  };
 }).info("Authenticate a user and receive an access token");
 
 // =============================================================================
@@ -413,7 +424,7 @@ export const GET_pets: JetFunc<{
     maxAge,
     available,
     sort = "name",
-    search
+    search,
   } = ctx.query;
 
   // Filter pets based on query parameters
@@ -422,33 +433,34 @@ export const GET_pets: JetFunc<{
   // Filter by availability
   if (available !== undefined) {
     const isAvailable = available === Boolean(available);
-    filteredPets = filteredPets.filter(pet => pet.available === isAvailable);
+    filteredPets = filteredPets.filter((pet) => pet.available === isAvailable);
   }
 
   // Filter by species
   if (species) {
-    filteredPets = filteredPets.filter(pet =>
+    filteredPets = filteredPets.filter((pet) =>
       pet.species.toLowerCase() === species.toLowerCase()
     );
   }
 
   // Filter by age range
   if (minAge !== undefined) {
-    filteredPets = filteredPets.filter(pet => pet.age >= minAge);
+    filteredPets = filteredPets.filter((pet) => pet.age >= minAge);
   }
 
   if (maxAge !== undefined) {
-    filteredPets = filteredPets.filter(pet => pet.age <= maxAge);
+    filteredPets = filteredPets.filter((pet) => pet.age <= maxAge);
   }
 
   // Search by name, description, or tags
   if (search) {
     const searchLower = search.toLowerCase();
-    filteredPets = filteredPets.filter(pet =>
+    filteredPets = filteredPets.filter((pet) =>
       pet.name.toLowerCase().includes(searchLower) ||
       pet.description.toLowerCase().includes(searchLower) ||
       pet.breed.toLowerCase().includes(searchLower) ||
-      (pet.tags && pet.tags.some(tag => tag.toLowerCase().includes(searchLower)))
+      (pet.tags &&
+        pet.tags.some((tag) => tag.toLowerCase().includes(searchLower)))
     );
   }
 
@@ -468,7 +480,7 @@ export const GET_pets: JetFunc<{
   // Calculate total pages for pagination
   const totalPages = Math.ceil(filteredPets.length / limit);
 
-  // Create next and previous page URLs if applicable 
+  // Create next and previous page URLs if applicable
 
   const baseUrl = new URL(ctx.get("host")!).origin + "/pets";
   let nextPage: string | null = null;
@@ -505,13 +517,14 @@ export const GET_pets: JetFunc<{
     currentPage: Math.floor(offset / limit) + 1,
     pagination: {
       next: nextPage,
-      prev: prevPage
+      prev: prevPage,
     },
-    pets: paginatedPets
+    pets: paginatedPets,
   });
 };
 
-GET_pets.info = "Retrieves a list of pets with filtering and pagination options";
+GET_pets.info =
+  "Retrieves a list of pets with filtering and pagination options";
 
 /**
  * Get pet details by ID
@@ -523,7 +536,8 @@ export const GET_petBy$id: JetFunc<{
   query: { includeReviews?: boolean };
 }> = async function (ctx) {
   const petId = ctx.params.id;
-  const includeReviews = ctx.query.includeReviews === true || ctx.query.includeReviews === Boolean("true");
+  const includeReviews = ctx.query.includeReviews === true ||
+    ctx.query.includeReviews === Boolean("true");
 
   // Find pet by id
   const pet = pets.find((p) => p.id === petId);
@@ -532,7 +546,7 @@ export const GET_petBy$id: JetFunc<{
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Pet not found"
+      message: "Pet not found",
     });
     return;
   }
@@ -541,25 +555,30 @@ export const GET_petBy$id: JetFunc<{
   let petData: any = { ...pet };
 
   if (includeReviews) {
-    const petReviews = reviews.filter(review => review.petId === petId);
+    const petReviews = reviews.filter((review) => review.petId === petId);
 
     // Calculate average rating
-    const totalRating = petReviews.reduce((sum, review) => sum + review.rating, 0);
-    const averageRating = petReviews.length > 0 ? totalRating / petReviews.length : 0;
+    const totalRating = petReviews.reduce(
+      (sum, review) => sum + review.rating,
+      0,
+    );
+    const averageRating = petReviews.length > 0
+      ? totalRating / petReviews.length
+      : 0;
 
     petData = {
       ...petData,
       reviews: petReviews,
       reviewStats: {
         count: petReviews.length,
-        averageRating: averageRating
-      }
+        averageRating: averageRating,
+      },
     };
   }
 
   ctx.send({
     status: "success",
-    pet: petData
+    pet: petData,
   });
 };
 
@@ -578,13 +597,13 @@ export const POST_pets: JetFunc<{
     ctx.code = 403;
     ctx.send({
       status: "error",
-      message: "Only administrators can add new pets"
+      message: "Only administrators can add new pets",
     });
     return;
   }
 
   await ctx.parse();
-  const petData =  (ctx.body);
+  const petData = ctx.body;
 
   // Generate unique ID and metadata
   const newPet = {
@@ -592,7 +611,7 @@ export const POST_pets: JetFunc<{
     id: `pet-${Date.now()}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    available: petData.available !== undefined ? petData.available : true
+    available: petData.available !== undefined ? petData.available : true,
   };
 
   // Add pet to database
@@ -603,14 +622,14 @@ export const POST_pets: JetFunc<{
   ctx.plugins?.["logger"]?.info({
     action: "create_pet",
     petId: newPet.id,
-    adminId: ctx.state["user"]?.id || "unknown"
+    adminId: ctx.state["user"]?.id || "unknown",
   });
 
   ctx.code = 201; // Created
   ctx.send({
     status: "success",
     message: "Pet added successfully",
-    pet: newPet
+    pet: newPet,
   });
 };
 
@@ -619,20 +638,20 @@ use(POST_pets).body((t) => {
     name: t.string({ err: "Pet name is required" }).required(),
     species: t.string({ err: "Pet species is required" }).required(),
     breed: t.string({ err: "Pet breed is required" }).required(),
-    age: t.number({ err: "Pet age is required",   }).required(),
+    age: t.number({ err: "Pet age is required" }).required(),
     gender: t.string({ err: "Pet gender is required" }).required(),
     color: t.string({ err: "Pet color is required" }).required(),
     description: t.string({ err: "Pet description is required" }).required(),
-    image: t.file() ,
-    price: t.number({ err: "Pet price is required",   }).required(),
-    available: t.boolean() ,
-    tags: t.array(t.string()) ,
+    image: t.file(),
+    price: t.number({ err: "Pet price is required" }).required(),
+    available: t.boolean(),
+    tags: t.array(t.string()),
     health: t.object({
-      vaccinated: t.boolean() ,
-      neutered: t.boolean() ,
-      medicalHistory: t.array(t.string()) 
-    }) 
-  }
+      vaccinated: t.boolean(),
+      neutered: t.boolean(),
+      medicalHistory: t.array(t.string()),
+    }),
+  };
 }).info("Add a new pet to the inventory (admin only)");
 
 /**
@@ -649,14 +668,14 @@ export const PUT_petBy$id: JetFunc<{
     ctx.code = 403;
     ctx.send({
       status: "error",
-      message: "Only administrators can update pets"
+      message: "Only administrators can update pets",
     });
     return;
   }
 
   const petId = ctx.params.id;
   await ctx.parse();
-  const updatedPetData =  (ctx.body);
+  const updatedPetData = ctx.body;
 
   // Find pet by ID
   const index = pets.findIndex((p) => p.id === petId);
@@ -665,7 +684,7 @@ export const PUT_petBy$id: JetFunc<{
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Pet not found"
+      message: "Pet not found",
     });
     return;
   }
@@ -676,7 +695,7 @@ export const PUT_petBy$id: JetFunc<{
     ...updatedPetData,
     id: petId, // Ensure ID doesn't change
     createdAt: pets[index].createdAt, // Preserve original creation date
-    updatedAt: new Date().toISOString() // Update the modification timestamp
+    updatedAt: new Date().toISOString(), // Update the modification timestamp
   };
 
   // Save updated pet
@@ -688,37 +707,36 @@ export const PUT_petBy$id: JetFunc<{
     action: "update_pet",
     petId: updatedPet.id,
     adminId: ctx.state["user"]?.id || "unknown",
-    changes: Object.keys(updatedPetData).join(", ")
+    changes: Object.keys(updatedPetData).join(", "),
   });
 
   ctx.send({
     status: "success",
     message: "Pet updated successfully",
-    pet: updatedPet
+    pet: updatedPet,
   });
 };
-
 
 use(PUT_petBy$id).body((t) => {
   return {
     name: t.string({ err: "Pet name is required" }).required(),
     species: t.string({ err: "Pet species is required" }).required(),
     breed: t.string({ err: "Pet breed is required" }).required(),
-    age: t.number({ err: "Pet age is required",   }).required(),
+    age: t.number({ err: "Pet age is required" }).required(),
     gender: t.string({ err: "Pet gender is required" }).required(),
     color: t.string({ err: "Pet color is required" }).required(),
     description: t.string({ err: "Pet description is required" }).required(),
-    price: t.number({ err: "Pet price is required",   }).required(),
-    available: t.boolean() ,
-    image: t.file() ,
-    tags: t.array(t.string()) ,
+    price: t.number({ err: "Pet price is required" }).required(),
+    available: t.boolean(),
+    image: t.file(),
+    tags: t.array(t.string()),
     health: t.object({
-      vaccinated: t.boolean() ,
-      neutered: t.boolean() ,
-      medicalHistory: t.array(t.string()) 
-    })
-  }
-})
+      vaccinated: t.boolean(),
+      neutered: t.boolean(),
+      medicalHistory: t.array(t.string()),
+    }),
+  };
+});
 
 PUT_petBy$id.info = "Update an existing pet's information (admin only)";
 
@@ -728,14 +746,14 @@ PUT_petBy$id.info = "Update an existing pet's information (admin only)";
  * @access Authenticated (Admin only)
  */
 export const DELETE_petBy$id: JetFunc<{
-  params: { id: string }
+  params: { id: string };
 }, [AuthPluginType]> = function (ctx) {
   // Check if user is an admin
   if (!ctx.plugins.isAdmin(ctx)) {
     ctx.code = 403;
     ctx.send({
       status: "error",
-      message: "Only administrators can delete pets"
+      message: "Only administrators can delete pets",
     });
     return;
   }
@@ -749,7 +767,7 @@ export const DELETE_petBy$id: JetFunc<{
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Pet not found"
+      message: "Pet not found",
     });
     return;
   }
@@ -758,9 +776,9 @@ export const DELETE_petBy$id: JetFunc<{
   const deletedPet = pets.splice(index, 1)[0];
 
   // Remove associated reviews
-  const reviewsToRemove = reviews.filter(review => review.petId === petId);
-  reviewsToRemove.forEach(review => {
-    const reviewIndex = reviews.findIndex(r => r.id === review.id);
+  const reviewsToRemove = reviews.filter((review) => review.petId === petId);
+  reviewsToRemove.forEach((review) => {
+    const reviewIndex = reviews.findIndex((r) => r.id === review.id);
     if (reviewIndex !== -1) {
       reviews.splice(reviewIndex, 1);
     }
@@ -771,13 +789,13 @@ export const DELETE_petBy$id: JetFunc<{
   ctx.plugins?.["logger"]?.info({
     action: "delete_pet",
     petId: deletedPet.id,
-    adminId: ctx.state["user"]?.id || "unknown"
+    adminId: ctx.state["user"]?.id || "unknown",
   });
 
   ctx.send({
     status: "success",
     message: "Pet deleted successfully",
-    pet: deletedPet
+    pet: deletedPet,
   });
 };
 
@@ -796,7 +814,7 @@ export const GET_pets_search: JetFunc<{
     minPrice?: number;
     maxPrice?: number;
     tags?: string;
-  }
+  };
 }> = async function (ctx) {
   // Validate query parameters
 
@@ -806,7 +824,7 @@ export const GET_pets_search: JetFunc<{
     breed,
     minPrice,
     maxPrice,
-    tags
+    tags,
   } = ctx.query;
 
   // Create filters based on provided parameters
@@ -814,65 +832,71 @@ export const GET_pets_search: JetFunc<{
 
   if (name) {
     const searchName = name.toLowerCase();
-    filteredPets = filteredPets.filter(pet =>
+    filteredPets = filteredPets.filter((pet) =>
       pet.name.toLowerCase().includes(searchName)
     );
   }
 
   if (species) {
     const searchSpecies = species.toLowerCase();
-    filteredPets = filteredPets.filter(pet =>
+    filteredPets = filteredPets.filter((pet) =>
       pet.species.toLowerCase() === searchSpecies
     );
   }
 
   if (breed) {
     const searchBreed = breed.toLowerCase();
-    filteredPets = filteredPets.filter(pet =>
+    filteredPets = filteredPets.filter((pet) =>
       pet.breed.toLowerCase().includes(searchBreed)
     );
   }
 
   if (minPrice !== undefined) {
     if (minPrice !== undefined) {
-      filteredPets = filteredPets.filter(pet => pet.price >= minPrice);
+      filteredPets = filteredPets.filter((pet) => pet.price >= minPrice);
     }
 
     if (maxPrice !== undefined) {
-      filteredPets = filteredPets.filter(pet => pet.price <= maxPrice);
+      filteredPets = filteredPets.filter((pet) => pet.price <= maxPrice);
     }
 
     if (tags) {
-      const tagList = tags.split(',').map(tag => tag.trim().toLowerCase());
-      filteredPets = filteredPets.filter(pet =>
-        pet.tags && tagList.some(tag =>
-          pet.tags?.map(t => t.toLowerCase()).includes(tag)
+      const tagList = tags.split(",").map((tag) => tag.trim().toLowerCase());
+      filteredPets = filteredPets.filter((pet) =>
+        pet.tags &&
+        tagList.some((tag) =>
+          pet.tags?.map((t) => t.toLowerCase()).includes(tag)
         )
       );
     }
 
     // Get pet reviews for average ratings
-    const petsWithRatings = filteredPets.map(pet => {
-      const petReviews = reviews.filter(review => review.petId === pet.id);
-      const totalRating = petReviews.reduce((sum, review) => sum + review.rating, 0);
-      const averageRating = petReviews.length > 0 ? totalRating / petReviews.length : 0;
+    const petsWithRatings = filteredPets.map((pet) => {
+      const petReviews = reviews.filter((review) => review.petId === pet.id);
+      const totalRating = petReviews.reduce(
+        (sum, review) => sum + review.rating,
+        0,
+      );
+      const averageRating = petReviews.length > 0
+        ? totalRating / petReviews.length
+        : 0;
 
       return {
         ...pet,
         reviewStats: {
           count: petReviews.length,
-          averageRating
-        }
+          averageRating,
+        },
       };
     });
 
     ctx.send({
       status: "success",
       count: petsWithRatings.length,
-      pets: petsWithRatings
+      pets: petsWithRatings,
     });
-  };
-}
+  }
+};
 
 GET_pets_search.info = "Advanced search for pets by various criteria";
 
@@ -894,7 +918,7 @@ export const POST_petImage$id: JetFunc<{
     ctx.code = 403;
     ctx.send({
       status: "error",
-      message: "Only administrators can upload pet images"
+      message: "Only administrators can upload pet images",
     });
     return;
   }
@@ -908,7 +932,7 @@ export const POST_petImage$id: JetFunc<{
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Pet not found"
+      message: "Pet not found",
     });
     return;
   }
@@ -922,18 +946,18 @@ export const POST_petImage$id: JetFunc<{
       ctx.code = 400;
       ctx.send({
         status: "error",
-        message: "No image file provided"
+        message: "No image file provided",
       });
       return;
     }
 
     // Validate image type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedTypes.includes(image.mimetype)) {
       ctx.code = 400;
       ctx.send({
         status: "error",
-        message: "Invalid image format. Only JPEG, PNG and WebP are supported."
+        message: "Invalid image format. Only JPEG, PNG and WebP are supported.",
       });
       return;
     }
@@ -956,26 +980,26 @@ export const POST_petImage$id: JetFunc<{
       action: "upload_pet_image",
       petId,
       imageUrl,
-      adminId: ctx.state["user"]?.id || "unknown"
+      adminId: ctx.state["user"]?.id || "unknown",
     });
 
     ctx.send({
       status: "success",
       message: "Image uploaded successfully",
       imageUrl,
-      pet: pets[index]
+      pet: pets[index],
     });
   } catch (error: any) {
     ctx.plugins?.["logger"]?.error({
       action: "upload_pet_image_error",
       petId,
-      error: error.message
+      error: error.message,
     });
 
     ctx.code = 500;
     ctx.send({
       status: "error",
-      message: "Failed to process image upload"
+      message: "Failed to process image upload",
     });
   }
 };
@@ -993,13 +1017,13 @@ export const GET_petBy$id_gallery: JetFunc<{
   const petId = ctx.params.id;
 
   // Find pet by ID
-  const pet = pets.find(p => p.id === petId);
+  const pet = pets.find((p) => p.id === petId);
 
   if (!pet) {
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Pet not found"
+      message: "Pet not found",
     });
     return;
   }
@@ -1012,7 +1036,7 @@ export const GET_petBy$id_gallery: JetFunc<{
     status: "success",
     petId,
     petName: pet.name,
-    gallery
+    gallery,
   });
 };
 
@@ -1035,19 +1059,19 @@ export const GET_petBy$id_reviews: JetFunc<{
   const sort = ctx.query.sort || "-createdAt"; // Default sort by newest
 
   // Find pet by ID
-  const pet = pets.find(p => p.id === petId);
+  const pet = pets.find((p) => p.id === petId);
 
   if (!pet) {
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Pet not found"
+      message: "Pet not found",
     });
     return;
   }
 
   // Get reviews for this pet
-  let petReviews = reviews.filter(review => review.petId === petId);
+  let petReviews = reviews.filter((review) => review.petId === petId);
 
   // Sort reviews
   const sortField = sort.startsWith("-") ? sort.substring(1) : sort;
@@ -1060,8 +1084,13 @@ export const GET_petBy$id_reviews: JetFunc<{
   });
 
   // Calculate average rating
-  const totalRating = petReviews.reduce((sum, review) => sum + review.rating, 0);
-  const averageRating = petReviews.length > 0 ? totalRating / petReviews.length : 0;
+  const totalRating = petReviews.reduce(
+    (sum, review) => sum + review.rating,
+    0,
+  );
+  const averageRating = petReviews.length > 0
+    ? totalRating / petReviews.length
+    : 0;
 
   ctx.send({
     status: "success",
@@ -1069,9 +1098,9 @@ export const GET_petBy$id_reviews: JetFunc<{
     petName: pet.name,
     stats: {
       count: petReviews.length,
-      averageRating
+      averageRating,
     },
-    reviews: petReviews
+    reviews: petReviews,
   });
 };
 
@@ -1095,7 +1124,7 @@ export const POST_petBy$id_reviews: JetFunc<{
     ctx.code = 401;
     ctx.send({
       status: "error",
-      message: "Authentication required to post reviews"
+      message: "Authentication required to post reviews",
     });
     return;
   }
@@ -1103,19 +1132,19 @@ export const POST_petBy$id_reviews: JetFunc<{
   const petId = ctx.params.id;
 
   // Find pet by ID
-  const pet = pets.find(p => p.id === petId);
+  const pet = pets.find((p) => p.id === petId);
 
   if (!pet) {
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Pet not found"
+      message: "Pet not found",
     });
     return;
   }
 
   await ctx.parse();
-  const { rating, comment } =  (ctx.body);
+  const { rating, comment } = ctx.body;
 
   // Create new review
   const newReview = {
@@ -1125,7 +1154,7 @@ export const POST_petBy$id_reviews: JetFunc<{
     username: auth.user!.username,
     rating,
     comment,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
 
   // Add review to database
@@ -1137,22 +1166,22 @@ export const POST_petBy$id_reviews: JetFunc<{
     action: "create_review",
     reviewId: newReview.id,
     petId,
-    userId: auth.user?.id
+    userId: auth.user?.id,
   });
 
   ctx.code = 201; // Created
   ctx.send({
     status: "success",
     message: "Review added successfully",
-    review: newReview
+    review: newReview,
   });
 };
 
 use(POST_petBy$id_reviews).body((t) => {
   return {
-    rating: t.number({ err: "Rating is required (1-5)",   }).required(),
-    comment: t.string({ err: "Review comment is required" }).required()
-  }
+    rating: t.number({ err: "Rating is required (1-5)" }).required(),
+    comment: t.string({ err: "Review comment is required" }).required(),
+  };
 }).info("Add a review for a specific pet");
 
 /**
@@ -1169,7 +1198,7 @@ export const DELETE_reviews$reviewId: JetFunc<{
     ctx.code = 401;
     ctx.send({
       status: "error",
-      message: "Authentication required to delete reviews"
+      message: "Authentication required to delete reviews",
     });
     return;
   }
@@ -1177,13 +1206,13 @@ export const DELETE_reviews$reviewId: JetFunc<{
   const reviewId = ctx.params.reviewId;
 
   // Find review by ID
-  const reviewIndex = reviews.findIndex(r => r.id === reviewId);
+  const reviewIndex = reviews.findIndex((r) => r.id === reviewId);
 
   if (reviewIndex === -1) {
     ctx.code = 404;
     ctx.send({
       status: "error",
-      message: "Review not found"
+      message: "Review not found",
     });
     return;
   }
@@ -1198,7 +1227,7 @@ export const DELETE_reviews$reviewId: JetFunc<{
     ctx.code = 403;
     ctx.send({
       status: "error",
-      message: "You don't have permission to delete this review"
+      message: "You don't have permission to delete this review",
     });
     return;
   }
@@ -1212,17 +1241,19 @@ export const DELETE_reviews$reviewId: JetFunc<{
     action: "delete_review",
     reviewId,
     petId: deletedReview.petId,
-    userId: auth.user?.id
+    userId: auth.user?.id,
   });
 
   ctx.send({
     status: "success",
     message: "Review deleted successfully",
-    review: deletedReview
+    review: deletedReview,
   });
 };
 
-use(DELETE_reviews$reviewId).info("Delete a review (admin or review owner only)");
+use(DELETE_reviews$reviewId).info(
+  "Delete a review (admin or review owner only)",
+);
 
 // =============================================================================
 // STATISTICS AND REPORTS
@@ -1239,19 +1270,19 @@ export const GET_stats: JetFunc<{}, [AuthPluginType]> = function (ctx) {
     ctx.code = 403;
     ctx.send({
       status: "error",
-      message: "Only administrators can access statistics"
+      message: "Only administrators can access statistics",
     });
     return;
   }
 
   // Calculate statistics
   const totalPets = pets.length;
-  const availablePets = pets.filter(pet => pet.available).length;
-  const totalSpecies = new Set(pets.map(pet => pet.species)).size;
+  const availablePets = pets.filter((pet) => pet.available).length;
+  const totalSpecies = new Set(pets.map((pet) => pet.species)).size;
 
   // Count pets by species
   const speciesCount: Record<string, number> = {};
-  pets.forEach(pet => {
+  pets.forEach((pet) => {
     speciesCount[pet.species] = (speciesCount[pet.species] || 0) + 1;
   });
 
@@ -1273,14 +1304,14 @@ export const GET_stats: JetFunc<{}, [AuthPluginType]> = function (ctx) {
         unavailable: totalPets - availablePets,
         speciesCount,
         totalSpecies,
-        averagePrice
+        averagePrice,
       },
       reviews: {
         total: totalReviews,
-        averageRating
-      }
+        averageRating,
+      },
     },
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
   });
 };
 
@@ -1296,15 +1327,15 @@ use(GET_stats).info("Get shop statistics (admin only)");
  * @access Public
  */
 const sockets = new Set<any>();
-export const GET_live: JetFunc = (ctx) => {  
-  ctx.upgrade(); 
-  
+export const GET_live: JetFunc = (ctx) => {
+  ctx.upgrade();
+
   const conn = ctx.connection!;
   if (!conn) {
     ctx.code = 500;
     ctx.send({
       status: "error",
-      message: "WebSocket connection failed!!!"
+      message: "WebSocket connection failed!!!",
     });
     return;
   }
@@ -1314,30 +1345,34 @@ export const GET_live: JetFunc = (ctx) => {
     conn.addEventListener("open", (socket) => {
       sockets.add(socket);
       // Send welcome message with current stats
-      const availablePets = pets.filter(pet => pet.available).length;
+      const availablePets = pets.filter((pet) => pet.available).length;
       socket.send(
         `
         Connected to PetShop live updates
         total pets: ${pets.length}
         available pets: ${availablePets}
         timestamp: ${new Date().toISOString()}
-        `
-      ); 
-      Array.from(sockets.values()).filter(s => s !== socket).forEach(s => s.send("We have a new member!"));
+        `,
+      );
+      Array.from(sockets.values()).filter((s) => s !== socket).forEach((s) =>
+        s.send("We have a new member!")
+      );
     });
 
     // Handle incoming messages
     conn.addEventListener("message", (socket, event) => {
-      const message = event.data; 
-        // Handle subscription requests
-        if (message === "ping") {
-          // Handle ping-pong for connection health checks
-          const m = ("pong " + new Date().toISOString());
-          socket.send(m);
-          return
-        }
-        const m = message
-       Array.from(sockets.values()).filter(s => s !== socket).forEach(s => s.send(m));
+      const message = event.data;
+      // Handle subscription requests
+      if (message === "ping") {
+        // Handle ping-pong for connection health checks
+        const m = "pong " + new Date().toISOString();
+        socket.send(m);
+        return;
+      }
+      const m = message;
+      Array.from(sockets.values()).filter((s) => s !== socket).forEach((s) =>
+        s.send(m)
+      );
     });
 
     // Handle connection close
@@ -1345,13 +1380,14 @@ export const GET_live: JetFunc = (ctx) => {
       sockets.delete(socket);
       console.log("Client disconnected from live updates");
     });
-
   } catch (error) {
     console.error("WebSocket error:", error);
   }
 };
 
-use(GET_live).info("WebSocket for real-time inventory updates and notifications");
+use(GET_live).info(
+  "WebSocket for real-time inventory updates and notifications",
+);
 
 // =============================================================================
 // FILE UPLOADS AND FORMS
@@ -1369,7 +1405,7 @@ export const POST_upload: JetFunc<{
     title: string;
     description: string;
     tags: string[];
-  }
+  };
 }, [AuthPluginType, jetLoggerType]> = async (ctx) => {
   // Check if user is an admin
   // if (!ctx.plugins.isAdmin(ctx)) {
@@ -1384,8 +1420,8 @@ export const POST_upload: JetFunc<{
   try {
     // Parse form data
     const form = await ctx.parse({
-      maxBodySize: 20 * 1024 * 1024 // 10MB
-    })  
+      maxBodySize: 20 * 1024 * 1024, // 10MB
+    });
     const results: Record<string, any> = {};
     console.log(form);
     // Process each file in the form
@@ -1393,7 +1429,7 @@ export const POST_upload: JetFunc<{
       const field = form[fieldName as keyof typeof form] as JetFile;
       // Check if field is a file
       if (field && field.fileName) {
-        console.log(field);  
+        console.log(field);
         // Generate unique filename to prevent overwrites
         const timestamp = Date.now();
         const uniqueFilename = `${timestamp}-${field.fileName}`;
@@ -1407,7 +1443,7 @@ export const POST_upload: JetFunc<{
           savedAs: uniqueFilename,
           size: field.content.byteLength,
           mimeType: field.mimeType,
-          url: `${saveDir}/${uniqueFilename}`
+          url: `${saveDir}/${uniqueFilename}`,
         };
       } else {
         // Store text field values
@@ -1418,39 +1454,36 @@ export const POST_upload: JetFunc<{
     ctx.plugins.info(ctx, {
       action: "file_upload",
       userId: ctx.state["user"]?.id || "unknown",
-      files: Object.keys(results).filter(key => results[key].url)
+      files: Object.keys(results).filter((key) => results[key].url),
     });
 
     ctx.send({
       status: "success",
       message: "Files uploaded successfully",
-      data: results
+      data: results,
     });
-
-  } catch (error: any) { 
+  } catch (error: any) {
     ctx.plugins.error(ctx, {
       action: "file_upload_error",
-      error: error.message
+      error: error.message,
     });
     ctx.code = 500;
     ctx.send({
-      status: error.message|| "error",
-      message: "Failed to process file upload"
+      status: error.message || "error",
+      message: "Failed to process file upload",
     });
   }
-  
 };
 
- 
 use(POST_upload).body((t) => {
   return {
-    image: t.file({inputAccept: "image/*"}),
+    image: t.file({ inputAccept: "image/*" }),
     document: t.file(),
     title: t.string(),
     description: t.string(),
     tags: (t.string()),
-  }
-}).info("Upload files with metadata (admin only)")
+  };
+}).info("Upload files with metadata (admin only)");
 
 // =============================================================================
 // ERROR HANDLING AND TESTING
@@ -1481,14 +1514,16 @@ export const GET_health: JetFunc = function (ctx) {
     status: "healthy",
     uptime: {
       seconds: uptime,
-      formatted: `${Math.floor(uptime / 86400)}d ${Math.floor((uptime % 86400) / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${Math.floor(uptime % 60)}s`
+      formatted: `${Math.floor(uptime / 86400)}d ${
+        Math.floor((uptime % 86400) / 3600)
+      }h ${Math.floor((uptime % 3600) / 60)}m ${Math.floor(uptime % 60)}s`,
     },
     memory: {
       rss: `${Math.round(memoryUsage.rss / 1024 / 1024)} MB`,
       heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
-      heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`
+      heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
     },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 };
 
@@ -1525,7 +1560,7 @@ export const GET_export_docs$format: JetFunc<{
     version: "1.0.0",
     description: "A comprehensive API for managing pet shop inventory",
     baseUrl: new URL(ctx.get("host")!).origin,
-    endpoints: []
+    endpoints: [],
   };
 
   // Get all routes and their information
@@ -1541,8 +1576,8 @@ export const GET_export_docs$format: JetFunc<{
         limit: "Number of pets to return",
         offset: "Number of pets to skip",
         species: "Filter by species",
-        available: "Filter by availability"
-      }
+        available: "Filter by availability",
+      },
     },
     {
       path: "/petBy/:id",
@@ -1550,8 +1585,8 @@ export const GET_export_docs$format: JetFunc<{
       description: "Get details for a specific pet",
       parameters: {
         id: "Pet ID (path parameter)",
-        includeReviews: "Include pet reviews in response"
-      }
+        includeReviews: "Include pet reviews in response",
+      },
     },
   ];
 
@@ -1612,18 +1647,23 @@ export const GET_export_docs$format: JetFunc<{
     ctx.code = 400;
     ctx.send({
       status: "error",
-      message: `Unsupported format: ${format}. Supported formats are json, yaml, and markdown.`
+      message:
+        `Unsupported format: ${format}. Supported formats are json, yaml, and markdown.`,
     });
   }
 };
 
-use(GET_export_docs$format).info("Export API documentation in different formats (json, yaml, markdown)");
+use(GET_export_docs$format).info(
+  "Export API documentation in different formats (json, yaml, markdown)",
+);
 
-
-
-export const GET_serve$0: JetFunc<{params: {"*": string}}> = function (ctx) {
+export const GET_serve$0: JetFunc<{ params: { "*": string } }> = function (
+  ctx,
+) {
   ctx.sendStream(ctx.params["*"] || "./usage");
 };
-export const GET_static$0: JetFunc<{params: {"*": string}}> = function (ctx) {
+export const GET_static$0: JetFunc<{ params: { "*": string } }> = function (
+  ctx,
+) {
   ctx.download(ctx.params["*"] || "./usage");
 };
