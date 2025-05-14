@@ -26,10 +26,11 @@ import { resolve } from "node:path";
  * static file serving, and global headers that will be applied to all responses.
  */
 const app = new Jetpath({
-  generateTypes: true,
+  strictMode: "ON",
   apiDoc: {
     display: "UI",
     name: "PetShop API",
+    
     info: `
     # PetShop API Documentation
     
@@ -51,7 +52,7 @@ const app = new Jetpath({
 
 
     `,
-    color: "#c95050", // Professional blue color scheme
+    color: "#7e57c2", // Professional blue color scheme
     username: "admin",
     password: "1234",
 
@@ -1389,7 +1390,7 @@ export const POST_upload: JetFunc<{
     console.log(form);
     // Process each file in the form
     for (const fieldName in form) {
-      const field = form[fieldName];
+      const field = form[fieldName as keyof typeof form] as JetFile;
       // Check if field is a file
       if (field && field.fileName) {
         console.log(field);  
@@ -1404,7 +1405,7 @@ export const POST_upload: JetFunc<{
         results[fieldName] = {
           fileName: field.fileName,
           savedAs: uniqueFilename,
-          size: field.size,
+          size: field.content.byteLength,
           mimeType: field.mimeType,
           url: `${saveDir}/${uniqueFilename}`
         };

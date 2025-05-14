@@ -12,9 +12,9 @@ import {
 } from "./functions.js";
 import type {
   AnyExecutor,
-  ContextType,
   FileOptions,
   HTTPBody,
+  JetContext,
   JetFunc,
   jetOptions,
   JetPluginExecutorInitParams,
@@ -23,13 +23,13 @@ import type {
   SchemaType,
   ValidationOptions,
 } from "./types.js";
-import { resolve, sep } from "node:path";
 import { mime } from "../extracts/mimejs-extract.js";
-import { BunFile } from "bun";
+import { resolve, sep } from "node:path";
+import type { BunFile } from "bun";
 
 export class JetPlugin<
   C extends Record<string, unknown> = Record<string, unknown>,
-  E extends AnyExecutor = AnyExecutor,
+  E extends AnyExecutor<C> = AnyExecutor<C>,
 > {
   executor: E;
   JetPathServer?: any;
@@ -178,7 +178,7 @@ export class Context {
     return this._7.state;
   }
   //? load
-  payload ?: string = undefined;
+  payload?: string = undefined;
   // ? header of response
   _2: Record<string, string> = {};
   // //? stream
@@ -945,7 +945,7 @@ export class JetMockServer {
   */
   async _run(
     func: JetFunc,
-    ctx?: ContextType<any, any>,
+    ctx?: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     let returned: (Function | void)[] | undefined;
     const r = func;
@@ -988,7 +988,9 @@ export class JetMockServer {
     }
     return {
       code: ctx!.code,
-      body: typeof ctx!.payload !== "string" ? ctx!.payload : JSON.parse(ctx!.payload),
+      body: typeof ctx!.payload !== "string"
+        ? ctx!.payload
+        : JSON.parse(ctx!.payload),
       headers: ctx!._2!,
     };
   }
@@ -999,7 +1001,7 @@ export class JetMockServer {
   }
   runWithCtx(
     func: JetFunc,
-    ctx: ContextType<any, any>,
+    ctx: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func, ctx);
   }

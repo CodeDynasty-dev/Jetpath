@@ -1,19 +1,19 @@
 // compatible node imports
 import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
-import path, { resolve, sep } from "node:path";
+import path, { join, resolve, sep } from "node:path";
 import { cwd } from "node:process";
 import { createServer } from "node:http";
 // type imports
 import { type IncomingMessage, type ServerResponse } from "node:http";
-import {
-  type allowedMethods,
+import type {
+  allowedMethods,
   AnyExecutor,
   compilerType,
   FileOptions,
-  type HTTPBody,
-  type JetFunc,
-  type jetOptions,
-  type methods,
+  HTTPBody,
+  JetFunc,
+  jetOptions,
+  methods,
   ValidationOptions,
 } from "./types.js";
 import {
@@ -22,7 +22,7 @@ import {
   Context,
   DateSchema,
   FileSchema,
-  type JetPlugin,
+  JetPlugin,
   JetSocket,
   Log,
   NumberSchema,
@@ -31,8 +31,10 @@ import {
   SchemaCompiler,
   StringSchema,
   Trie,
-} from "./classes.js";
+} from "./classes.js" with { type: "comptime" };
 import { networkInterfaces } from "node:os";
+import { execFile } from "node:child_process";
+import { mkdirSync } from "node:fs";
 
 /**
  * an inbuilt CORS post middleware
@@ -728,8 +730,12 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     },
   );
 
-  return UI.replace("`{ JETPATH }`", `\`${api}\``)
-    .replaceAll("`{ JETPATHGH }`", `${JSON.stringify(globalHeaders)}`)
+  return UI.replace('"{ JETPATH }"', `\`${api}\``)
+    .replaceAll(
+      '"{ JETENVIRONMENTS }"',
+      JSON.stringify(options?.apiDoc?.environments!),
+    )
+    .replaceAll('"{ JETPATHGH }"', `${JSON.stringify(globalHeaders)}`)
     .replaceAll("{NAME}", options?.apiDoc?.name || "Jetpath API Doc")
     .replaceAll("JETPATHCOLOR", options?.apiDoc?.color || "#4285f4")
     .replaceAll(
@@ -790,11 +796,13 @@ export const compileAPI = (options: jetOptions): [number, string] => {
                   target[key] = [{}];
                   processSchema(field.objectSchema, target[key][0]);
                 } else {
-                  target[key] = [field.arrayType || "text"];
+                  target[key] = [
+                    field.arrayType + ":" + (field.arrayDefaultValue || ""),
+                  ];
                 }
               } else {
-                target[key] = field?.inputDefaultValue || field?.inputType ||
-                  "text";
+                target[key] = field?.inputType + ":" +
+                  (field?.inputDefaultValue || "");
               }
             }
           };
@@ -1280,7 +1288,10 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
   //? Regex to find exported const variables
   const ROUTE_EXPORT_REGEX = /export\s+const\s+([A-Z]+_[a-zA-Z0-9_$]+)\s*[:=]/g;
   const METHOD_PATH_REGEX = /^([A-Z]+)_[a-zA-Z0-9_$]+$/;
-  const OUTPUT_FILE = path.resolve(cwd(), "apis-types.d.ts");
+  const OUTPUT_FILE = resolve(
+    join(cwd(), "node_modules", ".jetpath", ".apis-types.ts"),
+  );
+  mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
   const declarations: string[] = [];
 
   async function walkDir(currentDir: string) {
@@ -1288,7 +1299,7 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
       const entries = await readdir(currentDir, {
         withFileTypes: true,
       });
-
+      let mIdex = 0;
       for (const entry of entries) {
         const fullPath = path.join(currentDir, entry.name);
 
@@ -1313,15 +1324,21 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
             }
 
             if (foundExports.length > 0) {
+              const moduleName = "m" + mIdex; // only alphanumeric letters;
               //? Generate the declare module block for this file
-              let moduleDeclaration = `declare module '${modulePath}' {\n`;
+              let moduleDeclaration =
+                `import * as ${moduleName} from '../../${modulePath}';\n\n\n`;
               //? Add declarations for each found route export
               for (const exportName of foundExports) {
                 //? Declare the export with the basic JetFunc<any, any> type
-                moduleDeclaration +=
-                  `    export const ${exportName}: JetFunc<any, any>;\n`;
+                if (exportName.startsWith("MIDDLEWARE_")) {
+                  moduleDeclaration +=
+                    `const ${exportName} = ${moduleName}.${exportName} satisfies JetMiddleware<any, any>\n\n `;
+                } else {
+                  moduleDeclaration +=
+                    `const ${exportName} = ${moduleName}.${exportName} satisfies JetFunc<any, any>\n\n `;
+                }
               }
-              moduleDeclaration += `}\n`;
               declarations.push(moduleDeclaration);
             }
           } catch (error) {
@@ -1330,6 +1347,7 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
             );
           }
         }
+        mIdex++;
       }
     } catch (error) {
       console.error(`Error reading directory ${currentDir}: ${error}`);
@@ -1339,20 +1357,51 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
   //? Generate the final .d.ts file content
   let outputContent =
     `//? This file is auto-generated by Jetpath. DO NOT MODIFY!\n\n`;
-  outputContent += `import { type JetFunc } from 'jetpath';\n\n`;
+  outputContent += `// @ts-ignore\nimport { type JetFunc, JetMiddleware } from 'jetpath';\n\n`;
 
   //? Add all the generated module declarations
   outputContent += declarations.join("\n");
 
   try {
+    Log.info("\n⚙️  StrictMode...");
     await writeFile(OUTPUT_FILE, outputContent, "utf-8");
-    Log.info(
-      `Type definitions saved to apis-types.d.ts\nadd this file to your tsconfig.json\n
-"include": [
-    "${ROUTES_DIR}/**/*.ts", //? your source files
-    "apis-types.d.ts" //? generated type file
-],`,
+
+
+   const promisifiedExecFile = ()=> new Promise((resolve) => {
+    execFile(
+      "tsc",
+      [
+        "--noEmit",
+        "--target",
+        "ESNext",
+        "--module",
+        "NodeNext",
+        "--moduleResolution",
+        "NodeNext",
+        "--lib",
+        "ESNext,DOM",
+        "--strict",
+        "--esModuleInterop",
+        "--allowImportingTsExtensions",
+        "--skipLibCheck",
+        OUTPUT_FILE,
+      ],
+      { encoding: "utf8" },
+      (err, stdout, stderr) => {
+        if (err) {
+          Log.info("\n🛠️ StrictMode warnings");
+          Log.error(stderr.replaceAll("\n", "\n\n"));
+          Log.error(stdout.replaceAll("\n", "\n\n"));
+          const errors =(stdout.split("\n\n")).length;
+          Log.info(
+           errors+ ` Problem${errors===1?"":"s"} 🐞\n\nYou are seeing these warnings because you have strict mode enabled\n`,
+          );
+        }
+        resolve(undefined);
+      },
     );
+  });
+  await promisifiedExecFile();
   } catch (error) {
     Log.error(`Error writing output file apis-types.d.ts: ${error}`);
   }

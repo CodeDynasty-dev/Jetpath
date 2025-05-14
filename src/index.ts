@@ -7,13 +7,13 @@ import {
   compileAPI,
   compileUI,
   corsMiddleware,
-  // generateRouteTypes,
+  generateRouteTypes,
   getHandlers,
   getLocalIP,
   isIdentical,
   UTILS,
 } from "./primitives/functions.js";
-import { AnyExecutor, type jetOptions } from "./primitives/types.js";
+import type { AnyExecutor, jetOptions } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
 import { sep } from "node:path";
 
@@ -70,18 +70,14 @@ export class Jetpath {
   async listen(): Promise<void> {
     if (!this.options.source) {
       Log.error(
-        "Jetpath: Please provide a source directory to avoid scanning the root directory",
+        "Jetpath: Provide a source directory to avoid scanning the root directory",
       );
     }
     // ? {-view-} here is replaced at build time to html
     let UI = `{{view}}`;
     Log.info("Compiling...");
     const startTime = performance.now();
-    //? generate types
-    // TODO: Refactor this
-    // if (this.options?.generateTypes === true) {
-    //   generateRouteTypes(this.options.source || ".");
-    // }
+
     // ? Load all jetpath functions described in user code
     const errorsCount = await getHandlers(this.options?.source!, true);
     const endTime = performance.now();
@@ -171,12 +167,20 @@ export class Jetpath {
           )
         }ms`,
       );
+      //? generate types
+      if (this.options?.strictMode === "ON") {
+        await generateRouteTypes(this.options.source || ".");
+      }
       Log.info(
         `APIs: Viewable at http://localhost:${this.options.port}${
           this.options?.apiDoc?.path || "/api-doc"
         }`,
       );
     } else if (this.options?.apiDoc?.display === "HTTP") {
+      //? generate types
+      if (this.options?.strictMode === "ON") {
+        await generateRouteTypes(this.options.source || ".");
+      }
       // ? render API in a .HTTP file
       await writeFile("api-doc.http", compiledAPI);
       Log.info(
@@ -204,7 +208,6 @@ export class Jetpath {
     if (this.options?.upgrade === true) {
       UTILS.upgrade = true;
     }
-
     this.server = UTILS.server(this.plugs);
     //
     assignMiddleware(_JetPath_paths, _jet_middleware);
@@ -219,7 +222,7 @@ export class Jetpath {
 //? exports
 export type {
   AnyExecutor,
-  ContextType,
+  JetContext,
   JetFile,
   JetFunc,
   JetMiddleware,

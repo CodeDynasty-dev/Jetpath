@@ -3,7 +3,7 @@
 // PLUGINS CONFIGURATION
 // =============================================================================
 
-import { JetPlugin, type ContextType } from "../../dist/index.js";
+import { JetPlugin, type JetContext } from "../../dist/index.js";
 
 /**
  * Auth Plugin - Provides authentication and authorization functionality
@@ -25,9 +25,6 @@ export const authPlugin = new JetPlugin({
     return {
       /**
        * Validates user credentials and returns a token
-       * @param {string} username - User's username
-       * @param {string} password - User's password
-       * @returns {object} Authentication result with token if successful
        */
       authenticateUser(username: string, password: string) {
         const user = users.find(u => u.username === username && u.password === password);
@@ -46,10 +43,8 @@ export const authPlugin = new JetPlugin({
 
       /**
        * Verifies if a request has valid authentication
-       * @param {JetRequest} request - The incoming request
-       * @returns {object} Verification result with user info if authenticated
        */
-      verifyAuth(ctx: ContextType<any, any>)  {
+      verifyAuth(ctx: JetContext<any, any>)  {
         const authHeader = ctx.get("authorization");
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -73,10 +68,8 @@ export const authPlugin = new JetPlugin({
 
       /**
        * Verifies if the request is from an admin
-       * @param {JetRequest} request - The incoming request
-       * @returns {boolean} Whether the user is an admin
        */
-      isAdmin(ctx: ContextType<any, any>): boolean {
+      isAdmin(ctx: JetContext<any, any>): boolean {
         // Check for admin API key
         if (ctx.get("x-admin-Key") === ADMIN_API_KEY) {
           return true;
@@ -84,6 +77,7 @@ export const authPlugin = new JetPlugin({
 
         // Alternatively check user role
         const auth = this["verifyAuth"](ctx);
+        // @ts-ignore
         return auth.authenticated && auth.user.role === "admin";
       }
     };

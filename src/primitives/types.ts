@@ -1,7 +1,7 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths, v } from "./functions.js";
-import { CookieOptions, SchemaBuilder } from "./classes.js";
-import { type BunFile } from "bun";
+import { type CookieOptions, JetPlugin, SchemaBuilder } from "./classes.js";
+import type { BunFile } from "bun";
 import type Stream from "node:stream";
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
@@ -9,7 +9,7 @@ type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
 ) => void ? I
   : never;
 
-export interface ContextType<
+export interface JetContext<
   JetData extends {
     body?: Record<string, any>;
     params?: Record<string, any>;
@@ -139,10 +139,10 @@ export type JetPluginExecutorInitParams = {
 };
 
 // A helper type for “any function of the right shape”
-export type AnyExecutor = (
-  this: any,
+export type AnyExecutor<C extends Record<string, unknown> = Record<string, unknown>> = (
+  this: JetPlugin<C>,
   init: JetPluginExecutorInitParams,
-  config: Record<string, unknown>,
+  config: C,
 ) => any;
 
 export type contentType =
@@ -167,9 +167,10 @@ export type jetOptions = {
   upgrade?: boolean;
   source?: string;
   globalHeaders?: Record<string, string>;
-  generateTypes?: boolean;
+  strictMode?: "ON" | "OFF";
   apiDoc?: {
     display?: "UI" | "HTTP" | false;
+    environments?: Record<string, string>;
     name?: string;
     info?: string;
     color?: string;
@@ -250,17 +251,17 @@ export type JetMiddleware<
   } = { body: {}; params: {}; query: {} },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = (
-  ctx: ContextType<JetData, JetPluginTypes>,
+  ctx: JetContext<JetData, JetPluginTypes>,
 ) =>
   | void
   | Promise<void>
   | ((
-    ctx: ContextType<JetData, JetPluginTypes>,
+    ctx: JetContext<JetData, JetPluginTypes>,
     error: unknown,
   ) => void | Promise<void>)
   | Promise<
     ((
-      ctx: ContextType<JetData, JetPluginTypes>,
+      ctx: JetContext<JetData, JetPluginTypes>,
       error: unknown,
     ) => void | Promise<void>) | undefined
   >
@@ -284,7 +285,7 @@ export type JetFunc<
   },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
-  (ctx: ContextType<JetData, JetPluginTypes>): Promise<void> | void;
+  (ctx: JetContext<JetData, JetPluginTypes>): Promise<void> | void;
   body?: HTTPBody<JetData["body"] & Record<string, any>>;
   headers?: Record<string, string>;
   info?: string;

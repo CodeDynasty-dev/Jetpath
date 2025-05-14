@@ -13,7 +13,7 @@ The `Context` object, universally referred to as `ctx` in Jetpath, is the centra
 Its type signature reveals its capabilities:
 
 ```typescript
-interface ContextType<
+interface JetContext<
   // Defines expected shapes for body, params, query
   JetData extends {
     body?: Record<string, any>;

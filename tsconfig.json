@@ -5,12 +5,12 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleDetection": "force",
-    "allowJs": true,
+    // "allowJs": true, 
     // "removeComments": true,
 
     // Bundler mode
     // "moduleResolution": "nodenext",
-    // "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": true,
     // "noEmit": true,
     "declaration": true,
     // "allowSyntheticDefaultImports": true,
@@ -27,9 +27,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "outDir": "./dist", 
   }, 
-"include": ["src/**/*", 
-
- "apis-types.d.ts" //? generated type file
+"include": ["src/**/*"
 ],
   "exclude": ["node_modules"]
 }

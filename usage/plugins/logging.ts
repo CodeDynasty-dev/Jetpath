@@ -81,8 +81,14 @@ export class FileTransport implements Transport {
 /**
  * Creates a JetPlugin with structured logging capabilities
  */
-export const jetLogger = new JetPlugin({
-    executor() {
+export const jetLogger = new JetPlugin<{
+    level?: LogLevel;
+    format?: 'json' | 'text';
+    filename?: string;
+    getRequestId?: (req: Request) => string;
+    transports?: Transport[];
+}>({
+    executor() {        
         const { level = 'info', format = 'json', filename, getRequestId, transports: customTransports } = this.config;
         // Determine transports: custom, or build from filename/console defaults
         const transports: Transport[] = customTransports
