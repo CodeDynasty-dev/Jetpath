@@ -1291,15 +1291,16 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
   const OUTPUT_FILE = resolve(
     join(cwd(), "node_modules", ".jetpath", ".apis-types.ts"),
   );
+
   mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
   const declarations: string[] = [];
 
+  let mIdex = 0;
   async function walkDir(currentDir: string) {
     try {
       const entries = await readdir(currentDir, {
         withFileTypes: true,
       });
-      let mIdex = 0;
       for (const entry of entries) {
         const fullPath = path.join(currentDir, entry.name);
 

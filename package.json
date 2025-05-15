@@ -1,6 +1,6 @@
 {
   "name": "jetpath",
-  "version": "1.7.11-rc-3",
+  "version": "1.7.11-rc-4",
   "description": "Jetpath - A fast, seamless and minimalist framework for Node, Deno and Bun.js. Embrace the speed and elegance of the next-gen server-side experience.",
   "main": "dist/index.js",
   "type": "module",
@@ -13,6 +13,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/codedynasty-dev/jetpath.git"
+  },
+  "bin": {
+    "jetpath": "./dist/cli.js"
   },
   "keywords": [
     "web",
@@ -32,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/codedynasty-dev/jetpath/issues"
   },
-  "homepage": "https://github.com/codedynasty-dev/jetpath#readme",
+  "homepage": "https://jetpath.codedynasty.dev",
   "scripts": {
     "compile": "./pack",
     "deno": "deno run --allow-all tests/app.jet.ts",

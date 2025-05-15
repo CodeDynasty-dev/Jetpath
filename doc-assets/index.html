@@ -81,8 +81,8 @@
       <div class="hero-content">
         <div class="hero-badge">Blazing Fast Backend Framework</div>
         <h1 class="hero-title">Build high-performance APIs with minimal effort</h1>
-        <p class="hero-subtitle">Jetpath is a modern Node.js framework designed for speed and developer productivity.
-          Build robust, type-safe APIs with elegant syntax and unmatched performance.</p>
+        <p class="hero-subtitle">Jetpath is a modern cross runtime framework designed for speed and DX.
+          Build robust, type-safe APIs with unmatched performance.</p>
         <div class="hero-cta">
         </div>
 
@@ -105,9 +105,7 @@
               <button class="copy-btn" data-code="basic">Copy</button>
               <pre><code class="language-javascript">import { type JetFunc, Jetpath } from "jetpath";
 
-const app = new Jetpath();
-
-app.listen();
+new Jetpath().listen();
 
 // this goes to = get /
 export const GET_: JetFunc = function (ctx) {
@@ -118,7 +116,7 @@ export const GET_: JetFunc = function (ctx) {
               <button class="copy-btn" data-code="advanced">Copy</button>
               <pre><code class="language-javascript">import { Jetpath } from "jetpath";
 
-const app = new Jetpath();
+new Jetpath().listen();
 
 export const GET_room: JetFunc = (ctx) => {
   ctx.upgrade();
@@ -137,7 +135,11 @@ export const GET_room: JetFunc = (ctx) => {
             </div>
             <div class="code-wrapper" id="typescript-code">
               <button class="copy-btn" data-code="typescript">Copy</button>
-              <pre><code class="language-typescript">export const POST_auth_login: JetFunc = async function (ctx) {
+              <pre><code class="language-typescript">import { type JetFunc, Jetpath } from "jetpath";
+
+new Jetpath().listen();
+
+export const POST_auth_login: JetFunc = async function (ctx) {
   await ctx.parse();
   const { username, password } = ctx.body;
   

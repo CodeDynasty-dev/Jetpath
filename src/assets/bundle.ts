@@ -94,6 +94,7 @@ function $if(condition: any, ...elements: any[]) {
 const button = cra("button");
 const div = cra("div");
 const h2 = cra("h2");
+const h3 = cra("h3");
 const h4 = cra("h4");
 const h5 = cra("h5");
 const input = cra("input");
@@ -170,7 +171,7 @@ function copyToClipboard(text: string, type: string) {
 function createEnvironmentSelector() {
   const container = document.getElementById("env-switcher-container");
   if (!container) return;
-  const label = span(
+  const label = h3(
     { style: { marginRight: "8px", fontWeight: "500" } },
     "Environment:",
   );
