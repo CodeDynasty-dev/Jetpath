@@ -285,17 +285,22 @@ export class Context {
 
   sendStream(
     stream: Stream | string | BunFile,
-    folder?: string,
-    ContentType: string = "application/octet-stream",
+    config: {
+      folder?: string,
+      ContentType: string 
+    } = {
+      folder: undefined,
+      ContentType: "application/octet-stream",
+    }
   ) {
     if (typeof stream === "string") {
-      if (folder) {
+      if (config.folder) {
         let normalizedTarget: string;
         let normalizedBase: string;
         try {
-          stream = resolve(folder, stream);
+          stream = resolve(config.folder, stream);
           normalizedTarget = realpathSync(stream);
-          normalizedBase = realpathSync(folder);
+          normalizedBase = realpathSync(config.folder);
         } catch (error) {
           throw new Error("File not found!");
         }
@@ -306,7 +311,7 @@ export class Context {
       } else {
         stream = resolve(stream);
       }
-      ContentType = mime.getType(stream) || ContentType;
+      config.ContentType = mime.getType(stream) || config.ContentType;
       this._2["Content-Disposition"] = `inline; filename="${
         stream.split("/").at(-1) || "unnamed.bin"
       }"`;
@@ -323,15 +328,20 @@ export class Context {
       }
     }
 
-    this._2["Content-Type"] = ContentType;
+    this._2["Content-Type"] = config.ContentType;
     this._3 = stream as Stream;
   }
   download(
     stream: string | BunFile,
-    folder?: string,
-    ContentType: string = "application/octet-stream",
+    config: {
+      folder?: string,
+      ContentType: string,
+    } = {
+      folder: undefined,
+      ContentType: "application/octet-stream",
+    }
   ) {
-    this.sendStream(stream, folder, ContentType);
+    this.sendStream(stream, config);
     this._2["Content-Disposition"] = `attachment; filename="${
       (stream as string).split("/").at(-1) || "unnamed.bin"
     }"`;
