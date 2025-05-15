@@ -45,7 +45,10 @@ import { mkdirSync } from "node:fs";
 
 const optionsCtx = {
   payload: undefined,
-  _2: {},
+  _2: {
+    "Vary": "Origin",
+    "Connection": "keep-alive",
+  },
   _6: false,
   code: 204,
   set(field: string, value: string) {
@@ -55,7 +58,11 @@ const optionsCtx = {
   },
   request: { method: "OPTIONS" },
 };
-const cachedCorsHeaders: Record<string, string> = {};
+const cachedCorsHeaders: Record<string, string> = {
+  "Vary": "Origin",
+  "Connection": "keep-alive",
+
+};
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
   allowMethods?: allowedMethods;
@@ -75,10 +82,7 @@ export function corsMiddleware(options: {
 }) {
   //
   options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
-    !!options.keepHeadersOnError;
-  //
-  optionsCtx.set("Connection", "keep-alive");
-  
+    !!options.keepHeadersOnError; 
   //?  pre populate context for Preflight Request
   if (options.maxAge) {
     optionsCtx.set("Access-Control-Max-Age", options.maxAge);
@@ -117,7 +121,6 @@ export function corsMiddleware(options: {
   // ? Pre-popular normal response headers.
   //? Add Vary header to indicate response varies based on the Origin header
   cachedCorsHeaders["Vary"] = "Origin";
-  cachedCorsHeaders["Connection"] = "keep-alive";
   if (options.credentials === true) {
     cachedCorsHeaders["Access-Control-Allow-Credentials"] = "true";
   }
@@ -444,7 +447,7 @@ const Jetpath = async (
 ) => {
   if (req.method === "OPTIONS") {
     optionsCtx.code = 200;
-    return makeRes(res, optionsCtx as Context);
+    return makeRes(res, optionsCtx as unknown as Context);
   }
   const responder = _JetPath_paths_trie[req.method as methods]?.get_responder(
     req.url!,
@@ -487,7 +490,7 @@ const Jetpath = async (
   }
   const ctx404 = optionsCtx;
   ctx404.code = 404;
-  return makeRes(res, ctx404 as Context);
+  return makeRes(res, ctx404 as unknown as Context);
 };
 
 const handlersPath = (path: string) => {
