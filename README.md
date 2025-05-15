@@ -11,7 +11,7 @@
     <a href="https://jetpath.codedynasty.dev"><strong>Explore Jetpath APIs »</strong></a>
     <br/>
     <br/>
-    <a href="https://jetpath.codedynasty.dev">Join Community</a>
+    <a href="https://discord.gg/faqydQASTy">Join Discord</a>
     .
     <a href="https://github.com/codedynasty-dev/jetpath/issues">Report Bug</a>
     .
@@ -100,6 +100,21 @@ Jetpath is designed for high performance, security and ease of use, using conven
 
 --
   
+### Quick Start
+
+```bash
+# Install Jetpath CLI
+npx jetpath new-project
+
+# Navigate to the project directory
+cd new-project
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
 
 ## Installation
 
