@@ -31,7 +31,7 @@ import {
   SchemaCompiler,
   StringSchema,
   Trie,
-} from "./classes.js" with { type: "comptime" };
+} from "./classes.js";
 import { networkInterfaces } from "node:os";
 import { execFile } from "node:child_process";
 import { mkdirSync } from "node:fs";
