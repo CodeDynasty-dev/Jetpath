@@ -77,6 +77,8 @@ export function corsMiddleware(options: {
   options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
     !!options.keepHeadersOnError;
   //
+  optionsCtx.set("Connection", "keep-alive");
+  
   //?  pre populate context for Preflight Request
   if (options.maxAge) {
     optionsCtx.set("Access-Control-Max-Age", options.maxAge);
@@ -115,6 +117,7 @@ export function corsMiddleware(options: {
   // ? Pre-popular normal response headers.
   //? Add Vary header to indicate response varies based on the Origin header
   cachedCorsHeaders["Vary"] = "Origin";
+  cachedCorsHeaders["Connection"] = "keep-alive";
   if (options.credentials === true) {
     cachedCorsHeaders["Access-Control-Allow-Credentials"] = "true";
   }

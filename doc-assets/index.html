@@ -199,27 +199,19 @@ use(POST_auth_login).body((t) => {
       <div class="terminal-body">
         <div class="terminal-line">
           <span class="terminal-prompt">$</span>
-          <span class="terminal-output" style="animation-delay: 0s">npm install jetpath</span>
+          <span class="terminal-output" style="animation-delay: 0s">npx jetpath my-api</span>
         </div>
         <div class="terminal-line">
           <span class="terminal-prompt">$</span>
-          <span class="terminal-output" style="animation-delay: 0.8s">npx jetpath init my-api</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 1.6s">✓ Creating project structure...</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 2.4s">✓ Installing dependencies...</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 3.2s">✓ Configuring TypeScript...</span>
-        </div>
-        <div class="terminal-line">
-          <span class="terminal-output" style="animation-delay: 4s">🚀 Project created successfully!</span>
+          <span class="terminal-output" style="animation-delay: 0.8s">cd my-api</span>
         </div>
         <div class="terminal-line">
           <span class="terminal-prompt">$</span>
-          <span class="terminal-output" style="animation-delay: 4.8s">cd my-api && npm run dev</span>
+          <span class="terminal-output" style="animation-delay: 1.6s">npm install</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span>
+          <span class="terminal-output" style="animation-delay: 2.4s">npm run dev</span>
         </div>
         <div class="terminal-line">
           <span class="terminal-output" style="animation-delay: 5.6s">🔥 Jetpath server running at
@@ -243,20 +235,21 @@ use(POST_auth_login).body((t) => {
         <div class="!m-4 text-left space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-lg font-medium text-emerald-400">Jetpath</span>
-            <span class="text-lg font-bold text-white">~7519.36 req/s</span>
+            <span class="text-lg font-bold text-white">~32,339 req/s</span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 81%"></div>
+            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 92%"></div>
           </div>
           <div class="flex justify-between items-center mt-3">
             <span class="text-lg font-medium text-gray-400">Elysia</span>
-            <span class="text-lg font-bold text-gray-400">~9569.38 req/s</span>
+            <span class="text-lg font-bold text-gray-400">~33,383 req/s</span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gray-500 h-2.5 rounded-full" style="width: 90%"></div>
+            <div class="bg-gray-500 h-2.5 rounded-full" style="width: 96%"></div>
           </div>
         </div>
         <p class="text-sm text-gray-500 mt-6">*initial benchmark. more benchmarks coming soon.</p>
+        <a href="https://github.com/codedynasty-dev/jetpath-benchmark" target="_blank" class="btn btn-primary mb-1">View Benchmark</a>
       </div>
     </div>
   </div>
