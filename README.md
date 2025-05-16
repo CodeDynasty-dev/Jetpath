@@ -8,7 +8,7 @@
    Jetpath is the fast and minimalist framework for Node, Deno and Bun.
     <br/>
     <br/>
-    <a href="https://jetpath.codedynasty.dev"><strong>Explore Jetpath APIs »</strong></a>
+    <a href="https://jetpath.codedynasty.dev"><strong>Documentation »</strong></a>
     <br/>
     <br/>
     <a href="https://discord.gg/faqydQASTy">Join Discord</a>
@@ -71,19 +71,21 @@ compatibility but pure engine api(s).
 // src/index.jet.js
 import { type JetFunc, Jetpath, use } from "jetpath";
 
-const app = new Jetpath({ APIdisplay: "HTTP" });
+const app = new Jetpath();
 
 //? listening for requests
 app.listen();
 
 // this goes to = get /
 export const GET_: JetFunc = async function (ctx) {
-  ctx.send("hello world!");
+  ctx.send({ message: "success" });
 };
 
 // this goes to = post /
 export const POST_: JetFunc = async function (ctx) {
-  ctx.send( ctx.parse() );
+  const data = await ctx.parse();
+  console.log(data);
+  ctx.send({ message: "we received your payload" });
 };
 
 // this goes to = post /api/v1/payments
@@ -93,14 +95,15 @@ export const POST_api_v1_payments: JetFunc = async function (ctx) {
     ctx.send({ success: true, message: "Payment successful" });
 };
 
-use(POST_api_v1_payments).body((t)=>{
+use(POST_api_v1_payments)
+.info("Charge a user's account")
+.body((t)=>{
  return {
     amount: t.number().required(),
     currency: t.string().required(),
     account: t.string().required()
  }   
-})
-.info("Charge a user's account");
+});
 ```
 
 # Rationale - [Docs](https://jetpath.codedynasty.dev/)

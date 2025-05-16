@@ -163,6 +163,7 @@ export class Context {
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
+  handler: JetFunc | null = null;
   __jet_pool = true;
   get plugins() {
     return UTILS.plugins;
@@ -183,8 +184,6 @@ export class Context {
   _2: Record<string, string> = {};
   // //? stream
   _3?: Stream = undefined;
-  //? used to know if the request has been offloaded
-  _5: JetFunc | null = null;
   //? response
   _6: boolean = false;
   //? original response
@@ -286,12 +285,12 @@ export class Context {
   sendStream(
     stream: Stream | string | BunFile,
     config: {
-      folder?: string,
-      ContentType: string 
+      folder?: string;
+      ContentType: string;
     } = {
       folder: undefined,
       ContentType: "application/octet-stream",
-    }
+    },
   ) {
     if (typeof stream === "string") {
       if (config.folder) {
@@ -334,12 +333,12 @@ export class Context {
   download(
     stream: string | BunFile,
     config: {
-      folder?: string,
-      ContentType: string,
+      folder?: string;
+      ContentType: string;
     } = {
       folder: undefined,
       ContentType: "application/octet-stream",
-    }
+    },
   ) {
     this.sendStream(stream, config);
     this._2["Content-Disposition"] = `attachment; filename="${
@@ -405,8 +404,8 @@ export class Context {
       return this.body as Promise<Type>;
     }
     this.body = await parseRequest(this.request, options) as Promise<Type>;
-    if (this._5!.body) {
-      this.body = validator(this._5!.body, this.body);
+    if (this.handler!.body) {
+      this.body = validator(this.handler!.body, this.body);
     }
     return this.body as Promise<Type>;
   }
@@ -845,10 +844,10 @@ export class Trie {
     currentNode.handler = handler;
   }
 
-  get_responder(path: string):
-    | [JetFunc, Record<string, any>, Record<string, any>, string]
+  get_responder(req: IncomingMessage | Request, res: any):
+    | Context
     | undefined {
-    let normalizedPath = path;
+    let normalizedPath = req.url!;
     // ? Handle absolute paths in non-node environments
     if (!isNode) {
       const pathStart = normalizedPath.indexOf("/", 7);
@@ -858,20 +857,33 @@ export class Trie {
     }
     // ? Check if route is cached
     if (this.hashmap[normalizedPath]) {
-      return [this.hashmap[normalizedPath]!, {}, {}, path];
+      return getCtx(
+        req,
+        res,
+        normalizedPath,
+        this.hashmap[normalizedPath]!,
+      );
     }
-    const query: Record<string, string> = {};
+    let query: Record<string, string> | undefined;
     //? Handle query parameters
     const queryIndex = normalizedPath.indexOf("?");
     if (queryIndex > -1) {
       // ? Extract query parameters
       const queryParams = new URLSearchParams(normalizedPath.slice(queryIndex));
+      query = {};
       queryParams.forEach((value, key) => {
-        query[key] = value;
+        query![key] = value;
       });
       normalizedPath = normalizedPath.slice(0, queryIndex);
       if (this.hashmap[normalizedPath]) {
-        return [this.hashmap[normalizedPath]!, {}, query, path];
+        return getCtx(
+          req,
+          res,
+          normalizedPath,
+          this.hashmap[normalizedPath]!,
+          undefined,
+          query,
+        );
       }
     }
     // ? Handle leading and trailing slashes
@@ -885,7 +897,14 @@ export class Trie {
     // ? Handle empty path
     if (normalizedPath === "") {
       if (this.root.handler) {
-        return [this.root.handler, {}, query, path];
+        return getCtx(
+          req,
+          res,
+          normalizedPath,
+          this.root.handler,
+          undefined,
+          query,
+        );
       }
     }
     let currentNode = this.root;
@@ -913,7 +932,14 @@ export class Trie {
     }
     if (currentNode.handler) {
       // ? Route found
-      return [currentNode.handler, params, query, path];
+      return getCtx(
+        req,
+        res,
+        normalizedPath,
+        currentNode.handler,
+        params,
+        query,
+      );
     }
   }
 }

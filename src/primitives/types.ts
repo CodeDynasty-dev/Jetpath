@@ -170,6 +170,7 @@ export type jetOptions = {
   source?: string;
   globalHeaders?: Record<string, string>;
   strictMode?: "ON" | "OFF";
+  keepAliveTimeout?: number;
   apiDoc?: {
     display?: "UI" | "HTTP" | false;
     environments?: Record<string, string>;

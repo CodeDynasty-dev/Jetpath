@@ -208,7 +208,7 @@ export class Jetpath {
     if (this.options?.upgrade === true) {
       UTILS.upgrade = true;
     }
-    this.server = UTILS.server(this.plugs);
+    this.server = UTILS.server(this.plugs, this.options);
     //
     assignMiddleware(_JetPath_paths, _jet_middleware);
     // ? start server

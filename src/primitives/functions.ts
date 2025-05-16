@@ -61,7 +61,6 @@ const optionsCtx = {
 const cachedCorsHeaders: Record<string, string> = {
   "Vary": "Origin",
   "Connection": "keep-alive",
-
 };
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
@@ -82,7 +81,7 @@ export function corsMiddleware(options: {
 }) {
   //
   options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
-    !!options.keepHeadersOnError; 
+    !!options.keepHeadersOnError;
   //?  pre populate context for Preflight Request
   if (options.maxAge) {
     optionsCtx.set("Access-Control-Max-Age", options.maxAge);
@@ -195,11 +194,15 @@ export const UTILS = {
   runtime: null as unknown as Record<string, boolean>,
   server(
     plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[],
+    options: jetOptions,
   ): { listen: any; edge: boolean } | void {
     let server;
     let server_else;
     if (UTILS.runtime["node"]) {
-      server = createServer((x: any, y: any) => {
+      server = createServer({
+        keepAliveTimeout: options.keepAliveTimeout || 120_000,
+        keepAlive: true,
+      }, (x: any, y: any) => {
         Jetpath(x, y);
       });
     }
@@ -337,7 +340,7 @@ export const getCtx = (
     // //? stream
     ctx._3 = undefined;
     //? the route handler
-    ctx._5 = route;
+    ctx.handler = route;
     //? custom response
     ctx._6 = false;
     // ? code
@@ -353,7 +356,7 @@ export const getCtx = (
   ctx.params = params;
   ctx.query = query;
   ctx.path = path;
-  ctx._5 = route;
+  ctx.handler = route;
   return ctx;
 };
 
@@ -367,7 +370,7 @@ let makeRes: (
 const makeResBunAndDeno = (
   _res: any,
   ctx: Context,
-) => { 
+) => {
   // ? prepare response
   // redirect
   // if (ctx?.code === 301 && ctx._2?.["Location"]) {
@@ -450,31 +453,22 @@ const Jetpath = async (
     optionsCtx.code = 200;
     return makeRes(res, optionsCtx as unknown as Context);
   }
-  const responder = _JetPath_paths_trie[req.method as methods]?.get_responder(
-    req.url!,
+  const ctx = _JetPath_paths_trie[req.method as methods]?.get_responder(
+    req,
+    res,
   );
-  let ctx: Context;
   let returned: (Function | void)[] | undefined;
-  if (responder) {
-    const r = responder[0];
-    ctx = getCtx(
-      req,
-      res,
-      responder[3],
-      r,
-      responder[1],
-      responder[2],
-    );
-    
-    try { 
+  if (ctx) {
+    const r = ctx.handler!;
+    try {
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
-      ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
-      : undefined;
+        ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
+        : undefined;
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
-      returned && await Promise.all(returned.map((m) => m?.(ctx, null))); 
+      returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
       return makeRes(res, ctx);
     } catch (error) {
       console.log(error);
