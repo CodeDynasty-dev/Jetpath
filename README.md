@@ -19,10 +19,28 @@
   </p>
 </p>
 
-![Contributors](https://img.shields.io/github/contributors/codedynasty-dev/jetpath?color=dark-green)
-[![npm Version](https://img.shields.io/npm/v/jetpath.svg)](https://www.npmjs.com/package/jetpath)
-![Forks](https://img.shields.io/github/forks/codedynasty-dev/jetpath?style=social)
-![Stargazers](https://img.shields.io/github/stars/codedynasty-dev/jetpath?style=social)
+<div align="center">
+ <br/> 
+<a title="PM2 Downloads" href="https://npm-stat.com/charts.html?package=jetpath&from=2018-01-01&to=2023-08-01">
+  <img src="https://img.shields.io/npm/dm/jetpath" alt="Downloads per Month"/>
+</a>
+
+<a title="PM2 Downloads" href="https://npm-stat.com/charts.html?package=jetpath&from=2018-01-01&to=2023-08-01">
+  <img src="https://img.shields.io/npm/dy/jetpath" alt="Downloads per Year"/>
+</a>
+
+<a href="https://badge.fury.io/js/jetpath" title="NPM Version Badge">
+   <img src="https://badge.fury.io/js/jetpath.svg" alt="npm version">
+</a> 
+
+<a href="https://badge.fury.io/js/jetpath" title="NPM Version Badge">
+<img src="https://img.shields.io/github/stars/codedynasty-dev/jetpath?style=social" alt="Stars"/>
+</a>
+
+<br/>
+<br/>
+<br/>
+</div>
  
 ## Latest version info
 

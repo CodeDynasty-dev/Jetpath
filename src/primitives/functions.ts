@@ -367,14 +367,14 @@ let makeRes: (
 const makeResBunAndDeno = (
   _res: any,
   ctx: Context,
-) => {
+) => { 
   // ? prepare response
   // redirect
-  if (ctx?.code === 301 && ctx._2?.["Location"]) {
-    ctxPool.push(ctx);
-    // @ts-ignore
-    return Response.redirect(ctx._2?.["Location"]);
-  }
+  // if (ctx?.code === 301 && ctx._2?.["Location"]) {
+  //   ctxPool.push(ctx);
+  //   // @ts-ignore
+  //   return Response.redirect(ctx._2?.["Location"]);
+  // }
   // ? streaming with ctx.sendStream
   if (ctx?._3) {
     // handle deno promise.
@@ -401,6 +401,7 @@ const makeResBunAndDeno = (
   }
   // normal response
   ctx.__jet_pool && ctxPool.push(ctx);
+
   return new Response(ctx?.payload, {
     status: ctx.code,
     headers: ctx?._2,
@@ -464,16 +465,16 @@ const Jetpath = async (
       responder[1],
       responder[2],
     );
-
-    try {
+    
+    try { 
       //? pre-request middlewares here
       returned = r.jet_middleware?.length
-        ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
-        : undefined;
+      ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
+      : undefined;
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
-      returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
+      returned && await Promise.all(returned.map((m) => m?.(ctx, null))); 
       return makeRes(res, ctx);
     } catch (error) {
       console.log(error);

@@ -1,6 +1,6 @@
 {
   "name": "jetpath",
-  "version": "1.7.11-rc-8",
+  "version": "1.7.11-rc-9",
   "description": "Jetpath - A fast, seamless and minimalist framework for Node, Deno and Bun.js. Embrace the speed and elegance of the next-gen server-side experience.",
   "main": "dist/index.js",
   "type": "module",
@@ -51,7 +51,8 @@
     "prepare": "tsc && bun bundle.ts && npm run build",
     "pretest": "npm run build",
     "build:css": " css-purge -i doc-fragments/index.css  -o doc-assets/index.css",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "bench": "./bench.sh"
   },
   "engines": {
     "node": ">=14.0.0",
