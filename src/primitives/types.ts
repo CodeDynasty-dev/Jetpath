@@ -123,7 +123,7 @@ export interface JetContext<
   _2?: Record<string, string>;
   _3?: any; //Stream | undefined; // Stream
   _4?: boolean | undefined;
-  _5?: JetFunc | undefined;
+  _5?: JetRoute | undefined;
   _6?: Response | false;
 }
 
@@ -270,7 +270,7 @@ export type JetMiddleware<
   >
   | undefined;
 
-export type JetFunc<
+export type JetRoute<
   JetData extends {
     body?: Record<string, any>;
     params?: Record<string, any>;

@@ -2,7 +2,7 @@
 
 import { writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path"; // Import join
-import { type JetFile, JetFunc, use } from "jetpath";
+import { type JetFile, JetRoute, use } from "jetpath";
 import { pets, reviews } from "../data/models"; // Import data for stats route
 import { type AuthPluginType } from "../plugins/auth"; // Import AuthPluginType for stats route
 
@@ -120,7 +120,7 @@ const manualApiEndpoints: ApiEndpointInfo[] = [
  * @access Public
  * Demonstrates: Basic GET route, returning simple JSON info.
  */
-export const GET_: JetFunc = function (ctx) {
+export const GET_: JetRoute = function (ctx) {
   ctx.send({
     name: "PetShop API", // Using PetShop name from original sample
     version: "1.0.0",
@@ -145,7 +145,7 @@ use(GET_).info("Returns API information and status");
  * @access Admin only (Based on sample logic)
  * Demonstrates: GET request, performing calculations on data, authorization check.
  */
-export const GET_stats: JetFunc<{}> = function (ctx) { // Removed plugin type here, relying on global middleware for auth check
+export const GET_stats: JetRoute<{}> = function (ctx) { // Removed plugin type here, relying on global middleware for auth check
   // Check if user is an admin (access user role from ctx.state)
   // The global middleware populates ctx.state.user if authenticated.
   const user = ctx.state["user"];
@@ -208,7 +208,7 @@ use(GET_stats).info("Get shop statistics (admin only)");
  * @access Public (for testing only)
  * Demonstrates: How throwing an error is caught by the global middleware.
  */
-export const GET_error: JetFunc = function (_ctx) {
+export const GET_error: JetRoute = function (_ctx) {
   // Intentionally throw an error to trigger the global error handler.
   throw new Error("This is an intentional error for testing error handling");
 };
@@ -224,7 +224,7 @@ use(GET_error).info(
  * @access Public
  * Demonstrates: Basic GET route, accessing system information, returning status.
  */
-export const GET_health: JetFunc = function (ctx) {
+export const GET_health: JetRoute = function (ctx) {
   // Get system information like uptime and memory usage.
   const uptime = process.uptime(); // Process uptime in seconds
   const memoryUsage = process.memoryUsage(); // Memory usage details
@@ -267,7 +267,7 @@ use(GET_health).info("API health check endpoint");
  * @access Public
  * Demonstrates: Dynamic GET route ($format), path parameter, conditional response formatting (JSON, YAML, Markdown), setting Content-Type headers.
  */
-export const GET_export_docs$format: JetFunc<{
+export const GET_export_docs$format: JetRoute<{
   params: { format: string }; // Format from path parameter
 }> = function (ctx) {
   // Access the requested format from the path parameter.
@@ -358,7 +358,7 @@ use(GET_export_docs$format).info(
  * Demonstrates: Handling multipart/form-data with multiple file fields and text fields, saving files.
  * Assumes body contains fields like 'image', 'document', 'title', 'description', 'tags'.
  */
-export const POST_upload: JetFunc<{
+export const POST_upload: JetRoute<{
   body: { // Expected structure based on sample's use().body()
     image: JetFile;
     document: JetFile; // Assuming 'document' is also a file based on sample
@@ -516,7 +516,7 @@ use(POST_upload).body((t) => {
  * @access Public
  * Demonstrates: Dynamic routing ($0 for wildcard), serving static content.
  */
-export const GET_serve$0: JetFunc<{ params: { "*": string } }> = function (
+export const GET_serve$0: JetRoute<{ params: { "*": string } }> = function (
   ctx,
 ) {
   // Access the wildcard path parameter.
@@ -544,7 +544,7 @@ use(GET_serve$0).info(
  * @access Public
  * Demonstrates: Dynamic routing ($0 for wildcard), downloading content (often in-browser).
  */
-export const GET_static$0: JetFunc<{ params: { "*": string } }> = function (
+export const GET_static$0: JetRoute<{ params: { "*": string } }> = function (
   ctx,
 ) {
   // Access the wildcard path parameter.

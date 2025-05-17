@@ -58,21 +58,21 @@ The core convention lies in the names of the **exported functions** within your 
 
   * In `src/index.jet.ts` (maps to `/`):
     ```typescript
-    export const GET_: JetFunc = (ctx) => { ... }; // Maps to: GET /
+    export const GET_: JetRoute = (ctx) => { ... }; // Maps to: GET /
     ```
   * In `src/auth/login.jet.ts` (maps to `/auth/login`):
     ```typescript
     // Assuming this code lives in src/auth/login.jet.ts
-    export const POST_: JetFunc = async (ctx) => { ... }; // Maps to: POST /auth/login
+    export const POST_: JetRoute = async (ctx) => { ... }; // Maps to: POST /auth/login
     ```
     *Alternatively, if in `src/auth.jet.ts`:*
     ```typescript
-    export const POST_login: JetFunc = async (ctx) => { ... }; // Maps to: POST /auth/login [cite: tests/app.jet.ts]
+    export const POST_login: JetRoute = async (ctx) => { ... }; // Maps to: POST /auth/login [cite: tests/app.jet.ts]
     ```
   * In `src/pets.jet.ts` (maps to `/pets`):
     ```typescript
-    export const GET_: JetFunc<...> = (ctx) => { ... }; // Maps to: GET /pets [cite: tests/app.jet.ts]
-    export const POST_: JetFunc<...> = async (ctx) => { ... }; // Maps to: POST /pets [cite: tests/app.jet.ts]
+    export const GET_: JetRoute<...> = (ctx) => { ... }; // Maps to: GET /pets [cite: tests/app.jet.ts]
+    export const POST_: JetRoute<...> = async (ctx) => { ... }; // Maps to: POST /pets [cite: tests/app.jet.ts]
     ```
 
 ### 5\. Index Routes
@@ -89,7 +89,7 @@ To capture dynamic segments in the URL, use a `$` prefix followed by the paramet
   * **File-based:** `src/pets/by$id.jet.ts` -\> Defines routes under `/pets/by/:id`
     ```typescript
     // Inside src/pets/by$id.jet.ts
-    export const GET_: JetFunc<...> = (ctx) => {
+    export const GET_: JetRoute<...> = (ctx) => {
         const petId = ctx.params.id; // Access the parameter
         // ...
     }; // Maps to: GET /pets/by/:id
@@ -97,17 +97,17 @@ To capture dynamic segments in the URL, use a `$` prefix followed by the paramet
   * **Export-based:** Define within a parent file (e.g., `src/pets.jet.ts`).
     ```typescript
     // Inside src/pets.jet.ts
-    export const GET_petBy$id: JetFunc<...> = (ctx) => {
+    export const GET_petBy$id: JetRoute<...> = (ctx) => {
         const petId = ctx.params.id;
         // ...
     }; // Maps to: GET /pets/petBy/:id [cite: tests/app.jet.ts]
 
-    export const PUT_petBy$id: JetFunc<...> = async (ctx) => {
+    export const PUT_petBy$id: JetRoute<...> = async (ctx) => {
         const petId = ctx.params.id;
         // ...
     }; // Maps to: PUT /pets/petBy/:id [cite: tests/app.jet.ts]
 
-    export const DELETE_petBy$id: JetFunc<...> = (ctx) => {
+    export const DELETE_petBy$id: JetRoute<...> = (ctx) => {
         const petId = ctx.params.id;
         // ...
     }; // Maps to: DELETE /pets/petBy/:id [cite: tests/app.jet.ts]
@@ -126,7 +126,7 @@ To match multiple path segments at the end of a route, use `$$` at the end of a 
   * **File-based:** `src/files$$.jet.ts` -\> Defines routes under `/files/*`
     ```typescript
     // Inside src/files$$.jet.ts
-    export const GET_: JetFunc = (ctx) => {
+    export const GET_: JetRoute = (ctx) => {
         const filePath = ctx.params._; // Access the matched path segments (exact property name TBC)
         // ... handle file serving ...
     }; // Maps to GET /files/*
@@ -134,7 +134,7 @@ To match multiple path segments at the end of a route, use `$$` at the end of a 
   * **Export-based:**
     ```typescript
     // Inside src/pets.jet.ts
-    export const GET_pets_search$$: JetFunc<...> = async (ctx) => { ... }; // Maps to GET /pets/search/* [cite: tests/app.jet.ts]
+    export const GET_pets_search$$: JetRoute<...> = async (ctx) => { ... }; // Maps to GET /pets/search/* [cite: tests/app.jet.ts]
     // The matched part '*' would be available in ctx.params._ (or similar TBC)
     ```
   * The matched path segments are typically available under a special parameter like `ctx.params._` or `ctx.params.slug`. *(Note: The exact property name for the catch-all parameter should be confirmed from Jetpath's implementation details or core documentation).*
@@ -145,7 +145,7 @@ Define WebSocket handlers using the `WS_` prefix in the export name.
 
 ```typescript
 // Inside src/live.jet.ts (or similar)
-export const WS_live: JetFunc = (ctx) => {
+export const WS_live: JetRoute = (ctx) => {
     const conn = ctx.connection!; // Access WebSocket connection
     conn.addEventListener("open", (socket) => { /* ... */ });
     conn.addEventListener("message", (socket, event) => { /* ... */ });

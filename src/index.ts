@@ -224,9 +224,9 @@ export type {
   AnyExecutor,
   JetContext,
   JetFile,
-  JetFunc,
   JetMiddleware,
   JetPluginExecutorInitParams,
+  JetRoute,
 } from "./primitives/types.js";
 export { JetMockServer, JetPlugin } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";

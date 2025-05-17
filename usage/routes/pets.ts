@@ -2,7 +2,7 @@
 
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { type JetFile, JetFunc, use } from "jetpath";
+import { type JetFile, JetRoute, use } from "jetpath";
 // Import AuthPluginType if authentication checks are done within route handlers (besides global middleware)
 import { type AuthPluginType } from "../plugins/auth";
 // Import data models and in-memory data arrays
@@ -17,7 +17,7 @@ import { PetType } from "../types"; // Import PetType
  * @access Public (Based on app.jet.ts sample)
  * Demonstrates: GET request, query parameters, filtering, sorting, pagination.
  */
-export const GET_pets: JetFunc<{
+export const GET_pets: JetRoute<{
   query: {
     limit?: number;
     offset?: number;
@@ -188,7 +188,7 @@ use(GET_pets).info(
  * @access Public (Based on app.jet.ts sample)
  * Demonstrates: Dynamic GET route ($id), path parameter access, querying data, handling "not found", optional related data inclusion (reviews).
  */
-export const GET_petBy$id: JetFunc<{
+export const GET_petBy$id: JetRoute<{
   params: { id: string };
   query: { includeReviews?: boolean }; // Example query parameter
 }> = async function (ctx) {
@@ -255,7 +255,7 @@ use(GET_petBy$id).info(
  * @access Authenticated (Admin only - based on sample's middleware check)
  * Demonstrates: POST request, body parsing, input validation (via use().body()), data insertion.
  */
-export const POST_pets: JetFunc<{
+export const POST_pets: JetRoute<{
   body: PetType; // Expecting PetType structure in the request body
 }, [AuthPluginType]> = async function (ctx) {
   // The global middleware handles general authentication.
@@ -344,7 +344,7 @@ use(POST_pets).body((t) => {
  * @access Authenticated (Admin only - based on sample's middleware check)
  * Demonstrates: PUT request, dynamic routing ($id), path parameter access, body parsing, input validation, data update.
  */
-export const PUT_petBy$id: JetFunc<{
+export const PUT_petBy$id: JetRoute<{
   params: { id: string };
   body: Partial<PetType>; // Expecting partial PetType structure in body
 }, [AuthPluginType]> = async function (ctx) {
@@ -436,7 +436,7 @@ use(PUT_petBy$id).body((t) => {
  * @access Authenticated (Admin only - based on sample's middleware check)
  * Demonstrates: DELETE request, dynamic routing ($id), path parameter access, data deletion.
  */
-export const DELETE_petBy$id: JetFunc<{
+export const DELETE_petBy$id: JetRoute<{
   params: { id: string }; // Access path parameter 'id'.
 }, [AuthPluginType]> = function (ctx) {
   // Check if user is an admin (access user role from ctx.state)
@@ -504,7 +504,7 @@ use(DELETE_petBy$id).info("Remove a pet from the inventory (admin only)");
  * @access Public (Based on app.jet.ts sample)
  * Demonstrates: GET request, query parameters for complex filtering.
  */
-export const GET_pets_search: JetFunc<{
+export const GET_pets_search: JetRoute<{
   query: {
     name?: string;
     species?: string;
@@ -615,7 +615,7 @@ use(GET_pets_search).info("Advanced search for pets by various criteria");
  * Demonstrates: File uploads using use().body() with t.file(), accessing file data, saving files.
  * Assumes multipart/form-data with a field named 'image'.
  */
-export const POST_recipes$id_image: JetFunc<{
+export const POST_recipes$id_image: JetRoute<{
   params: { id: string }; // Recipe ID from path
   body: { image: JetFile }; // Expecting a file field named 'image' in multipart/form-data body
 }, [AuthPluginType]> = async (ctx) => { // Sample had AuthPluginType and jetLoggerType here
@@ -737,7 +737,7 @@ use(POST_recipes$id_image).body((t) => {
  * @access Public
  * Demonstrates: Dynamic GET route ($id), returning related data.
  */
-export const GET_petBy$id_gallery: JetFunc<{
+export const GET_petBy$id_gallery: JetRoute<{
   params: { id: string };
 }> = function (ctx) {
   const petId = ctx.params.id;

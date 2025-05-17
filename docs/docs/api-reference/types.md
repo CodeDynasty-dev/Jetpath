@@ -3,13 +3,13 @@
 
 This section provides references for core types used within the Jetpath framework, as observed in usage examples. For precise definitions, refer to the Jetpath source code.
 
-## `JetFunc<JetData = any, JetPluginTypes = any>`
+## `JetRoute<JetData = any, JetPluginTypes = any>`
 
 * **Type:** Function Signature
 * **Description:** Represents the expected signature for a Jetpath route handler function (exported with names like `GET_`, `POST_something`, `WS_live`).
 * **Signature (Conceptual):**
     ```typescript
-    type JetFunc<JetData = any, JetPluginTypes = any> =
+    type JetRoute<JetData = any, JetPluginTypes = any> =
       (ctx: JetContext<JetData, JetPluginTypes>) => void | Promise<void>;
     ```
 * **Generics:**
@@ -17,11 +17,11 @@ This section provides references for core types used within the Jetpath framewor
     * `JetPluginTypes`: A tuple type representing the APIs exposed by registered plugins (e.g., `[typeof PluginAInstance, typeof PluginBInstance]`), used for typing `ctx.plugins`.
 * **Usage:**
     ```typescript
-    import type { JetFunc, JetContext } from "jetpath";
+    import type { JetRoute, JetContext } from "jetpath";
     import type { AuthPluginAPI } from "./plugins"; // Example plugin type
 
     // Example without data/plugins specified
-    export const GET_: JetFunc = (ctx) => {
+    export const GET_: JetRoute = (ctx) => {
         ctx.send("Hello");
     };
 
@@ -29,7 +29,7 @@ This section provides references for core types used within the Jetpath framewor
     type UserParams = { params: { id: string } };
     type UserPlugins = [AuthPluginAPI];
 
-    export const GET_user$id: JetFunc<UserParams, UserPlugins> = async (ctx) => {
+    export const GET_user$id: JetRoute<UserParams, UserPlugins> = async (ctx) => {
         const userId = ctx.params.id; // Typed as string
         const auth = ctx.plugins.verifyAuth(ctx); // Plugin methods typed
         // ...

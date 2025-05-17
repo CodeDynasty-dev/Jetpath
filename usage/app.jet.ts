@@ -8,7 +8,7 @@
 import { writeFile } from "node:fs/promises";
 import {
   type JetFile,
-  type JetFunc,
+  type JetRoute,
   type JetMiddleware,
   Jetpath,
   use,
@@ -333,7 +333,7 @@ app.listen();
  * @route GET /
  * @access Public
  */
-export const GET_: JetFunc = function (ctx) {
+export const GET_: JetRoute = function (ctx) {
   ctx.send({
     name: "PetShop API",
     version: "1.0.0",
@@ -354,7 +354,7 @@ GET_.info = "Returns API information and status";
  * @route POST /auth/login
  * @access Public
  */
-export const POST_auth_login: JetFunc<
+export const POST_auth_login: JetRoute<
   { body: { username: string; password: string } },
   [AuthPluginType]
 > = async function (ctx) {
@@ -403,7 +403,7 @@ use(POST_auth_login).body((t) => {
  * @route GET /pets
  * @access Public
  */
-export const GET_pets: JetFunc<{
+export const GET_pets: JetRoute<{
   query: {
     limit?: number;
     offset?: number;
@@ -531,7 +531,7 @@ GET_pets.info =
  * @route GET /petBy/:id
  * @access Public
  */
-export const GET_petBy$id: JetFunc<{
+export const GET_petBy$id: JetRoute<{
   params: { id: string };
   query: { includeReviews?: boolean };
 }> = async function (ctx) {
@@ -589,7 +589,7 @@ GET_petBy$id.info = "Retrieve detailed information about a specific pet by ID";
  * @route POST /pets
  * @access Authenticated (Admin only)
  */
-export const POST_pets: JetFunc<{
+export const POST_pets: JetRoute<{
   body: PetType;
 }, [AuthPluginType]> = async function (ctx) {
   // Check if user is an admin
@@ -659,7 +659,7 @@ use(POST_pets).body((t) => {
  * @route PUT /petBy/:id
  * @access Authenticated (Admin only)
  */
-export const PUT_petBy$id: JetFunc<{
+export const PUT_petBy$id: JetRoute<{
   params: { id: string };
   body: Partial<PetType>;
 }, [AuthPluginType]> = async function (ctx) {
@@ -745,7 +745,7 @@ PUT_petBy$id.info = "Update an existing pet's information (admin only)";
  * @route DELETE /petBy/:id
  * @access Authenticated (Admin only)
  */
-export const DELETE_petBy$id: JetFunc<{
+export const DELETE_petBy$id: JetRoute<{
   params: { id: string };
 }, [AuthPluginType]> = function (ctx) {
   // Check if user is an admin
@@ -806,7 +806,7 @@ DELETE_petBy$id.info = "Remove a pet from the inventory (admin only)";
  * @route GET /pets/search
  * @access Public
  */
-export const GET_pets_search: JetFunc<{
+export const GET_pets_search: JetRoute<{
   query: {
     name?: string;
     species?: string;
@@ -910,7 +910,7 @@ GET_pets_search.info = "Advanced search for pets by various criteria";
  * @access Authenticated (Admin only)
  */
 
-export const POST_petImage$id: JetFunc<{
+export const POST_petImage$id: JetRoute<{
   params: { id: string };
 }, [AuthPluginType]> = async function (ctx) {
   // Check if user is an admin
@@ -1011,7 +1011,7 @@ POST_petImage$id.info = "Upload an image for a specific pet (admin only)";
  * @route GET /petBy/:id/gallery
  * @access Public
  */
-export const GET_petBy$id_gallery: JetFunc<{
+export const GET_petBy$id_gallery: JetRoute<{
   params: { id: string };
 }> = function (ctx) {
   const petId = ctx.params.id;
@@ -1051,7 +1051,7 @@ GET_petBy$id_gallery.info = "Get all images for a specific pet";
  * @route GET /petBy/:id/reviews
  * @access Public
  */
-export const GET_petBy$id_reviews: JetFunc<{
+export const GET_petBy$id_reviews: JetRoute<{
   params: { id: string };
   query: { sort?: string };
 }> = function (ctx) {
@@ -1111,7 +1111,7 @@ GET_petBy$id_reviews.info = "Get all reviews for a specific pet";
  * @route POST /petBy/:id/reviews
  * @access Authenticated
  */
-export const POST_petBy$id_reviews: JetFunc<{
+export const POST_petBy$id_reviews: JetRoute<{
   params: { id: string };
   body: {
     rating: number;
@@ -1189,7 +1189,7 @@ use(POST_petBy$id_reviews).body((t) => {
  * @route DELETE /reviews/:reviewId
  * @access Authenticated (Review owner or Admin)
  */
-export const DELETE_reviews$reviewId: JetFunc<{
+export const DELETE_reviews$reviewId: JetRoute<{
   params: { reviewId: string };
 }, [AuthPluginType]> = function (ctx) {
   // Verify user is authenticated
@@ -1264,7 +1264,7 @@ use(DELETE_reviews$reviewId).info(
  * @route GET /stats
  * @access Admin only
  */
-export const GET_stats: JetFunc<{}, [AuthPluginType]> = function (ctx) {
+export const GET_stats: JetRoute<{}, [AuthPluginType]> = function (ctx) {
   // Check if user is an admin
   if (!ctx.plugins.isAdmin(ctx)) {
     ctx.code = 403;
@@ -1327,7 +1327,7 @@ use(GET_stats).info("Get shop statistics (admin only)");
  * @access Public
  */
 const sockets = new Set<any>();
-export const GET_live: JetFunc = (ctx) => {
+export const GET_live: JetRoute = (ctx) => {
   ctx.upgrade();
 
   const conn = ctx.connection!;
@@ -1398,7 +1398,7 @@ use(GET_live).info(
  * @route POST /upload
  * @access Authenticated (Admin only)
  */
-export const POST_upload: JetFunc<{
+export const POST_upload: JetRoute<{
   body: {
     image: JetFile;
     document: File;
@@ -1494,7 +1494,7 @@ use(POST_upload).body((t) => {
  * @route GET /error
  * @access Public (for testing only)
  */
-export const GET_error: JetFunc = function (_ctx) {
+export const GET_error: JetRoute = function (_ctx) {
   throw new Error("This is an intentional error for testing error handling");
 };
 
@@ -1505,7 +1505,7 @@ use(GET_error).info("Route that intentionally throws an error (for testing)");
  * @route GET /health
  * @access Public
  */
-export const GET_health: JetFunc = function (ctx) {
+export const GET_health: JetRoute = function (ctx) {
   // Simple health check with basic system stats
   const uptime = process.uptime();
   const memoryUsage = process.memoryUsage();
@@ -1549,7 +1549,7 @@ interface ApiInfo {
  * @route GET /export/docs/:format
  * @access Public
  */
-export const GET_export_docs$format: JetFunc<{
+export const GET_export_docs$format: JetRoute<{
   params: { format: string };
 }> = function (ctx) {
   const format = ctx.params.format.toLowerCase();
@@ -1657,12 +1657,12 @@ use(GET_export_docs$format).info(
   "Export API documentation in different formats (json, yaml, markdown)",
 );
 
-export const GET_serve$0: JetFunc<{ params: { "*": string } }> = function (
+export const GET_serve$0: JetRoute<{ params: { "*": string } }> = function (
   ctx,
 ) {
   ctx.sendStream(ctx.params["*"] || "./usage");
 };
-export const GET_static$0: JetFunc<{ params: { "*": string } }> = function (
+export const GET_static$0: JetRoute<{ params: { "*": string } }> = function (
   ctx,
 ) {
   ctx.download(ctx.params["*"] || "./usage");

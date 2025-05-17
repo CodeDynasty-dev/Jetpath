@@ -71,7 +71,7 @@ The `Context` object (`ctx`) is passed to every Jetpath route handler and middle
   * **`app: {}`**
       * Request-scoped object for sharing state between middleware/handlers. Type defined by `JetMiddleware` generic `AppState`.
   * **`plugins: { ... }`**
-      * Access methods exposed by registered plugins. Type defined by `JetMiddleware`/`JetFunc` generic `JetPluginTypes`.
+      * Access methods exposed by registered plugins. Type defined by `JetMiddleware`/`JetRoute` generic `JetPluginTypes`.
   * **`body: T`**
       * Holds the *parsed* request body. Populated after calling `ctx.json()`, `ctx.plugins.formData()`, `ctx.validate()`, or via eager pre-processing. Type `T` inferred from schema.
   * **`query: T`**

@@ -1,6 +1,6 @@
 // src/routes/live.ts
 
-import { JetFunc, use } from "jetpath";
+import { JetRoute, use } from "jetpath";
 // Import types if needed, e.g., for initial stats message
 import { pets } from "../data/models"; // Import pets data for initial stats message
 
@@ -40,7 +40,7 @@ export { broadcastMessage };
  * @access Public (Based on app.jet.ts sample)
  * Demonstrates: Handling WebSocket connections, sending/receiving messages, broadcasting.
  */
-export const GET_live: JetFunc = (ctx) => {
+export const GET_live: JetRoute = (ctx) => {
   // Initiate the WebSocket upgrade handshake.
   // This tells Jetpath to switch from HTTP to WebSocket protocol for this connection.
   ctx.upgrade();

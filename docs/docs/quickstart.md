@@ -98,12 +98,12 @@ Inside the `src` directory, create a file named `index.jet.ts`. This file will a
 
 ```typescript
 // src/index.jet.ts
-import type { JetFunc } from "jetpath";
+import type { JetRoute } from "jetpath";
 
 /**
  * Handles GET requests to the root path ('/').
  */
-export const GET_: JetFunc = (ctx) => {
+export const GET_: JetRoute = (ctx) => {
   // Use the context (ctx) to send a response
   ctx.send({
     message: "Welcome to your first Jetpath API!",
@@ -119,7 +119,7 @@ GET_.info = "Returns a welcome message and API status.";
 
 **Explanation:**
 
-  * We import the `JetFunc` type for better type checking of our handler.
+  * We import the `JetRoute` type for better type checking of our handler.
   * We export a constant named `GET_`. The `GET` part maps to the HTTP GET method, and the `_` combined with the filename `index.jet.ts` maps to the root path `/`.
   * The function receives the `ctx` (Context) object.
   * `ctx.send()` sends a JSON response back to the client. Jetpath automatically sets the `Content-Type` header to `application/json` for objects.

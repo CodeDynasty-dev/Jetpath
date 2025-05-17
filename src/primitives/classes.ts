@@ -15,9 +15,9 @@ import type {
   FileOptions,
   HTTPBody,
   JetContext,
-  JetFunc,
   jetOptions,
   JetPluginExecutorInitParams,
+  JetRoute,
   methods,
   SchemaDefinition,
   SchemaType,
@@ -163,7 +163,7 @@ export class Context {
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
-  handler: JetFunc | null = null;
+  handler: JetRoute | null = null;
   __jet_pool = true;
   get plugins() {
     return UTILS.plugins;
@@ -689,7 +689,7 @@ class TrieNode {
   // ? wildcard node
   wildcardChild?: TrieNode;
   // ? route handler
-  handler?: JetFunc;
+  handler?: JetRoute;
   constructor() {
     this.parameterChild = undefined;
     this.paramName = undefined;
@@ -704,7 +704,7 @@ class TrieNode {
 export class Trie {
   root: TrieNode;
   method: string;
-  hashmap: Record<string, JetFunc> = {};
+  hashmap: Record<string, JetRoute> = {};
   constructor(
     method:
       | "GET"
@@ -724,7 +724,7 @@ export class Trie {
   /**
    * Inserts a route path and its associated handler into the Trie.
    */
-  insert(path: string, handler: JetFunc): void {
+  insert(path: string, handler: JetRoute): void {
     // ? remove leading/trailing slashes, handle empty path
     if (!/(\*|:)+/.test(path)) {
       this.hashmap[path] = handler;
@@ -980,7 +980,7 @@ export class JetMockServer {
   internal method
   */
   async _run(
-    func: JetFunc,
+    func: JetRoute,
     ctx?: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     let returned: (Function | void)[] | undefined;
@@ -1031,12 +1031,12 @@ export class JetMockServer {
     };
   }
   runBare(
-    func: JetFunc,
+    func: JetRoute,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func);
   }
   runWithCtx(
-    func: JetFunc,
+    func: JetRoute,
     ctx: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func, ctx);

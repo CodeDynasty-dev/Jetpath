@@ -69,7 +69,7 @@ compatibility but pure engine api(s).
 
 ```ts
 // src/index.jet.js
-import { type JetFunc, Jetpath, use } from "jetpath";
+import { type JetRoute, Jetpath, use } from "jetpath";
 
 const app = new Jetpath();
 
@@ -77,19 +77,19 @@ const app = new Jetpath();
 app.listen();
 
 // this goes to = get /
-export const GET_: JetFunc = async function (ctx) {
+export const GET_: JetRoute = async function (ctx) {
   ctx.send({ message: "success" });
 };
 
 // this goes to = post /
-export const POST_: JetFunc = async function (ctx) {
+export const POST_: JetRoute = async function (ctx) {
   const data = await ctx.parse();
   console.log(data);
   ctx.send({ message: "we received your payload" });
 };
 
 // this goes to = post /api/v1/payments
-export const POST_api_v1_payments: JetFunc = async function (ctx) {
+export const POST_api_v1_payments: JetRoute = async function (ctx) {
     const { amount, currency, account } = ctx.parse();
     ctx.plugin.charge({ amount, currency, account });
     ctx.send({ success: true, message: "Payment successful" });

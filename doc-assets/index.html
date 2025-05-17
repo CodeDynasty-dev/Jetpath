@@ -103,12 +103,12 @@
           <div class="code-content">
             <div class="code-wrapper active" id="basic-code">
               <button class="copy-btn" data-code="basic">Copy</button>
-              <pre><code class="language-javascript">import { type JetFunc, Jetpath } from "jetpath";
+              <pre><code class="language-javascript">import { type JetRoute, Jetpath } from "jetpath";
 
 new Jetpath().listen();
 
 // this goes to = get /
-export const GET_: JetFunc = function (ctx) {
+export const GET_: JetRoute = function (ctx) {
   ctx.send("hello world!");
 };</code></pre>
             </div>
@@ -118,7 +118,7 @@ export const GET_: JetFunc = function (ctx) {
 
 new Jetpath().listen();
 
-export const GET_room: JetFunc = (ctx) => {
+export const GET_room: JetRoute = (ctx) => {
   ctx.upgrade();
 
   const conn = ctx.connection!;
@@ -135,11 +135,11 @@ export const GET_room: JetFunc = (ctx) => {
             </div>
             <div class="code-wrapper" id="typescript-code">
               <button class="copy-btn" data-code="typescript">Copy</button>
-              <pre><code class="language-typescript">import { type JetFunc, Jetpath } from "jetpath";
+              <pre><code class="language-typescript">import { type JetRoute, Jetpath } from "jetpath";
 
 new Jetpath().listen();
 
-export const POST_auth_login: JetFunc = async function (ctx) {
+export const POST_auth_login: JetRoute = async function (ctx) {
   await ctx.parse();
   const { username, password } = ctx.body;
   

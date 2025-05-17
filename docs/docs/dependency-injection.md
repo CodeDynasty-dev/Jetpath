@@ -93,9 +93,9 @@ The **Plugin System** is the most idiomatic way to manage shared services and de
 
 
     // src/users/by$id.jet.ts
-    import type { JetFunc } from "jetpath";
+    import type { JetRoute } from "jetpath";
     // Assuming DatabasePluginAPI is exported or available for typing ctx
-    export const GET_: JetFunc<...> = async (ctx) => {
+    export const GET_: JetRoute<...> = async (ctx) => {
        const userId = ctx.params.id;
        // Access the dependency via the plugin method
        const user = await ctx.plugins.findUserById(userId);
@@ -138,10 +138,10 @@ This is the standard approach in JavaScript/TypeScript without a dedicated DI co
 
 
     // src/users.jet.ts
-    import type { JetFunc } from "jetpath";
+    import type { JetRoute } from "jetpath";
     import { notificationService } from "../services/notificationService"; // Import instance
 
-    export const POST_: JetFunc<...> = async (ctx) => {
+    export const POST_: JetRoute<...> = async (ctx) => {
        // ... create user logic ...
        const newUser = { id: 'user-456', email: 'test@example.com' };
 

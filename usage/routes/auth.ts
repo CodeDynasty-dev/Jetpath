@@ -1,6 +1,6 @@
 // src/routes/auth.ts
 
-import { JetFunc, use } from "jetpath";
+import { JetRoute, use } from "jetpath";
 import { type AuthPluginType } from "../plugins/auth"; // Import AuthPluginType
 
 // --- Authentication Route ---
@@ -11,7 +11,7 @@ import { type AuthPluginType } from "../plugins/auth"; // Import AuthPluginType
  * @access Public
  * Demonstrates: POST request, body parsing, plugin usage (auth), sending token.
  */
-export const POST_auth_login: JetFunc<
+export const POST_auth_login: JetRoute<
   { body: { username: string; password: string } },
   [AuthPluginType]
 > = async function (ctx) {

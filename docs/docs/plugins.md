@@ -66,7 +66,7 @@ Once registered, the methods and properties returned by the plugin's `executor` 
 
 ```typescript
 // In a route handler or middleware
-import type { JetFunc, JetMiddleware } from "jetpath";
+import type { JetRoute, JetMiddleware } from "jetpath";
 // Import types exposed by plugins if available
 import type { JetBusBoyType } from "@jetpath/plugin-busboy";
 import type { AuthPluginAPI } from "./plugins/authPlugin";
@@ -74,7 +74,7 @@ import type { AuthPluginAPI } from "./plugins/authPlugin";
 // Use generics to type ctx.plugins
 type HandlerPlugins = [JetBusBoyType, AuthPluginAPI];
 
-export const POST_upload: JetFunc<{}, HandlerPlugins> = async (ctx) => {
+export const POST_upload: JetRoute<{}, HandlerPlugins> = async (ctx) => {
     // Access file upload functionality from jetbusboy plugin
     const formData = await ctx.plugins.formData(ctx);
     const image = formData.image;
@@ -83,7 +83,7 @@ export const POST_upload: JetFunc<{}, HandlerPlugins> = async (ctx) => {
     ctx.send({ message: "Upload processed" });
 };
 
-export const GET_profile: JetFunc<{}, HandlerPlugins> = (ctx) => {
+export const GET_profile: JetRoute<{}, HandlerPlugins> = (ctx) => {
     // Access auth functionality from authPlugin
     const authResult = ctx.plugins.verifyAuth(ctx); // Example method name
     if (!authResult.authenticated) {

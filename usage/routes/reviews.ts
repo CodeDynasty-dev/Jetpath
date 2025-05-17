@@ -1,6 +1,6 @@
 // src/routes/reviews.ts
 
-import { JetFunc, use } from "jetpath";
+import { JetRoute, use } from "jetpath";
 // Import AuthPluginType if authentication checks are done within route handlers
 import { type AuthPluginType } from "../plugins/auth";
 // Import data models and in-memory data arrays
@@ -15,7 +15,7 @@ import { ReviewType } from "../types"; // Import ReviewType
  * @access Public (Based on app.jet.ts sample)
  * Demonstrates: Dynamic GET route ($id), path parameter, filtering related data, sorting, calculating aggregates (average rating).
  */
-export const GET_petBy$id_reviews: JetFunc<{
+export const GET_petBy$id_reviews: JetRoute<{
   params: { id: string }; // Pet ID from path
   query: { sort?: string }; // Optional sort query parameter
 }> = function (ctx) {
@@ -82,7 +82,7 @@ use(GET_petBy$id_reviews).info("Get all reviews for a specific pet");
  * @access Authenticated (Based on sample's middleware check)
  * Demonstrates: POST request, dynamic routing ($id), body parsing, input validation (use().body()), data insertion.
  */
-export const POST_petBy$id_reviews: JetFunc<{
+export const POST_petBy$id_reviews: JetRoute<{
   params: { id: string }; // Pet ID from path
   body: { // Expected request body structure
     rating: number;
@@ -171,7 +171,7 @@ use(POST_petBy$id_reviews).body((t) => {
  * @access Authenticated (Review owner or Admin - Based on sample logic)
  * Demonstrates: DELETE request, dynamic routing ($reviewId), path parameter, data deletion, authorization check (owner or admin).
  */
-export const DELETE_reviews$reviewId: JetFunc<{
+export const DELETE_reviews$reviewId: JetRoute<{
   params: { reviewId: string }; // Review ID from path
 }, [AuthPluginType]> = function (ctx) {
   // Check if user is authenticated.

@@ -155,7 +155,7 @@ interface JetContext<
   * **Example:**
     ```typescript
     // Route: WS_live
-    export const WS_live: JetFunc = (ctx) => {
+    export const WS_live: JetRoute = (ctx) => {
       const conn = ctx.connection!; // Assert non-null for WS routes
       console.log("Client connected via WebSocket");
 
