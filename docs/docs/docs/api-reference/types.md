@@ -1,4 +1,4 @@
-<docmach type="wrapper" file="doc-fragments/docs.html" replacement="content">
+<docmach type="wrapper" file="docs/fragments/docs.html" replacement="content">
   # API Reference: Types
 
 This section provides references for core types used within the Jetpath framework, as observed in usage examples. For precise definitions, refer to the Jetpath source code.

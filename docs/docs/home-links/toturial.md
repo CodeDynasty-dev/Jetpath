@@ -1,4 +1,4 @@
-<docmach type="wrapper" file="doc-fragments/other.html" replacement="content">
+<docmach type="wrapper" file="docs/fragments/other.html" replacement="content">
    
  
 

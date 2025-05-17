@@ -29,3 +29,4 @@ usage/pet-shop-api-log.log
 src/assets/bundle.js
 bench.sh
 **.log
+docs/build

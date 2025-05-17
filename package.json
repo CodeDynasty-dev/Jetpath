@@ -50,7 +50,7 @@
     "fix": "gts fix",
     "prepare": "tsc && bun bundle.ts && npm run build",
     "pretest": "npm run build",
-    "build:css": " css-purge -i doc-fragments/index.css  -o doc-assets/index.css",
+    "build:css": " css-purge -i docs/fragments/index.css  -o docs/assets/index.css",
     "posttest": "npm run lint",
     "bench": "./bench.sh"
   },
@@ -68,7 +68,8 @@
     "typescript": "^5.6.3"
   },
   "docmach": {
-    "docs-directory": "docs",
-    "assets-folder": "./doc-assets"
+    "docs-directory": "docs/docs",
+    "assets-folder": "docs/assets",
+    "build-directory": "docs/build"
   }
 }

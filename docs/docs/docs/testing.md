@@ -1,4 +1,4 @@
-<docmach type="wrapper" file="doc-fragments/docs.html" replacement="content">
+<docmach type="wrapper" file="docs/fragments/docs.html" replacement="content">
 
 # Testing & Debugging
 
