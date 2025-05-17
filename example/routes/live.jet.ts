@@ -1,8 +1,8 @@
 // src/routes/live.ts
 
-import { JetRoute, use } from "jetpath";
+import { JetRoute, use } from "../../dist/index.js";
 // Import types if needed, e.g., for initial stats message
-import { pets } from "../data/models"; // Import pets data for initial stats message
+import { pets } from "../data/models.js"; // Import pets data for initial stats message
 
 // --- WebSocket Server ---
 // This route handles WebSocket connections for real-time updates.
@@ -35,9 +35,9 @@ const broadcastMessage = (message: string) => {
 export { broadcastMessage };
 
 /**
- * WebSocket Endpoint for real-time updates. (Extracted from app.jet.ts)
+ * WebSocket Endpoint for real-time updates.
  * @route GET /live
- * @access Public (Based on app.jet.ts sample)
+ * @access Public
  * Demonstrates: Handling WebSocket connections, sending/receiving messages, broadcasting.
  */
 export const GET_live: JetRoute = (ctx) => {
@@ -48,7 +48,7 @@ export const GET_live: JetRoute = (ctx) => {
   // After a successful upgrade, ctx.connection or a similar property holds the WebSocket object.
   // The exact way to access the WebSocket object might depend on the Jetpath version/adapter.
   // The original sample uses `const conn = ctx.connection!`. Let's stick to that assumption.
-  const ws: WebSocket = (ctx as any).connection; // Assuming ctx.connection is the WebSocket or similar
+  const ws = ctx.connection; // Assuming ctx.connection is the WebSocket or similar
 
   // If the upgrade fails, handle the error (though the middleware might catch it).
   if (!ws) {
@@ -62,14 +62,14 @@ export const GET_live: JetRoute = (ctx) => {
   // Attach event listeners to the WebSocket object to handle connection events and messages.
 
   // When the WebSocket connection is opened successfully.
-  ws.onopen = () => {
+  ws.addEventListener("open", (socket) => {
     console.log("WebSocket client connected.");
-    connectedSockets.add(ws); // Add the new socket to our set of connected clients.
+    connectedSockets.add(socket); // Add the new socket to our set of connected clients.
 
     // Send a welcome message to the new client.
     // You could include initial data like current stats.
     const availablePets = pets.filter((pet) => pet.available).length;
-    ws.send(JSON.stringify({
+    socket.send(JSON.stringify({
       type: "info",
       message: "Connected to PetShop live updates.",
       currentStats: {
@@ -83,10 +83,10 @@ export const GET_live: JetRoute = (ctx) => {
     broadcastMessage(
       `A new client connected (Total active connections: ${connectedSockets.size}).`,
     );
-  };
+  });
 
   // When a message is received from a client.
-  ws.onmessage = (event) => {
+  ws.addEventListener("message", (socket, event) => {
     const message = event.data; // The data received from the client.
     console.log("WebSocket message received:", message);
     // Handle incoming messages from clients if needed.
@@ -97,50 +97,39 @@ export const GET_live: JetRoute = (ctx) => {
         : message;
       if (parsedMessage.type === "ping") {
         // Respond with a pong message for health checks.
-        ws.send(
+        socket.send(
           JSON.stringify({ type: "pong", timestamp: new Date().toISOString() }),
         );
       } else {
         // If the message is not recognized, you could broadcast it or handle it differently.
         // For this sample, we'll just log and ignore other messages.
-        console.log(
-          "Ignoring unknown WebSocket message type:",
-          parsedMessage.type,
-        );
-        // Optionally send an error back to the client:
-        // ws.send(JSON.stringify({ type: 'error', message: 'Unknown message type' }));
+        broadcastMessage(message);
       }
       // You could add more complex command handling here based on message.type or content.
     } catch (e) {
       console.error("Failed to parse or handle WebSocket message:", e);
-      ws.send(
+      socket.send(
         JSON.stringify({
           type: "error",
           message: "Invalid message format (expected JSON)",
         }),
       );
     }
-  };
+  });
 
   // When the WebSocket connection is closed by either the client or server.
-  ws.onclose = (event) => {
+  ws.addEventListener("close", (socket, event) => {
     console.log(
       `WebSocket client disconnected (Code: ${event.code}, Reason: ${
         event.reason || "No reason"
       }).`,
     );
-    connectedSockets.delete(ws); // Remove the closed socket from the set.
+    connectedSockets.delete(socket); // Remove the closed socket from the set.
     // Inform other clients about the disconnection (optional).
     broadcastMessage(
       `A client disconnected (Total active connections: ${connectedSockets.size}).`,
     );
-  };
-
-  // When a WebSocket error occurs.
-  ws.onerror = (error) => {
-    console.error("WebSocket error:", error);
-    // The `onclose` event typically follows an `onerror` event, so cleanup usually happens in `onclose`.
-  };
+  });
 
   // The initial HTTP request handler does not send a response after calling ctx.upgrade().
   // The connection is now managed by the WebSocket event listeners and the server's WebSocket handling.

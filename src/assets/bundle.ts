@@ -1360,6 +1360,8 @@ async function testApi(
       } else if (contentType === "application/x-www-form-urlencoded") {
         fetchOptions.body = new URLSearchParams(body).toString();
       } else fetchOptions.body = body;
+    } else {
+      delete fetchOptions.body;
     }
     console.log(fetchOptions, body);
     response = await fetch(url, fetchOptions);

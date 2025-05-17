@@ -1,10 +1,10 @@
 // src/routes/utils.ts
 
+import { type JetFile, JetRoute, use } from "../../dist/index.js";
 import { writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path"; // Import join
-import { type JetFile, JetRoute, use } from "jetpath";
-import { pets, reviews } from "../data/models"; // Import data for stats route
-import { type AuthPluginType } from "../plugins/auth"; // Import AuthPluginType for stats route
+import { join } from "node:path"; // Import join
+import { pets, reviews } from "../data/models.js"; // Import data for stats route
+import { type AuthPluginType } from "../plugins/auth.js"; // Import AuthPluginType for stats route
 
 // --- Utility and Miscellaneous Routes ---
 
@@ -115,7 +115,7 @@ const manualApiEndpoints: ApiEndpointInfo[] = [
 ];
 
 /**
- * Root endpoint - Welcome message and API status (Extracted from app.jet.ts)
+ * Root endpoint - Welcome message and API status
  * @route GET /
  * @access Public
  * Demonstrates: Basic GET route, returning simple JSON info.
@@ -140,7 +140,7 @@ export const GET_: JetRoute = function (ctx) {
 use(GET_).info("Returns API information and status");
 
 /**
- * Get shop statistics (Extracted from app.jet.ts)
+ * Get shop statistics
  * @route GET /stats
  * @access Admin only (Based on sample logic)
  * Demonstrates: GET request, performing calculations on data, authorization check.
@@ -203,7 +203,7 @@ export const GET_stats: JetRoute<{}> = function (ctx) { // Removed plugin type h
 use(GET_stats).info("Get shop statistics (admin only)");
 
 /**
- * Intentional error route for testing error handling (Extracted from app.jet.ts)
+ * Intentional error route for testing error handling
  * @route GET /error
  * @access Public (for testing only)
  * Demonstrates: How throwing an error is caught by the global middleware.
@@ -219,7 +219,7 @@ use(GET_error).info(
 );
 
 /**
- * Health check endpoint (Extracted from app.jet.ts)
+ * Health check endpoint
  * @route GET /health
  * @access Public
  * Demonstrates: Basic GET route, accessing system information, returning status.
@@ -262,7 +262,7 @@ export const GET_health: JetRoute = function (ctx) {
 use(GET_health).info("API health check endpoint");
 
 /**
- * Export API documentation in various formats (Extracted from app.jet.ts)
+ * Export API documentation in various formats
  * @route GET /export/docs/:format
  * @access Public
  * Demonstrates: Dynamic GET route ($format), path parameter, conditional response formatting (JSON, YAML, Markdown), setting Content-Type headers.
@@ -352,7 +352,7 @@ use(GET_export_docs$format).info(
 );
 
 /**
- * General file upload handler (Extracted from app.jet.ts)
+ * General file upload handler
  * @route POST /upload
  * @access Authenticated (Admin only - Based on sample logic)
  * Demonstrates: Handling multipart/form-data with multiple file fields and text fields, saving files.
@@ -511,7 +511,7 @@ use(POST_upload).body((t) => {
 );
 
 /**
- * Serve files from the file system (Extracted from app.jet.ts)
+ * Serve files from the file system
  * @route GET /serve/*
  * @access Public
  * Demonstrates: Dynamic routing ($0 for wildcard), serving static content.
@@ -539,7 +539,7 @@ use(GET_serve$0).info(
 );
 
 /**
- * Serve static files (Similar to serve, but often used for explicit static assets) (Extracted from app.jet.ts)
+ * Serve static files (Similar to serve, but often used for explicit static assets)
  * @route GET /static/*
  * @access Public
  * Demonstrates: Dynamic routing ($0 for wildcard), downloading content (often in-browser).

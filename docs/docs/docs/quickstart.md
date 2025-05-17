@@ -16,119 +16,99 @@ Create a basic Jetpath server with a single endpoint (`GET /`) that responds wit
 Before you start, make sure you have:
 
 1.  Installed a compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+).
-2.  Completed the steps in the [**Installation Guide**](./installation.md) to install Jetpath and TypeScript.
-3.  Optionally installed a schema library like Zod (recommended).
-
+2.  Completed the steps in the [**Installation Guide**](./installation.html) to install Jetpath and TypeScript.
 ---
 
-## Step 1: Set Up Your Project Folder
-
-Create a new directory for your project and set up the basic folder structure:
+## Build from from the basic template.
+ 
 
 ```bash
-mkdir my-jetpath-app
-cd my-jetpath-app
-mkdir src
-````
+npx jetpath my-api
+```
 
 Your structure should look like this:
 
 ```
-my-jetpath-app/
-└── src/
+my-api/
+└── src/ 
+        └── app/
+                └── auth.jet.ts
+                └── carts.jet.ts
+                └── products.jet.ts
+                └── users.jet.ts
+            └── db/
+                └── schema.ts
+                └── interfaces.ts
+                └── index.ts                
+            └── site/
+                └── index.html
+                └── about.html
+                └── contact.html
+└── package.json 
+└── .dockerignore 
+└── .gitignore
+└── Dockerfile
+└── README.md
+└── fly.toml 
+└── tsconfig.json
 ```
 
 -----
 
-## Step 2: Install Dependencies
+## Install Dependencies
 
 If you haven't already, install Jetpath and a schema library (we'll use Zod here). Choose the command for your runtime:
 
 ```shell
-# Using npm (Node.js)
-npm install jetpath zod
+# cd into your project directory
+cd my-api
 
-# Using yarn (Node.js)
-yarn add jetpath zod
+# install dependencies
+npm install # or yarn install or pnpm install or bun install
+```
 
-# Using pnpm (Node.js)
-pnpm add jetpath zod
-
-# Using Bun
-bun add jetpath zod
+-----
+  
  
-```
+## Create Your First Route
 
------
-
-## Step 3: Configure TypeScript (`tsconfig.json`)
-
-Create a `tsconfig.json` file in your project root (`my-jetpath-app/`). This tells TypeScript how to compile your code.
-
-```js 
-// tsconfig.json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler", // Use "NodeNext" or "Node" for Node.js if needed
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "outDir": "./dist", // Optional: specify output directory
-    "rootDir": "./",
-    "resolveJsonModule": true,
-    "declaration": true,
-    "sourceMap": true
-    // Add "types": ["node"] here if using Node.js and needing Node types
-  },
-  "include": ["src/**/*.ts", "server.ts"], // Adjust if your entry file has a different name
-  "exclude": ["node_modules", "dist"]
-}
-```
-
-*(Remember to adjust `moduleResolution` and `types` based on your specific runtime and setup if needed - see the [Installation Guide](https://www.google.com/search?q=./installation.md) for details).*
-
------
-
-## Step 4: Create Your First Route
-
-Inside the `src` directory, create a file named `index.jet.ts`. This file will automatically handle requests to the root path (`/`) of your API.
+Inside the `src` directory, create a file named `users.jet.ts`. This file will automatically handle requests to the root path (`/`) of your API.
 
 ```typescript
-// src/index.jet.ts
-import type { JetRoute } from "jetpath";
+// src/users.jet.ts
+import { type JetRoute, use } from "jetpath";
 
 /**
  * Handles GET requests to the root path ('/').
  */
-export const GET_: JetRoute = (ctx) => {
+export const GET_users: JetRoute = (ctx) => {
   // Use the context (ctx) to send a response
   ctx.send({
     message: "Welcome to your first Jetpath API!",
-    status: "ok",
-    timestamp: new Date().toISOString(),
+    status: "ok", 
   });
 };
 
 // Optional: Add description for API documentation
-GET_.info = "Returns a welcome message and API status.";
+use(GET_users).info("Returns a welcome message and API status.");
 
 ```
 
 **Explanation:**
 
   * We import the `JetRoute` type for better type checking of our handler.
-  * We export a constant named `GET_`. The `GET` part maps to the HTTP GET method, and the `_` combined with the filename `index.jet.ts` maps to the root path `/`.
+  * We import the `use` function to add metadata for API documentation.
+  * We export a constant named `GET_users`. 
+  The `GET` part maps to the HTTP GET method, and the `users` combined with the filename `users.jet.ts` maps to the root path `/`.
   * The function receives the `ctx` (Context) object.
-  * `ctx.send()` sends a JSON response back to the client. Jetpath automatically sets the `Content-Type` header to `application/json` for objects.
+  * `ctx.send()` sends a JSON response back to the client. 
+  Jetpath automatically sets the `Content-Type` header to `application/json` for objects.
 
 -----
 
-## Step 5: Create the Server Entry Point
+## Create the Server Entry Point
 
-Now, create a file named `server.ts` in your project root (`my-jetpath-app/`). This file initializes and starts the Jetpath server.
+Now, create a file named `server.ts` in your project root (`my-api/`). This file initializes and starts the Jetpath server.
 
 ```typescript
 // server.ts
@@ -174,9 +154,9 @@ console.log(`📚 API Docs available at http://localhost:${PORT}/docs`);
 
 -----
 
-## Step 6: Run Your Server
+## Run Your Server
 
-Open your terminal in the project root (`my-jetpath-app/`) and run the server using your chosen runtime:
+Open your terminal in the project root (`my-api`) and run the server using your chosen runtime:
 
 ```bash
 # Using Node.js (you might need ts-node or compile first)
@@ -201,7 +181,7 @@ You should see the following output (or similar):
 
 -----
 
-## Step 7: Verify It Works\!
+## Verify It Works
 
 1.  **Check the API:** Open your web browser and navigate to `http://localhost:3000`. You should see the JSON response:
     ```json
@@ -213,7 +193,7 @@ You should see the following output (or similar):
     ```
 2.  **Check the Docs:** Navigate to `http://localhost:3000/docs`. You should see the interactive API documentation UI, listing your `GET /` endpoint.
 
-**Congratulations\! You've successfully created and run your first Jetpath application\!**
+**Congratulations\! You've successfully created and run your first Jetpath application  \!**
 
 -----
 
@@ -221,8 +201,8 @@ You should see the following output (or similar):
 
 Now that you have a basic server running, explore further:
 
-  * **Core Concepts:** Learn about [Routing](https://www.google.com/search?q=./core-concepts/routing.md), the [Context Object](https://www.google.com/search?q=./core-concepts/context.md), [Validation](https://www.google.com/search?q=./core-concepts/validation.md), and [Middleware](https://www.google.com/search?q=./core-concepts/middleware.md).
-  * **Guides:** Build more complex features by following the practical [Guides](https://www.google.com/search?q=./guides/crud-api.md).
+  * **Core Concepts:** Learn about [Routing](./core-concepts/routing.md), the [Context Object](./core-concepts/context.md), [Validation](./core-concepts/validation.md), and [Middleware](./core-concepts/middleware.md).
+  * **Guides:** Build more complex features by following the practical [Guides](./guides/crud-api.md).
   
  
 

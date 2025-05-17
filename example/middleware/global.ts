@@ -6,7 +6,7 @@ import { type AuthPluginType } from "../plugins/auth"; // Assuming auth plugin t
 import { type jetLoggerType } from "../plugins/logging"; // Assuming logger plugin types are here
 
 /**
- * Global middleware for request processing and error handling (Extracted from app.jet.ts)
+ * Global middleware for request processing and error handling
  * This middleware runs for all routes and handles:
  * - Request logging
  * - Authentication verification (when needed)

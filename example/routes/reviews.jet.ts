@@ -1,18 +1,18 @@
 // src/routes/reviews.ts
 
-import { JetRoute, use } from "jetpath";
+import { JetRoute, use } from "../../dist/index.js";
 // Import AuthPluginType if authentication checks are done within route handlers
-import { type AuthPluginType } from "../plugins/auth";
+import { type AuthPluginType } from "../plugins/auth.js";
 // Import data models and in-memory data arrays
-import { pets, reviews } from "../data/models";
-import { ReviewType } from "../types"; // Import ReviewType
+import { pets, reviews } from "../data/models.js";
+import { ReviewType } from "../types.js"; // Import ReviewType
 
 // --- Reviews Management Routes ---
 
 /**
- * Get all reviews for a pet (Extracted from app.jet.ts)
+ * Get all reviews for a pet
  * @route GET /petBy/:id/reviews
- * @access Public (Based on app.jet.ts sample)
+ * @access Public
  * Demonstrates: Dynamic GET route ($id), path parameter, filtering related data, sorting, calculating aggregates (average rating).
  */
 export const GET_petBy$id_reviews: JetRoute<{
@@ -77,7 +77,7 @@ export const GET_petBy$id_reviews: JetRoute<{
 use(GET_petBy$id_reviews).info("Get all reviews for a specific pet");
 
 /**
- * Add a review for a pet (Extracted from app.jet.ts)
+ * Add a review for a pet
  * @route POST /petBy/:id/reviews
  * @access Authenticated (Based on sample's middleware check)
  * Demonstrates: POST request, dynamic routing ($id), body parsing, input validation (use().body()), data insertion.
@@ -158,7 +158,6 @@ use(POST_petBy$id_reviews).body((t) => {
     // Validate rating as a required number.
     rating: t.number({
       err: "Rating is required (1-5)",
-      description: "Rating between 1 and 5",
     }).required(),
     // Validate comment as a required string.
     comment: t.string({ err: "Review comment is required" }).required(),
@@ -166,7 +165,7 @@ use(POST_petBy$id_reviews).body((t) => {
 }).info("Add a review for a specific pet (authenticated users only)");
 
 /**
- * Delete a review (Extracted from app.jet.ts)
+ * Delete a review
  * @route DELETE /reviews/:reviewId
  * @access Authenticated (Review owner or Admin - Based on sample logic)
  * Demonstrates: DELETE request, dynamic routing ($reviewId), path parameter, data deletion, authorization check (owner or admin).

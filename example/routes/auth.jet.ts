@@ -1,12 +1,12 @@
 // src/routes/auth.ts
 
-import { JetRoute, use } from "jetpath";
-import { type AuthPluginType } from "../plugins/auth"; // Import AuthPluginType
+import { JetRoute, use } from "../../dist/index.js";
+import { type AuthPluginType } from "../plugins/auth.js"; // Import AuthPluginType
 
 // --- Authentication Route ---
 
 /**
- * Authentication endpoint - Login with username and password (Extracted from app.jet.ts)
+ * Authentication endpoint - Login with username and password
  * @route POST /auth/login
  * @access Public
  * Demonstrates: POST request, body parsing, plugin usage (auth), sending token.
@@ -21,7 +21,7 @@ export const POST_auth_login: JetRoute<
 
   // Use the auth plugin to authenticate the user.
   // Access plugins via ctx.plugins, assuming the plugin was added with app.addPlugin(authPlugin) in index.ts.
-  const authResult = ctx.plugins.auth.authenticateUser(username, password);
+  const authResult = ctx.plugins.authenticateUser(username, password);
 
   // Check authentication result.
   if (!authResult.authenticated) {

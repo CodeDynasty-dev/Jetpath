@@ -1,20 +1,20 @@
 // src/routes/pets.ts
 
 import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import { type JetFile, JetRoute, use } from "jetpath";
+import { type JetFile, JetRoute, use } from "../../dist/index.js";
 // Import AuthPluginType if authentication checks are done within route handlers (besides global middleware)
-import { type AuthPluginType } from "../plugins/auth";
+import { type AuthPluginType } from "../plugins/auth.js";
 // Import data models and in-memory data arrays
-import { pets, reviews } from "../data/models";
-import { PetType } from "../types"; // Import PetType
+import { pets, reviews } from "../data/models.js";
+import { PetType } from "../types.js"; // Import PetType
+import { join } from "node:path";
 
 // --- Pet Management Routes ---
 
 /**
- * Get all pets with filtering and pagination (Extracted from app.jet.ts)
+ * Get all pets with filtering and pagination
  * @route GET /pets
- * @access Public (Based on app.jet.ts sample)
+ * @access Public
  * Demonstrates: GET request, query parameters, filtering, sorting, pagination.
  */
 export const GET_pets: JetRoute<{
@@ -183,9 +183,9 @@ use(GET_pets).info(
 );
 
 /**
- * Get pet details by ID (Extracted from app.jet.ts)
+ * Get pet details by ID
  * @route GET /petBy/:id
- * @access Public (Based on app.jet.ts sample)
+ * @access Public
  * Demonstrates: Dynamic GET route ($id), path parameter access, querying data, handling "not found", optional related data inclusion (reviews).
  */
 export const GET_petBy$id: JetRoute<{
@@ -250,7 +250,7 @@ use(GET_petBy$id).info(
 );
 
 /**
- * Add a new pet to the inventory (Extracted from app.jet.ts)
+ * Add a new pet to the inventory
  * @route POST /pets
  * @access Authenticated (Admin only - based on sample's middleware check)
  * Demonstrates: POST request, body parsing, input validation (via use().body()), data insertion.
@@ -326,9 +326,7 @@ use(POST_pets).body((t) => {
     // Validate available as an optional boolean.
     available: t.boolean().optional(),
     // Validate tags as an optional array of strings.
-    tags: t.array(t.string({ err: "Each tag must be a string" }), {
-      err: "Tags must be an array of strings",
-    }).optional(),
+    tags: t.array(t.string({ err: "Each tag must be a string" })).optional(),
     // Validate health as an optional object with boolean and array properties.
     health: t.object({
       vaccinated: t.boolean().optional(),
@@ -339,7 +337,7 @@ use(POST_pets).body((t) => {
 }).info("Add a new pet to the inventory (admin only)");
 
 /**
- * Update an existing pet (Extracted from app.jet.ts)
+ * Update an existing pet
  * @route PUT /petBy/:id
  * @access Authenticated (Admin only - based on sample's middleware check)
  * Demonstrates: PUT request, dynamic routing ($id), path parameter access, body parsing, input validation, data update.
@@ -431,7 +429,7 @@ use(PUT_petBy$id).body((t) => {
 }).info("Update an existing pet's information (admin only)");
 
 /**
- * Delete a pet from the inventory (Extracted from app.jet.ts)
+ * Delete a pet from the inventory
  * @route DELETE /petBy/:id
  * @access Authenticated (Admin only - based on sample's middleware check)
  * Demonstrates: DELETE request, dynamic routing ($id), path parameter access, data deletion.
@@ -499,9 +497,9 @@ export const DELETE_petBy$id: JetRoute<{
 use(DELETE_petBy$id).info("Remove a pet from the inventory (admin only)");
 
 /**
- * Advanced search for pets (Extracted from app.jet.ts)
+ * Advanced search for pets
  * @route GET /pets/search
- * @access Public (Based on app.jet.ts sample)
+ * @access Public
  * Demonstrates: GET request, query parameters for complex filtering.
  */
 export const GET_pets_search: JetRoute<{
@@ -725,8 +723,7 @@ export const POST_recipes$id_image: JetRoute<{
 use(POST_recipes$id_image).body((t) => {
   return {
     // Define the 'image' field as a required file type.
-    image: t.file({ inputAccept: "image/*", err: "Image field must be a file" })
-      .required(),
+    image: t.file({ inputAccept: "image/*" }).required(),
     // You could define other expected text fields in the form data here if any.
   };
 }).info("Upload an image for a specific pet (admin only)");

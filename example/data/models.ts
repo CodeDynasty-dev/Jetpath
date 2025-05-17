@@ -1,7 +1,7 @@
 import { PetType, ReviewType } from "../types"; // Import types
 
 /**
- * In-memory pet database (Extracted from app.jet.ts)
+ * In-memory pet database
  * In a production application, this would be replaced with a real database
  * Exported for use in route handlers.
  */
@@ -52,7 +52,7 @@ export const pets: PetType[] = [
 ];
 
 /**
- * In-memory reviews database (Extracted from app.jet.ts)
+ * In-memory reviews database
  * Exported for use in route handlers.
  */
 export const reviews: ReviewType[] = [
