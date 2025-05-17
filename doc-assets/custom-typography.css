@@ -179,3 +179,9 @@ hr {
     font-size: 0.8125rem;
   }
 }
+
+
+.token.string {
+  color: gold !important;
+  text-shadow: 0px 0px 12px gold !important;
+}

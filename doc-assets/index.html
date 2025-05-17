@@ -53,20 +53,21 @@
 
       <!-- Search Bar -->
       <div class="search-bar-container">
-        <div class="search-bar">
+        <!-- <div class="search-bar">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <input type="text" class="search-input" placeholder="Search...">
-        </div>
+        </div> -->
       </div>
 
       <nav class="nav lg:ml-6">  
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
-        <a href="/docs/performance" class="nav-link">Performance</a>
-        <a href="/docs/ecosystem" class="nav-link">Ecosystem</a>
+        <!-- <a href="/docs/performance" class="nav-link">Performance</a> -->
+        <a href="https://discord.gg/faqydQASTy" class="nav-link" target="_blank">Discord</a>
+        <a href="/docs/plugins" class="nav-link">Plugins</a>
         <a href="https://github.com/CodeDynasty-dev/Jetpath" target="_blank" class="btn btn-outline">GitHub</a>
         <!-- <a href="/docs/introduction.html" class="btn btn-primary">Get Started</a> -->
       </nav>
@@ -109,7 +110,7 @@ new Jetpath().listen();
 
 // this goes to = get /
 export const GET_: JetRoute = function (ctx) {
-  ctx.send("hello world!");
+  ctx.send("I am fast!");
 };</code></pre>
             </div>
             <div class="code-wrapper" id="advanced-code">
@@ -234,11 +235,11 @@ use(POST_auth_login).body((t) => {
         <p class="text-gray-400">Requests per second on a standard benchmark:</p>
         <div class="!m-4 text-left space-y-2">
           <div class="flex justify-between items-center">
-            <span class="text-lg font-medium text-emerald-400">Jetpath</span>
+            <span class="text-lg font-medium text-white">Jetpath</span>
             <span class="text-lg font-bold text-white">~32,339 req/s</span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div class="bg-gradient-to-r from-emerald-400 to-blue-500 h-2.5 rounded-full" style="width: 92%"></div>
+            <div class="bg-gradient-to-r from-white to-blue-500 h-2.5 rounded-full" style="width: 92%"></div>
           </div>
           <div class="flex justify-between items-center mt-3">
             <span class="text-lg font-medium text-gray-400">Elysia</span>
@@ -246,6 +247,13 @@ use(POST_auth_login).body((t) => {
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
             <div class="bg-gray-500 h-2.5 rounded-full" style="width: 96%"></div>
+          </div>
+          <div class="flex justify-between items-center mt-3">
+            <span class="text-lg font-medium text-gray-400">Bun</span>
+            <span class="text-lg font-bold text-gray-400">~40,890 req/s</span>
+          </div>
+          <div class="w-full bg-gray-700 rounded-full h-2.5">
+            <div class="bg-gray-500 h-2.5 rounded-full" style="width: 99%"></div>
           </div>
         </div>
         <p class="text-sm text-gray-500 mt-6">*initial benchmark. more benchmarks coming soon.</p>
@@ -378,8 +386,8 @@ use(POST_auth_login).body((t) => {
               <td>Performance</td>
               <td class="highlight-cell">Ultra-fast</td>
               <td>Ultra-fast</td>
-              <td>Fast</td>
               <td>Moderate</td>
+              <td>Fast</td>
             </tr>
             <tr>
               <td>TypeScript Support</td>
@@ -392,8 +400,8 @@ use(POST_auth_login).body((t) => {
               <td>Built-in Validation</td>
               <td class="highlight-cell">Yes</td>
               <td>Yes</td>
-              <td>Yes</td>
-              <td>Yes</td>
+              <td>No</td>
+              <td>No</td>
             </tr>
             <tr>
               <td>Learning Curve</td>
@@ -403,25 +411,19 @@ use(POST_auth_login).body((t) => {
               <td>High</td>
             </tr>
             <tr>
-              <td>Bundle Size</td>
-              <td class="highlight-cell">&lt; 28KB</td>
-              <td>Medium</td>
-              <td>Medium</td>
-              <td>Large</td>
-            </tr>
-            <tr>
               <td>WebSocket Support</td>
               <td class="highlight-cell">Built-in</td>
-              <td>Plugin</td>
+              <td>Built-in</td>
               <td>Plugin</td>
               <td>Built-in</td>
             </tr>
+            <tr>
               <td>Cross-runtime support</td>
               <td class="highlight-cell">Built-in</td>
               <td>No</td>
               <td>No</td>
               <td>No</td>
-            </tr>
+            </tr> 
           </tbody>
         </table>
       </div>
@@ -430,30 +432,9 @@ use(POST_auth_login).body((t) => {
 
   <!-- Performance Section -->
   <section class="section performance" id="performance">
-    <div class="container">
-      <h2 class="section-title">Unmatched <span>Performance</span></h2>
-      <p class="section-subtitle">When speed matters, Jetpath delivers.</p>
-
-      <div class="benchmark-container">
-        
-        <div class="benchmark-grid">
-          <div class="benchmark-card">
-            <div class="benchmark-value">84,200</div>
-            <div class="benchmark-label">Jetpath</div>
-          </div>
-          
-          <div class="benchmark-card">
-            <div class="benchmark-value">52,396</div>
-            <div class="benchmark-label">Fastify</div>
-          </div> 
-          
-          <div class="benchmark-card">
-            <div class="benchmark-value">14,201</div>
-            <div class="benchmark-label">Express</div>
-          </div>
-        </div>
-        <h3 class="mt-8">Requests per second (higher is better)</h3>
-      </div>
+    <div class="container"> 
+      <p class="section-subtitle">Jetpath is designed to make backend development enjoyable with powerful built-in
+        features that boost your productivity.</p>
     </div>
   </section>
 
