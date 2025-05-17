@@ -51,7 +51,7 @@
       </div>
 
       <!-- Search Bar -->
-      <div class="search-bar-container">
+      <!-- <div class="search-bar-container">
         <div class="search-bar">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -60,7 +60,7 @@
           </svg>
           <input type="text" class="search-input" placeholder="Search...">
         </div>
-      </div>
+      </div> -->
 
       <nav class="nav lg:ml-6">  
         <a href="/docs/introduction.html" class="nav-link">Docs</a>
@@ -75,10 +75,10 @@
   <div class="mobile-overlay"></div>
 
   <!-- Sidebar -->
-  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-14 max-md:mt-[8rem]">
+  <aside id="doc-side-bar" class="w-full lg:w-64 lg:flex-shrink-0 mb-8 lg:mb-0 bg-gray-900 text-gray-200 hidden lg:block mt-44 max-md:mt-[8rem]">
     <nav class="sticky top-[calc(4rem+1px+2rem)] h-full">
       <!-- Search -->
-      <div class="px-4 py-6">
+      <!-- <div class="px-4 py-6">
         <div class="relative">  
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -87,7 +87,7 @@
           </div>
           <input type="text" name="doc-search" id="doc-search" class="block w-full pl-10 pr-3 py-2 border border-gray-700 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 sm:text-sm" placeholder="Search documentation">
         </div>
-      </div>
+      </div> -->
 
       <!-- Navigation Links -->
       <div class="space-y-2">
@@ -484,7 +484,7 @@
           });
 
           // Optionally update URL hash without page jump
-          // history.pushState(null, null, targetId);
+           history.pushState(null, null, targetId);
         }
       });
     });
