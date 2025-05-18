@@ -1,6 +1,6 @@
 {
   "name": "jetpath",
-  "version": "1.7.12",
+  "version": "1.7.11",
   "description": "Jetpath - A fast, seamless and minimalist framework for Node, Deno and Bun.js. Embrace the speed and elegance of the next-gen server-side experience.",
   "main": "dist/index.js",
   "type": "module",
@@ -40,8 +40,8 @@
     "compile": "./pack",
     "deno": "deno run --allow-all tests/app.jet.ts",
     "bun": "bun --watch tests/app.jet.ts",
-    "dev": "node --watch --experimental-strip-types tests/app.jet.ts",
-    "node": "node --watch --experimental-strip-types tests/app.jet.ts",
+    "dev": "node --watch --experimental-strip-types example/index.jet.ts",
+    "node": "node --watch --experimental-strip-types example/index.jet.ts",
     "watch": "tsc tests/*.ts --target esnext --watch",
     "watch:docs": "docmach",
     "build": "npx docmach build",
