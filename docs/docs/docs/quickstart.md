@@ -9,7 +9,7 @@ Let's build your first Jetpath application! This guide will walk you through cre
 
 Before you start, make sure you have:
 
-1. A compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+)
+- A compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+)
 
 ## Create a New Project
 
@@ -86,9 +86,9 @@ const app = new Jetpath({
   apiDoc: {
     name: "My First Jetpath API",
     info: "This is the documentation for the Quick Start API.",
-    color: "#7e57c2"
+    color: "#7e57c2",
     display: "UI"
-  },
+  }
 });
 
 app.listen();
@@ -109,12 +109,8 @@ npx run dev
 
 ## Next Steps
 
-Now that you have a basic server running, explore further:
-
-  * **Core Concepts:** Learn about [Routing](./routing.md), the [Context Object](./context.md), [Validation](./validation.md), and [Middleware](./middleware.md).
-  * **Guides:** Build more complex features by following the practical [Guides](./guides/crud-api.md).
-  
- 
+- Learn about [Routing](./routing.md), the [Context Object](./context.md), [Validation](./validation.md), and [Middleware](./middleware.md)
+- Build more complex features by following the practical [Guides](./guides/crud-api.md)
 
 </docmach>
 

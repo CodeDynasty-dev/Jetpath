@@ -100,7 +100,7 @@ code {
   background: rgba(16, 16, 16, 0.9);
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  color: var(--primary);
+  color: #7f99ff;
 }
 
 /* Blockquotes */

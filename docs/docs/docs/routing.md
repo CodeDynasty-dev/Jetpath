@@ -1,200 +1,118 @@
 <docmach type="wrapper" file="docs/fragments/docs.html" replacement="content">
  
+
 # Core Concepts: Routing
 
-Routing in Jetpath is designed to be intuitive, primarily relying on **convention over configuration** through a **function naming convention**. This means in your project, how you name your exported functions directly determine your API endpoints.
-
----
+Routing in Jetpath is designed to be intuitive, relying on **convention over configuration** through a **function naming convention**. Your exported function names directly determine your API endpoints.
 
 ## Key Concepts
 
 ### 1. Source Directory
 
-When you initialize Jetpath, you specify a `source` directory. Jetpath watches this directory for `.jet.ts` files containing your route handlers.
+When you initialize Jetpath, specify a `source` directory for your `.jet.ts` route handler files:
 
 ```typescript
 // server.ts
 import { Jetpath } from "jetpath";
 
 const app = new Jetpath({
-  source: "./src", // Jetpath looks for routes inside the 'src' folder
-  // ... other options
+  source: "./src"
 });
 
 app.listen();
 ```
 
-### 2\. Handler Files (`.jet.ts`)
+### 2. Handler Files (`.jet.ts`)
 
-Files ending with `.jet.ts` are scanned by Jetpath for exported functions that define route handlers. Other `.ts` or `.js` files in the `source` directory are ignored for routing purposes (but can still be imported by your handlers).
+Files ending with `.jet.ts` are scanned for exported functions that define route handlers. Other `.ts` or `.js` files are ignored for routing but can be imported by your handlers.
 
-### 3\. Export Naming Convention
+### 3. Export Naming Convention
 
-The core convention lies in the names of the **exported functions** within your `.jet.ts` files.
+The core convention lies in the names of the exported functions:
 
-  * **Format:** `METHOD_optionalPathSegment` or `WS_optionalPathSegment`
-  * **`METHOD`:** Specifies the HTTP method (case-insensitive, but uppercase recommended):
-      * `GET_`
-      * `POST_`
-      * `PUT_`
-      * `DELETE_`
-      * `PATCH_`
-      * `OPTIONS_`
-      * `HEAD_`
-  * **`WS_`:** Specifies a WebSocket endpoint.
-  * **`optionalPathSegment`:** An optional string that gets appended to the route path derived from the file structure. This allows multiple related endpoints within a single file.
+- **Format:** `METHOD_optionalPathSegment`
+- **`METHOD`:** HTTP method prefix (uppercase recommended):
+  - `GET_`
+  - `POST_`
+  - `PUT_`
+  - `DELETE_`
+  - `PATCH_` 
+  - `HEAD_` 
 
-**Examples from `tests/app.jet.ts`:**
-
-  * In `src/index.jet.ts` (maps to `/`):
-    ```typescript
-    export const GET_: JetRoute = (ctx) => { ... }; // Maps to: GET /
-    ```
-  * In `src/auth/login.jet.ts` (maps to `/auth/login`):
-    ```typescript
-    // Assuming this code lives in src/auth/login.jet.ts
-    export const POST_: JetRoute = async (ctx) => { ... }; // Maps to: POST /auth/login
-    ```
-    *Alternatively, if in `src/auth.jet.ts`:*
-    ```typescript
-    export const POST_login: JetRoute = async (ctx) => { ... }; // Maps to: POST /auth/login [cite: tests/app.jet.ts]
-    ```
-  * In `src/pets.jet.ts` (maps to `/pets`):
-    ```typescript
-    export const GET_: JetRoute<...> = (ctx) => { ... }; // Maps to: GET /pets [cite: tests/app.jet.ts]
-    export const POST_: JetRoute<...> = async (ctx) => { ... }; // Maps to: POST /pets [cite: tests/app.jet.ts]
-    ```
-
-### 4\. Index Routes
-
-Files named `index.jet.ts` represent the root path segment for their directory.
-
-  * `src/index.jet.ts` -\> `/`
-  * `src/pets/index.jet.ts` -\> `/pets`
-
-### 4\. Path Parameters (`$paramName`)
-
-To capture dynamic segments in the URL, use a `$` prefix followed by the parameter name within a filename segment or an exported function name segment.
-
-  * **File-based:** `src/pets/by$id.jet.ts` -\> Defines routes under `/pets/by/:id`
-    ```typescript
-    // Inside src/pets/by$id.jet.ts
-    export const GET_: JetRoute<...> = (ctx) => {
-        const petId = ctx.params.id; // Access the parameter
-        // ...
-    }; // Maps to: GET /pets/by/:id
-    ```
-  * **Export-based:** Define within a parent file (e.g., `src/pets.jet.ts`).
-    ```typescript
-    // Inside src/pets.jet.ts
-    export const GET_petBy$id: JetRoute<...> = (ctx) => {
-        const petId = ctx.params.id;
-        // ...
-    }; // Maps to: GET /pets/petBy/:id [cite: tests/app.jet.ts]
-
-    export const PUT_petBy$id: JetRoute<...> = async (ctx) => {
-        const petId = ctx.params.id;
-        // ...
-    }; // Maps to: PUT /pets/petBy/:id [cite: tests/app.jet.ts]
-
-    export const DELETE_petBy$id: JetRoute<...> = (ctx) => {
-        const petId = ctx.params.id;
-        // ...
-    }; // Maps to: DELETE /pets/petBy/:id [cite: tests/app.jet.ts]
-
-    // Multiple params example (hypothetical)
-    // export const GET_orders$orderId_items$itemId = (ctx) => {
-    //   const { orderId, itemId } = ctx.params;
-    // }; // Maps to: GET /pets/orders/:orderId/items/:itemId
-    ```
-  * Parameters are accessed via the `ctx.params` object.
-
-### 5\. Catch-all / Greedy Routes (`$$`)
-
-To match multiple path segments at the end of a route, use `$$` at the end of a filename segment or export name segment.
-
-  * **File-based:** `src/files$$.jet.ts` -\> Defines routes under `/files/*`
-    ```typescript
-    // Inside src/files$$.jet.ts
-    export const GET_: JetRoute = (ctx) => {
-        const filePath = ctx.params._; // Access the matched path segments (exact property name TBC)
-        // ... handle file serving ...
-    }; // Maps to GET /files/*
-    ```
-  * **Export-based:**
-    ```typescript
-    // Inside src/pets.jet.ts
-    export const GET_pets_search$$: JetRoute<...> = async (ctx) => { ... }; // Maps to GET /pets/search/* [cite: tests/app.jet.ts]
-    // The matched part '*' would be available in ctx.params._ (or similar TBC)
-    ```
-  * The matched path segments are typically available under a special parameter like `ctx.params._` or `ctx.params.slug`. *(Note: The exact property name for the catch-all parameter should be confirmed from Jetpath's implementation details or core documentation).*
-
-### 6\. WebSocket Routes (`WS_`)
-
-Define WebSocket handlers using the `WS_` prefix in the export name.
+**Examples: In `src/pets.jet.ts`:**
 
 ```typescript
-// Inside src/live.jet.ts (or similar)
-export const WS_live: JetRoute = (ctx) => {
-    const conn = ctx.connection!; // Access WebSocket connection
-    conn.addEventListener("open", (socket) => { /* ... */ });
-    conn.addEventListener("message", (socket, event) => { /* ... */ });
-    // ...
-}; // Maps WebSocket connections to ws://your-host/live [cite: tests/app.jet.ts]
+// GET /pets
+export const GET_: JetRoute = (ctx) => { ... }
+
+// POST /pets
+export const POST_: JetRoute = async (ctx) => { ... }
+
+// GET /pets/search
+
+export const GET_search: JetRoute = (ctx) => { ... }
 ```
 
------
+### 4. Path Parameters (`$paramName`)
+
+Capture dynamic segments using a `$` prefix in filenames or export names:
+
+```typescript 
+// Maps to: GET /pets/by/:id
+export const GET_by$id: JetRoute = (ctx) => {
+  const petId = ctx.params.id;
+  // ...
+}; 
+
+
+ // Maps to: GET /pets/petBy/:id/:slug
+export const GET_petBy$id$slug: JetRoute = (ctx) => {
+  const petId = ctx.params.id;
+  const slug = ctx.params.slug;
+  // ...
+}; 
+```
+
+### 5. Catch-all Routes (`$0`)
+
+Match multiple path segments using `$0
+`:
+
+```typescript 
+// Maps to GET /*
+export const GET_$0: JetRoute = (ctx) => {
+  const filePath = ctx.params.$0; // e.g., "file.txt" from
+  ctx.sendStream(filePath, {
+      folder: "./files", 
+    });
+}; 
+
+ 
+```
+
+### 6. WebSocket Routes (`WS`) via `ctx.upgrade()`
+
+```typescript 
+// Maps to ws://your-host/live
+export const GET_live: JetRoute = (ctx) => {
+  ctx.upgrade();
+  const conn = ctx.connection!;
+  conn.addEventListener("open", (socket) => { /* ... */ });
+  conn.addEventListener("message", (socket, event) => { /* ... */ });
+  // ...
+};
+```
 
 ## Route Precedence
 
-Jetpath follows standard routing precedence rules:
-
-1.  **Static routes** (e.g., `/pets/search`) are matched before dynamic routes (`/pets/:id`).
-2.  **More specific dynamic routes** (e.g., `/pets/by/:id`) are matched before catch-all routes (`/pets/search/$$`).
-3.  *(Need to confirm)* If multiple exports in the same file could match the same METHOD + Path, the behavior might be unpredictable or follow source code order. It's best practice to ensure unique METHOD + Path combinations.
-
------
-
-## Advanced Routing
-
-### Explicit Overrides (Recommended Practice)
-
-While conventions are powerful, complex scenarios might benefit from explicit definitions. Using a `defineHandler` helper (if implemented based on recommendations) allows overriding inferred paths or methods:
-
-```typescript
-// Recommended pattern for complex cases
-import { defineHandler } from "jetpath";
-import { PetSchema } from "./schemas"; // Assuming Zod/TypeBox schema
-
-export const updatePetStatus = defineHandler({
-  // Explicitly define the route if convention doesn't fit well
-  route: { method: 'PATCH', path: '/pets/:id/status' },
-  schema: {
-    params: t.object({ id: t.string() }),
-    body: t.object({ available: t.boolean() })
-  },
-  handler: async (ctx) => {
-    const { id } = ctx.params; // Typed based on schema
-    const { available } = ctx.body; // Typed and potentially pre-validated
-    // ... logic ...
-  }
-});
-```
-
-### Programmatic Routing
-
-*(This section would detail any API provided by Jetpath for adding routes programmatically via `app.addRoute(...)` or similar, if available. This is useful for dynamic route generation or plugin integrations.)*
-
------
+Jetpath follows standard routing precedence:
+Static routes (e.g., `/pets/search`) are matched before dynamic routes (`/pets/:id`)  
 
 ## Next Steps
 
-  * Learn how the [**Context (`ctx`) Object**](https://www.google.com/search?q=./context.md) provides access to request/response data within your handlers.
-  * Understand the full [**Request Lifecycle**](https://www.google.com/search?q=./request-lifecycle.md), including middleware execution.
- 
- 
+- Learn how the [Context (`ctx`) Object](./context.html) provides access to request/response data
+- Understand the full [Request Lifecycle](./request-lifecycle.html), including middleware execution
+
+
 
 </docmach>
-
-
-
