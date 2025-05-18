@@ -10,7 +10,6 @@ Let's build your first Jetpath application! This guide will walk you through cre
 Before you start, make sure you have:
 
 1. A compatible JavaScript runtime (Node.js v18+, Deno v1.30+, or Bun v1.0+)
-2. Completed the steps in the [Installation Guide](./installation.html) to install Jetpath and TypeScript
 
 ## Create a New Project
 
@@ -112,7 +111,7 @@ npx run dev
 
 Now that you have a basic server running, explore further:
 
-  * **Core Concepts:** Learn about [Routing](./core-concepts/routing.md), the [Context Object](./core-concepts/context.md), [Validation](./core-concepts/validation.md), and [Middleware](./core-concepts/middleware.md).
+  * **Core Concepts:** Learn about [Routing](./routing.md), the [Context Object](./context.md), [Validation](./validation.md), and [Middleware](./middleware.md).
   * **Guides:** Build more complex features by following the practical [Guides](./guides/crud-api.md).
   
  

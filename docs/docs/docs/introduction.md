@@ -50,7 +50,7 @@ Jetpath is an excellent choice for:
 ## Ready to Dive In?
 
 * **Get Started Quickly:** Follow the [**Quick Start**](./quick-start.md) guide.
-* **Understand the Fundamentals:** Explore the [**Core Concepts**](./core-concepts/routing.md).
+* **Understand the Fundamentals:** Explore the [**Core Concepts**](./routing.md).
 
 </docmach>
 

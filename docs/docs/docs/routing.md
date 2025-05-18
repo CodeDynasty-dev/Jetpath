@@ -2,7 +2,7 @@
  
 # Core Concepts: Routing
 
-Routing in Jetpath is designed to be intuitive and fast, primarily relying on **convention over configuration** through a **file-based system**. This means your project's file structure and how you name your exported functions directly determine your API endpoints.
+Routing in Jetpath is designed to be intuitive, primarily relying on **convention over configuration** through a **function naming convention**. This means in your project, how you name your exported functions directly determine your API endpoints.
 
 ---
 
@@ -22,23 +22,13 @@ const app = new Jetpath({
 });
 
 app.listen();
-````
+```
 
-### 2\. File and Folder Mapping
-
-The path to a `.jet.ts` file within the `source` directory directly maps to the URL path segments.
-
-  * `src/index.jet.ts` maps to `/`
-  * `src/users.jet.ts` maps to `/users`
-  * `src/pets/index.jet.ts` maps to `/pets`
-  * `src/pets/search.jet.ts` maps to `/pets/search`
-  * `src/auth/login.jet.ts` maps to `/auth/login`
-
-### 3\. Handler Files (`.jet.ts`)
+### 2\. Handler Files (`.jet.ts`)
 
 Files ending with `.jet.ts` are scanned by Jetpath for exported functions that define route handlers. Other `.ts` or `.js` files in the `source` directory are ignored for routing purposes (but can still be imported by your handlers).
 
-### 4\. Export Naming Convention
+### 3\. Export Naming Convention
 
 The core convention lies in the names of the **exported functions** within your `.jet.ts` files.
 
@@ -75,14 +65,14 @@ The core convention lies in the names of the **exported functions** within your 
     export const POST_: JetRoute<...> = async (ctx) => { ... }; // Maps to: POST /pets [cite: tests/app.jet.ts]
     ```
 
-### 5\. Index Routes
+### 4\. Index Routes
 
 Files named `index.jet.ts` represent the root path segment for their directory.
 
   * `src/index.jet.ts` -\> `/`
   * `src/pets/index.jet.ts` -\> `/pets`
 
-### 6\. Path Parameters (`$paramName`)
+### 4\. Path Parameters (`$paramName`)
 
 To capture dynamic segments in the URL, use a `$` prefix followed by the parameter name within a filename segment or an exported function name segment.
 
@@ -119,7 +109,7 @@ To capture dynamic segments in the URL, use a `$` prefix followed by the paramet
     ```
   * Parameters are accessed via the `ctx.params` object.
 
-### 7\. Catch-all / Greedy Routes (`$$`)
+### 5\. Catch-all / Greedy Routes (`$$`)
 
 To match multiple path segments at the end of a route, use `$$` at the end of a filename segment or export name segment.
 
@@ -139,7 +129,7 @@ To match multiple path segments at the end of a route, use `$$` at the end of a 
     ```
   * The matched path segments are typically available under a special parameter like `ctx.params._` or `ctx.params.slug`. *(Note: The exact property name for the catch-all parameter should be confirmed from Jetpath's implementation details or core documentation).*
 
-### 8\. WebSocket Routes (`WS_`)
+### 6\. WebSocket Routes (`WS_`)
 
 Define WebSocket handlers using the `WS_` prefix in the export name.
 

@@ -10,7 +10,7 @@
 
 # Tutorials
 
-Welcome to the Jetpath Tutorials section! These guides provide practical, step-by-step instructions for building common features and tackling specific tasks using the Jetpath framework. While the [Core Concepts](./core-concepts/routing.md) explain *how* things work, these tutorials show you *how to do it*.
+Welcome to the Jetpath Tutorials section! These guides provide practical, step-by-step instructions for building common features and tackling specific tasks using the Jetpath framework. While the [Core Concepts](./routing.md) explain *how* things work, these tutorials show you *how to do it*.
 
 We'll often refer to concepts demonstrated in the PetShop API example found in the `tests/app.jet.ts` file.
 
