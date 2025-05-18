@@ -25,7 +25,7 @@ export class Jetpath {
     apiDoc: { display: "UI" },
     cors: false,
   };
-  private plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[] = [];
+  private plugs: JetPlugin<AnyExecutor>[] = [];
   constructor(options: jetOptions = {}) {
     Object.assign(this.options, options);
     if (!this.options.port) this.options.port = 8080;
@@ -61,7 +61,7 @@ export class Jetpath {
       )
     ) {
       this.plugs.push(
-        plugin as JetPlugin<Record<string, unknown>, AnyExecutor>,
+        plugin as JetPlugin<AnyExecutor>,
       );
     } else {
       throw Error("invalid Jetpath plugin");
@@ -215,7 +215,10 @@ export class Jetpath {
     this.listening = true;
     this.server.listen(this.options.port);
     Log.info(`Open http://localhost:${this.options.port}`);
-    Log.info(`External: http://${getLocalIP()}:${this.options.port}`);
+    const localIP = getLocalIP();
+    if (localIP) {
+      Log.info(`External: http://${localIP}:${this.options.port}`);
+    }
   }
 }
 

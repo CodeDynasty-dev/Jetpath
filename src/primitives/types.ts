@@ -139,12 +139,10 @@ export type JetPluginExecutorInitParams = {
 };
 
 // A helper type for “any function of the right shape”
-export type AnyExecutor<
-  C extends Record<string, unknown> = Record<string, unknown>,
-> = (
-  this: JetPlugin<C>,
+export type AnyExecutor = (
+  this: JetPlugin,
   init: JetPluginExecutorInitParams,
-  config: C,
+  config: Record<string, unknown>,
 ) => any;
 
 export type contentType =
@@ -281,7 +279,8 @@ export type JetRoute<
     params: {};
     query: {};
     response: {};
-    info: "";
+    title: "";
+    description: "";
     method: "";
     path: "";
     jet_middleware: [];
@@ -291,7 +290,8 @@ export type JetRoute<
   (ctx: JetContext<JetData, JetPluginTypes>): Promise<void> | void;
   body?: HTTPBody<JetData["body"] & Record<string, any>>;
   headers?: Record<string, string>;
-  info?: string;
+  title?: string;
+  description?: string;
   method?: string;
   path?: string;
   jet_middleware?: JetMiddleware[];
@@ -331,6 +331,8 @@ export interface ValidationOptions {
 }
 export interface FileOptions {
   inputAccept?: string;
+  inputMultiple?: boolean;
+  err?: string;
 }
 
 export interface ArrayOptions extends ValidationOptions {
@@ -369,7 +371,8 @@ export type compilerType<
   headers: (
     headers: Record<string, string>,
   ) => compilerType<JetData, JetPluginTypes>;
-  info: (info: string) => compilerType<JetData, JetPluginTypes>;
+  title: (title: string) => compilerType<JetData, JetPluginTypes>;
+  description: (description: string) => compilerType<JetData, JetPluginTypes>;
   params: (
     schemaFn: (
       t: typeof v,

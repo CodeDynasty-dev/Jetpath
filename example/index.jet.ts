@@ -22,9 +22,12 @@ const app = new Jetpath({
     // Use Markdown for a rich description in the documentation.
     // This info can be more general, as route-specific info comes from .info() calls.
     info: `
-# PetShop API Documentation
 
-This is a comprehensive API for managing a pet shop inventory, built with the **Jetpath** cross-runtime framework.
+
+#### PetShop API Documentation
+
+
+This is an API for managing a pet shop inventory, built with the **Jetpath** cross-runtime framework.
 
 It demonstrates various Jetpath features including:
 - Convention-over-configuration for routing and middleware.
@@ -32,27 +35,22 @@ It demonstrates various Jetpath features including:
 - Cross-runtime capabilities.
 - Authentication and authorization (via plugin).
 - Comprehensive logging (via plugin).
-- Robust error handling (via global middleware).
-- Input validation using \`use().body()\`.
-- **File uploads (multipart/form-data).**
-- **WebSocket communication for real-time updates.**
-- Automatic API Documentation UI (Swagger UI).
-- API Documentation Export (JSON, YAML, Markdown).
-- Handling of various HTTP methods (GET, POST, PUT, DELETE).
-- Dynamic routing with path parameters (e.g., \`/petBy/:id\`).
-- Query parameter parsing for filtering, sorting, and pagination.
-- Error Handling and Testing routes (\`/error\`).
-- Health Check route (\`/health\`).
-- Serving static/uploaded files (\`/serve/*\`, \`/static/*\`).
+- Robust error handling (via global middleware)
 
-Access this interactive documentation at \`/api-doc\`.
-        `,
+[check our docs for more info](https://jetpath.codedynasty.dev)
+
+
+
+
+
+`,
+
     color: "#7e57c2", // Using the color from the original sample
     // Optional: Secure the documentation UI itself with basic authentication (example from sample).
     username: "admin", // Default username from sample
     password: "1234", // Default password from sample **WARNING:** Do not use simple passwords in production. Use environment variables.
   },
-
+  source: "./example",
   // Configure global headers to be sent with all responses.
   globalHeaders: {
     "X-Pet-API-Version": "1.0.0", // Example custom header from sample

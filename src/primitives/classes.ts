@@ -28,20 +28,19 @@ import { resolve, sep } from "node:path";
 import type { BunFile } from "bun";
 
 export class JetPlugin<
-  C extends Record<string, unknown> = Record<string, unknown>,
-  E extends AnyExecutor<C> = AnyExecutor<C>,
+  E extends AnyExecutor = AnyExecutor,
 > {
   executor: E;
   JetPathServer?: any;
   hasServer?: boolean;
-  config: C = {} as C;
+  config: Record<string, unknown> = {};
   constructor({ executor }: { executor: E }) {
     this.executor = executor;
   }
   _setup(init: JetPluginExecutorInitParams): any {
     return this.executor.call(this, init, this.config);
   }
-  setConfig(config: C): void {
+  setConfig(config: Record<string, unknown>): void {
     this.config = config;
   }
 }

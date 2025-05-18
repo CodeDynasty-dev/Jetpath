@@ -137,6 +137,6 @@ export const GET_live: JetRoute = (ctx) => {
 
 // Apply .info() for documentation.
 // This describes the GET request that initiates the WebSocket handshake.
-use(GET_live).info("WebSocket endpoint for real-time pet updates."); // Adjusted info message
+use(GET_live).title("WebSocket endpoint for real-time pet updates."); // Adjusted info message
 
 // Export the route handler.

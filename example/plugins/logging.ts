@@ -17,7 +17,7 @@ const levelRank: Record<LogLevel, number> = {
 /**
  * Configuration options for the logging plugin
  */
-export interface LoggingConfig {
+interface LoggingConfig {
   level?: LogLevel; // minimum level to emit
   format?: "json" | "text"; // format of log entries
   filename?: string; // file to write logs to
@@ -28,7 +28,7 @@ export interface LoggingConfig {
 /**
  * Structure of a log entry
  */
-export interface LogEntry {
+interface LogEntry {
   timestamp: string;
   level: LogLevel;
   message?: string;
@@ -39,12 +39,12 @@ export interface LogEntry {
 }
 
 /** Transport interface for log targets */
-export interface Transport {
+interface Transport {
   log(entry: LogEntry): Promise<void> | void;
 }
 
 /** Default console transport, respects JSON or text */
-export class ConsoleTransport implements Transport {
+class ConsoleTransport implements Transport {
   private format: "json" | "text" = "json";
   constructor(format: "json" | "text" = "json") {
     this.format = format;
@@ -62,7 +62,7 @@ export class ConsoleTransport implements Transport {
 }
 
 /** File transport for Node/Bun/Deno, appends to given filename */
-export class FileTransport implements Transport {
+class FileTransport implements Transport {
   private filename: string;
   private format: "json" | "text" = "json";
   constructor(
@@ -88,13 +88,7 @@ export class FileTransport implements Transport {
 /**
  * Creates a JetPlugin with structured logging capabilities
  */
-export const jetLogger = new JetPlugin<{
-  level?: LogLevel;
-  format?: "json" | "text";
-  filename?: string;
-  getRequestId?: (req: Request) => string;
-  transports?: Transport[];
-}>({
+export const jetLogger = new JetPlugin({
   executor() {
     const {
       level = "info",
@@ -102,7 +96,7 @@ export const jetLogger = new JetPlugin<{
       filename,
       getRequestId,
       transports: customTransports,
-    } = this.config;
+    } = this.config as LoggingConfig;
     // Determine transports: custom, or build from filename/console defaults
     const transports: Transport[] = customTransports
       ? customTransports

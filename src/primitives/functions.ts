@@ -193,7 +193,7 @@ export const UTILS = {
   },
   runtime: null as unknown as Record<string, boolean>,
   server(
-    plugs: JetPlugin<Record<string, unknown>, AnyExecutor>[],
+    plugs: JetPlugin<AnyExecutor>[],
     options: jetOptions,
   ): { listen: any; edge: boolean } | void {
     let server;
@@ -727,7 +727,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
   const globalHeaders = JSON.stringify(
     options?.globalHeaders || {
-      "Authorization": "Bearer <token>",
+      "Authorization": "Bearer <jwt token>",
     },
   );
 
@@ -817,10 +817,23 @@ ${method} ${
             : "http://localhost:" + (options?.port || 8080)
         }${route.path} HTTP/1.1
 ${headers.length ? headers.join("\n") : ""}\n
-${(body && method !== "GET" ? method : "") ? JSON.stringify(bodyData) : ""}\n${
-          validator?.["info"] ? "#" + validator?.["info"] + "-JETE" : ""
-        }
-###`;
+${
+          (body && method !== "GET" ? method : "")
+            ? JSON.stringify(bodyData)
+            : ""
+        }\n\n${
+          validator?.["title"]
+            ? "#-JET-TITLE " + validator?.["title"].replaceAll("\n", "\n# ") +
+              "#-JET-TITLE"
+            : ""
+        }\n${
+          validator?.["description"]
+            ? "#-JET-DESCRIPTION\n# " +
+              validator?.["description"].replaceAll("\n", "\n# ") +
+              "\n#-JET-DESCRIPTION"
+            : ""
+        }\n
+### break ###`;
 
         // ? combine api(s)
         const low = sorted_insert(compiledRoutes, route.path!);
@@ -1223,14 +1236,25 @@ export function use<
       return compiler;
     },
     /**
-     * Sets the API documentation info for the endpoint
-     * @param {string} info - The API documentation info
+     * Sets the API documentation title for the endpoint
+     * @param {string} title - The API documentation title
      */
-    info: function (info: string) {
+    title: function (title: string) {
       if (typeof endpoint !== "function") {
         throw new Error("Endpoint must be a function");
       }
-      endpoint.info = info;
+      endpoint.title = title;
+      return compiler;
+    },
+    /**
+     * Sets the API documentation description for the endpoint
+     * @param {string} description - The API documentation description
+     */
+    description: function (description: string) {
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
+      }
+      endpoint.description = description;
       return compiler;
     },
     /**
@@ -1287,8 +1311,10 @@ export function use<
 
 export async function generateRouteTypes(ROUTES_DIR: string) {
   //? Regex to find exported const variables
-  const ROUTE_EXPORT_REGEX = /export\s+const\s+([A-Z]+_[a-zA-Z0-9_$]+)\s*[:=]/g;
-  const METHOD_PATH_REGEX = /^([A-Z]+)_[a-zA-Z0-9_$]+$/;
+  const ROUTE_EXPORT_REGEX =
+    /^(?!\s*\/\/)export\s+const\s+((?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$]*\$?[a-zA-Z0-9$_]*)\s*/gm; //! let's make sure if this line is a comments then it should not be matched!
+  const METHOD_PATH_REGEX =
+    /(?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$_]*$/; //! let's make sure if this line is a comments then it should not be matched!
   const OUTPUT_FILE = resolve(
     join(cwd(), "node_modules", ".jetpath", ".apis-types.ts"),
   );
@@ -1322,6 +1348,8 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
               const exportName = match[1];
               if (METHOD_PATH_REGEX.test(exportName)) {
                 foundExports.push(exportName);
+              } else {
+                Log.error(` ${exportName} is not a valid JetRoute export`);
               }
             }
 
@@ -1366,7 +1394,7 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
   outputContent += declarations.join("\n");
 
   try {
-    Log.info("\n⚙️  StrictMode...");
+    Log.info("⚙️  StrictMode...");
     await writeFile(OUTPUT_FILE, outputContent, "utf-8");
 
     const promisifiedExecFile = () =>
@@ -1395,7 +1423,8 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
               Log.info("\n🛠️ StrictMode warnings");
               Log.error(stderr.replaceAll("\n", "\n\n"));
               Log.error(stdout.replaceAll("\n", "\n\n"));
-              const errors = (stdout.split("\n\n")).length;
+              const errors = (stdout.split("\n")).length - 1;
+
               Log.info(
                 errors +
                   ` Problem${

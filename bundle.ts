@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "fs/promises";
-
+// ? This file does a lot of in just few lines thanks to bunjs
 console.log("Jetpath: compiling...");
 const html = await readFile("src/assets/api-doc.html", {
   encoding: "utf-8",

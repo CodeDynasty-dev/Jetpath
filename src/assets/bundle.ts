@@ -1,4 +1,10 @@
-const MAX_HISTORY_ITEMS = 10;
+const infodoc = document.getElementById("project-info-text");
+if (infodoc) {
+  //  @ts-ignore
+  infodoc.innerHTML = markdown(infodoc.innerText);
+}
+
+const MAX_HISTORY_ITEMS = 15;
 let requestHistory = JSON.parse(localStorage.getItem("jetpathApiHistory")!) ||
   [];
 const apiDocumentationRawTemplate = `{ JETPATH }`;
@@ -143,6 +149,7 @@ function syntaxHighlight(json: any) {
     trailingCommas: false,
   });
 }
+
 function escapeHtml(unsafe: string) {
   return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
     />/g,
@@ -458,7 +465,7 @@ function parsePayloadData(bodyPackElement: HTMLElement) {
           assembledPayload[key] = processNode(topLevelNode);
         }
         // @ts-ignore
-        console.log(key, assembledPayload[key]);
+        // console.log(key, assembledPayload[key]);
       }
     },
   );
@@ -639,7 +646,9 @@ function parsePayloadStructure(
   return packer;
 }
 function parseApiDocumentation(apiDocString: string) {
-  const requests = apiDocString.split("###").map((request) => request.trim())
+  const requests = apiDocString.split("### break ###").map((request) =>
+    request.trim()
+  )
     .filter((a) => a !== "");
   return requests.map(parseRequest);
 }
@@ -659,12 +668,26 @@ function parseRequest(requestString: string) {
   let payload = payloadIndex !== 0
     ? lines.slice(payloadIndex).join("\\n")
     : null;
-  let comment = "";
+  let title = "";
+  let description = "";
   if (payload?.includes("#")) {
-    comment = payload.slice(payload.indexOf("#") + 1, payload.indexOf("-JETE"));
-    payload = payload.replace(["#", comment, "-JETE"].join(""), "");
+    if (payload.includes("#-JET-TITLE")) {
+      title = payload.slice(
+        payload.indexOf("#-JET-TITLE") + 12,
+        payload.lastIndexOf("#-JET-TITLE"),
+      );
+    }
+    if (payload.includes("#-JET-DESCRIPTION")) {
+      description = payload.slice(
+        payload.indexOf("#-JET-DESCRIPTION") + 18,
+        payload.lastIndexOf("#-JET-DESCRIPTION"),
+      );
+    }
+    payload = payload.split("\n").filter((line) => !line.startsWith("#")).join(
+      "\n",
+    );
   }
-  return { method, url, httpVersion, headers, payload, comment };
+  return { method, url, httpVersion, headers, payload, title, description };
 }
 const groupByFirstFeature = (apis: any[]) => {
   const results: any = {};
@@ -682,7 +705,7 @@ const groupByFirstFeature = (apis: any[]) => {
     }
   }
   for (const apilist in results) {
-    out.push({ comment: apilist, isGroup: true });
+    out.push({ title: apilist, isGroup: true });
     out.push(...results[apilist]);
   }
   return out;
@@ -818,8 +841,18 @@ function showApiResponse(
   $(`#${tabToActivate}`).tab("show");
 }
 
+type cardType = {
+  "method": "PUT" | "GET" | "POST" | "DELETE";
+  "url": string;
+  "httpVersion": string;
+  "headers": Record<string, string>;
+  "payload": string;
+  "title": string;
+  "description": string;
+};
+
 // --- API CARD RENDERING & ACTIONS ---
-function createApiCard(request: any, i: number) {
+function createApiCard(request: cardType, i: number) {
   const payloadSchema = JSON.parse(
     request.payload?.includes("{") ? request.payload : "null",
   );
@@ -1109,6 +1142,7 @@ function createApiCard(request: any, i: number) {
         ?.trim();
     const globalAuthHeaders = parsePayload(document.getElementById("keys")!) ||
       {};
+
     const requestSpecificHeaders = request.headers;
     const combinedHeaders = { ...requestSpecificHeaders, ...globalAuthHeaders };
     const payloadData = parsePayloadData(
@@ -1189,12 +1223,8 @@ function createApiCard(request: any, i: number) {
                 `global-auth-preview-${cardId}`,
               );
               if (authPreview && authPreview.children.length <= 1) { // Only populate if empty (except for title)
-                const globalHeaders = parsePayload(
-                  document.getElementById("keys") as HTMLInputElement,
-                );
-                console.log(globalHeaders, "?");
-                if (globalHeaders && Object.keys(globalHeaders).length > 0) {
-                  Object.entries(globalHeaders).forEach(([key, value]) => {
+                if (Object.keys(request.headers).length > 0) {
+                  Object.entries(request.headers).forEach(([key, value]) => {
                     authPreview.appendChild(
                       div(
                         { style: { fontSize: "0.85rem" } },
@@ -1222,7 +1252,7 @@ function createApiCard(request: any, i: number) {
           span({
             className: "text-muted small ml-2",
             style: { fontWeight: "normal" },
-          }, request.comment || ""),
+          }, request.title || ""),
         ),
       ),
     ),
@@ -1235,6 +1265,22 @@ function createApiCard(request: any, i: number) {
       div(
         { className: "card-body" },
         requestTabs,
+        $if(
+          request.description || request.title,
+          div(
+            {
+              className: "tab-content",
+              // @ts-expect-error
+              innerHTML: markdown(
+                (request.description || "#" + request.title)?.slice(1)
+                  ?.replaceAll(
+                    "\n#",
+                    "\n",
+                  ),
+              ),
+            },
+          ),
+        ),
         requestTabsContent,
         div(
           { className: "action-buttons mt-3 mb-3" },
@@ -1286,7 +1332,9 @@ function renderApiEndpoints() {
   let visibleApis = parsedApis;
   if (searchTerm) {
     visibleApis = parsedApis.filter((api) => {
-      const fullText = `${api.method} ${api.url} ${api.comment || ""}`
+      const fullText = `${api.method} ${api.url} ${
+        api.title || api.description || ""
+      }`
         .toLowerCase();
       return fullText.includes(searchTerm);
     });
@@ -1320,7 +1368,7 @@ function renderApiEndpoints() {
           borderBottom: "1px solid var(--surface-3)",
           paddingBottom: "5px",
         },
-      }, item.comment.toUpperCase());
+      }, item.title.toUpperCase());
       apiEndpointContainer.appendChild(groupTitle);
     } else {
       apiEndpointContainer.appendChild(createApiCard(item, i));
@@ -1363,7 +1411,6 @@ async function testApi(
     } else {
       delete fetchOptions.body;
     }
-    console.log(fetchOptions, body);
     response = await fetch(url, fetchOptions);
     const responseBody = await response.text();
     const responseHeaders: Record<string, string> = {};

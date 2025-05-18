@@ -178,7 +178,7 @@ export const GET_pets: JetRoute<{
 };
 
 // Apply .info for documentation.
-use(GET_pets).info(
+use(GET_pets).title(
   "Retrieves a list of pets with filtering and pagination options",
 );
 
@@ -245,7 +245,7 @@ export const GET_petBy$id: JetRoute<{
 };
 
 // Apply .info for documentation.
-use(GET_petBy$id).info(
+use(GET_petBy$id).title(
   "Retrieve detailed information about a specific pet by ID",
 );
 
@@ -334,7 +334,7 @@ use(POST_pets).body((t) => {
       medicalHistory: t.array(t.string()).optional(),
     }).optional(),
   };
-}).info("Add a new pet to the inventory (admin only)");
+}).title("Add a new pet to the inventory (admin only)");
 
 /**
  * Update an existing pet
@@ -426,7 +426,7 @@ use(PUT_petBy$id).body((t) => {
       medicalHistory: t.array(t.string()).optional(),
     }).optional(),
   };
-}).info("Update an existing pet's information (admin only)");
+}).title("Update an existing pet's information (admin only)");
 
 /**
  * Delete a pet from the inventory
@@ -494,7 +494,7 @@ export const DELETE_petBy$id: JetRoute<{
 };
 
 // Apply .info() for documentation.
-use(DELETE_petBy$id).info("Remove a pet from the inventory (admin only)");
+use(DELETE_petBy$id).title("Remove a pet from the inventory (admin only)");
 
 /**
  * Advanced search for pets
@@ -601,7 +601,7 @@ export const GET_pets_search: JetRoute<{
 };
 
 // Apply .info() for documentation.
-use(GET_pets_search).info("Advanced search for pets by various criteria");
+use(GET_pets_search).title("Advanced search for pets by various criteria");
 
 // --- File Upload Route for Recipe Images ---
 
@@ -726,7 +726,7 @@ use(POST_recipes$id_image).body((t) => {
     image: t.file({ inputAccept: "image/*" }).required(),
     // You could define other expected text fields in the form data here if any.
   };
-}).info("Upload an image for a specific pet (admin only)");
+}).title("Upload an image for a specific pet (admin only)");
 
 /**
  * Get all pet images (Example route from sample - simplified as we only store one image URL per pet)
@@ -763,7 +763,7 @@ export const GET_petBy$id_gallery: JetRoute<{
   });
 };
 
-use(GET_petBy$id_gallery).info(
+use(GET_petBy$id_gallery).title(
   "Get images for a specific pet (returns main image URL in this sample)",
 );
 

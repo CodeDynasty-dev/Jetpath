@@ -136,8 +136,8 @@ export const GET_: JetRoute = function (ctx) {
   });
 };
 
-// Apply .info() for documentation.
-use(GET_).info("Returns API information and status");
+// Apply .title() for documentation.
+use(GET_).title("Returns API information and status");
 
 /**
  * Get shop statistics
@@ -199,8 +199,8 @@ export const GET_stats: JetRoute<{}> = function (ctx) { // Removed plugin type h
   });
 };
 
-// Apply .info() for documentation.
-use(GET_stats).info("Get shop statistics (admin only)");
+// Apply .title() for documentation.
+use(GET_stats).title("Get shop statistics (admin only)");
 
 /**
  * Intentional error route for testing error handling
@@ -213,8 +213,8 @@ export const GET_error: JetRoute = function (_ctx) {
   throw new Error("This is an intentional error for testing error handling");
 };
 
-// Apply .info() for documentation.
-use(GET_error).info(
+// Apply .title() for documentation.
+use(GET_error).title(
   "Route that intentionally throws an error (for testing global error handling)",
 );
 
@@ -258,8 +258,8 @@ export const GET_health: JetRoute = function (ctx) {
   });
 };
 
-// Apply .info() for documentation.
-use(GET_health).info("API health check endpoint");
+// Apply .title() for documentation.
+use(GET_health).title("API health check endpoint");
 
 /**
  * Export API documentation in various formats
@@ -279,8 +279,7 @@ export const GET_export_docs$format: JetRoute<{
     name: "PetShop API", // Using PetShop name
     version: "1.0.0", // Using sample version
     description: "A comprehensive API for managing pet shop inventory", // Using sample description
-    baseUrl:
-      new URL(ctx.get("host") || `http://localhost:${ctx.config.port}`).origin, // Get base URL from context or config
+    baseUrl: new URL(ctx.get("host") || `http://localhost:3000`).origin, // Get base URL from context or config
     endpoints: manualApiEndpoints, // Use the manually defined list of endpoints
   };
 
@@ -346,8 +345,8 @@ export const GET_export_docs$format: JetRoute<{
   }
 };
 
-// Apply .info() for documentation.
-use(GET_export_docs$format).info(
+// Apply .title() for documentation.
+use(GET_export_docs$format).title(
   "Export API documentation in different formats (json, yaml, markdown)",
 );
 
@@ -465,7 +464,7 @@ export const POST_upload: JetRoute<{
     }
 
     // Log the overall upload action.
-    ctx.plugins?.logger?.info({
+    ctx.plugins?.logger?.title({
       action: "general_file_upload",
       userId: user.id,
       uploadedFiles: Object.keys(results).filter((key) => results[key].url).map(
@@ -506,7 +505,7 @@ use(POST_upload).body((t) => {
     description: t.string({ err: "Description must be a string" }).optional(), // Optional description string
     tags: t.string({ err: "Tags must be a string" }).optional(), // Optional tags string (as in sample's use)
   };
-}).info(
+}).title(
   "Upload files with metadata (admin only) - expects multipart/form-data",
 );
 
@@ -533,8 +532,8 @@ export const GET_serve$0: JetRoute<{ params: { "*": string } }> = function (
   ctx.sendStream(fullPath);
 };
 
-// Apply .info() for documentation.
-use(GET_serve$0).info(
+// Apply .title() for documentation.
+use(GET_serve$0).title(
   "Serve files from the file system based on wildcard path parameter.",
 );
 
@@ -559,8 +558,8 @@ export const GET_static$0: JetRoute<{ params: { "*": string } }> = function (
   ctx.download(fullPath);
 };
 
-// Apply .info() for documentation.
-use(GET_static$0).info(
+// Apply .title() for documentation.
+use(GET_static$0).title(
   "Serve static files for download or in-browser display.",
 );
 

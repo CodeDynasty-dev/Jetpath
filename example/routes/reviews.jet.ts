@@ -74,7 +74,7 @@ export const GET_petBy$id_reviews: JetRoute<{
 };
 
 // Apply .info() for documentation.
-use(GET_petBy$id_reviews).info("Get all reviews for a specific pet");
+use(GET_petBy$id_reviews).title("Get all reviews for a specific pet");
 
 /**
  * Add a review for a pet
@@ -162,7 +162,7 @@ use(POST_petBy$id_reviews).body((t) => {
     // Validate comment as a required string.
     comment: t.string({ err: "Review comment is required" }).required(),
   };
-}).info("Add a review for a specific pet (authenticated users only)");
+}).title("Add a review for a specific pet (authenticated users only)");
 
 /**
  * Delete a review
@@ -235,7 +235,7 @@ export const DELETE_reviews$reviewId: JetRoute<{
 };
 
 // Apply .info() for documentation.
-use(DELETE_reviews$reviewId).info(
+use(DELETE_reviews$reviewId).title(
   "Delete a review (admin or review owner only)",
 );
 

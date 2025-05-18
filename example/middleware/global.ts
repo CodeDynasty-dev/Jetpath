@@ -29,12 +29,10 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
 
   // Log initial request info using the logger plugin (if available)
   // Use optional chaining in case plugins aren't correctly loaded/typed
-  ctx.plugins?.logger?.info({
-    requestId,
-    method: ctx.request.method,
-    url: ctx.request.url,
-    message: "Request received",
-  });
+  ctx.plugins?.info(
+    ctx,
+    "Request received",
+  );
 
   // Authentication verification (example from app.jet.ts)
   // Skip auth check for public routes
@@ -62,12 +60,10 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
     if (!auth?.authenticated) {
       ctx.code = 401; // Unauthorized
       ctx.set("WWW-Authenticate", "Bearer"); // Suggest Bearer auth
-      ctx.plugins?.logger?.warn({
-        requestId,
-        message: "Authentication failed",
-        url: ctx.request.url,
-        method: ctx.request.method,
-      });
+      ctx.plugins?.warn(
+        ctx,
+        "Authentication failed",
+      );
       // We don't ctx.throw here; the post-handler will process the 401 code.
     } else {
       // Attach user info to context state for use in route handlers
@@ -86,16 +82,10 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
     // --- Error Handling ---
     if (err) {
       // An error occurred. Log it using the logger plugin.
-      ctx.plugins?.logger?.error({
-        requestId,
-        error: err instanceof Error ? err.message : String(err),
-        stack: err instanceof Error ? err.stack : undefined,
-        code: ctx.code || 500, // Use existing code or default to 500
-        url: ctx.request.url,
-        method: ctx.request.method,
-        duration,
-        message: "Request failed due to error",
-      });
+      ctx.plugins?.error(
+        ctx,
+        "Request failed due to error",
+      );
 
       // Determine the status code for the error response.
       ctx.code = ctx.code >= 400
@@ -122,13 +112,10 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
     // --- 404 Handling ---
     // If no route matched, Jetpath sets ctx.code to 404. Handle this specifically.
     if (ctx.code === 404) {
-      ctx.plugins?.logger?.warn({
-        requestId,
-        message: "Resource not found (404)",
-        url: ctx.request.url,
-        method: ctx.request.method,
-        duration,
-      });
+      ctx.plugins?.warn(
+        ctx,
+        "Resource not found (404)",
+      );
 
       ctx.send({
         status: "error",
@@ -141,14 +128,10 @@ export const MIDDLEWARE_: JetMiddleware<{}, [AuthPluginType, jetLoggerType]> = (
 
     // --- Successful Response Logging ---
     // If no error and code is not 404, it's a successful response.
-    ctx.plugins?.logger?.info({
-      requestId,
-      status: ctx.code,
-      duration,
-      url: ctx.request.url,
-      method: ctx.request.method,
-      message: "Request completed successfully",
-    });
+    ctx.plugins?.info(
+      ctx,
+      "Request completed successfully",
+    );
 
     // If the post-handler doesn't return anything (or returns undefined),
     // Jetpath continues with the response process.
