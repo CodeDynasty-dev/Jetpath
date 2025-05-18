@@ -6,14 +6,6 @@
 Hello welcome to jetpath.
 
 
-```typescript
-const GET = () => {
-    return "Hello World";
-}
-
-```
-
-
 Get ready to build universal JavaScript backends! Installing Jetpath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.
 
 ---
