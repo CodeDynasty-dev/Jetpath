@@ -1,165 +1,173 @@
-<br/>
 <p align="center">
-     <img src="https://github.com/CodeDynasty-dev/Jetpath/raw/main/icon.png" alt="Jetpath" width="190" height="190">
+  <img src="https://github.com/CodeDynasty-dev/Jetpath/raw/main/icon.png" alt="Jetpath" width="190" height="190">
+</p>
 
 <h1 align="center">Jetpath</h1>
 
 <p align="center">
-   Jetpath is the fast and minimalist framework for Node, Deno and Bun.
-    <br/>
-    <br/>
-    <a href="https://jetpath.codedynasty.dev"><strong>Documentation »</strong></a>
-    <br/>
-    <br/>
-    <a href="https://discord.gg/faqydQASTy">Join Discord</a>
-    .
-    <a href="https://github.com/codedynasty-dev/jetpath/issues">Report Bug</a>
-    .
-    <a href="https://github.com/codedynasty-dev/jetpath/issues">Request Feature</a>
-  </p>
+  A performance-first cross-runtime API framework without the boilerplate
+  <br/>
+  <br/>
+  <a href="https://jetpath.codedynasty.dev"><strong>Documentation »</strong></a>
+  <br/>
+  <br/>
+  <a href="https://discord.gg/faqydQASTy">Join Discord</a>
+  ·
+  <a href="https://github.com/codedynasty-dev/jetpath/issues">Report Bug</a>
+  ·
+  <a href="https://github.com/codedynasty-dev/jetpath/issues">Request Feature</a>
 </p>
 
 <div align="center">
- <br/> 
-<a title="PM2 Downloads" href="https://npm-stat.com/charts.html?package=jetpath&from=2018-01-01&to=2023-08-01">
-  <img src="https://img.shields.io/npm/dm/jetpath" alt="Downloads per Month"/>
-</a>
-
-<a title="PM2 Downloads" href="https://npm-stat.com/charts.html?package=jetpath&from=2018-01-01&to=2023-08-01">
-  <img src="https://img.shields.io/npm/dy/jetpath" alt="Downloads per Year"/>
-</a>
-
-<a href="https://badge.fury.io/js/jetpath" title="NPM Version Badge">
-   <img src="https://badge.fury.io/js/jetpath.svg" alt="npm version">
-</a> 
-
-<a href="https://badge.fury.io/js/jetpath" title="NPM Version Badge">
-<img src="https://img.shields.io/github/stars/codedynasty-dev/jetpath?style=social" alt="Stars"/>
-</a>
-
-<br/>
-<br/>
-<br/>
+  <a href="https://npm-stat.com/charts.html?package=jetpath">
+    <img src="https://img.shields.io/npm/dm/jetpath" alt="Downloads per Month"/>
+  </a>
+  <a href="https://npm-stat.com/charts.html?package=jetpath">
+    <img src="https://img.shields.io/npm/dy/jetpath" alt="Downloads per Year"/>
+  </a>
+  <a href="https://badge.fury.io/js/jetpath">
+    <img src="https://badge.fury.io/js/jetpath.svg" alt="npm version">
+  </a>
+  <a href="https://github.com/codedynasty-dev/jetpath">
+    <img src="https://img.shields.io/github/stars/codedynasty-dev/jetpath?style=social" alt="Stars"/>
+  </a>
 </div>
- 
-## Latest version info
 
-In this version, we added/tested these features on all runtimes.
+## Why Engineers Choose Jetpath
 
-1. auto-generated api documentation UI (Jetpath UI).
-2. file uploads
-3. support for websockets
-4. Jet Plugins.
-5. Robust schema validation
-6. Multi-runtime support
-7. Robust Context and body parser
-8. Security audits and fixes
-9. Robust error handling
-10. Robust logging
-11. Robust middleware
-12. Performance enhancements
-
-In this version, multi-runtime support is no-longer based on
-compatibility but pure engine api(s). 
-
-- more speed, same size, more power.
-
-
-## Syntax
+Every framework promises to be fast and easy. Jetpath got built because most of them aren't.
 
 ```ts
-// src/index.jet.js
+// This is a complete API endpoint in Jetpath
+export const GET_users_$id: JetRoute = async function (ctx) {
+  const { id } = ctx.params;
+  const user = await db.users.findUnique({ where: { id } });
+  return ctx.send(user);
+};
+```
+
+Jetpath eliminates the cognitive overhead that slows down development. No more router configuration, middleware chains, or callback hell. Just pure functions that map directly to HTTP endpoints through a clean, predictable naming convention.
+
+**The tech stack you already trust, but faster:**
+- Write APIs in TypeScript/JavaScript across Node.js, Deno, or Bun
+- ~50% less code than Express with stronger type safety
+- [Benchmarks](https://github.com/CodeDynasty-dev/jetpath-benchmark) show massive throughput compared to Elysia.js.
+
+## Core Design Principles
+
+Jetpath is built with strong opinions on what matters most:
+
+1. **Zero config by default** - Convention eliminates boilerplate
+2. **Runtime agnostic** - True support for Node.js, Deno, and Bun (not just compatibility layers)
+3. **Type safety** - Full TypeScript support that doesn't get in your way
+4. **Predictable routing** - Routes derived from function names (GET_users_$id → GET /users/:id)
+5. **Built for production** - Security, validation, and error handling baked in
+
+## In Production
+
+I am using Jetpath in production and here are the results.
+- 40% reduction in API codebase size
+- Simplified onboarding for new team members
+- Faster iterations on API endpoints
+
+## Quick Start
+
+```bash
+# Create new project
+npx jetpath new-project
+
+# Navigate and start the dev server
+cd new-project && npm install && npm run dev
+```
+
+## API Design That Gets Out of Your Way
+
+```ts
 import { type JetRoute, Jetpath, use } from "jetpath";
 
 const app = new Jetpath();
+app.listen(3000);
 
-//? listening for requests
-app.listen();
-
-// this goes to = get /
-export const GET_: JetRoute = async function (ctx) {
-  ctx.send({ message: "success" });
+// GET /products
+export const GET_products: JetRoute = async (ctx) => {
+  const products = await db.products.findMany();
+  ctx.send({ products });
 };
 
-// this goes to = post /
-export const POST_: JetRoute = async function (ctx) {
+// POST /products with validation
+export const POST_products: JetRoute = async (ctx) => {
   const data = await ctx.parse();
-  console.log(data);
-  ctx.send({ message: "we received your payload" });
+  const product = await db.products.create({ data });
+  ctx.send({ product }, 201);
 };
 
-// this goes to = post /api/v1/payments
-export const POST_api_v1_payments: JetRoute = async function (ctx) {
-    const { amount, currency, account } = ctx.parse();
-    ctx.plugin.charge({ amount, currency, account });
-    ctx.send({ success: true, message: "Payment successful" });
+// Add validation and docs in one step
+use(POST_products)
+  .title("Create a new product")
+  .body((t) => ({
+    name: t.string().required().min(3),
+    price: t.number().required().min(0),
+    description: t.string()
+  }));
+
+// Maps to ws://your-host/live
+export const GET_live: JetRoute = (ctx) => {
+  ctx.upgrade();
+  const conn = ctx.connection!;
+  conn.addEventListener("open", (socket) => { /* ... */ });
+  conn.addEventListener("message", (socket, event) => { /* ... */ });
 };
-
-use(POST_api_v1_payments)
-.info("Charge a user's account")
-.body((t)=>{
- return {
-    amount: t.number().required(),
-    currency: t.string().required(),
-    account: t.string().required()
- }   
-});
 ```
 
-# Rationale - [Docs](https://jetpath.codedynasty.dev/)
+## Key Features
 
-Jetpath is designed for high performance, security and ease of use, using convention over configuration method, jetpath ensure you spend less time on configuration and more time on the functionalities and concise organization of all your projects.
+- **Unified dev experience** across Node.js, Deno, and Bun
+- **Auto-generated API documentation** with interactive UI
+- **First-class WebSocket support**
+- **Plugin system** for extending functionality
+- **Schema validation** that is part of api documentation
+- **Request parsing** that just works (JSON, forms, multipart)
+- **Performance-optimized** routing and middleware execution
+- **Security** good defaults
 
-[benchmark repo](https://github.com/FridayCandour/jetpath-benchmark)
+## Real Performance
 
-- Jetpath now runs on the runtime you are using, bun or node or deno.
-- Function names as routing patterns.
-- Middleware and error handler design.
-- Inbuilt Cors, body parser, websocket, cookies and logger handlers.
-- Inbuilt API auto doc functionality. 
-- Fast, Small and easy as peasy - jetpath will make your projects shine.
+It's not just a claim how fast - measure it. In the [benchmark suite](hhttps://github.com/CodeDynasty-dev/jetpath-benchmark), Jetpath consistently perform close to raw Bunjs performance matches elysia.js on common API workloads:
 
---
-  
-### Quick Start
+| Framework | Requests/sec | Latency (avg)
+|-----------|-------------|---------------|
+| Bun   | ~40,890       | 12.2ms        |
+| Elysia   | ~33,383       | 13.2ms         |
+| Jetpath   | ~32,339      | 13.7ms         |
 
-```bash
-# Install Jetpath CLI
-npx jetpath new-project
+*4-core CPU, 1000 concurrent connections and 1,000,000 requests, simple JSON response*
 
-# Navigate to the project directory
-cd new-project
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
+Bunjs being amongst the fastest http runtime.
 
 ## Installation
 
-Install Jetpath Right away on your project using npm or Javascript other package
-managers.
+For existing projects:
 
+```bash
+npm install jetpath --save
 ```
-npm i jetpath --save
-```
- 
 
-## Apache 2.0 Licensed
+## Community & Support
 
-Open sourced And Free.
+- [Documentation](https://jetpath.codedynasty.dev) - In-depth guides and API reference
+- [Discord Community](https://discord.gg/faqydQASTy) - Get help from the team and other users
+- [GitHub Issues](https://github.com/codedynasty-dev/jetpath/issues) - Report bugs or request features
 
-### Contribution and License Agreement
+## License
 
-If you contribute code to this project, you are implicitly allowing your code to
-be distributed under the Apache 2.0 license. You are also implicitly verifying that all
-code are your original work.
-See our [contributing guide](https://github.com/CodeDynasty-dev/Jetpath/blob/main/contributing.md)
+Apache 2.0 - Open source and built for the community.
 
-### Support
+### Contributing
 
-Your contribution(s) is a good force for change anytime you do it, you can
-ensure Jetpath's continues growth and improvement by contributing a re-occurring
-or fixed donations to our Github sponsors.
+We welcome contributions! See our [contributing guide](https://github.com/CodeDynasty-dev/Jetpath/blob/main/contributing.md) for details on how to get involved.
+
+By contributing, you agree to license your code under the Apache 2.0 license and confirm that all contributions are your original work.
+
+### Support or Sponsor the Project
+
+If Jetpath helps you or your team ship faster and more understandable codebase, consider supporting its development through [GitHub Sponsors](https://github.com/sponsors/CodeDynasty-dev).
