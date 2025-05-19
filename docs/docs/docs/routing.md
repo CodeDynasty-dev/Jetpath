@@ -1,7 +1,7 @@
 <docmach type="wrapper" file="docs/fragments/docs.html" replacement="content">
  
 
-# Core Concepts: Routing
+# Core Concepts 1: Routing
 
 Routing in Jetpath is designed to be intuitive, relying on **convention over configuration** through a **function naming convention**. Your exported function names directly determine your API endpoints.
 
@@ -12,7 +12,7 @@ Routing in Jetpath is designed to be intuitive, relying on **convention over con
 When you initialize Jetpath, specify a `source` directory for your `.jet.ts` route handler files:
 
 ```typescript
-// server.ts
+// index.jet.ts
 import { Jetpath } from "jetpath";
 
 const app = new Jetpath({
@@ -31,7 +31,7 @@ Files ending with `.jet.ts` are scanned for exported functions that define route
 The core convention lies in the names of the exported functions:
 
 - **Format:** `METHOD_optionalPathSegment`
-- **`METHOD`:** HTTP method prefix (uppercase recommended):
+- **`METHOD`:** HTTP method prefix (uppercase only):
   - `GET_`
   - `POST_`
   - `PUT_`
