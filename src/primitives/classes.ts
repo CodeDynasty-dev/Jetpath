@@ -33,7 +33,7 @@ export class JetPlugin {
     this.plugin = plugin;
   }
   setup(init: JetPluginExecutorInitParams): any {
-    return this.plugin.executor.call(this, init);
+    return this.plugin.executor(init);
   }
 }
 

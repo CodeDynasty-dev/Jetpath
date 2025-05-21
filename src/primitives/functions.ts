@@ -1261,8 +1261,8 @@ export async function generateRouteTypes(
             await walkDir(fullPath);
           }
         } else if (entry.isFile() && entry.name.endsWith(".jet.ts")) {
-          const relativePath = path.relative(cwd(), fullPath);
-          const modulePath = relativePath.replace(/\\/g, "/");
+          // const relativePath = path.relative(cwd(), fullPath);
+          // const modulePath = relativePath.replace(/\\/g, "/");
 
           try {
             const fileContent = await readFile(fullPath, "utf-8");
@@ -1284,9 +1284,8 @@ export async function generateRouteTypes(
             if (foundExports.length > 0) {
               const moduleName = "m" + mIdex; // only alphanumeric letters;
               //? Generate the declare module block for this file
-              let moduleDeclaration = `import * as ${moduleName} from '${
-                resolve(join("../../", modulePath))
-              }';\n\n\n`;
+              let moduleDeclaration =
+                `import * as ${moduleName} from '${fullPath}';\n\n\n`;
               //? Add declarations for each found route export
               for (const exportName of foundExports) {
                 //? Declare the export with the basic JetRoute<any, any> type

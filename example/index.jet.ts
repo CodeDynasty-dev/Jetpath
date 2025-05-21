@@ -75,13 +75,13 @@ It demonstrates various Jetpath features including:
 
 // Add the logger plugin
 // Configure the logger plugin first if needed, then add it.
-jetLogger.setConfig({ // Using sample's logger config
+jetLogger.config = {
   level: process.env.NODE_ENV === "production" ? "info" : "debug",
   format: "json", // Log format (json or text)
   filename: "./pet-shop-api-log.log", // Log file path relative to project root
-});
-app.addPlugin(jetLogger);
-app.addPlugin(authPlugin);
+};
+
+app.addPlugins(jetLogger, authPlugin);
 
 // --- Start the Server ---
 // Start the Jetpath server and begin listening for incoming HTTP requests.

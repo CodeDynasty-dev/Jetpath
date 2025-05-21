@@ -1,6 +1,6 @@
 import { appendFileSync } from "node:fs";
-import { JetPlugin } from "../../dist/index.js";
 import { resolve } from "node:path";
+import { config } from "node:process";
 
 /**
  * Supported log levels
@@ -88,7 +88,18 @@ class FileTransport implements Transport {
 /**
  * Creates a JetPlugin with structured logging capabilities
  */
-export const jetLogger = new JetPlugin({
+export const jetLogger = {
+  name: "jetLogger",
+  /**
+   * Creates a logging plugin instance
+   * @param config Configuration options for the logger
+   */
+  config: {
+    level: "info",
+    format: "json",
+    filename: undefined,
+    transports: undefined,
+  } as LoggingConfig,
   executor() {
     const {
       level = "info",
@@ -96,7 +107,7 @@ export const jetLogger = new JetPlugin({
       filename,
       getRequestId,
       transports: customTransports,
-    } = this.config as LoggingConfig;
+    } = this.config;
     // Determine transports: custom, or build from filename/console defaults
     const transports: Transport[] = customTransports
       ? customTransports
@@ -184,6 +195,6 @@ export const jetLogger = new JetPlugin({
       },
     };
   },
-});
+};
 
 export type jetLoggerType = ReturnType<typeof jetLogger.executor>;

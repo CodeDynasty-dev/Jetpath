@@ -22,7 +22,7 @@ export class Jetpath {
   /**
    * an object you can set values to per request
    */
-  plugins: (UnionToIntersection<JetPlugin[]> & Record<string, any>) | undefined;
+  plugins: any[] = [];
   private options: jetOptions = {
     port: 8080,
     apiDoc: { display: "UI" },
@@ -47,11 +47,13 @@ export class Jetpath {
       });
     }
   }
-  addPlugins(plugins: {
-    executor: (init: any) => Record<string, Function>;
-    server?: any;
-    name: string;
-  }[]): void {
+  addPlugins<K>(
+    ...plugins: {
+      executor: (init: any) => Record<string, Function>;
+      server?: any;
+      name: string;
+    }[]
+  ) {
     if (this.listening) {
       throw new Error("Your app is listening new plugins can't be added.");
     }
@@ -67,6 +69,7 @@ export class Jetpath {
         throw new Error("Plugin executor and name is required");
       }
     });
+    return this as unknown as UnionToIntersection<K>;
   }
   async listen(): Promise<void> {
     if (!this.options.source) {
@@ -77,7 +80,7 @@ export class Jetpath {
     }
     // ? {-view-} here is replaced at build time to html
     let UI = `{{view}}`;
-    Log.LOG("Compiling...", "warn");
+    Log.LOG("Compiling...", "info");
     const startTime = performance.now();
 
     // ? Load all jetpath functions described in user code
@@ -168,7 +171,7 @@ export class Jetpath {
             endTime - startTime,
           )
         }ms`,
-        "warn",
+        "info",
       );
       //? generate types
       if (/(ON|WARN)/.test(this.options?.strictMode || "OFF")) {
@@ -237,6 +240,6 @@ export type {
   JetMiddleware,
   JetRoute,
 } from "./primitives/types.js";
-export { JetMockServer, JetPlugin } from "./primitives/classes.js";
+export { JetMockServer } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";
 export { mime } from "./extracts/mimejs-extract.js";

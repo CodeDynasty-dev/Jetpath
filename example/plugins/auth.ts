@@ -2,7 +2,7 @@
 // PLUGINS CONFIGURATION
 // =============================================================================
 
-import { type JetContext, JetPlugin } from "../../dist/index.js";
+import { type JetContext } from "../../dist/index.js";
 
 /**
  * Auth Plugin - Provides authentication and authorization functionality
@@ -10,7 +10,8 @@ import { type JetContext, JetPlugin } from "../../dist/index.js";
  * This plugin adds methods for token generation, validation, and user
  * authentication that can be used across routes.
  */
-export const authPlugin = new JetPlugin({
+export const authPlugin = {
+  name: "authPlugin",
   executor() {
     // In a real application, use a secure secret management solution
     const ADMIN_API_KEY = process.env["ADMIN_API_KEY"] || "admin-secret-key";
@@ -83,6 +84,6 @@ export const authPlugin = new JetPlugin({
       },
     };
   },
-});
+};
 
 export type AuthPluginType = ReturnType<typeof authPlugin.executor>;
