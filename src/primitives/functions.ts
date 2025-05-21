@@ -7,7 +7,6 @@ import { createServer } from "node:http";
 import { type IncomingMessage, type ServerResponse } from "node:http";
 import type {
   allowedMethods,
-  AnyExecutor,
   compilerType,
   FileOptions,
   HTTPBody,
@@ -174,146 +173,128 @@ export const _jet_middleware: Record<
 > = {};
 
 export const ctxPool: Context[] = [];
-export const UTILS = {
-  upgrade: false,
-  plugins: {},
-  ae(cb: { (): any; (): any; (): void }) {
-    try {
-      cb();
-      return true;
-    } catch (error) {
-      return false;
-    }
-  },
-  set() {
-    const bun = UTILS.ae(() => Bun);
-    // @ts-expect-error
-    const deno = UTILS.ae(() => Deno);
-    this.runtime = { bun, deno, node: !bun && !deno };
-  },
-  runtime: null as unknown as Record<string, boolean>,
-  server(
-    plugs: JetPlugin<AnyExecutor>[],
-    options: jetOptions,
-  ): { listen: any; edge: boolean } | void {
-    let server;
-    let server_else;
-    if (UTILS.runtime["node"]) {
-      server = createServer({
-        keepAliveTimeout: options.keepAliveTimeout || 120_000,
-        keepAlive: true,
-      }, (x: any, y: any) => {
-        Jetpath(x, y);
-      });
-    }
-    if (UTILS.runtime["deno"]) {
+export let runtime: Record<"bun" | "deno" | "node" | "edge", boolean> = {
+  bun: false,
+  deno: false,
+  node: false,
+  edge: false,
+};
+export const plugins: {} = {};
+export const isNode = runtime["node"];
+
+const ae = (cb: { (): any; (): any; (): void }) => {
+  try {
+    cb();
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+(() => {
+  const bun = ae(() => Bun);
+  // @ts-expect-error
+  const deno = ae(() => Deno);
+  runtime = { bun, deno, node: !bun && !deno, edge: false };
+})();
+
+export const server = (
+  plugs: JetPlugin[],
+  options: jetOptions,
+): { listen: any; edge: boolean } | void => {
+  let server;
+  let server_else;
+  if (runtime["node"]) {
+    server = createServer({
+      keepAliveTimeout: options.keepAliveTimeout || 120_000,
+      keepAlive: true,
+    }, (x: any, y: any) => {
+      Jetpath(x, y);
+    });
+  }
+  if (runtime["deno"]) {
+    server = {
+      listen(port: number) {
+        // @ts-expect-error
+        server_else = Deno.serve({ port: port }, Jetpath);
+      },
+      edge: false,
+    };
+  }
+  if (runtime["bun"]) {
+    if (options.upgrade && options.upgrade === true) {
       server = {
         listen(port: number) {
-          // @ts-expect-error
-          server_else = Deno.serve({ port: port }, Jetpath);
+          server_else = Bun.serve({
+            port,
+            // @ts-expect-error
+            fetch: Jetpath,
+            websocket: {
+              message(...p) {
+                p[1] = {
+                  // @ts-expect-error
+                  data: p[1],
+                };
+                JetSocketInstance.__binder("message", p);
+              },
+              close(...p) {
+                JetSocketInstance.__binder("close", p);
+              },
+              drain(...p) {
+                JetSocketInstance.__binder("drain", p);
+              },
+              open(...p) {
+                JetSocketInstance.__binder("open", p);
+              },
+            },
+          });
+        },
+        edge: false,
+      };
+    } else {
+      server = {
+        listen(port: number) {
+          server_else = Bun.serve({
+            port,
+            // @ts-expect-error
+            fetch: Jetpath,
+          });
         },
         edge: false,
       };
     }
-    if (UTILS.runtime["bun"]) {
-      if (UTILS.upgrade) {
-        server = {
-          listen(port: number) {
-            server_else = Bun.serve({
-              port,
-              // @ts-expect-error
-              fetch: Jetpath,
-              websocket: {
-                message(...p) {
-                  p[1] = {
-                    // @ts-expect-error
-                    data: p[1],
-                  };
-                  JetSocketInstance.__binder("message", p);
-                },
-                close(...p) {
-                  JetSocketInstance.__binder("close", p);
-                },
-                drain(...p) {
-                  JetSocketInstance.__binder("drain", p);
-                },
-                open(...p) {
-                  JetSocketInstance.__binder("open", p);
-                },
-              },
-            });
-          },
-          edge: false,
-        };
-      } else {
-        server = {
-          listen(port: number) {
-            server_else = Bun.serve({
-              port,
-              // @ts-expect-error
-              fetch: Jetpath,
-            });
-          },
-          edge: false,
-        };
-      }
-    }
-    //! likely on the edge
-    //! let's see what the plugins has to say
+  }
 
-    const decorations: Record<string, any> = {};
+  // ? yes a plugin can bring it's own server
 
-    // ? yes a plugin can bring it's own server
-    const edgePluginIdx = plugs.findIndex((plug) => plug.hasServer);
-
-    if (edgePluginIdx > -1) {
-      const edgePlugin = plugs.splice(edgePluginIdx, 1)[0];
-      if (edgePlugin !== undefined && edgePlugin.hasServer) {
-        const decs = edgePlugin._setup({
-          server: (!UTILS.runtime["node"] ? server_else! : server!) as any,
-          runtime: UTILS.runtime as any,
-          routesObject: _JetPath_paths,
-          JetPath_app: Jetpath as any,
-        });
-        Object.assign(decorations, decs);
-        //? setting the jet server from the plugin
-        if (edgePlugin.JetPathServer) {
-          server = edgePlugin.JetPathServer;
-          server.edge = true;
-        }
-      }
+  //? compile plugins
+  for (let i = 0; i < plugs.length; i++) {
+    const decs = plugs[i].setup({
+      server: !runtime["node"] ? server_else! : server!,
+      runtime: runtime as any,
+      routesObject: _JetPath_paths,
+      JetPath_app: Jetpath as any,
+    });
+    Object.assign(plugins, decs);
+  }
+  const edgePlugin = plugs.find((plug) => plug.plugin.server);
+  // ? adding ctx plugin bindings
+  if (edgePlugin) {
+    const edge_server = edgePlugin.plugin.server({
+      server: !runtime["node"] ? server_else! : server!,
+      runtime: runtime,
+      routesObject: _JetPath_paths,
+      handler: Jetpath,
+      router: _JetPath_paths,
+    });
+    if (edge_server !== undefined) {
+      server = edge_server;
+      server.edge = true;
     }
-
-    //? compile plugins
-    for (let i = 0; i < plugs.length; i++) {
-      const decs = plugs[i]._setup({
-        server: !UTILS.runtime["node"] ? server_else! : server!,
-        runtime: UTILS.runtime as any,
-        routesObject: _JetPath_paths,
-        JetPath_app: Jetpath as any,
-      });
-      Object.assign(decorations, decs);
-    }
-    // ? adding ctx plugin bindings
-    for (const key in decorations) {
-      if (!(UTILS.plugins as any)[key]) {
-        (UTILS.plugins as any)[key] = decorations[key];
-      }
-    }
-    if (!server) {
-      const edge_server = plugs.find(
-        (plug) => plug.JetPathServer,
-      )?.JetPathServer;
-      if (edge_server !== undefined) {
-        server = edge_server;
-      }
-    }
-    return server!;
-  },
+  }
+  return server!;
 };
-// ? setting up the runtime check
-UTILS.set();
-export const isNode = UTILS.runtime["node"];
+
 export const getCtx = (
   req: IncomingMessage | Request,
   res: any,
@@ -382,7 +363,7 @@ const makeResBunAndDeno = (
   if (ctx?._3) {
     // handle deno promise.
     // @ts-expect-error
-    if (UTILS.runtime["deno"] && ctx._3.then) {
+    if (runtime["deno"] && ctx._3.then) {
       ctxPool.push(ctx);
       // @ts-expect-error
       return ctx._3.then((stream: any) => {
@@ -509,8 +490,8 @@ const getModule = async (src: string, name: string) => {
     const mod = await import(path.resolve(src + "/" + name));
     return mod;
   } catch (error) {
-    Log.info("Error at " + src + "/" + name + "  loading failed!");
-    Log.error(String(error));
+    Log.LOG("Error at " + src + "/" + name + "  loading failed!", "info");
+    Log.LOG(String(error), "error");
     return String(error);
   }
 };
@@ -527,8 +508,8 @@ export async function getHandlers(
   if (!again) {
     source = path.resolve(path.join(curr_d, source));
     if (!source.includes(curr_d)) {
-      Log.warn('source: "' + error_source + '" is invalid');
-      Log.error("Jetpath source must be within the project directory");
+      Log.LOG('source: "' + error_source + '" is invalid', "warn");
+      Log.LOG("Jetpath source must be within the project directory", "error");
       process.exit(1);
     }
   } else {
@@ -541,9 +522,10 @@ export async function getHandlers(
       (dirent.name.endsWith(".jet.js") || dirent.name.endsWith(".jet.ts"))
     ) {
       if (print) {
-        Log.info(
+        Log.LOG(
           "Loading " + source.replace(curr_d + "/", "") + sep +
             dirent.name,
+          "info",
         );
       }
       try {
@@ -904,51 +886,6 @@ export function assignMiddleware(
   }
 }
 
-export function isIdentical<T extends object, U extends object>(
-  instanceA: T | null | undefined,
-  instanceB: U | null | undefined,
-): boolean {
-  if (!instanceA || !instanceB) {
-    return false;
-  }
-  const ownKeysA = Object.getOwnPropertyNames(instanceA);
-  const ownKeysB = Object.getOwnPropertyNames(instanceB);
-  if (ownKeysA.length !== ownKeysB.length) {
-    return false;
-  }
-  ownKeysA.sort();
-  ownKeysB.sort();
-  for (let i = 0; i < ownKeysA.length; i++) {
-    if (ownKeysA[i] !== ownKeysB[i]) {
-      return false;
-    }
-    if (!Object.prototype.hasOwnProperty.call(instanceB, ownKeysA[i])) {
-      return false;
-    }
-  }
-  const protoA = Object.getPrototypeOf(instanceA);
-  const protoB = Object.getPrototypeOf(instanceB);
-  if (protoA === protoB) {
-  } else if (
-    !protoA || !protoB || protoA === Object.prototype ||
-    protoB === Object.prototype
-  ) {
-    if (
-      (protoA && protoA !== Object.prototype) !==
-        (protoB && protoB !== Object.prototype)
-    ) {
-      return false;
-    }
-  }
-
-  if (instanceA.constructor && instanceB.constructor) {
-    if (instanceA.constructor.length !== instanceB.constructor.length) {
-      return false;
-    }
-  }
-  return true;
-}
-
 export function parseFormData(
   rawBody: Uint8Array,
   contentType: string,
@@ -1273,9 +1210,7 @@ export function use<
       endpoint.params = createSchema(schemaFn as any) as any;
       return compiler;
     },
-    /**
-     * Sets the API documentation query for the endpoint
-     */
+
     query: function (
       schemaFn: (
         t: typeof v,
@@ -1289,32 +1224,22 @@ export function use<
       endpoint.query = createSchema(schemaFn as any) as any;
       return compiler;
     },
-    /**
-     * Sets the API documentation response for the endpoint
-     */
-    response: function (
-      schemaFn: (
-        t: typeof v,
-      ) => Partial<
-        Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
-      >,
-    ) {
-      if (typeof endpoint !== "function") {
-        throw new Error("Endpoint must be a function");
-      }
-      endpoint.response = createSchema(schemaFn as any) as any;
-      return compiler;
-    },
   };
   return compiler;
 }
 
-export async function generateRouteTypes(ROUTES_DIR: string) {
+//? needs to optimized, does exactly the same as the getModule function
+export async function generateRouteTypes(
+  ROUTES_DIR: string,
+  mode: "ON" | "WARN",
+) {
   //? Regex to find exported const variables
+  // ? let's make sure if this line is a comments then it should not be matched!
   const ROUTE_EXPORT_REGEX =
-    /^(?!\s*\/\/)export\s+const\s+((?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$]*\$?[a-zA-Z0-9$_]*)\s*/gm; //! let's make sure if this line is a comments then it should not be matched!
+    /^(?!\s*\/\/)export\s+const\s+((?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$]*\$?[a-zA-Z0-9$_]*)\s*/gm;
+  //? let's make sure if this line is a comments then it should not be matched!
   const METHOD_PATH_REGEX =
-    /(?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$_]*$/; //! let's make sure if this line is a comments then it should not be matched!
+    /(?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$_]*$/;
   const OUTPUT_FILE = resolve(
     join(cwd(), "node_modules", ".jetpath", ".apis-types.ts"),
   );
@@ -1349,15 +1274,19 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
               if (METHOD_PATH_REGEX.test(exportName)) {
                 foundExports.push(exportName);
               } else {
-                Log.error(` ${exportName} is not a valid JetRoute export`);
+                Log.LOG(
+                  ` ${exportName} is not a valid JetRoute export`,
+                  "error",
+                );
               }
             }
 
             if (foundExports.length > 0) {
               const moduleName = "m" + mIdex; // only alphanumeric letters;
               //? Generate the declare module block for this file
-              let moduleDeclaration =
-                `import * as ${moduleName} from '../../${modulePath}';\n\n\n`;
+              let moduleDeclaration = `import * as ${moduleName} from '${
+                resolve(join("../../", modulePath))
+              }';\n\n\n`;
               //? Add declarations for each found route export
               for (const exportName of foundExports) {
                 //? Declare the export with the basic JetRoute<any, any> type
@@ -1383,7 +1312,11 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
       console.error(`Error reading directory ${currentDir}: ${error}`);
     }
   }
-  await walkDir(resolve(cwd(), ROUTES_DIR));
+  if (mode === "ON") {
+    await walkDir(resolve(cwd(), ROUTES_DIR));
+  } else {
+    walkDir(resolve(cwd(), ROUTES_DIR));
+  }
   //? Generate the final .d.ts file content
   let outputContent =
     `//? This file is auto-generated by Jetpath. DO NOT MODIFY!\n\n`;
@@ -1394,7 +1327,7 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
   outputContent += declarations.join("\n");
 
   try {
-    Log.info("⚙️  StrictMode...");
+    Log.LOG("⚙️  StrictMode...\nmode: " + mode, "info");
     await writeFile(OUTPUT_FILE, outputContent, "utf-8");
 
     const promisifiedExecFile = () =>
@@ -1420,16 +1353,23 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
           { encoding: "utf8" },
           (err, stdout, stderr) => {
             if (err) {
-              Log.info("\n🛠️ StrictMode warnings");
-              Log.error(stderr.replaceAll("\n", "\n\n"));
-              Log.error(stdout.replaceAll("\n", "\n\n"));
+              Log.LOG("\n🛠️ StrictMode warnings", "warn");
+              Log.LOG(
+                stderr.replaceAll("\n", "\n\n"),
+                mode === "WARN" ? "warn" : "error",
+              );
+              Log.LOG(
+                stdout.replaceAll("\n", "\n\n"),
+                mode === "WARN" ? "warn" : "error",
+              );
               const errors = (stdout.split("\n")).length - 1;
 
-              Log.info(
+              Log.LOG(
                 errors +
                   ` Problem${
                     errors === 1 ? "" : "s"
                   } 🐞\n\nYou are seeing these warnings because you have strict mode enabled\n`,
+                "info",
               );
             }
             resolve(undefined);
@@ -1438,7 +1378,7 @@ export async function generateRouteTypes(ROUTES_DIR: string) {
       });
     await promisifiedExecFile();
   } catch (error) {
-    Log.error(`Error writing output file apis-types.d.ts: ${error}`);
+    Log.LOG(`Error writing output file apis-types.d.ts: ${error}`, "error");
   }
 }
 

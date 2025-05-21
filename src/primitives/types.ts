@@ -1,13 +1,14 @@
 import { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { _JetPath_paths, v } from "./functions.js";
-import { type CookieOptions, JetPlugin, SchemaBuilder } from "./classes.js";
+import { type CookieOptions, SchemaBuilder } from "./classes.js";
 import type { BunFile } from "bun";
 import type Stream from "node:stream";
 
-type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
-  x: infer I,
-) => void ? I
-  : never;
+export type UnionToIntersection<U> =
+  (U extends any ? (x: U) => void : never) extends (
+    x: infer I,
+  ) => void ? I
+    : never;
 
 export interface JetContext<
   JetData extends {
@@ -138,13 +139,6 @@ export type JetPluginExecutorInitParams = {
   JetPath_app: (req: Request) => Response;
 };
 
-// A helper type for “any function of the right shape”
-export type AnyExecutor = (
-  this: JetPlugin,
-  init: JetPluginExecutorInitParams,
-  config: Record<string, unknown>,
-) => any;
-
 export type contentType =
   | "application/x-www-form-urlencoded"
   | "multipart/form-data"
@@ -167,7 +161,7 @@ export type jetOptions = {
   upgrade?: boolean;
   source?: string;
   globalHeaders?: Record<string, string>;
-  strictMode?: "ON" | "OFF";
+  strictMode?: "ON" | "OFF" | "WARN";
   keepAliveTimeout?: number;
   apiDoc?: {
     display?: "UI" | "HTTP" | false;
@@ -361,6 +355,10 @@ export type compilerType<
   },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
+  //? docs and validation
+  /**
+   * Sets the API body validation and documentation body for the endpoint
+   */
   body: (
     schemaFn: (
       t: typeof v,
@@ -368,18 +366,10 @@ export type compilerType<
       Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>
     >,
   ) => compilerType<JetData, JetPluginTypes>;
-  headers: (
-    headers: Record<string, string>,
-  ) => compilerType<JetData, JetPluginTypes>;
-  title: (title: string) => compilerType<JetData, JetPluginTypes>;
-  description: (description: string) => compilerType<JetData, JetPluginTypes>;
-  params: (
-    schemaFn: (
-      t: typeof v,
-    ) => Partial<
-      Record<keyof HTTPBody<NonNullable<JetData["params"]>>, SchemaBuilder>
-    >,
-  ) => compilerType<JetData, JetPluginTypes>;
+  //? docs and validation
+  /**
+   * Sets the API documentation query for the endpoint
+   */
   query: (
     schemaFn: (
       t: typeof v,
@@ -387,11 +377,14 @@ export type compilerType<
       Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>
     >,
   ) => compilerType<JetData, JetPluginTypes>;
-  response: (
-    schemaFn: (
-      t: typeof v,
-    ) => Partial<
-      Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
-    >,
-  ) => compilerType<JetData, JetPluginTypes>;
+  //? docs only
+  /**
+   * Sets the API documentation title for the endpoint
+   */
+  title: (title: string) => compilerType<JetData, JetPluginTypes>;
+  //? docs only
+  /**
+   * Sets the API documentation description for the endpoint
+   */
+  description: (description: string) => compilerType<JetData, JetPluginTypes>;
 };

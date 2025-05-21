@@ -191,4 +191,30 @@ hr {
   text-decoration: none;
   transition: color 0.2s ease;
 }
-   
+
+/* mobile styles */
+@media (max-width: 768px) {
+  .prose {
+    font-size: var(--font-size-base);
+  }
+
+  .prose h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .prose h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  .prose h3 {
+    font-size: var(--font-size-lg);
+  }
+
+  .prose h4 {
+    font-size: var(--font-size-base);
+  }
+
+  .header {
+    padding: 0; 
+  }
+}

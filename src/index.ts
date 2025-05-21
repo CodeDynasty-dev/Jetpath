@@ -10,22 +10,27 @@ import {
   generateRouteTypes,
   getHandlers,
   getLocalIP,
-  isIdentical,
-  UTILS,
+  server,
 } from "./primitives/functions.js";
-import type { AnyExecutor, jetOptions } from "./primitives/types.js";
+import type { jetOptions, UnionToIntersection } from "./primitives/types.js";
 import { JetPlugin, Log } from "./primitives/classes.js";
 import { sep } from "node:path";
 
 export class Jetpath {
   public server: any;
   private listening: boolean = false;
+  /**
+   * an object you can set values to per request
+   */
+  plugins: (UnionToIntersection<JetPlugin[]> & Record<string, any>) | undefined;
   private options: jetOptions = {
     port: 8080,
     apiDoc: { display: "UI" },
     cors: false,
+    strictMode: "OFF",
+    source: ".",
   };
-  private plugs: JetPlugin<AnyExecutor>[] = [];
+  private plugs: JetPlugin[] = [];
   constructor(options: jetOptions = {}) {
     Object.assign(this.options, options);
     if (!this.options.port) this.options.port = 8080;
@@ -42,46 +47,43 @@ export class Jetpath {
       });
     }
   }
-  addPlugin(plugin: {
-    _setup: (init: any) => any;
-    hasServer?: boolean;
-    executor: any;
-  }): void {
+  addPlugins(plugins: {
+    executor: (init: any) => Record<string, Function>;
+    server?: any;
+    name: string;
+  }[]): void {
     if (this.listening) {
       throw new Error("Your app is listening new plugins can't be added.");
     }
-    if (
-      isIdentical(
-        plugin,
-        new JetPlugin({
-          executor: () => {
-            return {};
-          },
-        }),
-      )
-    ) {
-      this.plugs.push(
-        plugin as JetPlugin<AnyExecutor>,
-      );
-    } else {
-      throw Error("invalid Jetpath plugin");
-    }
+    plugins.forEach((plugin) => {
+      if (
+        typeof plugin.executor === "function" || typeof plugin.name === "string"
+      ) {
+        // ? add plugin to the server
+        this.plugs.push(
+          new JetPlugin(plugin),
+        );
+      } else {
+        throw new Error("Plugin executor and name is required");
+      }
+    });
   }
   async listen(): Promise<void> {
     if (!this.options.source) {
-      Log.error(
+      Log.LOG(
         "Jetpath: Provide a source directory to avoid scanning the root directory",
+        "warn",
       );
     }
     // ? {-view-} here is replaced at build time to html
     let UI = `{{view}}`;
-    Log.info("Compiling...");
+    Log.LOG("Compiling...", "warn");
     const startTime = performance.now();
 
     // ? Load all jetpath functions described in user code
     const errorsCount = await getHandlers(this.options?.source!, true);
     const endTime = performance.now();
-    // Log.info("Compiled!");
+    // Log.LOG("Compiled!");
     //? compile API
     const [handlersCount, compiledAPI] = compileAPI(this.options);
     // ? render API in UI
@@ -160,75 +162,79 @@ export class Jetpath {
           return;
         }
       });
-      Log.info(
+      Log.LOG(
         `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
             endTime - startTime,
           )
         }ms`,
+        "warn",
       );
       //? generate types
-      if (this.options?.strictMode === "ON") {
-        await generateRouteTypes(this.options.source || ".");
+      if (/(ON|WARN)/.test(this.options?.strictMode || "OFF")) {
+        await generateRouteTypes(
+          this.options.source || ".",
+          this.options.strictMode as "ON" | "WARN",
+        );
       }
-      Log.info(
+      Log.LOG(
         `APIs: Viewable at http://localhost:${this.options.port}${
           this.options?.apiDoc?.path || "/api-doc"
         }`,
+        "info",
       );
     } else if (this.options?.apiDoc?.display === "HTTP") {
       //? generate types
-      if (this.options?.strictMode === "ON") {
-        await generateRouteTypes(this.options.source || ".");
-      }
+      await generateRouteTypes(
+        this.options.source || ".",
+        this.options?.strictMode as "ON" | "WARN",
+      );
       // ? render API in a .HTTP file
       await writeFile("api-doc.http", compiledAPI);
-      Log.info(
+      Log.LOG(
         `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
             endTime - startTime,
           )
         }ms`,
+        "info",
       );
-      Log.info(
+      Log.LOG(
         `APIs: written to ${sep}api-doc.http`,
+        "info",
       );
     }
     if (errorsCount) {
       for (let i = 0; i < errorsCount.length; i++) {
-        Log.error(
+        Log.LOG(
           `\nReport: ${errorsCount[i].file} file was not loaded due to \n "${
             errorsCount[i].error
           }" error; \n please resolve!`,
+          "warn",
         );
       }
     }
 
-    // ? kickoff server
-    if (this.options?.upgrade === true) {
-      UTILS.upgrade = true;
-    }
-    this.server = UTILS.server(this.plugs, this.options);
+    this.server = server(this.plugs, this.options);
     //
     assignMiddleware(_JetPath_paths, _jet_middleware);
     // ? start server
     this.listening = true;
     this.server.listen(this.options.port);
-    Log.info(`Open http://localhost:${this.options.port}`);
+    Log.LOG(`Open http://localhost:${this.options.port}`, "info");
+    // ? show external IP
     const localIP = getLocalIP();
     if (localIP) {
-      Log.info(`External: http://${localIP}:${this.options.port}`);
+      Log.LOG(`External: http://${localIP}:${this.options.port}`, "info");
     }
   }
 }
 
 //? exports
 export type {
-  AnyExecutor,
   JetContext,
   JetFile,
   JetMiddleware,
-  JetPluginExecutorInitParams,
   JetRoute,
 } from "./primitives/types.js";
 export { JetMockServer, JetPlugin } from "./primitives/classes.js";

@@ -7,11 +7,11 @@ import {
   isNode,
   JetSocketInstance,
   parseRequest,
-  UTILS,
+  plugins,
+  runtime,
   validator,
 } from "./functions.js";
 import type {
-  AnyExecutor,
   FileOptions,
   HTTPBody,
   JetContext,
@@ -27,21 +27,13 @@ import { mime } from "../extracts/mimejs-extract.js";
 import { resolve, sep } from "node:path";
 import type { BunFile } from "bun";
 
-export class JetPlugin<
-  E extends AnyExecutor = AnyExecutor,
-> {
-  executor: E;
-  JetPathServer?: any;
-  hasServer?: boolean;
-  config: Record<string, unknown> = {};
-  constructor({ executor }: { executor: E }) {
-    this.executor = executor;
+export class JetPlugin {
+  plugin: any;
+  constructor(plugin: { executor: Function; server?: any }) {
+    this.plugin = plugin;
   }
-  _setup(init: JetPluginExecutorInitParams): any {
-    return this.executor.call(this, init, this.config);
-  }
-  setConfig(config: Record<string, unknown>): void {
-    this.config = config;
+  setup(init: JetPluginExecutorInitParams): any {
+    return this.plugin.executor.call(this, init);
   }
 }
 
@@ -77,21 +69,15 @@ export class Log {
   static print(message: any, color: string) {
     console.log(`${color}%s${Log.colors.reset}`, `${message}`);
   }
-
-  static info(message: string) {
-    Log.print(message, Log.colors.fgBlue);
-  }
-
-  static warn(message: string) {
-    Log.print(message, Log.colors.fgYellow);
-  }
-
-  static error(message: string) {
-    Log.print(message, Log.colors.fgRed);
-  }
-
-  static success(message: string) {
-    Log.print(message, Log.colors.fgGreen);
+  static LOG(message: string, type: "info" | "warn" | "error" | "success") {
+    Log.print(
+      message,
+      type === "info"
+        ? Log.colors.fgBlue
+        : type === "warn"
+        ? Log.colors.fgYellow
+        : Log.colors.fgRed,
+    );
   }
 }
 
@@ -165,7 +151,7 @@ export class Context {
   handler: JetRoute | null = null;
   __jet_pool = true;
   get plugins() {
-    return UTILS.plugins;
+    return plugins;
   }
   // ? state
   get state(): Record<string, any> {
@@ -193,23 +179,18 @@ export class Context {
     this._7 = new ctxState();
   }
   send(data: unknown, contentType?: string) {
+    if (this._6 || this._3) {
+      throw new Error("Response already set");
+    }
     if (contentType) {
       this._2["Content-Type"] = contentType;
       this.payload = String(data);
     } else {
-      switch (typeof data) {
-        case "string":
-          this._2["Content-Type"] = "text/plain";
-          this.payload = data;
-          break;
-        case "object":
-          this._2["Content-Type"] = "application/json";
-          this.payload = JSON.stringify(data);
-          break;
-        default:
-          this._2["Content-Type"] = "text/plain";
-          this.payload = data ? String(data) : "";
-          break;
+      if (typeof data === "object") {
+        this._2["Content-Type"] = "application/json";
+        this.payload = JSON.stringify(data);
+      } else {
+        this.payload = data ? String(data) : "";
       }
     }
   }
@@ -219,24 +200,12 @@ export class Context {
     this._2["Location"] = url;
   }
 
-  throw(code: unknown = 404, message: unknown = "Not Found"): never {
-    if (typeof code !== "number") {
-      this.code = 400;
-      this.send(code);
-    } else {
-      this.code = code;
-      this.send(message);
-    }
-    throw new Error(this.payload);
-  }
-
   get(field: string) {
     if (field) {
-      if (UTILS.runtime["node"]) {
-        // @ts-expect-error
-        return this.request.headers[field] as string;
+      if (runtime["node"]) {
+        return (this.request as IncomingMessage).headers[field] as string;
       }
-      return (this.request as unknown as Request).headers.get(field) as string;
+      return (this.request as Request).headers.get(field) as string;
     }
     return undefined;
   }
@@ -248,7 +217,7 @@ export class Context {
   }
 
   getCookie(name: string): string | undefined {
-    const cookieHeader = UTILS.runtime["node"]
+    const cookieHeader = runtime["node"]
       ? (this.request as IncomingMessage).headers.cookie
       : (this.request as Request).headers.get("cookie");
 
@@ -260,7 +229,7 @@ export class Context {
   }
 
   getCookies(): Record<string, string> {
-    const cookieHeader = UTILS.runtime["node"]
+    const cookieHeader = runtime["node"]
       ? (this.request as IncomingMessage).headers.cookie
       : (this.request as Request).headers.get("cookie");
 
@@ -313,9 +282,9 @@ export class Context {
       this._2["Content-Disposition"] = `inline; filename="${
         stream.split("/").at(-1) || "unnamed.bin"
       }"`;
-      if (UTILS.runtime["bun"]) {
+      if (runtime["bun"]) {
         stream = Bun.file(stream);
-      } else if (UTILS.runtime["deno"]) {
+      } else if (runtime["deno"]) {
         // @ts-expect-error
         const file = Deno.open(stream).catch(() => {});
         stream = file;
@@ -346,8 +315,10 @@ export class Context {
   }
   // Only for deno and bun
   sendResponse(Response?: Response) {
-    // @ts-ignore
-    this._6 = Response;
+    if (!runtime["node"]) {
+      // @ts-ignore
+      this._6 = Response;
+    }
   }
   // Only for deno and bun
   upgrade(): void | never {
@@ -358,7 +329,7 @@ export class Context {
       if (this.get("upgrade") != "websocket") {
         throw new Error("Invalid upgrade header");
       }
-      if (UTILS.runtime["deno"]) {
+      if (runtime["deno"]) {
         // @ts-expect-error
         const { socket, response } = Deno.upgradeWebSocket(req);
         // @ts-expect-error
@@ -380,13 +351,13 @@ export class Context {
         this.connection = JetSocketInstance;
         return this.sendResponse(response);
       }
-      if (UTILS.runtime["bun"]) {
+      if (runtime["bun"]) {
         if (this.res?.upgrade?.(req)) {
           this.connection = JetSocketInstance;
           return this.sendResponse(undefined);
         }
       }
-      if (UTILS.runtime["node"]) {
+      if (runtime["node"]) {
         throw new Error(
           "No current websocket support for Nodejs! run with bun or deno.",
         );
@@ -403,8 +374,13 @@ export class Context {
       return this.body as Promise<Type>;
     }
     this.body = await parseRequest(this.request, options) as Promise<Type>;
+    //? validate body
     if (this.handler!.body) {
       this.body = validator(this.handler!.body, this.body);
+    }
+    //? validate query
+    if (this.handler!.query && this.query) {
+      this.query = validator(this.handler!.query, this.query);
     }
     return this.body as Promise<Type>;
   }
@@ -740,8 +716,9 @@ export class Trie {
     // ? Handle the root path explicitly
     if (normalizedPath === "") {
       if (this.root.handler) {
-        Log.warn(
+        Log.LOG(
           `Warning: Duplicate route definition for path ${this.method} ${path}`,
+          "warn",
         );
       }
       this.root.handler = handler;
@@ -766,8 +743,9 @@ export class Trie {
         // ? Check if a parameter node already exists at this level
         if (currentNode.parameterChild) {
           if (currentNode.parameterChild.paramName !== paramName) {
-            Log.warn(
+            Log.LOG(
               `Warning: Route path conflict at segment '${segment}' in ${this.method} ${path}. Parameter ': ${currentNode.parameterChild.paramName}' already defined at this level.`,
+              "warn",
             );
           }
           currentNode = currentNode.parameterChild;
@@ -793,8 +771,9 @@ export class Trie {
           );
         }
         if (currentNode.wildcardChild) {
-          Log.warn(
+          Log.LOG(
             `Warning: Duplicate wildcard definition at segment '${segment}' in ${this.method} ${path}.`,
+            "warn",
           );
           currentNode = currentNode.wildcardChild;
         } else if (currentNode.parameterChild) {
@@ -835,8 +814,9 @@ export class Trie {
       }
     }
     if (currentNode.handler) {
-      Log.warn(
+      Log.LOG(
         `Warning: Duplicate route definition for path '${path}'.`,
+        "warn",
       );
     }
     //? Set the handler and original path

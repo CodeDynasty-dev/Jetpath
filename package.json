@@ -48,7 +48,7 @@
     "lint": "gts lint",
     "clean": "gts clean",
     "fix": "gts fix",
-    "prepare": "tsc && bun bundle.ts && npm run build",
+    "prepare": "tsc --project tsconfig.d.json && tsc --project tsconfig.json && bun bundle.ts && npm run build",
     "pretest": "npm run build",
     "build:css": " css-purge -i docs/fragments/index.css  -o docs/assets/index.css",
     "posttest": "npm run lint",

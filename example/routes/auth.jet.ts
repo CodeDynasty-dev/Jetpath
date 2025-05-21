@@ -57,21 +57,6 @@ use(POST_auth_login).body((t) => {
     }).required(), // Password must be a required string.
   };
 }).title("Authenticate a user and receive an access token") // Add info for documentation.
-  .description(/*js*/ `
-    
-  ### ok here
-  - use the default values for username and password to authenticate as admin
-
-import { readFile  } from "fs/promises";
-// ? This file does a lot of in just few lines thanks to bunjs
-console.log("Jetpath: compiling...");
-const html = await readFile("src/assets/api-doc.html", {
-  encoding: "utf-8",
-});
-const code = await readFile("dist/index.js", {
-  encoding: "utf-8",
-});
- 
-
-// [X] npm pack will call npm run prepare which will run this file
-  `);
+  .description(`
+    ### ok here
+ `);
