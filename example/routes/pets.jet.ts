@@ -1,12 +1,12 @@
 // src/routes/pets.ts
 
 import { writeFile } from "node:fs/promises";
-import { type JetFile, JetRoute, use } from "../../dist/index.js";
+import { type JetFile,type JetRoute, use } from "../../dist/index.js";
 // Import AuthPluginType if authentication checks are done within route handlers (besides global middleware)
 import { type AuthPluginType } from "../plugins/auth.js";
 // Import data models and in-memory data arrays
 import { pets, reviews } from "../data/models.js";
-import { PetType } from "../types.js"; // Import PetType
+import { type PetType } from "../types.js"; // Import PetType
 import { join } from "node:path";
 
 // --- Pet Management Routes ---
@@ -291,7 +291,8 @@ export const POST_pets: JetRoute<{
   pets.push(newPet);
 
   // Log the creation action (using logger plugin via ctx.plugins).
-  ctx.plugins?.logger?.info({
+  // Log the creation action (using logger plugin via ctx.plugins).
+  ctx.plugins?.["info"]({
     action: "create_pet",
     petId: newPet.id,
     adminId: user.id,
@@ -388,7 +389,8 @@ export const PUT_petBy$id: JetRoute<{
   pets[index] = updatedPet;
 
   // Log the update action.
-  ctx.plugins?.logger?.info({
+  // Log the update action.
+  ctx.plugins?.["info"]({
     action: "update_pet",
     petId: updatedPet.id,
     adminId: user.id,
@@ -478,7 +480,8 @@ export const DELETE_petBy$id: JetRoute<{
   });
 
   // Log the deletion action.
-  ctx.plugins?.logger?.info({
+  // Log the deletion action.
+  ctx.plugins?.["info"]({
     action: "delete_pet",
     petId: deletedPet.id,
     adminId: user.id,
@@ -689,7 +692,8 @@ export const POST_recipes$id_image: JetRoute<{
     pet.updatedAt = new Date().toISOString(); // Update modification timestamp
 
     // Log the image upload action.
-    ctx.plugins?.logger?.info({
+    // Log the image upload action.
+    ctx.plugins?.["info"]({
       action: "upload_pet_image",
       petId,
       imageUrl: pet.image, // Log the new image URL
@@ -709,7 +713,7 @@ export const POST_recipes$id_image: JetRoute<{
   } catch (error: any) {
     // If an error occurs during file saving, log it and throw it to the global error handler.
     console.error("Error saving file:", error);
-    ctx.plugins?.logger?.error({
+    ctx.plugins?.["error"]({
       action: "upload_pet_image_error",
       petId,
       error: error.message,

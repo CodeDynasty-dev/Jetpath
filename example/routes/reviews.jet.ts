@@ -1,11 +1,11 @@
 // src/routes/reviews.ts
 
-import { JetRoute, use } from "../../dist/index.js";
+import {type JetRoute, use } from "../../dist/index.js";
 // Import AuthPluginType if authentication checks are done within route handlers
 import { type AuthPluginType } from "../plugins/auth.js";
 // Import data models and in-memory data arrays
 import { pets, reviews } from "../data/models.js";
-import { ReviewType } from "../types.js"; // Import ReviewType
+import {type ReviewType } from "../types.js"; // Import ReviewType
 
 // --- Reviews Management Routes ---
 
@@ -74,7 +74,16 @@ export const GET_petBy$id_reviews: JetRoute<{
 };
 
 // Apply .info() for documentation.
-use(GET_petBy$id_reviews).title("Get all reviews for a specific pet");
+use(GET_petBy$id_reviews).title("Get all reviews for a specific pet").query(
+  (t) => {
+    // Define the expected query parameters and validation rules.
+    return {
+      // Optional sort parameter, default to '-createdAt' (newest first).
+      sort: t.string({
+        err: "Sort parameter must be a string",
+      }).default("-createdAt"),
+    };
+  },)
 
 /**
  * Add a review for a pet
@@ -134,7 +143,8 @@ export const POST_petBy$id_reviews: JetRoute<{
   reviews.push(newReview);
 
   // Log the review creation action.
-  ctx.plugins?.logger?.info({
+  // Log the review creation action.
+  ctx.plugins?.["info"]({
     action: "create_review",
     reviewId: newReview.id,
     petId: newReview.petId,
@@ -218,7 +228,7 @@ export const DELETE_reviews$reviewId: JetRoute<{
   const deletedReview = reviews.splice(reviewIndex, 1)[0];
 
   // Log the deletion action.
-  ctx.plugins?.logger?.info({
+  ctx.plugins?.["info"]({
     action: "delete_review",
     reviewId: deletedReview.id,
     petId: deletedReview.petId,

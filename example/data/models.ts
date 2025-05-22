@@ -1,4 +1,4 @@
-import { PetType, ReviewType } from "../types.js"; // Import types
+import type { PetType, ReviewType } from "../types.js"; // Import types
 
 /**
  * In-memory pet database

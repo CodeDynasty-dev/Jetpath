@@ -23,7 +23,7 @@ import {
   FileSchema,
   JetPlugin,
   JetSocket,
-  Log,
+  LOG,
   NumberSchema,
   ObjectSchema,
   SchemaBuilder,
@@ -490,8 +490,8 @@ const getModule = async (src: string, name: string) => {
     const mod = await import(path.resolve(src + "/" + name));
     return mod;
   } catch (error) {
-    Log.LOG("Error at " + src + "/" + name + "  loading failed!", "info");
-    Log.LOG(String(error), "error");
+    LOG.log("Error at " + src + "/" + name + "  loading failed!", "info");
+    LOG.log(String(error), "error");
     return String(error);
   }
 };
@@ -508,8 +508,8 @@ export async function getHandlers(
   if (!again) {
     source = path.resolve(path.join(curr_d, source));
     if (!source.includes(curr_d)) {
-      Log.LOG('source: "' + error_source + '" is invalid', "warn");
-      Log.LOG("Jetpath source must be within the project directory", "error");
+      LOG.log('source: "' + error_source + '" is invalid', "warn");
+      LOG.log("Jetpath source must be within the project directory", "error");
       process.exit(1);
     }
   } else {
@@ -522,7 +522,7 @@ export async function getHandlers(
       (dirent.name.endsWith(".jet.js") || dirent.name.endsWith(".jet.ts"))
     ) {
       if (print) {
-        Log.LOG(
+        LOG.log(
           "Loading " + source.replace(curr_d + "/", "") + sep +
             dirent.name,
           "info",
@@ -1241,7 +1241,7 @@ export async function generateRouteTypes(
   const METHOD_PATH_REGEX =
     /(?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$_]*$/;
   const OUTPUT_FILE = resolve(
-    join(cwd(), "node_modules", ".jetpath", ".apis-types.ts"),
+    join(cwd(), "node_modules", "@jetflare-types", "index.ts"),
   );
 
   mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
@@ -1261,9 +1261,6 @@ export async function generateRouteTypes(
             await walkDir(fullPath);
           }
         } else if (entry.isFile() && entry.name.endsWith(".jet.ts")) {
-          // const relativePath = path.relative(cwd(), fullPath);
-          // const modulePath = relativePath.replace(/\\/g, "/");
-
           try {
             const fileContent = await readFile(fullPath, "utf-8");
             const foundExports = [];
@@ -1274,7 +1271,7 @@ export async function generateRouteTypes(
               if (METHOD_PATH_REGEX.test(exportName)) {
                 foundExports.push(exportName);
               } else {
-                Log.LOG(
+                LOG.log(
                   ` ${exportName} is not a valid JetRoute export`,
                   "error",
                 );
@@ -1322,11 +1319,113 @@ export async function generateRouteTypes(
   outputContent +=
     `// @ts-ignore\nimport { type JetRoute, JetMiddleware } from 'jetpath';\n\n`;
 
+  outputContent += `export const routes = {\n ${
+    Object.keys(_JetPath_paths).reduce((acc: string[], method) => {
+      const routes = Object.keys(_JetPath_paths[method as methods]);
+      const obj = _JetPath_paths[method as methods];
+    
+      if (routes.length > 0) {
+        for (const route of routes) {
+          const body: Record<string, "string"> = {};
+          const params: Record<string, "string"> = {};
+          const query: Record<string, "string"> = {};
+          for (const key in obj[route].body) {
+            body[key] = obj[route].body[key].type as "string" || "string";
+          }
+          for (const key in obj[route].params) {
+            params[key] = "string";
+          }
+          for (const key in obj[route].query) {
+            query[key] = "string";
+          }
+          acc.push(
+            `${
+              obj[route].name
+            }: {\n    path: "${route}",\n    method: "${method.toLowerCase()}",\n    body: ${JSON.stringify(body || {})},\n    query: ${JSON.stringify(query || {})},\n    title: "${obj[route].title || ''}",\n    params: ${JSON.stringify(params || {})}\n}`,
+          );
+        }
+      }
+      return acc;
+    }, []).join(",\n ")
+  } \n} as const;\n\n`;
+  outputContent += `declare class CacheManager {
+    private cache;
+    private maxSize;
+    set(key: string, data: any, ttl?: number): void;
+    get(key: string): any;
+    invalidate(pattern: string | string[]): void;
+    clear(): void;
+}
+declare class JetResponse {
+    response: Response;
+    cached: boolean;
+    fromCache: boolean;
+    constructor(response: Response, cached?: boolean, fromCache?: boolean);
+    get ok(): boolean;
+    get status(): number;
+    get statusText(): string;
+    get headers(): Headers;
+    get url(): string;
+    json<T = any>(): Promise<T>;
+    text(): Promise<string>;
+    blob(): Promise<Blob>;
+    arrayBuffer(): Promise<ArrayBuffer>;
+    formData(): Promise<FormData>;
+}
+interface ApiFunctionPayload  {
+    body?: any;
+    query?: Record<string, any>;
+    params?: Record<string, any>;
+    headers?: Record<string, string>;
+    files?: FileList | File[] | File;
+    cache?: boolean | { ttl?: number; key?: string };
+    timeout?: number;
+    retry?: boolean | { attempts?: number; delay?: number };
+    onUploadProgress?: (progress: { loaded: number; total: number; percentage: number }) => void;
+    onDownloadProgress?: (progress: { loaded: number; total: number; percentage: number }) => void;
+}
+type ApiFunction = (payload?: ApiFunctionPayload) => Promise<JetResponse>;
+type WebSocketFunction = (payload?: { protocols?: string | string[] }) => {
+    connect: () => WebSocket;
+    on: (event: string, handler: Function) => void;
+    off: (event: string, handler: Function) => void;
+    send: (data: any) => void;
+    close: () => void;
+};
+type SSEFunction = (payload?: ApiFunctionPayload) => {
+    connect: () => EventSource;
+    on: (event: string, handler: (event: any) => void) => void;
+    close: () => void;
+};
+
+// Main SDK type
+export type API = {
+    [K in keyof typeof routes]: 
+        (typeof routes)[K]['method'] extends 'websocket' ? WebSocketFunction :
+        (typeof routes)[K]['method'] extends 'sse' ? SSEFunction :
+        ApiFunction;
+} & { 
+    origin: string;
+    cache: CacheManager;
+    interceptors: {
+        request: Set<(config: any) => any>;
+        response: Set<(response: JetResponse) => JetResponse>;
+        error: Set<(error: Error) => Error>;
+    };
+    setBaseURL: (url: string) => void;
+    setDefaultHeaders: (headers: Record<string, string>) => void;
+    setDefaultTimeout: (timeout: number) => void;
+    withAuth: (token: string) => API;
+    withTimeout: (timeout: number) => API;
+    withBaseURL: (url: string) => API;
+};
+\n
+`;
   //? Add all the generated module declarations
   outputContent += declarations.join("\n");
 
   try {
-    Log.LOG("⚙️  StrictMode...\nmode: " + mode, "info");
+    LOG.log("⚙️  StrictMode...\nmode: " + mode, "info");
     await writeFile(OUTPUT_FILE, outputContent, "utf-8");
 
     const promisifiedExecFile = () =>
@@ -1352,18 +1451,18 @@ export async function generateRouteTypes(
           { encoding: "utf8" },
           (err, stdout, stderr) => {
             if (err) {
-              Log.LOG("\n🛠️ StrictMode warnings", "warn");
-              Log.LOG(
+              LOG.log("\n🛠️ StrictMode warnings", "warn");
+              LOG.log(
                 stderr.replaceAll("\n", "\n\n"),
                 mode === "WARN" ? "warn" : "error",
               );
-              Log.LOG(
+              LOG.log(
                 stdout.replaceAll("\n", "\n\n"),
                 mode === "WARN" ? "warn" : "error",
               );
               const errors = (stdout.split("\n")).length - 1;
 
-              Log.LOG(
+              LOG.log(
                 errors +
                   ` Problem${
                     errors === 1 ? "" : "s"
@@ -1377,7 +1476,7 @@ export async function generateRouteTypes(
       });
     await promisifiedExecFile();
   } catch (error) {
-    Log.LOG(`Error writing output file apis-types.d.ts: ${error}`, "error");
+    LOG.log(`Error writing output file apis-types.d.ts: ${error}`, "error");
   }
 }
 

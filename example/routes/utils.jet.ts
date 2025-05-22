@@ -1,6 +1,6 @@
 // src/routes/utils.ts
 
-import { type JetFile, JetRoute, use } from "../../dist/index.js";
+import { type JetFile, type JetRoute, use } from "../../dist/index.js";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path"; // Import join
 import { pets, reviews } from "../data/models.js"; // Import data for stats route
@@ -437,7 +437,7 @@ export const POST_upload: JetRoute<{
         } catch (fileError) {
           console.error(`Error saving file ${fileData.fileName}:`, fileError);
           // Log file save error using logger plugin.
-          ctx.plugins?.logger?.error({
+          ctx.plugins?.["error"]({
             action: "file_upload_save_error",
             fieldName: fieldName,
             fileName: fileData.fileName,
@@ -464,7 +464,8 @@ export const POST_upload: JetRoute<{
     }
 
     // Log the overall upload action.
-    ctx.plugins?.logger?.title({
+    // Log the overall upload action.
+    ctx.plugins?.["title"]({
       action: "general_file_upload",
       userId: user.id,
       uploadedFiles: Object.keys(results).filter((key) => results[key].url).map(
@@ -483,7 +484,7 @@ export const POST_upload: JetRoute<{
     // If an error occurred during body parsing (e.g., maxBodySize exceeded, invalid multipart data),
     // log it and throw it to the global error handler.
     console.error("Error processing file upload:", error);
-    ctx.plugins?.logger?.error({
+    ctx.plugins?.["error"]({
       action: "general_file_upload_process_error",
       error: error.message,
       adminId: user?.id || "unknown",

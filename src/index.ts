@@ -13,7 +13,7 @@ import {
   server,
 } from "./primitives/functions.js";
 import type { jetOptions, UnionToIntersection } from "./primitives/types.js";
-import { JetPlugin, Log } from "./primitives/classes.js";
+import { JetPlugin, LOG } from "./primitives/classes.js";
 import { sep } from "node:path";
 
 export class Jetpath {
@@ -73,20 +73,20 @@ export class Jetpath {
   }
   async listen(): Promise<void> {
     if (!this.options.source) {
-      Log.LOG(
+      LOG.log(
         "Jetpath: Provide a source directory to avoid scanning the root directory",
         "warn",
       );
     }
     // ? {-view-} here is replaced at build time to html
     let UI = `{{view}}`;
-    Log.LOG("Compiling...", "info");
+    LOG.log("Compiling...", "info");
     const startTime = performance.now();
 
     // ? Load all jetpath functions described in user code
     const errorsCount = await getHandlers(this.options?.source!, true);
     const endTime = performance.now();
-    // Log.LOG("Compiled!");
+    // LOG.log("Compiled!");
     //? compile API
     const [handlersCount, compiledAPI] = compileAPI(this.options);
     // ? render API in UI
@@ -165,7 +165,7 @@ export class Jetpath {
           return;
         }
       });
-      Log.LOG(
+      LOG.log(
         `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
             endTime - startTime,
@@ -180,7 +180,7 @@ export class Jetpath {
           this.options.strictMode as "ON" | "WARN",
         );
       }
-      Log.LOG(
+      LOG.log(
         `APIs: Viewable at http://localhost:${this.options.port}${
           this.options?.apiDoc?.path || "/api-doc"
         }`,
@@ -194,7 +194,7 @@ export class Jetpath {
       );
       // ? render API in a .HTTP file
       await writeFile("api-doc.http", compiledAPI);
-      Log.LOG(
+      LOG.log(
         `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
             endTime - startTime,
@@ -202,14 +202,14 @@ export class Jetpath {
         }ms`,
         "info",
       );
-      Log.LOG(
+      LOG.log(
         `APIs: written to ${sep}api-doc.http`,
         "info",
       );
     }
     if (errorsCount) {
       for (let i = 0; i < errorsCount.length; i++) {
-        Log.LOG(
+        LOG.log(
           `\nReport: ${errorsCount[i].file} file was not loaded due to \n "${
             errorsCount[i].error
           }" error; \n please resolve!`,
@@ -224,11 +224,11 @@ export class Jetpath {
     // ? start server
     this.listening = true;
     this.server.listen(this.options.port);
-    Log.LOG(`Open http://localhost:${this.options.port}`, "info");
+    LOG.log(`Open http://localhost:${this.options.port}`, "info");
     // ? show external IP
     const localIP = getLocalIP();
     if (localIP) {
-      Log.LOG(`External: http://${localIP}:${this.options.port}`, "info");
+      LOG.log(`External: http://${localIP}:${this.options.port}`, "info");
     }
   }
 }
@@ -243,3 +243,4 @@ export type {
 export { JetMockServer } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";
 export { mime } from "./extracts/mimejs-extract.js";
+export { Jetflare } from "./primitives/jetflare.js";

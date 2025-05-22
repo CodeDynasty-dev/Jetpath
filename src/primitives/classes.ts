@@ -37,7 +37,7 @@ export class JetPlugin {
   }
 }
 
-export class Log {
+export class LOG {
   // Define ANSI escape codes for colors and styles
   static colors = {
     reset: "\x1b[0m",
@@ -67,16 +67,16 @@ export class Log {
     bgWhite: "\x1b[47m",
   };
   static print(message: any, color: string) {
-    console.log(`${color}%s${Log.colors.reset}`, `${message}`);
+    console.log(`${color}%s${LOG.colors.reset}`, `${message}`);
   }
-  static LOG(message: string, type: "info" | "warn" | "error" | "success") {
-    Log.print(
+  static log(message: string, type: "info" | "warn" | "error" | "success") {
+    LOG.print(
       message,
       type === "info"
-        ? Log.colors.fgBlue
+        ? LOG.colors.fgBlue
         : type === "warn"
-        ? Log.colors.fgYellow
-        : Log.colors.fgRed,
+        ? LOG.colors.fgYellow
+        : LOG.colors.fgRed,
     );
   }
 }
@@ -716,7 +716,7 @@ export class Trie {
     // ? Handle the root path explicitly
     if (normalizedPath === "") {
       if (this.root.handler) {
-        Log.LOG(
+        LOG.log(
           `Warning: Duplicate route definition for path ${this.method} ${path}`,
           "warn",
         );
@@ -743,7 +743,7 @@ export class Trie {
         // ? Check if a parameter node already exists at this level
         if (currentNode.parameterChild) {
           if (currentNode.parameterChild.paramName !== paramName) {
-            Log.LOG(
+            LOG.log(
               `Warning: Route path conflict at segment '${segment}' in ${this.method} ${path}. Parameter ': ${currentNode.parameterChild.paramName}' already defined at this level.`,
               "warn",
             );
@@ -771,7 +771,7 @@ export class Trie {
           );
         }
         if (currentNode.wildcardChild) {
-          Log.LOG(
+          LOG.log(
             `Warning: Duplicate wildcard definition at segment '${segment}' in ${this.method} ${path}.`,
             "warn",
           );
@@ -814,7 +814,7 @@ export class Trie {
       }
     }
     if (currentNode.handler) {
-      Log.LOG(
+      LOG.log(
         `Warning: Duplicate route definition for path '${path}'.`,
         "warn",
       );

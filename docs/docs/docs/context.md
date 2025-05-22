@@ -40,7 +40,7 @@ export const GET_user = async (ctx) => {
   const user = await getUser(userId);
   
   if (!user) {
-    ctx.plugins?.logger?.error(`User ${userId} not found`);
+    ctx.plugins?.error(`User ${userId} not found`);
     ctx.throw(404, `User ${userId} not found`);
   }
   ctx.send(user);

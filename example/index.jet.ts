@@ -1,10 +1,10 @@
 // src/index.ts
 
-import { Jetpath } from "../dist/index.js";
+import { Jetpath, Jetflare } from "../dist/index.js";
 // Create mock plugin files in src/plugins if you don't have real ones.
 import { authPlugin } from "./plugins/auth.js";
 import { jetLogger } from "./plugins/logging.js";
-
+import { type API, routes } from "../node_modules/@jetflare-types/index.js";
 // --- Application Initialization ---
 
 // Create a new Jetpath application instance with configuration.
@@ -81,10 +81,34 @@ jetLogger.config = {
   filename: "./pet-shop-api-log.log", // Log file path relative to project root
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.addPlugins(jetLogger, authPlugin);
 
-// --- Start the Server ---
-// Start the Jetpath server and begin listening for incoming HTTP requests.
-// Jetpath automatically discovers and hooks up the exported middleware and routes
-// from imported modules upon initialization and the call to .listen().
 app.listen();
+
+setTimeout(async() => {
+  
+  
+  const api = new Jetflare({
+  origin: "http://localhost:9000",
+  routes
+}) as unknown as API;
+
+const data =  await api
+  .GET_stats();
+  console.log(await data.json()); 
+  
+}, 6000);
