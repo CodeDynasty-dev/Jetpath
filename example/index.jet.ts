@@ -99,16 +99,16 @@ app.addPlugins(jetLogger, authPlugin);
 
 app.listen();
 
-setTimeout(async() => {
+// setTimeout(async() => {
   
   
-  const api = new Jetflare({
-  origin: "http://localhost:9000",
-  routes
-}) as unknown as API;
+//   const api: API = new Jetflare({
+//   origin: "http://localhost:9000",
+//   routes
+// }) as API; 
 
-const data =  await api
-  .GET_stats();
-  console.log(await data.json()); 
+// const data =  await api
+//   .GET_stats();
+//   console.log(await data.json()); 
   
-}, 6000);
+// }, 6000);

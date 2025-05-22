@@ -243,4 +243,3 @@ export type {
 export { JetMockServer } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";
 export { mime } from "./extracts/mimejs-extract.js";
-export { Jetflare } from "./primitives/jetflare.js";
