@@ -162,6 +162,7 @@ export type jetOptions = {
   source?: string;
   globalHeaders?: Record<string, string>;
   strictMode?: "ON" | "OFF" | "WARN";
+  generateRoutes?: boolean;
   keepAliveTimeout?: number;
   apiDoc?: {
     display?: "UI" | "HTTP" | false;
@@ -193,7 +194,7 @@ export type jetOptions = {
       exposeHeaders?: string[];
       keepHeadersOnError?: boolean;
       maxAge?: string;
-      credentials?: boolean;
+    credentials?: boolean;
       privateNetworkAccess?: any;
       origin?: string[];
     }

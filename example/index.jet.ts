@@ -12,6 +12,7 @@ import { jetLogger } from "./plugins/logging.js";
 const app = new Jetpath({
   // Strict mode can enforce certain behaviors (e.g., strict content type checking).
   strictMode: "ON", // Example from app.jet.ts
+  generateRoutes: true, // Automatically generate routes based on imported modules
 
   // Configure API documentation (Swagger UI).
   // This makes it easy to visualize and test the API endpoints.
@@ -21,10 +22,7 @@ const app = new Jetpath({
     // Use Markdown for a rich description in the documentation.
     // This info can be more general, as route-specific info comes from .info() calls.
     info: `
-
-
 #### PetShop API Documentation
-
 
 This is an API for managing a pet shop inventory, built with the **Jetpath** cross-runtime framework.
 
@@ -37,11 +35,6 @@ It demonstrates various Jetpath features including:
 - Robust error handling (via global middleware)
 
 [check our docs for more info](https://jetpath.codedynasty.dev)
-
-
-
-
-
 `,
 
     color: "#7e57c2", // Using the color from the original sample

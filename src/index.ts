@@ -8,7 +8,7 @@ import {
   compileAPI,
   compileUI,
   corsMiddleware,
-  generateRouteTypes,
+  codeGen,
   getHandlers,
   getLocalIP,
   server,
@@ -175,9 +175,11 @@ export class Jetpath {
       );
       //? generate types
       if (/(ON|WARN)/.test(this.options?.strictMode || "OFF")) {
-        await generateRouteTypes(
+        await codeGen(
           this.options.source || ".",
           this.options.strictMode as "ON" | "WARN",
+        this.options.generateRoutes
+
         );
       }
       LOG.log(
@@ -188,9 +190,10 @@ export class Jetpath {
       );
     } else if (this.options?.apiDoc?.display === "HTTP") {
       //? generate types
-      await generateRouteTypes(
+      await codeGen(
         this.options.source || ".",
         this.options?.strictMode as "ON" | "WARN",
+        this.options.generateRoutes
       );
       // ? render API in a .HTTP file
       await writeFile("api-doc.http", compiledAPI);

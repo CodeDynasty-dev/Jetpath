@@ -30,3 +30,4 @@ src/assets/bundle.js
 bench.sh
 **.log
 docs/build
+definitions.jet.ts

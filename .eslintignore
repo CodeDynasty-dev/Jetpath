@@ -2,3 +2,4 @@ docs/build
 example
 bundle.ts
 dist
+definitions.jet.ts
