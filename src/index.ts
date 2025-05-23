@@ -1,4 +1,5 @@
 import { writeFile } from "node:fs/promises";
+import { sep } from "node:path";
 import {
   _jet_middleware,
   _JetPath_paths,
@@ -14,7 +15,6 @@ import {
 } from "./primitives/functions.js";
 import type { jetOptions, UnionToIntersection } from "./primitives/types.js";
 import { JetPlugin, LOG } from "./primitives/classes.js";
-import { sep } from "node:path";
 
 export class Jetpath {
   public server: any;
@@ -47,12 +47,12 @@ export class Jetpath {
       });
     }
   }
-  addPlugins<K>(
-    ...plugins: {
+  derivePlugins<JetPluginTypes extends {
       executor: (init: any) => Record<string, Function>;
       server?: any;
       name: string;
-    }[]
+    }[] = []>(
+    ...plugins: JetPluginTypes
   ) {
     if (this.listening) {
       throw new Error("Your app is listening new plugins can't be added.");
@@ -69,7 +69,7 @@ export class Jetpath {
         throw new Error("Plugin executor and name is required");
       }
     });
-    return this as unknown as UnionToIntersection<K>;
+    return this as unknown as UnionToIntersection<JetPluginTypes[number]> & Record<string, any>;
   }
   async listen(): Promise<void> {
     if (!this.options.source) {

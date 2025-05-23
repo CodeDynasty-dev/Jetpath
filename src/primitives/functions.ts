@@ -1241,7 +1241,7 @@ export async function generateRouteTypes(
   const METHOD_PATH_REGEX =
     /(?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$_]*$/;
   const OUTPUT_FILE = resolve(
-    join(cwd(), "node_modules", "@jetflare-types", "index.ts"),
+    join(cwd(), "node_modules", "@jetpath", "index.ts"),
   );
 
   mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
@@ -1326,101 +1326,39 @@ export async function generateRouteTypes(
     
       if (routes.length > 0) {
         for (const route of routes) {
-          const body: Record<string, "string"> = {};
-          const params: Record<string, "string"> = {};
-          const query: Record<string, "string"> = {};
+          let body: Record<string, "string">| undefined;
+          let params: Record<string, "string">| undefined;
+          let query: Record<string, "string">| undefined;
           for (const key in obj[route].body) {
-            body[key] = obj[route].body[key].type as "string" || "string";
+            if (!body) {
+              body = {};
+            }
+            const type = obj[route].body[key].type;
+            let val = type === "string" ? "string" : type  === "number" ? 1 : type === "boolean" ? true : type === "object" ? {} : type === "array" ? [] : type === "file" ? "file" : type;
+            body[key] = val as "string";
           }
           for (const key in obj[route].params) {
+            if (!params) {
+              params = {};
+            }
             params[key] = "string";
           }
           for (const key in obj[route].query) {
+            if (!query) {
+              query = {};
+            }
             query[key] = "string";
           }
           acc.push(
             `${
               obj[route].name
-            }: {\n    path: "${route}",\n    method: "${method.toLowerCase()}",\n    body: ${JSON.stringify(body || {})},\n    query: ${JSON.stringify(query || {})},\n    title: "${obj[route].title || ''}",\n    params: ${JSON.stringify(params || {})}\n}`,
+            }: {\n    path: "${route}",\n    method: "${method.toLowerCase()}",\n${body?`    body: ${JSON.stringify(body || {})},\n`:""}${query?`    query: ${JSON.stringify(query || {})},\n`:""}    title: "${obj[route].title || ''}",\n${params?`    params: ${JSON.stringify(params || {})},\n`:""}}`,
           );
         }
       }
       return acc;
     }, []).join(",\n ")
   } \n} as const;\n\n`;
-  outputContent += `declare class CacheManager {
-    private cache;
-    private maxSize;
-    set(key: string, data: any, ttl?: number): void;
-    get(key: string): any;
-    invalidate(pattern: string | string[]): void;
-    clear(): void;
-}
-declare class JetResponse {
-    response: Response;
-    cached: boolean;
-    fromCache: boolean;
-    constructor(response: Response, cached?: boolean, fromCache?: boolean);
-    get ok(): boolean;
-    get status(): number;
-    get statusText(): string;
-    get headers(): Headers;
-    get url(): string;
-    json<T = any>(): Promise<T>;
-    text(): Promise<string>;
-    blob(): Promise<Blob>;
-    arrayBuffer(): Promise<ArrayBuffer>;
-    formData(): Promise<FormData>;
-}
-interface ApiFunctionPayload  {
-    body?: any;
-    query?: Record<string, any>;
-    params?: Record<string, any>;
-    headers?: Record<string, string>;
-    files?: FileList | File[] | File;
-    cache?: boolean | { ttl?: number; key?: string };
-    timeout?: number;
-    retry?: boolean | { attempts?: number; delay?: number };
-    onUploadProgress?: (progress: { loaded: number; total: number; percentage: number }) => void;
-    onDownloadProgress?: (progress: { loaded: number; total: number; percentage: number }) => void;
-}
-type ApiFunction = (payload?: ApiFunctionPayload) => Promise<JetResponse>;
-type WebSocketFunction = (payload?: { protocols?: string | string[] }) => {
-    connect: () => WebSocket;
-    on: (event: string, handler: Function) => void;
-    off: (event: string, handler: Function) => void;
-    send: (data: any) => void;
-    close: () => void;
-};
-type SSEFunction = (payload?: ApiFunctionPayload) => {
-    connect: () => EventSource;
-    on: (event: string, handler: (event: any) => void) => void;
-    close: () => void;
-};
-
-// Main SDK type
-export type API = {
-    [K in keyof typeof routes]: 
-        (typeof routes)[K]['method'] extends 'websocket' ? WebSocketFunction :
-        (typeof routes)[K]['method'] extends 'sse' ? SSEFunction :
-        ApiFunction;
-} & { 
-    origin: string;
-    cache: CacheManager;
-    interceptors: {
-        request: Set<(config: any) => any>;
-        response: Set<(response: JetResponse) => JetResponse>;
-        error: Set<(error: Error) => Error>;
-    };
-    setBaseURL: (url: string) => void;
-    setDefaultHeaders: (headers: Record<string, string>) => void;
-    setDefaultTimeout: (timeout: number) => void;
-    withAuth: (token: string) => API;
-    withTimeout: (timeout: number) => API;
-    withBaseURL: (url: string) => API;
-};
-\n
-`;
   //? Add all the generated module declarations
   outputContent += declarations.join("\n");
 
