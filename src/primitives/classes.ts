@@ -184,7 +184,7 @@ export class Context {
     if (contentType) {
       this._2["Content-Type"] = contentType;
       this.payload = String(data);
-      this.code = statusCode || 200;
+      if (statusCode) this.code = statusCode;
     } else {
       if (typeof data === "object") {
         this._2["Content-Type"] = "application/json";
@@ -192,7 +192,7 @@ export class Context {
       } else {
         this.payload = data ? String(data) : "";
       }
-      this.code = statusCode || 200;
+      if (statusCode) this.code = statusCode;
     }
   }
 
