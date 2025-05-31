@@ -86,10 +86,6 @@ export interface JetContext<
    */
   send(data: unknown, ContentType?: string): void;
   /**
-   * end the request with an error
-   */
-  throw(code?: unknown, message?: unknown): never;
-  /**
    * redirect the request
    */
   redirect(url: string): void;
