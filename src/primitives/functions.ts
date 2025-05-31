@@ -179,7 +179,16 @@ export let runtime: Record<"bun" | "deno" | "node" | "edge", boolean> = {
   node: false,
   edge: false,
 };
-export const plugins: {} = {};
+const plugins  : Record<string, Function> = {};
+
+export function abstractPluginCreator(ctx:  Context) {
+  const abstractPlugin : Record<string, Function> = {}
+  for (const key in plugins) {
+    abstractPlugin[key] = plugins[key].bind(ctx);
+  }
+  return abstractPlugin;
+}
+
 export const isNode = runtime["node"];
 
 const ae = (cb: { (): any; (): any; (): void }) => {

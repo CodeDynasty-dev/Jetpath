@@ -3,11 +3,11 @@ import { IncomingMessage } from "node:http";
 import { type Stream } from "node:stream";
 import {
   _JetPath_paths,
+  abstractPluginCreator,
   getCtx,
   isNode,
   JetSocketInstance,
-  parseRequest,
-  plugins,
+  parseRequest, 
   runtime,
   validator,
 } from "./functions.js";
@@ -139,6 +139,8 @@ class ctxState {
   state: Record<string, any> = {};
 }
 
+ 
+
 export class Context {
   code = 200;
   request: Request | IncomingMessage | undefined;
@@ -150,9 +152,7 @@ export class Context {
   method: methods | undefined;
   handler: JetRoute | null = null;
   __jet_pool = true;
-  get plugins() {
-    return plugins;
-  }
+  plugins: Record<string, Function>;
   // ? state
   get state(): Record<string, any> {
     // ? auto clean up state object
@@ -176,6 +176,7 @@ export class Context {
   //? state
   _7: ctxState;
   constructor() {
+    this.plugins = abstractPluginCreator(this);
     this._7 = new ctxState();
   }
   send(data: unknown, statusCode?: number, contentType?: string) {
