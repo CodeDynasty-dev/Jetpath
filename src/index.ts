@@ -5,10 +5,10 @@ import {
   _JetPath_paths,
   _JetPath_paths_trie,
   assignMiddleware,
+  codeGen,
   compileAPI,
   compileUI,
   corsMiddleware,
-  codeGen,
   getHandlers,
   getLocalIP,
   server,
@@ -47,11 +47,13 @@ export class Jetpath {
       });
     }
   }
-  derivePlugins<JetPluginTypes extends {
+  derivePlugins<
+    JetPluginTypes extends {
       executor: (init: any) => Record<string, Function>;
       server?: any;
       name: string;
-    }[] = []>(
+    }[] = [],
+  >(
     ...plugins: JetPluginTypes
   ) {
     if (this.listening) {
@@ -69,7 +71,9 @@ export class Jetpath {
         throw new Error("Plugin executor and name is required");
       }
     });
-    return this as unknown as UnionToIntersection<JetPluginTypes[number]> & Record<string, any>;
+    return this as unknown as
+      & UnionToIntersection<JetPluginTypes[number]>
+      & Record<string, any>;
   }
   async listen(): Promise<void> {
     if (!this.options.source) {
@@ -107,7 +111,8 @@ export class Jetpath {
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,200,
+                `<h1>401 Unauthorized</h1>`,
+                200,
                 "text/html",
               );
               return;
@@ -125,7 +130,8 @@ export class Jetpath {
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,200,
+                `<h1>401 Unauthorized</h1>`,
+                200,
                 "text/html",
               );
               return;
@@ -134,7 +140,7 @@ export class Jetpath {
               password === this.options?.apiDoc?.password &&
               username === this.options?.apiDoc?.username
             ) {
-              ctx.send(UI,200, "text/html");
+              ctx.send(UI, 200, "text/html");
               return;
             } else {
               ctx.code = 401;
@@ -143,7 +149,8 @@ export class Jetpath {
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,200,
+                `<h1>401 Unauthorized</h1>`,
+                200,
                 "text/html",
               );
               return;
@@ -155,7 +162,8 @@ export class Jetpath {
               `Basic realm=Jetpath API Doc`,
             );
             ctx.send(
-              `<h1>401 Unauthorized</h1>`,200,
+              `<h1>401 Unauthorized</h1>`,
+              200,
               "text/html",
             );
             return;
@@ -178,8 +186,7 @@ export class Jetpath {
         await codeGen(
           this.options.source || ".",
           this.options.strictMode as "ON" | "WARN",
-        this.options.generateRoutes
-
+          this.options.generateRoutes,
         );
       }
       LOG.log(
@@ -193,7 +200,7 @@ export class Jetpath {
       await codeGen(
         this.options.source || ".",
         this.options?.strictMode as "ON" | "WARN",
-        this.options.generateRoutes
+        this.options.generateRoutes,
       );
       // ? render API in a .HTTP file
       await writeFile("api-doc.http", compiledAPI);

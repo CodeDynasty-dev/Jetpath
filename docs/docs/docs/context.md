@@ -31,23 +31,6 @@ export const GET_user = async (ctx) => {
 }
 ```
 
-### Error Handling with Plugins
-
-```typescript
-// Using ctx.throw() with plugins
-export const GET_user = async (ctx) => {
-  const userId = ctx.params.id;
-  const user = await getUser(userId);
-  
-  if (!user) {
-    ctx.plugins?.error(`User ${userId} not found`);
-    ctx.throw(404, `User ${userId} not found`);
-  }
-  ctx.send(user);
-
-}
-```
-
 ### File Upload with Validation
 
 ```typescript
@@ -60,7 +43,8 @@ export const POST_upload = async (ctx) => {
   
   // Validate file data
   if (!data.files || !data.files.file) {
-    ctx.throw(400, 'No file uploaded');
+    ctx.send( 'No file uploaded',400);
+    return
   }
    
   ctx.send({ message: 'Files uploaded successfully' });
@@ -94,7 +78,7 @@ export const GET_live = async (ctx) => {
 ## Best Practices
 
 1. **Type Safety:** Use generics to define expected data shapes
-2. **Error Handling:** Use `ctx.throw()` for HTTP errors and `ctx.plugins.logger` for logging
+2. **Error Handling:** Use `ctx.send(error, <http status code>)` for HTTP errors
 3. **State Management:** Use `ctx.state` for request-scoped data and attach user info if authenticated
 4. **Security:** Always validate input data and implement proper authentication
 5. **Response Handling:** Use appropriate methods for different response types and include request ID in headers
@@ -109,6 +93,7 @@ export const GET_live = async (ctx) => {
 - `query`: URL query parameters
 - `params`: Route parameters
 - All type-safe based on `JetData` generic
+- `plugins`: Returns the plugin object
 
 ### Response Handling
 
@@ -116,13 +101,6 @@ export const GET_live = async (ctx) => {
 - `sendStream()`: Stream files
 - `download()`: Force file download
 - `sendResponse()`: Send raw Response object
-
-### Error Handling
-
-- `throw()`: Throw HTTP errors
-- `plugins.logger`: Log errors
-- Sets status code and message
-- Ends request cycle
 
 ### Navigation
 
@@ -175,11 +153,10 @@ export const POST_upload = async (ctx) => {
 
 ## Best Practices
 
-1. **Type Safety:** Use generics to define expected data shapes
-2. **Error Handling:** Prefer `ctx.throw()` for HTTP errors
-3. **State Management:** Use `ctx.state` for request-scoped data
-4. **Security:** Always validate input data
-5. **Response Handling:** Use appropriate methods for different response types
+1. **Type Safety:** Use generics to define expected data shapes 
+2. **State Management:** Use `ctx.state` for request-scoped data
+3. **Security:** Always validate input data
+4. **Response Handling:** Use appropriate methods for different response types
 
 ## Next Steps
 
@@ -322,7 +299,7 @@ export const POST_upload = async (ctx) => {
     ```typescript
     if (!resource) {
       ctx.code = 404; // Set explicit 404
-      ctx.throw("Resource not found"); // Middleware will use ctx.code (404)
+      ctx.send("Resource not found"); // Middleware will use ctx.code (404)
     }
     ```
     *[cite: tests/app.jet.ts (used extensively)]*
@@ -392,28 +369,20 @@ Methods returning `never` indicate they terminate the request flow.
   * **Example 1: Not Found**
     ```typescript
     // If pet with ctx.params.id doesn't exist:
-    ctx.throw(404, `Pet with ID ${ctx.params.id} not found`);
+    ctx.send(`Pet with ID ${ctx.params.id} not found`, 404);
     ```
   * **Example 2: Unauthorized**
     ```typescript
     // If authentication fails:
     ctx.set("WWW-Authenticate", "Bearer realm=\"protected area\""); // Add relevant header
-    ctx.throw(401, "Invalid credentials");
+    ctx.send("Invalid credentials", 401);
     ``` 
-  * **Example 3: Bad Request (Validation Failure)**
-    ```typescript
-    try {
-      ctx.validate(MySchema);
-    } catch (err) {
-      ctx.throw(400, err.message); // Pass validation error message
-    }
-    ```
-  * **Example 4: Internal Server Error**
+  * **Example 3: Internal Server Error**
     ```typescript
     try { /* some risky operation */ }
     catch (err) {
       console.error("Unexpected error:", err);
-      ctx.throw(500); // Let middleware handle generic message
+      ctx.send("",500); // Let middleware handle generic message
     }
     ```
 
@@ -462,7 +431,7 @@ Methods returning `never` indicate they terminate the request flow.
             // Now validate ctx.body or use it directly if validation not needed
             ctx.send({ received: ctx.body });
         } catch (err) {
-            ctx.throw(400, `Invalid JSON payload: ${err.message}`);
+            ctx.send(`Invalid JSON payload: ${err.message}`,400);
         }
     }
     ```

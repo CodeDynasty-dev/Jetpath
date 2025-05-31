@@ -190,7 +190,7 @@ export type jetOptions = {
       exposeHeaders?: string[];
       keepHeadersOnError?: boolean;
       maxAge?: string;
-    credentials?: boolean;
+      credentials?: boolean;
       privateNetworkAccess?: any;
       origin?: string[];
     }

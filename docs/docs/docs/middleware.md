@@ -96,8 +96,7 @@ Best practices for error handling in middleware:
 - Keep middleware focused on single concerns
 - Be mindful of execution order
 - Handle errors properly
-- Avoid heavy computations in global middleware
-- Use `ctx.throw()` for specific HTTP errors
+- Avoid heavy computations in global middleware 
 
 ## Next Steps
 

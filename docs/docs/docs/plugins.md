@@ -87,7 +87,7 @@ export const GET_profile: JetRoute<{}, HandlerPlugins> = (ctx) => {
     // Access auth functionality from authPlugin
     const authResult = ctx.plugins.verifyAuth(ctx); // Example method name
     if (!authResult.authenticated) {
-        ctx.throw(401, "Not authenticated");
+        ctx.send("Not authenticated", 402);
     }
     ctx.send({ user: authResult.user });
 };
@@ -100,56 +100,6 @@ export const GET_profile: JetRoute<{}, HandlerPlugins> = (ctx) => {
 ## Creating Plugins
 
 Creating your own plugins allows you to structure reusable logic cleanly.
-
-### The `JetPlugin` Class
-
-Jetpath provides a `JetPlugin` class (or a similar constructor pattern) to structure your plugin.
-
-```typescript
-import { JetPlugin } from "jetpath";
-import type { JetContext } from "jetpath"; // For typing ctx if needed
-
-// Define the interface for the API your plugin will expose on ctx.plugins
-interface MyPluginAPI {
-  doSomething: (input: string) => string;
-  // Add other methods/properties
-}
-
-// Define options your plugin might accept
-interface MyPluginOptions {
-  prefix?: string;
-}
-
-export function createMyPlugin(options: MyPluginOptions = {}): JetPlugin {
-  const prefix = options.prefix || "DEFAULT";
-
-  // Instantiate plugin
-  return new JetPlugin({
-    // The executor function runs when app.use() is called
-    async executor(/* Optional args like app instance might be passed */): Promise<MyPluginAPI> {
-      console.log(`Initializing MyPlugin with prefix: ${prefix}`);
-
-      // === Perform Initialization ===
-      // e.g., connect to a service, load config
-      // const externalClient = await connectToService();
-
-      // === Return the Plugin's Public API ===
-      // These methods become available on ctx.plugins
-      return {
-        doSomething: (input: string): string => {
-          // This function has access to 'prefix' and 'externalClient'
-          // via closure scope.
-          console.log("MyPlugin doing something...");
-          return `${prefix}: Processed ${input}`;
-          // Example using initialized client:
-          // return externalClient.process(input);
-        },
-        // Add other methods...
-      };
-    }
-  });
-}
-```
 
 ### The `executor` Function
 
@@ -184,12 +134,15 @@ export function createAuthPlugin(options: AuthPluginOptions): JetPlugin {
   const ADMIN_API_KEY = options.adminApiKey;
   // In-memory store or DB connection could be initialized here
 
-  return new JetPlugin({
+  return ({
     executor(): AuthPluginAPI {
       // Return the methods that handlers will call via ctx.plugins
       return {
-        verifyAuth(ctx: JetContext) {
-          const authHeader = ctx.get("authorization");
+
+        
+        verifyAuth(this: JetContext) {
+          // ? the this here is the ctx of the api request, hence you have access to the entire context;
+          const authHeader = this.get("authorization");
           // ... logic to validate token using JWT_SECRET ...
           if (/* valid token */) {
             // const user = findUserFromToken(...);
@@ -198,8 +151,8 @@ export function createAuthPlugin(options: AuthPluginOptions): JetPlugin {
           return { authenticated: false, message: "Invalid token" };
         },
 
-        isAdmin(ctx: JetContext) {
-          if (ctx.get("x-admin-key") === ADMIN_API_KEY) {
+        isAdmin(this: JetContext) {
+          if (this.get("x-admin-key") === ADMIN_API_KEY) {
             return true;
           }
           const auth = this.verifyAuth(ctx); // Can call other plugin methods
@@ -236,8 +189,7 @@ export function createAuthPlugin(options: AuthPluginOptions): JetPlugin {
 
 ## Next Steps
 
-  * See how plugins provide dependencies in the [**Dependency Injection**](https://www.google.com/search?q=./dependency-injection.md) guide.
-  * Understand how plugin methods are accessed via the [**Context (`ctx`) Object**](https://www.google.com/search?q=./context.md).
+  * Understand how plugin methods are accessed via the [**Context (`ctx`) Object**](./context.html).
  
 
 </docmach>

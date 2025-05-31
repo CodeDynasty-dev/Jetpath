@@ -175,7 +175,7 @@ export const MIDDLEWARE_ = (ctx) => {
         error: err.message,
         stack: err.stack
       });
-      ctx.throw(500, 'Internal server error');
+    return  ctx.send('Internal server error');
     }
   };
 };
@@ -196,7 +196,7 @@ Here are some practical tips I've picked up along the way:
    - Consider edge cases (like empty strings or null values)
 
 3. **Error Handling**
-   - Use `ctx.throw()` for known errors
+   - Use `ctx.send(msg, code)` and return;
    - Implement global error handling
    - Log errors with context
 

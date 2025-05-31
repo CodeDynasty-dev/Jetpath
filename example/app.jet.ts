@@ -127,7 +127,7 @@
 //         message: "Authentication failed",
 //         url: ctx.request.url,
 //       });
-//       // ctx.throw(401,"Unauthorized: Valid authentication is required");
+//       //return ctx.send("Unauthorized: Valid authentication is required", 401);
 //     }
 
 //     // Attach user info to context for use in route handlers

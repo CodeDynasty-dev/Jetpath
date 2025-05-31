@@ -8,17 +8,15 @@ Robust error handling is essential for creating reliable APIs. Jetpath centraliz
 
 Instead of scattered `try...catch` blocks, Jetpath's approach relies on:
 
-1. **Signaling Errors:** Using `ctx.throw()` or `throw new Error()`
+1. **Signaling Errors:** Using `throw new Error()`
 2. **Centralized Catching:** Intercepting errors in middleware
 3. **Standardized Responses:** Sending consistent error responses
 
 ## Throwing Errors
 
-When processing cannot continue normally, signal an error using `ctx.throw()`.
+When processing cannot continue normally, signal an error using `ctx.send(error, <status code>)`.
 
-### Using `ctx.throw()`
-
-The `ctx.throw(codeOrData, message?)` method signals HTTP errors:
+### Using `ctx.send(error, <status code>)`
 
 - **Common Status Codes:**
   - `400 Bad Request`: Validation errors
@@ -31,29 +29,29 @@ The `ctx.throw(codeOrData, message?)` method signals HTTP errors:
   ```typescript
   // Resource Not Found
   if (!pet) {
-    ctx.throw(404, `Pet ${ctx.params.id} not found`);
+    ctx.send(`Pet ${ctx.params.id} not found`, 404);
   }
 
   // Unauthorized Access
   if (!ctx.plugins.verifyAuth(ctx).authenticated) {
     ctx.set("WWW-Authenticate", "Bearer realm=\"protected\"");
-    ctx.throw(401, "Authentication required");
+    ctx.send("Authentication required", 401);
   }
 
   // Forbidden Action
   if (ctx.app.user?.role !== 'admin') {
-    ctx.throw(403, "Admin privileges required");
+    ctx.send("Admin privileges required", 403);
   }
 
   // Validation Error
   try {
     const data = ctx.validate(RequestSchema);
   } catch (err) {
-    ctx.throw(400, err.message);
+    ctx.send(err.message, 400);
   }
 
   // Simple Not Found
-  ctx.throw(404);
+  ctx.send("",404);
   ```
 
 ### Using `throw new Error()`
@@ -113,9 +111,9 @@ return (ctx, err?: Error) => {
 ## Error Cases
 
 - **404 Not Found:** Send 404 response if no error and no response was sent
-- **400 Bad Request:** Use `ctx.throw(400)` for validation errors
-- **401 Unauthorized:** Use `ctx.throw(401)` with `WWW-Authenticate` header
-- **403 Forbidden:** Use `ctx.throw(403)` for permission issues
+- **400 Bad Request:** Use `ctx.send(<message>, 400)` for validation errors
+- **401 Unauthorized:** Use `ctx.send(<message>, 401)` with `WWW-Authenticate` header
+- **403 Forbidden:** Use `ctx.send(<message>, 403)` for permission issues
 - **500 Internal Error:** Handle unexpected errors with generic messages
 
 ## Best Practices
@@ -124,7 +122,7 @@ return (ctx, err?: Error) => {
 - **Standardize:** Use consistent JSON structure for error responses
 - **Log Effectively:** Include request context in error logs
 - **Secure:** Never leak sensitive information in production
-- **Use `ctx.throw()`:** Prefer it for HTTP-specific errors
+- **Use `ctx.send(error, <status code>)`:** Prefer it for HTTP-specific errors
 
 ## Next Steps
 

@@ -7,7 +7,7 @@ import {
   getCtx,
   isNode,
   JetSocketInstance,
-  parseRequest, 
+  parseRequest,
   runtime,
   validator,
 } from "./functions.js";
@@ -138,8 +138,6 @@ class Cookie {
 class ctxState {
   state: Record<string, any> = {};
 }
-
- 
 
 export class Context {
   code = 200;
