@@ -178,13 +178,14 @@ export class Context {
   constructor() {
     this._7 = new ctxState();
   }
-  send(data: unknown, contentType?: string) {
+  send(data: unknown, statusCode?: number, contentType?: string) {
     if (this._6 || this._3) {
       throw new Error("Response already set");
     }
     if (contentType) {
       this._2["Content-Type"] = contentType;
       this.payload = String(data);
+      this.code = statusCode || 200;
     } else {
       if (typeof data === "object") {
         this._2["Content-Type"] = "application/json";
@@ -192,6 +193,7 @@ export class Context {
       } else {
         this.payload = data ? String(data) : "";
       }
+      this.code = statusCode || 200;
     }
   }
 

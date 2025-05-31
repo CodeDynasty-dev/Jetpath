@@ -84,7 +84,7 @@ export interface JetContext<
   /**
    * reply the request
    */
-  send(data: unknown, ContentType?: string): void;
+  send(data: unknown, statusCode?: number, ContentType?: string): void;
   /**
    * redirect the request
    */
