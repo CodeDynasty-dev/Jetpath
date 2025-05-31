@@ -107,7 +107,7 @@ export class Jetpath {
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,
+                `<h1>401 Unauthorized</h1>`,200,
                 "text/html",
               );
               return;
@@ -125,7 +125,7 @@ export class Jetpath {
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,
+                `<h1>401 Unauthorized</h1>`,200,
                 "text/html",
               );
               return;
@@ -134,7 +134,7 @@ export class Jetpath {
               password === this.options?.apiDoc?.password &&
               username === this.options?.apiDoc?.username
             ) {
-              ctx.send(UI, "text/html");
+              ctx.send(UI,200, "text/html");
               return;
             } else {
               ctx.code = 401;
@@ -143,7 +143,7 @@ export class Jetpath {
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,
+                `<h1>401 Unauthorized</h1>`,200,
                 "text/html",
               );
               return;
@@ -155,13 +155,13 @@ export class Jetpath {
               `Basic realm=Jetpath API Doc`,
             );
             ctx.send(
-              `<h1>401 Unauthorized</h1>`,
+              `<h1>401 Unauthorized</h1>`,200,
               "text/html",
             );
             return;
           }
         } else {
-          ctx.send(UI, "text/html");
+          ctx.send(UI, 200, "text/html");
           return;
         }
       });
