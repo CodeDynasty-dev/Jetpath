@@ -1332,6 +1332,7 @@ export async function codeGen(
   outputContent +=
     `// @ts-ignore\nimport { type JetRoute, JetMiddleware } from 'jetpath';\n\n`;
   if (generateRoutes === true) {
+    LOG.log("Generating routes file", "info");
     const outputContent = `export const routes = {\n ${
       Object.keys(_JetPath_paths).reduce((acc: string[], method) => {
         const routes = Object.keys(_JetPath_paths[method as methods]);
@@ -1389,8 +1390,8 @@ export async function codeGen(
         }
         return acc;
       }, []).join(",\n ")
-    } \n} as const;\n\n`;
-
+      } \n} as const;\n\n`;
+    LOG.log("Generated routes file successfully: " + ROUTE_FILE, "success");
     await writeFile(ROUTE_FILE, outputContent, "utf-8");
   }
   //? Add all the generated module declarations
@@ -1423,28 +1424,33 @@ export async function codeGen(
           { encoding: "utf8" },
           (err, stdout, stderr) => {
             if (err) {
+              if (err.toString().includes("Executable not found")) {
+                LOG.log(
+                  "\n🛠️ StrictMode Can't work: Please install typescript using \n'npm install -g typescript' or \n'yarn global add typescript'\n\n",
+                  "error",
+                );
+              }
               LOG.log("\n🛠️ StrictMode warnings", "warn");
-              if (stderr) {
+              if (typeof stderr === "string") {
                 LOG.log(
                   stderr.replaceAll("\n", "\n\n"),
                   mode === "WARN" ? "warn" : "error",
                 );
               }
-              if (stdout) {
+              if (typeof stdout === "string") {
                 LOG.log(
                   stdout.replaceAll("\n", "\n\n"),
                   mode === "WARN" ? "warn" : "error",
                 );
+                const errors = (stdout?.split("\n") || []).length - 1;
+                LOG.log(
+                  errors +
+                    ` Problem${
+                      errors === 1 ? "" : "s"
+                    } 🐞\n\nYou are seeing these warnings because you have strict mode enabled\n`,
+                  "info",
+                );
               }
-              const errors = (stdout?.split("\n") || []).length - 1;
-
-              LOG.log(
-                errors +
-                  ` Problem${
-                    errors === 1 ? "" : "s"
-                  } 🐞\n\nYou are seeing these warnings because you have strict mode enabled\n`,
-                "info",
-              );
             }
             resolve(undefined);
           },
