@@ -1424,15 +1424,19 @@ export async function codeGen(
           (err, stdout, stderr) => {
             if (err) {
               LOG.log("\n🛠️ StrictMode warnings", "warn");
-              LOG.log(
-                stderr.replaceAll("\n", "\n\n"),
-                mode === "WARN" ? "warn" : "error",
-              );
-              LOG.log(
-                stdout.replaceAll("\n", "\n\n"),
-                mode === "WARN" ? "warn" : "error",
-              );
-              const errors = (stdout.split("\n")).length - 1;
+              if (stderr) {
+                LOG.log(
+                  stderr.replaceAll("\n", "\n\n"),
+                  mode === "WARN" ? "warn" : "error",
+                );
+              }
+              if (stdout) {
+                LOG.log(
+                  stdout.replaceAll("\n", "\n\n"),
+                  mode === "WARN" ? "warn" : "error",
+                );
+              }
+              const errors = (stdout?.split("\n") || []).length - 1;
 
               LOG.log(
                 errors +
