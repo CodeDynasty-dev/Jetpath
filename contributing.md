@@ -29,9 +29,8 @@ Before contributing, read our [Code of Conduct](https://github.com/CodeDynasty-d
 
 Refer to the following channels to connect with fellow contributors or to stay up-to-date with news about JetPath:
 
-* Join our project contributors on {name and link to online chat}.Discord 
-* Participate in our project meetings on {specify the day of the week and cadence} at {specify time and timezone}, where you can provide a status update or raise questions and concerns about your contributions. Use the following link to join: {link to online meeting space}
-2-3 meetings monthly, Fridays
+* Join our project contributors on [Discord](https://discord.codedynasty.dev/) 
+
 
 ## Before you start
 
@@ -46,19 +45,21 @@ To set up your environment, perform the following actions:
 
 ### Developer
 
-1. Fork the Repository: Click the **Fork** button at the top right of the repository page to create a copy under your GitHub account.
+1. Fork the Repository
 
-2. Clone your forked repository to your computer using the command below. Replace `yourusername` with your GitHub username:
+2. Clone your forked repository to your local machine using the command below.
 
 ```bash
 git clone https://github.com/<yourusername>/JetPath.git
 ```
-3. Navigate to the Project Directory: Change into the project folder using the command below.
+Replace `yourusername` with your GitHub username
+
+3. Navigate to the Project Directory
 
 ```bash
 cd JetPath
 ```
-4. Install Dependencies: Install all necessary packages with npm:
+4. Install Dependencies
 
 ```bash
 npm install
@@ -70,14 +71,14 @@ This will download and set up all libraries the project depends on.
 ```bash
 git checkout -b your-feature-branch
 ```
-6. Run the Development Server: Start the local server to preview your changes
+6. Start the local server to preview your changes
 
 ```bash
 npm run dev
 ```
 Open your browser and click the URL shown in the terminal (usually http://localhost:4000).
 
-7. Compile the Project: Run the following command to  build the project for production
+7. Run the following command to  build the project for production
 
 ```bash
 npm run compile
@@ -89,15 +90,15 @@ Feel free to ask questions or open an issue if you need help!
 ### Writers
 
 
-1. Fork the Repository: Click the **Fork** button at the top right of the repository page to create a copy under your GitHub account.
+1. Fork the Repository
 
-2. Clone your forked repository to your computer using the command below. Replace <yourusername> with your GitHub username:
+2. Clone your forked repository to your computer using the command below. 
 
 ```bash
 git clone https://github.com/<yourusername>/JetPath.git
 ```
-3. Navigate to the Project Directory: Change into the project folder using the command below.
-
+Replace <yourusername> with your GitHub username
+3. Navigate to the Project Directory
 ```bash
 cd JetPath
 ```
@@ -117,11 +118,8 @@ git checkout -b your-feature-branch
 ```bash
 npx docmach 
 ```
-
-7. Push your branch to your fork and open a Pull Request to the main repository.
-
 Open your browser and click the URL shown in the terminal (usually http://localhost:4000).
-
+7. Push your branch to your fork and open a Pull Request to the main repository.
 
 
 ### Troubleshoot
@@ -257,11 +255,5 @@ Add any extra context, screenshots, or testing instructions.
 - [ ] Tests passed
 - [ ] Documentation updated
 ```
-
-### Releases
-
-{Provide a description of the release process and cadence for the project, such as the source code.}
-
-
 ---
  
