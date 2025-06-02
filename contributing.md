@@ -146,22 +146,23 @@ Read the [Google developers documentation writing style guide](https://developer
 
 To help us improve JetPath, please report any issues or bugs you encounter. Here’s how you can do it:
 
-1. **Check existing issues**: Before creating a new issue, search the issue tracker to see if someone else has already reported the problem.
-2. **Create a new issue**: If you can’t find an existing issue, click the **New issue** button and fill out the template provided. Make sure to include:
-* Summarize the issue in a few words.
+1. Before creating a new issue, search the issue tracker to see if someone else has already reported the problem.
+2. If you can’t find an existing issue, click the **New issue** button and fill out the template provided. Make sure to include:
+
+* A summary the issue in a few words.
 * Explain the problem, including any error messages or unexpected behavior.
 * List the steps you took that led to the issue.
 * Describe what you expected to happen and what actually happened.
 * Attach any relevant screenshots or log files if applicable.
 
-3. **Provide context**: If relevant, mention your environment for example, operating system, browser, version of JetPath.
+3. If relevant, mention your environment for example, operating system, browser, version of JetPath.
 
-4. **Use Labels**: Apply labels to categorize issues by type for eexample,bug, feature request, documentation.
-5. **Prioritize**: Use priority labels for example, high, medium, low to indicate the urgency of the issue.
+4. Apply labels to categorize issues by type for eexample,bug, feature request, documentation.
+5. Use priority labels for example, high, medium, low to indicate the urgency of the issue.
 
-6. **Comment and discuss**: Use the issue comments to discuss the problem and potential solutions with other contributors.
+6. Use the issue comments to discuss the problem and potential solutions with other contributors.
 
-By following these steps, we can efficiently track and resolve issues, ensuring JetPath continues to improve for everyone.
+Following these steps will help us track and resolve issues, ensuring JetPath continues to improve for everyone.
 
 ### Commit messages
 Here are the types and description of commit messages
@@ -191,7 +192,7 @@ refactor: reorganize src/utils for better modularity
 
 ### Branch creation
 
-To keep our repository organized and make collaboration easier, please follow these guidelines when creating and naming branches:
+To keep our repository organized and make collaboration easy, please follow these guidelines when creating and naming branches:
 
 Use a consistent prefix to indicate the type of work:
 
