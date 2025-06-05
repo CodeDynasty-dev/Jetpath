@@ -968,7 +968,13 @@ export function parseFormData(
           ? [...existing, value]
           : [existing, value];
       } else {
-        fields[fieldName] = value;
+          try {
+                    
+                    fields[fieldName] = JSON.parse(value.toString());
+                } catch (error) {
+                    
+                    fields[fieldName] = value;
+                }
       }
     }
   }
