@@ -1,11 +1,11 @@
 // src/routes/reviews.ts
 
-import {type JetRoute, use } from "../../dist/index.js";
+import { type JetRoute, use } from "../../dist/index.js";
 // Import AuthPluginType if authentication checks are done within route handlers
 import { type AuthPluginType } from "../plugins/auth.js";
 // Import data models and in-memory data arrays
 import { pets, reviews } from "../data/models.js";
-import {type ReviewType } from "../types.js"; // Import ReviewType
+import { type ReviewType } from "../types.js"; // Import ReviewType
 
 // --- Reviews Management Routes ---
 
@@ -83,7 +83,8 @@ use(GET_petBy$id_reviews).title("Get all reviews for a specific pet").query(
         err: "Sort parameter must be a string",
       }).default("-createdAt"),
     };
-  },)
+  },
+);
 
 /**
  * Add a review for a pet

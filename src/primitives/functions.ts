@@ -455,16 +455,21 @@ const Jetpath = async (
       returned = r.jet_middleware?.length
         ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
         : undefined;
+      //? check if the payload is already set by middleware chain;
+      if (ctx.payload) return makeRes(res, ctx);
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
       returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
       return makeRes(res, ctx);
     } catch (error) {
-      console.log(error);
       try {
         //? report error to error middleware
-        returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
+        if (returned) {
+          await Promise.all(returned.map((m) => m?.(ctx, error)));
+        } else {
+          console.log(error);
+        }
       } finally {
         if (!returned && ctx.code < 400) {
           ctx.code = 500;
@@ -968,13 +973,11 @@ export function parseFormData(
           ? [...existing, value]
           : [existing, value];
       } else {
-          try {
-                    
-                    fields[fieldName] = JSON.parse(value.toString());
-                } catch (error) {
-                    
-                    fields[fieldName] = value;
-                }
+        try {
+          fields[fieldName] = JSON.parse(value.toString());
+        } catch (error) {
+          fields[fieldName] = value;
+        }
       }
     }
   }
@@ -1396,7 +1399,7 @@ export async function codeGen(
         }
         return acc;
       }, []).join(",\n ")
-      } \n} as const;\n\n`;
+    } \n} as const;\n\n`;
     LOG.log("Generated routes file successfully: " + ROUTE_FILE, "success");
     await writeFile(ROUTE_FILE, outputContent, "utf-8");
   }

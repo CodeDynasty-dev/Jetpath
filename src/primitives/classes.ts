@@ -75,10 +75,10 @@ export class LOG {
       type === "info"
         ? LOG.colors.fgBlue
         : type === "warn"
-          ? LOG.colors.fgYellow
-          : type === "success"
-          ? LOG.colors.fgGreen
-          : LOG.colors.fgRed,
+        ? LOG.colors.fgYellow
+        : type === "success"
+        ? LOG.colors.fgGreen
+        : LOG.colors.fgRed,
     );
   }
 }

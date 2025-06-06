@@ -1,6 +1,6 @@
 // src/index.ts
 
-import { Jetpath  } from "../dist/index.js";
+import { Jetpath } from "../dist/index.js";
 // Create mock plugin files in src/plugins if you don't have real ones.
 import { authPlugin } from "./plugins/auth.js";
 import { jetLogger } from "./plugins/logging.js";

@@ -1,7 +1,7 @@
 // src/routes/pets.ts
 
 import { writeFile } from "node:fs/promises";
-import { type JetFile,type JetRoute, use } from "../../dist/index.js";
+import { type JetFile, type JetRoute, use } from "../../dist/index.js";
 // Import AuthPluginType if authentication checks are done within route handlers (besides global middleware)
 import { type AuthPluginType } from "../plugins/auth.js";
 // Import data models and in-memory data arrays
