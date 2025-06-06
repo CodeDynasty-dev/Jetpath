@@ -1,6 +1,6 @@
 {
   "name": "jetpath",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "description": "Jetpath - A fast, seamless and minimalist framework for Node, Deno and Bun.js. Embrace the speed and elegance of the next-gen server-side experience.",
   "main": "dist/index.js",
   "type": "module",
