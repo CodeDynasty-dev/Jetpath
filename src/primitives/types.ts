@@ -154,12 +154,36 @@ export type methods =
 export type allowedMethods = methods[];
 
 export type jetOptions = {
+  /**
+   * upgrade the request to a WebSocket connection
+   */
   upgrade?: boolean;
+  /**
+   * source of the app
+   */
   source?: string;
+  /**
+   * global headers
+   */
   globalHeaders?: Record<string, string>;
+  /**
+   * strict mode
+   */
   strictMode?: "ON" | "OFF" | "WARN";
-  generateRoutes?: boolean;
+  /**
+   * generated routes file path
+   * putting the file on the frontend folder will make it accessible
+   * during build time
+   * @default generates nothing
+   */
+  generatedRoutesFilePath?: string;
+  /**
+   * keep alive timeout
+   */
   keepAliveTimeout?: number;
+  /**
+   * api documentation options
+   */
   apiDoc?: {
     display?: "UI" | "HTTP" | false;
     environments?: Record<string, string>;
@@ -171,11 +195,20 @@ export type jetOptions = {
     password?: string;
     username?: string;
   };
+  /**
+   * credentials options
+   */
   credentials?: {
     cert: string;
     key: string;
   };
+  /**
+   * port
+   */
   port?: number;
+  /**
+   * cors options
+   */
   cors?:
     | {
       allowMethods?: allowedMethods;

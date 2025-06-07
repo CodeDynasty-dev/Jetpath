@@ -953,15 +953,18 @@ class MockRequest {
   }
 }
 
-export class JetMockServer {
-  options: jetOptions = {};
+export class JetServer {
+  /*
+  internal method
+  */
+  private options: jetOptions = {};
   constructor(options?: jetOptions) {
     Object.assign(this.options, options || {});
   }
   /*
   internal method
   */
-  async _run(
+  private async _run(
     func: JetRoute,
     ctx?: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
@@ -1017,10 +1020,20 @@ export class JetMockServer {
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func);
   }
-  runWithCtx(
+  runWithCTX(
     func: JetRoute,
     ctx: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func, ctx);
+  }
+  createCTX(
+    req: Request,
+    res: Response,
+    path: string,
+    handler: JetRoute,
+    params: Record<string, any>,
+    query: Record<string, any>,
+  ): JetContext {
+    return getCtx(req, res, path, handler, params, query) as any;
   }
 }

@@ -105,14 +105,13 @@ export class Jetpath {
           if (authHeader && authHeader.startsWith("Basic ")) {
             const [authType, encodedToken] = authHeader.trim().split(" ");
             if (authType !== "Basic" || !encodedToken) {
-              ctx.code = 401;
               ctx.set(
                 "WWW-Authenticate",
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,
-                200,
+                `<h1>Unauthorized</h1>`,
+                401,
                 "text/html",
               );
               return;
@@ -124,14 +123,13 @@ export class Jetpath {
               );
               [username, password] = decodedToken.split(":");
             } catch (error) {
-              ctx.code = 401;
               ctx.set(
                 "WWW-Authenticate",
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,
-                200,
+                `<h1>Unauthorized</h1>`,
+                401,
                 "text/html",
               );
               return;
@@ -143,27 +141,25 @@ export class Jetpath {
               ctx.send(UI, 200, "text/html");
               return;
             } else {
-              ctx.code = 401;
               ctx.set(
                 "WWW-Authenticate",
                 `Basic realm=Jetpath API Doc`,
               );
               ctx.send(
-                `<h1>401 Unauthorized</h1>`,
-                200,
+                `<h1>Unauthorized</h1>`,
+                401,
                 "text/html",
               );
               return;
             }
           } else {
-            ctx.code = 401;
             ctx.set(
               "WWW-Authenticate",
               `Basic realm=Jetpath API Doc`,
             );
             ctx.send(
-              `<h1>401 Unauthorized</h1>`,
-              200,
+              `<h1>Unauthorized</h1>`,
+              401,
               "text/html",
             );
             return;
@@ -186,7 +182,7 @@ export class Jetpath {
         await codeGen(
           this.options.source || ".",
           this.options.strictMode as "ON" | "WARN",
-          this.options.generateRoutes,
+          this.options.generatedRoutesFilePath,
         );
       }
       LOG.log(
@@ -200,7 +196,7 @@ export class Jetpath {
       await codeGen(
         this.options.source || ".",
         this.options?.strictMode as "ON" | "WARN",
-        this.options.generateRoutes,
+        this.options.generatedRoutesFilePath,
       );
       // ? render API in a .HTTP file
       await writeFile("api-doc.http", compiledAPI);
@@ -250,6 +246,6 @@ export type {
   JetMiddleware,
   JetRoute,
 } from "./primitives/types.js";
-export { JetMockServer } from "./primitives/classes.js";
+export { JetServer } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";
 export { mime } from "./extracts/mimejs-extract.js";

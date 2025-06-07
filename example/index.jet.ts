@@ -12,8 +12,7 @@ import { jetLogger } from "./plugins/logging.js";
 const app = new Jetpath({
   // Strict mode can enforce certain behaviors (e.g., strict content type checking).
   strictMode: "ON", // Example from app.jet.ts
-  generateRoutes: true, // Automatically generate routes based on imported modules
-
+  generatedRoutesFilePath: "./example/definitions.ts",
   // Configure API documentation (Swagger UI).
   // This makes it easy to visualize and test the API endpoints.
   apiDoc: {
