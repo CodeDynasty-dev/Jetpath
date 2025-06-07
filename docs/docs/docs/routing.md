@@ -43,14 +43,14 @@ The core convention lies in the names of the exported functions:
 
 ```typescript
 // GET /pets
-export const GET_: JetRoute = (ctx) => { ... }
+export const GET_pets: JetRoute = (ctx) => { ... }
 
 // POST /pets
-export const POST_: JetRoute = async (ctx) => { ... }
+export const POST_pets: JetRoute = async (ctx) => { ... }
 
 // GET /pets/search
 
-export const GET_search: JetRoute = (ctx) => { ... }
+export const GET_pets_search: JetRoute = (ctx) => { ... }
 ```
 
 ### 4. Path Parameters (`$paramName`)
@@ -59,14 +59,14 @@ Capture dynamic segments using a `$` prefix in filenames or export names:
 
 ```typescript 
 // Maps to: GET /pets/by/:id
-export const GET_by$id: JetRoute = (ctx) => {
+export const GET_pets_by$id: JetRoute = (ctx) => {
   const petId = ctx.params.id;
   // ...
 }; 
 
 
  // Maps to: GET /pets/petBy/:id/:slug
-export const GET_petBy$id$slug: JetRoute = (ctx) => {
+export const GET_pets_petBy$id$slug: JetRoute = (ctx) => {
   const petId = ctx.params.id;
   const slug = ctx.params.slug;
   // ...
