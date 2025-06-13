@@ -854,7 +854,7 @@ export class Trie {
       const queryParams = new URLSearchParams(normalizedPath.slice(queryIndex));
       query = {};
       queryParams.forEach((value, key) => {
-        query![key] = value;
+        query![key] = decodeURIComponent(value);
       });
       normalizedPath = normalizedPath.slice(0, queryIndex);
       if (this.hashmap[normalizedPath]) {
@@ -900,7 +900,7 @@ export class Trie {
       } else if (currentNode.parameterChild) {
         // ? parameter segment match
         const name = currentNode.parameterChild.paramName!;
-        params[name] = segment;
+        params[name] = decodeURIComponent(segment);
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
         // ? wildcard segment match
