@@ -3,10 +3,10 @@
 import { writeFile } from "node:fs/promises";
 import { type JetFile, type JetRoute, use } from "../../dist/index.js";
 // Import AuthPluginType if authentication checks are done within route handlers (besides global middleware)
-import { type AuthPluginType } from "../plugins/auth.js";
+import { type AuthPluginType } from "../plugins/auth.ts";
 // Import data models and in-memory data arrays
-import { pets, reviews } from "../data/models.js";
-import { type PetType } from "../types.js"; // Import PetType
+import { pets, reviews } from "../data/models.ts";
+import { type PetType } from "../types.ts"; // Import PetType
 import { join } from "node:path";
 
 // --- Pet Management Routes ---

@@ -2,7 +2,7 @@
 
 import { type JetRoute, use } from "../../dist/index.js";
 // Import types if needed, e.g., for initial stats message
-import { pets } from "../data/models.js"; // Import pets data for initial stats message
+import { pets } from "../data/models.ts"; // Import pets data for initial stats message
 
 // --- WebSocket Server ---
 // This route handles WebSocket connections for real-time updates.

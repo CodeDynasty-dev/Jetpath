@@ -3,8 +3,8 @@
 import { type JetFile, type JetRoute, use } from "../../dist/index.js";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path"; // Import join
-import { pets, reviews } from "../data/models.js"; // Import data for stats route
-import { type AuthPluginType } from "../plugins/auth.js"; // Import AuthPluginType for stats route
+import { pets, reviews } from "../data/models.ts"; // Import data for stats route
+import { type AuthPluginType } from "../plugins/auth.ts"; // Import AuthPluginType for stats route
 
 // --- Utility and Miscellaneous Routes ---
 

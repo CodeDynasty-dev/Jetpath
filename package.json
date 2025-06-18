@@ -42,7 +42,7 @@
     "bun": "bun --watch tests/app.jet.ts",
     "dev": "node --watch --experimental-strip-types example/index.jet.ts",
     "node": "node --watch --experimental-strip-types example/index.jet.ts",
-    "watch": "tsc tests/*.ts --target esnext --watch",
+    "watch": "tsc src/*.ts --target esnext --watch",
     "watch:docs": "docmach",
     "build": "npx docmach build",
     "lint": "gts lint",

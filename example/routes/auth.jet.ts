@@ -1,7 +1,7 @@
 // src/routes/auth.ts
 
 import { type JetRoute, use } from "../../dist/index.js";
-import { type AuthPluginType } from "../plugins/auth.js"; // Import AuthPluginType
+import { type AuthPluginType } from "../plugins/auth.ts"; // Import AuthPluginType
 
 // --- Authentication Route ---
 
