@@ -2,7 +2,7 @@
   "compilerOptions": {
     "lib": ["es2022", "esnext", "dom", "dom.iterable"],
     "target": "ESNext",
-    "module": "NodeNext",
+    "module": "ESNext",
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
     "noEmit": false,

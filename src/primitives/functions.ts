@@ -1,6 +1,6 @@
 // compatible node imports
 import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
-import path, { join, resolve, sep } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { cwd } from "node:process";
 import { createServer } from "node:http";
 // type imports
@@ -189,8 +189,6 @@ export function abstractPluginCreator(ctx: Context) {
   return abstractPlugin;
 }
 
-export const isNode = runtime["node"];
-
 const ae = (cb: { (): any; (): any; (): void }) => {
   try {
     cb();
@@ -207,6 +205,9 @@ const ae = (cb: { (): any; (): any; (): void }) => {
   runtime = { bun, deno, node: !bun && !deno, edge: false };
 })();
 
+// ? isNode
+export const isNode = runtime["node"];
+// ? server
 export const server = (
   plugs: JetPlugin[],
   options: jetOptions,
@@ -501,7 +502,7 @@ const handlersPath = (path: string) => {
 
 const getModule = async (src: string, name: string) => {
   try {
-    const mod = await import(path.resolve(src + "/" + name));
+    const mod = await import(resolve(src + "/" + name));
     return mod;
   } catch (error) {
     LOG.log("Error at " + src + "/" + name + "  loading failed!", "info");
@@ -520,14 +521,14 @@ export async function getHandlers(
   let error_source = source;
   source = source || "";
   if (!again) {
-    source = path.resolve(path.join(curr_d, source));
+    source = resolve(join(curr_d, source));
     if (!source.includes(curr_d)) {
       LOG.log('source: "' + error_source + '" is invalid', "warn");
       LOG.log("Jetpath source must be within the project directory", "error");
       process.exit(1);
     }
   } else {
-    source = path.resolve(curr_d, source);
+    source = resolve(curr_d, source);
   }
   const dir = await opendir(source);
   for await (const dirent of dir) {
@@ -1268,7 +1269,7 @@ export async function codeGen(
       : join(cwd(), "definitions.ts"),
   );
 
-  mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+  mkdirSync(dirname(OUTPUT_FILE), { recursive: true });
   const declarations: string[] = [];
 
   let mIdex = 0;
@@ -1278,7 +1279,7 @@ export async function codeGen(
         withFileTypes: true,
       });
       for (const entry of entries) {
-        const fullPath = path.join(currentDir, entry.name);
+        const fullPath = join(currentDir, entry.name);
 
         if (entry.isDirectory()) {
           if (!entry.name.startsWith(".")) {
