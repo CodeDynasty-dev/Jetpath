@@ -31,3 +31,4 @@ bench.sh
 **.log
 docs/build
 definitions.jet.ts
+example/definitions.ts
