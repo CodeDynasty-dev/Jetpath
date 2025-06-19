@@ -190,20 +190,20 @@ export const POST_upload = async (ctx) => {
     ```
     *[cite: tests/app.jet.ts]*
 
-### `body: JetData["body"]`
+### `body: Promise<JetData["body"]>`
 
   * **Type:** Inferred from Schema (`JetData` generic)
-  * **Description:** Represents the *parsed* request body. It's crucial to understand that `ctx.body` is typically `undefined` until you explicitly parse the request body using a method like `await ctx.json()`, `await ctx.plugins.formData(ctx)`, or implicitly via `ctx.validate()` if it handles parsing, *unless* you have enabled opt-in eager pre-processing for the route.
+  * **Description:** Represents the *parsed* request body. It's crucial to understand that `ctx.body` is typically a `Promise` that will resolve to the parsed validated body.
   * **Example:**
     ```typescript
     // For a POST request with JSON: { "name": "Fluffy", "age": 3 }
     // Define schema: const PetSchema = t.object({ name: t.string(), age: t.number() });
     export const POST_pets = async (ctx) => {
       // Assuming NO pre-processing:
-      console.log(ctx.body); // undefined (initially)
+      console.log(await ctx.body); // undefined (initially)
       await ctx.json();      // Parse the JSON body
-      console.log(ctx.body); // { name: "Fluffy", age: 3 }
-      const name = ctx.body.name; // Access data
+      console.log(await ctx.body); // { name: "Fluffy", age: 3 }
+      const name = (await ctx.body).name; // Access data
       // ... validation and logic ...
     }
     ```
@@ -418,18 +418,17 @@ Methods returning `never` indicate they terminate the request flow.
     ctx.set("X-Powered-By", "Jetpath"); // Add a custom header
     ```
 
-### `json(): Promise<Record<string, any>>`
+### `parse(options?: { maxBodySize?: number; contentType?: string }): Promise<Record<string, any>>`
 
   * **Description:** Asynchronously reads and parses the request body specifically as JSON. Populates `ctx.body` upon success. Throws if the body is not valid JSON or has already been consumed. It's often called just before `ctx.validate()` if not using eager pre-processing.
   * **Example:**
     ```typescript
     // In a POST handler expecting JSON:
     async function handler(ctx) {
-        try {
-            await ctx.json(); // Parse the body
-            const name = ctx.body.name;
+        try { 
+            const name = (await ctx.parse()).name;
             // Now validate ctx.body or use it directly if validation not needed
-            ctx.send({ received: ctx.body });
+            ctx.send({ received: name });
         } catch (err) {
             ctx.send(`Invalid JSON payload: ${err.message}`,400);
         }

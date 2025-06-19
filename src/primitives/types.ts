@@ -29,7 +29,7 @@ export interface JetContext<
   /**
    * get body params after /?
    */
-  body: JetData["body"];
+  body: Promise<JetData["body"]>;
   /**
    * get query params after /?
    */

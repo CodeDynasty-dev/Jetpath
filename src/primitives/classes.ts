@@ -146,7 +146,7 @@ export class Context {
   request: Request | IncomingMessage | undefined;
   params: Record<string, any> | undefined;
   query: Record<string, any> | undefined;
-  body?: Record<string, any>;
+ private _body?: Record<string, any>;
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
@@ -178,6 +178,12 @@ export class Context {
   constructor() {
     this.plugins = abstractPluginCreator(this);
     this._7 = new ctxState();
+  }
+  get body():  Promise<Record<string, any>> {
+    if (this._body) {
+      return this._body as Promise<Record<string, any>>;
+    }
+return this.parse()  
   }
   send(data: unknown, statusCode?: number, contentType?: string) {
     if (this._6 || this._3) {
@@ -373,19 +379,16 @@ export class Context {
     maxBodySize?: number;
     contentType?: string;
   }): Promise<Type> {
-    if (this.body) {
-      return this.body as Promise<Type>;
-    }
-    this.body = await parseRequest(this.request, options) as Promise<Type>;
+    this._body = await parseRequest(this.request, options) as Promise<Type>;
     //? validate body
     if (this.handler!.body) {
-      this.body = validator(this.handler!.body, this.body);
+      this._body = validator(this.handler!.body, this._body);
     }
     //? validate query
     if (this.handler!.query && this.query) {
       this.query = validator(this.handler!.query, this.query);
     }
-    return this.body as Promise<Type>;
+    return this._body as Promise<Type>;
   }
 }
 
