@@ -190,10 +190,10 @@ export const POST_upload = async (ctx) => {
     ```
     *[cite: tests/app.jet.ts]*
 
-### `body: Promise<JetData["body"]>`
+### `body: Promise<Record<string, any>>`
 
   * **Type:** Inferred from Schema (`JetData` generic)
-  * **Description:** Represents the *parsed* request body. It's crucial to understand that `ctx.body` is typically a `Promise` that will resolve to the parsed validated body.
+  * **Description:** Represents the *parsed* request body. It's crucial to understand that `ctx.body` is typically a `Promise` that will resolve to the parsed validated body,  So designed to be a parsed when you want to use it, with support for json, form-data, urlencoded.
   * **Example:**
     ```typescript
     // For a POST request with JSON: { "name": "Fluffy", "age": 3 }
@@ -208,7 +208,7 @@ export const POST_upload = async (ctx) => {
     }
     ```
 
-### `query: JetData["query"]`
+### `query: Record<string, string | string[]>`
 
   * **Type:** Inferred from Schema (`JetData` generic), defaults to `Record<string, string | string[]>`
   * **Description:** An object containing key-value pairs from the URL's query string (the part after `?`). Values are initially strings or arrays of strings (for repeated keys). Use validation to enforce specific types (like numbers or booleans).
@@ -228,7 +228,7 @@ export const POST_upload = async (ctx) => {
     ```
     *[cite: tests/app.jet.ts (GET\_pets example uses query params)]*
 
-### `params: JetData["params"]`
+### `params: Record<string, string>`
 
   * **Type:** Inferred from Schema (`JetData` generic), defaults to `Record<string, string>`
   * **Description:** An object containing values captured from dynamic segments in the route path (defined using `$paramName` in file/export names).
