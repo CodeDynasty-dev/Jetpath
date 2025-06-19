@@ -323,7 +323,7 @@ export const getCtx = (
     ctx.params = params;
     ctx.query = query;
     ctx.path = path;
-    ctx.body = undefined; // ? very important.
+    ctx.$_internal_body = undefined; // ? very important.
     //? load
     ctx.payload = undefined;
     // ? header of response
