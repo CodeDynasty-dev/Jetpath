@@ -387,7 +387,7 @@ export const POST_upload: JetRoute<{
     await ctx.parse({
       maxBodySize: 20 * 1024 * 1024, // Set max body size (e.g., 20MB)
     });
-    const formData = ctx.body; // Access the parsed form data
+    const formData = await ctx.parse(); // Access the parsed form data
 
     const results: Record<string, any> = {}; // Object to store results of processing each field
 

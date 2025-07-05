@@ -30,27 +30,27 @@ export const GET_pets: JetRoute<{
   };
 }> = function (ctx) {
   // Extract query parameters with defaults (Parsing to appropriate types if necessary, e.g., numbers)
-  const limit = ctx.query.limit !== undefined
-    ? parseInt(ctx.query.limit as any, 10)
+  const limit = ctx.parseQuery().limit !== undefined
+    ? parseInt(ctx.parseQuery().limit as any, 10)
     : 10;
-  const offset = ctx.query.offset !== undefined
-    ? parseInt(ctx.query.offset as any, 10)
+  const offset = ctx.parseQuery().offset !== undefined
+    ? parseInt(ctx.parseQuery().offset as any, 10)
     : 0;
-  const species = ctx.query.species;
-  const minAge = ctx.query.minAge !== undefined
-    ? parseInt(ctx.query.minAge as any, 10)
+  const species = ctx.parseQuery().species;
+  const minAge = ctx.parseQuery().minAge !== undefined
+    ? parseInt(ctx.parseQuery().minAge as any, 10)
     : undefined;
-  const maxAge = ctx.query.maxAge !== undefined
-    ? parseInt(ctx.query.maxAge as any, 10)
+  const maxAge = ctx.parseQuery().maxAge !== undefined
+    ? parseInt(ctx.parseQuery().maxAge as any, 10)
     : undefined;
   // Handle boolean query parameter for availability
   let available: boolean | undefined;
-  if (ctx.query.available !== undefined) {
+  if (ctx.parseQuery().available !== undefined) {
     // Convert string "true" or "false" to boolean, or handle other cases
-    available = String(ctx.query.available).toLowerCase() === "true";
+    available = String(ctx.parseQuery().available).toLowerCase() === "true";
   }
-  const sort = ctx.query.sort || "name"; // Default sort field
-  const search = ctx.query.search;
+  const sort = ctx.parseQuery().sort || "name"; // Default sort field
+  const search = ctx.parseQuery().search;
 
   // Start with a copy of the pets data to apply filters
   let filteredPets = [...pets];
@@ -194,8 +194,8 @@ export const GET_petBy$id: JetRoute<{
 }> = async function (ctx) {
   const petId = ctx.params.id; // Access the path parameter 'id'.
   // Access query parameter 'includeReviews' and convert to boolean.
-  const includeReviews = ctx.query.includeReviews === true ||
-    String(ctx.query.includeReviews).toLowerCase() === "true";
+  const includeReviews = ctx.parseQuery().includeReviews === true ||
+    String(ctx.parseQuery().includeReviews).toLowerCase() === "true";
 
   // Find pet by id in the in-memory array.
   const pet = pets.find((p) => p.id === petId);
@@ -272,8 +272,7 @@ export const POST_pets: JetRoute<{
   }
 
   // Parse and validate the request body. Jetpath handles this via use().body().
-  await ctx.parse(); // Ensure body is parsed
-  const petData = ctx.body; // Access the validated body
+  const petData = await ctx.parse(); // Ensure body is parsed
 
   // Generate a unique ID and add creation/update timestamps.
   const newPet: PetType = {
@@ -359,8 +358,7 @@ export const PUT_petBy$id: JetRoute<{
   }
 
   const petId = ctx.params.id; // Access path parameter 'id'.
-  await ctx.parse(); // Ensure body is parsed.
-  const updatedPetData = ctx.body; // Access the parsed body (validation happens via use().body()).
+  const updatedPetData = await ctx.parse(); // Access the parsed body (validation happens via use().body()).
 
   // Find pet by ID in the in-memory array.
   const index = pets.findIndex((p) => p.id === petId);
@@ -451,7 +449,7 @@ use(PUT_petBy$id).body((t) => {
         medicalHistory: t.array(t.string()).optional(),
       }).optional(),
     }).optional(),
-  }
+  };
 }).title("Update an existing pet's information (admin only)");
 
 /**
@@ -540,16 +538,16 @@ export const GET_pets_search: JetRoute<{
   };
 }> = async function (ctx) { // The sample marked this async, although it doesn't await anything. Keep async for consistency.
   // Extract and parse query parameters.
-  const name = ctx.query.name;
-  const species = ctx.query.species;
-  const breed = ctx.query.breed;
-  const minPrice = ctx.query.minPrice !== undefined
-    ? parseFloat(ctx.query.minPrice as any)
+  const name = ctx.parseQuery().name;
+  const species = ctx.parseQuery().species;
+  const breed = ctx.parseQuery().breed;
+  const minPrice = ctx.parseQuery().minPrice !== undefined
+    ? parseFloat(ctx.parseQuery().minPrice as any)
     : undefined; // Parse to float
-  const maxPrice = ctx.query.maxPrice !== undefined
-    ? parseFloat(ctx.query.maxPrice as any)
+  const maxPrice = ctx.parseQuery().maxPrice !== undefined
+    ? parseFloat(ctx.parseQuery().maxPrice as any)
     : undefined; // Parse to float
-  const tags = ctx.query.tags; // Comma-separated string
+  const tags = ctx.parseQuery().tags; // Comma-separated string
 
   // Start with a copy of the pets data.
   let filteredPets = [...pets];
@@ -668,12 +666,11 @@ export const POST_recipes$id_image: JetRoute<{
   }
 
   // Parse and validate the request body for the file field. Jetpath handles this via use().body() with t.file().
-  // The parsed file will be available at ctx.body.image.
-  await ctx.parse(); // Ensure body is parsed (required for file access)
-  const imageData = ctx.body.image; // Access the uploaded file data (JetFile type)
+
+  const imageData = await ctx.parse(); // Access the uploaded file data (JetFile type)
 
   // Check if file data is present and valid.
-  if (!imageData || !imageData.fileName) {
+  if (!imageData || !imageData.image.fileName) {
     ctx.code = 400; // Bad Request
     ctx.send({
       status: "error",
@@ -684,7 +681,7 @@ export const POST_recipes$id_image: JetRoute<{
 
   // Optional: Validate image type (example from sample)
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]; // Add gif perhaps
-  if (!allowedTypes.includes(imageData.mimeType)) {
+  if (!allowedTypes.includes(imageData.image.mimeType)) {
     ctx.code = 400;
     ctx.send({
       status: "error",
@@ -702,13 +699,13 @@ export const POST_recipes$id_image: JetRoute<{
   // Generate a unique filename for the saved image to prevent name collisions.
   const timestamp = Date.now();
   // Get the original file extension, defaulting if needed.
-  const fileExtension = imageData.fileName.split(".").pop() || "bin";
+  const fileExtension = imageData.image.fileName.split(".").pop() || "bin";
   const uniqueFileName = `${petId}-${timestamp}.${fileExtension}`;
   const filePath = join(uploadDir, uniqueFileName); // Full path to save the file
 
   try {
     // Save the file content (Buffer/Uint8Array) to the specified path using node:fs/promises.
-    await writeFile(filePath, imageData.content);
+    await writeFile(filePath, imageData.image.content);
 
     // Optional: Update the pet record in the database/memory with the image URL/path
     // Update the existing pet object directly.
@@ -730,7 +727,7 @@ export const POST_recipes$id_image: JetRoute<{
       status: "success",
       message: `Image uploaded successfully for pet ID ${petId}`,
       petId: petId,
-      fileName: imageData.fileName, // Original file name
+      fileName: imageData.image.fileName, // Original file name
       savedAs: uniqueFileName, // The unique name it was saved as
       url: pet.image, // The URL path stored/associated with the pet
     });
@@ -752,9 +749,27 @@ use(POST_recipes$id_image).body((t) => {
   return {
     // Define the 'image' field as a required file type.
     image: t.file({ inputAccept: "image/*" }).required(),
+    metadata: t.object({
+      name: t.string().required(),
+      description: t.string().optional(),
+      tags: t.array(t.string()).optional(),
+    }).optional(),
+    tags: t.array(t.object({
+      name: t.string().required(),
+      description: t.string().optional(),
+    })).optional(),
     // You could define other expected text fields in the form data here if any.
   };
-}).title("Upload an image for a specific pet (admin only)");
+}).title("Upload an image for a specific pet (admin only)").response((t) => {
+  return {
+    status: t.string().required(),
+    message: t.string().required(),
+    petId: t.string().required(),
+    fileName: t.string().required(),
+    savedAs: t.string().required(),
+    url: t.string().required(),
+  };
+});
 
 /**
  * Get all pet images (Example route from sample - simplified as we only store one image URL per pet)
@@ -793,6 +808,10 @@ export const GET_petBy$id_gallery: JetRoute<{
 
 use(GET_petBy$id_gallery).title(
   "Get images for a specific pet (returns main image URL in this sample)",
-);
+).query((t) => {
+  return {
+    sort: t.string().optional(),
+  };
+});
 
 // Export route handlers so Jetpath can discover and register them based on naming convention.

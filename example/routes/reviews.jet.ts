@@ -20,7 +20,7 @@ export const GET_petBy$id_reviews: JetRoute<{
   query: { sort?: string }; // Optional sort query parameter
 }> = function (ctx) {
   const petId = ctx.params.id; // Access pet ID from path.
-  const sort = ctx.query.sort || "-createdAt"; // Access sort query param, default to newest first.
+  const sort = ctx.parseQuery().sort || "-createdAt"; // Access sort query param, default to newest first.
 
   // Find the pet to ensure it exists.
   const pet = pets.find((p) => p.id === petId);
@@ -126,8 +126,7 @@ export const POST_petBy$id_reviews: JetRoute<{
   }
 
   // Parse and validate the request body. Jetpath handles this via use().body().
-  await ctx.parse(); // Ensure body is parsed
-  const { rating, comment } = ctx.body; // Access the validated body
+  const { rating, comment } = await ctx.parse(); // Ensure body is parsed
 
   // Create a new review object with a unique ID and current timestamp.
   const newReview: ReviewType = {

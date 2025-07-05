@@ -147,12 +147,12 @@ export class Context {
   params: Record<string, any> | undefined;
   /**
    * @internal
-  */
-    $_internal_query: Record<string, any> | undefined;
+   */
+  $_internal_query: Record<string, any> | undefined;
   /**
    * @internal
-  */
-  $_internal_body?: Record<string, any>; 
+   */
+  $_internal_body?: Record<string, any>;
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
@@ -188,6 +188,12 @@ export class Context {
   send(data: unknown, statusCode?: number, contentType?: string) {
     if (this._6 || this._3) {
       throw new Error("Response already set");
+    }
+    if (this.handler!.response) {
+      data = validator(this.handler!.response, data || {});
+      if (typeof data === "string") {
+        throw new Error(data);
+      }
     }
     if (contentType) {
       this._2["Content-Type"] = contentType;
@@ -378,26 +384,36 @@ export class Context {
   async parse<Type extends any = Record<string, any>>(options?: {
     maxBodySize?: number;
     contentType?: string;
-  } ): Promise<Type> {
-    this.$_internal_body = await parseRequest(this.request, options) as Promise<Type>;
+  }): Promise<Type> {
+    this.$_internal_body = await parseRequest(this.request, options) as Promise<
+      Type
+    >;
     //? validate body
     if (this.handler!.body) {
-      this.$_internal_body = validator(this.handler!.body, this.$_internal_body);
+      this.$_internal_body = validator(
+        this.handler!.body,
+        this.$_internal_body,
+      );
     }
-     return this.$_internal_body as Promise<Type>;
+    return this.$_internal_body as Promise<Type>;
   }
-  async parseQuery<Type extends any = Record<string, any>>(): Promise<Type> {
+  parseQuery<Type extends any = Record<string, any>>(): Promise<Type> {
     //? validate query
     const queryIndex = this.request?.url?.indexOf("?");
     if (queryIndex && queryIndex > -1) {
-      const queryParams = new URLSearchParams(this.request?.url?.slice(queryIndex));
+      const queryParams = new URLSearchParams(
+        this.request?.url?.slice(queryIndex),
+      );
       this.$_internal_query = {};
       queryParams.forEach((value, key) => {
         this.$_internal_query![key] = decodeURIComponent(value);
       });
     }
     if (this.handler!.query && this.$_internal_query) {
-      this.$_internal_query = validator(this.handler!.query, this.$_internal_query);
+      this.$_internal_query = validator(
+        this.handler!.query,
+        this.$_internal_query,
+      );
     }
     return this.$_internal_query as Promise<Type>;
   }

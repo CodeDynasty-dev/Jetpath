@@ -16,8 +16,7 @@ export const POST_auth_login: JetRoute<
   [AuthPluginType]
 > = async function (ctx) {
   // Parse the request body. Jetpath handles this.
-  await ctx.parse();
-  const { username, password } = ctx.body;
+  const { username, password } = await ctx.parse();
 
   // Use the auth plugin to authenticate the user.
   // Access plugins via ctx.plugins, assuming the plugin was added with app.addPlugin(authPlugin) in index.ts.

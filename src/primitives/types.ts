@@ -108,7 +108,7 @@ export interface JetContext<
     maxBodySize?: number;
     contentType?: string;
   }): Promise<JetData["body"]>;
-  parseQuery(): Promise<JetData["query"]>;
+  parseQuery(): JetData["query"];
   /**
    * Upgrade the request to a WebSocket connection
    */

@@ -89,8 +89,8 @@ export const GET_live = async (ctx) => {
 
 ### Request Data Access
 
-- `body`: Parsed request body data
-- `query`: URL query parameters
+- `await ctx.parse()`: Parsed request body data
+- `ctx.parseQuery()`: URL query parameters
 - `params`: Route parameters
 - All type-safe based on `JetData` generic
 - `plugins`: Returns the plugin object
@@ -427,7 +427,6 @@ Methods returning `never` indicate they terminate the request flow.
     async function handler(ctx) {
         try { 
             const name = (await ctx.parse()).name;
-            // Now validate ctx.body or use it directly if validation not needed
             ctx.send({ received: name });
         } catch (err) {
             ctx.send(`Invalid JSON payload: ${err.message}`,400);
@@ -441,7 +440,7 @@ Methods returning `never` indicate they terminate the request flow.
 
   * See how `ctx` is used throughout the [**Request Lifecycle**](./request-lifecycle.md).
   * Learn how [**Middleware**](./middleware.md) leverages `ctx` for cross-cutting concerns.
-  * Understand how [**Validation**](./validation.md) uses schemas to type and check `ctx.body`, `ctx.query`, and `ctx.params`.
+  * Understand how [**Validation**](./validation.md) uses schemas to type and check `ctx.parse()`, `ctx.parseQuery()`, and `ctx.params`.
  
  
 
