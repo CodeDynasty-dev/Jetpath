@@ -311,7 +311,6 @@ export const getCtx = (
   path: string,
   route: JetRoute,
   params?: Record<string, any>,
-  query?: Record<string, any>,
 ): Context => {
   if (ctxPool.length) {
     const ctx = ctxPool.shift()!;
@@ -321,9 +320,9 @@ export const getCtx = (
     ctx.res = res;
     ctx.method = req.method as "GET";
     ctx.params = params;
-    ctx.query = query;
-    ctx.path = path;
+    ctx.$_internal_query = undefined;
     ctx.$_internal_body = undefined; // ? very important.
+    ctx.path = path;
     //? load
     ctx.payload = undefined;
     // ? header of response
@@ -345,7 +344,6 @@ export const getCtx = (
   ctx._2 = cachedCorsHeaders;
   ctx.method = req.method as "GET";
   ctx.params = params;
-  ctx.query = query;
   ctx.path = path;
   ctx.handler = route;
   return ctx;
@@ -1178,6 +1176,19 @@ export function use<
       >,
     ) {
       endpoint.body = createSchema(schemaFn as any) as any;
+      return compiler;
+    },
+    /**
+     * Sets the API documentation body for the endpoint
+     */
+    response: function (
+      schemaFn: (
+        t: typeof v,
+      ) => Partial<
+        Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
+      >,
+    ) {
+      endpoint.response = createSchema(schemaFn as any) as any;
       return compiler;
     },
     /**

@@ -428,6 +428,30 @@ use(PUT_petBy$id).body((t) => {
       medicalHistory: t.array(t.string()).optional(),
     }).optional(),
   };
+}).response((t) => {
+  return {
+    status: t.string().required(),
+    message: t.string().required(),
+    pet: t.object({
+      id: t.string().required(),
+      name: t.string().required(),
+      species: t.string().required(),
+      breed: t.string().required(),
+      age: t.number().required(),
+      gender: t.string().required(),
+      color: t.string().required(),
+      description: t.string().required(),
+      image: t.string().optional(),
+      price: t.number().required(),
+      available: t.boolean().required(),
+      tags: t.array(t.string()).optional(),
+      health: t.object({
+        vaccinated: t.boolean().optional(),
+        neutered: t.boolean().optional(),
+        medicalHistory: t.array(t.string()).optional(),
+      }).optional(),
+    }).optional(),
+  }
 }).title("Update an existing pet's information (admin only)");
 
 /**

@@ -29,11 +29,11 @@ export interface JetContext<
   /**
    * get body params after /?
    */
-  body: Promise<JetData["body"]>;
+  // body: Promise<JetData["body"]>;
   /**
    * get query params after /?
    */
-  query: JetData["query"];
+  // query: JetData["query"];
   /**
    * get route params in /:thing
    */
@@ -108,6 +108,7 @@ export interface JetContext<
     maxBodySize?: number;
     contentType?: string;
   }): Promise<JetData["body"]>;
+  parseQuery(): Promise<JetData["query"]>;
   /**
    * Upgrade the request to a WebSocket connection
    */
@@ -396,6 +397,16 @@ export type compilerType<
       Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>
     >,
   ) => compilerType<JetData, JetPluginTypes>;
+  /**
+   * Sets the API body validation and documentation body for the endpoint
+   */
+  response: (
+    schemaFn: (
+      t: typeof v,
+    ) => Partial<
+      Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
+    >,
+  ) => compilerType<JetData, JetPluginTypes>;
   //? docs and validation
   /**
    * Sets the API documentation query for the endpoint
@@ -407,6 +418,7 @@ export type compilerType<
       Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>
     >,
   ) => compilerType<JetData, JetPluginTypes>;
+
   //? docs only
   /**
    * Sets the API documentation title for the endpoint

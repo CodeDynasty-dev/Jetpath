@@ -145,11 +145,14 @@ export class Context {
   code = 200;
   request: Request | IncomingMessage | undefined;
   params: Record<string, any> | undefined;
-  query: Record<string, any> | undefined;
   /**
    * @internal
   */
-  $_internal_body?: Record<string, any>;
+    $_internal_query: Record<string, any> | undefined;
+  /**
+   * @internal
+  */
+  $_internal_body?: Record<string, any>; 
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
@@ -181,12 +184,6 @@ export class Context {
   constructor() {
     this.plugins = abstractPluginCreator(this);
     this._7 = new ctxState();
-  }
-  get body():  Promise<Record<string, any>> {
-    if (this.$_internal_body) {
-      return this.$_internal_body as Promise<Record<string, any>>;
-    }
-return this.parse()  
   }
   send(data: unknown, statusCode?: number, contentType?: string) {
     if (this._6 || this._3) {
@@ -381,17 +378,28 @@ return this.parse()
   async parse<Type extends any = Record<string, any>>(options?: {
     maxBodySize?: number;
     contentType?: string;
-  }): Promise<Type> {
+  } ): Promise<Type> {
     this.$_internal_body = await parseRequest(this.request, options) as Promise<Type>;
     //? validate body
     if (this.handler!.body) {
       this.$_internal_body = validator(this.handler!.body, this.$_internal_body);
     }
+     return this.$_internal_body as Promise<Type>;
+  }
+  async parseQuery<Type extends any = Record<string, any>>(): Promise<Type> {
     //? validate query
-    if (this.handler!.query && this.query) {
-      this.query = validator(this.handler!.query, this.query);
+    const queryIndex = this.request?.url?.indexOf("?");
+    if (queryIndex && queryIndex > -1) {
+      const queryParams = new URLSearchParams(this.request?.url?.slice(queryIndex));
+      this.$_internal_query = {};
+      queryParams.forEach((value, key) => {
+        this.$_internal_query![key] = decodeURIComponent(value);
+      });
     }
-    return this.$_internal_body as Promise<Type>;
+    if (this.handler!.query && this.$_internal_query) {
+      this.$_internal_query = validator(this.handler!.query, this.$_internal_query);
+    }
+    return this.$_internal_query as Promise<Type>;
   }
 }
 
@@ -767,6 +775,10 @@ export class Trie {
             `Invalid route path: Parameter segment '${segment}' cannot follow a wildcard '*' at the same level in ${this.method} ${path}.`,
           );
         } else {
+          if (!handler.params) {
+            handler.params = {};
+          }
+          handler.params[paramName as keyof typeof handler.params] = "" as any;
           const newNode = new TrieNode();
           newNode.paramName = paramName;
           currentNode.parameterChild = newNode;
@@ -852,16 +864,10 @@ export class Trie {
         this.hashmap[normalizedPath]!,
       );
     }
-    let query: Record<string, string> | undefined;
     //? Handle query parameters
     const queryIndex = normalizedPath.indexOf("?");
     if (queryIndex > -1) {
       // ? Extract query parameters
-      const queryParams = new URLSearchParams(normalizedPath.slice(queryIndex));
-      query = {};
-      queryParams.forEach((value, key) => {
-        query![key] = decodeURIComponent(value);
-      });
       normalizedPath = normalizedPath.slice(0, queryIndex);
       if (this.hashmap[normalizedPath]) {
         return getCtx(
@@ -870,7 +876,6 @@ export class Trie {
           normalizedPath,
           this.hashmap[normalizedPath]!,
           undefined,
-          query,
         );
       }
     }
@@ -891,7 +896,6 @@ export class Trie {
           normalizedPath,
           this.root.handler,
           undefined,
-          query,
         );
       }
     }
@@ -926,7 +930,6 @@ export class Trie {
         normalizedPath,
         currentNode.handler,
         params,
-        query,
       );
     }
   }
@@ -988,7 +991,6 @@ export class JetServer {
         r.path!,
         r,
         {},
-        {},
       ) as any;
     }
     try {
@@ -1038,8 +1040,7 @@ export class JetServer {
     path: string,
     handler: JetRoute,
     params: Record<string, any>,
-    query: Record<string, any>,
   ): JetContext {
-    return getCtx(req, res, path, handler, params, query) as any;
+    return getCtx(req, res, path, handler, params) as any;
   }
 }
