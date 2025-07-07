@@ -1397,65 +1397,89 @@ export async function codeGen(
             let response: Record<string, "string"> | undefined;
             let params: Record<string, "string"> | undefined;
             let query: Record<string, "string"> | undefined;
-            for (const key in obj[route].body) {
-              if (!body) {
-                body = {};
+            if (obj[route].body) {
+              for (const key in obj[route].body) {
+                if (!body) {
+                  body = {};
+                }
+                const type = obj[route].body[key].type;
+                let val = type === "string"
+                  ? "string"
+                  : type === "number"
+                  ? 1
+                  : type === "boolean"
+                  ? true
+                  : type === "object"
+                  ? compileObjectStructureFromSchema(
+                    obj[route].body[key] as SchemaDefinition,
+                  )
+                  : type === "array"
+                  ? compileObjectStructureFromSchema(
+                    obj[route].body[key] as SchemaDefinition,
+                  )
+                  : type === "file"
+                  ? "file"
+                  : type;
+                body[key] = val as "string";
               }
-              const type = obj[route].body[key].type;
-              let val = type === "string"
-                ? "string"
-                : type === "number"
-                ? 1
-                : type === "boolean"
-                ? true
-                : type === "object"
-                ? compileObjectStructureFromSchema(
-                  obj[route].body[key] as SchemaDefinition,
-                )
-                : type === "array"
-                ? compileObjectStructureFromSchema(
-                  obj[route].body[key] as SchemaDefinition,
-                )
-                : type === "file"
-                ? "file"
-                : type;
-              body[key] = val as "string";
             }
-            for (const key in obj[route].response) {
-              if (!response) {
-                response = {};
+            if (obj[route].query) {
+              for (const key in obj[route].query) {
+                if (!query) {
+                  query = {};
+                }
+                const type = obj[route].query[key].type;
+                let val = type === "string"
+                  ? "string"
+                  : type === "number"
+                  ? 1
+                  : type === "boolean"
+                  ? true
+                  : type === "object"
+                  ? compileObjectStructureFromSchema(
+                    obj[route].query[key] as SchemaDefinition,
+                  )
+                  : type === "array"
+                  ? compileObjectStructureFromSchema(
+                    obj[route].query[key] as SchemaDefinition,
+                  )
+                  : type;
+                query[key] = val as "string";
               }
-              const type = obj[route].response[key].type;
-              let val = type === "string"
-                ? "string"
-                : type === "number"
-                ? 1
-                : type === "boolean"
-                ? true
-                : type === "object"
-                ? compileObjectStructureFromSchema(
-                  obj[route].response[key] as SchemaDefinition,
-                )
-                : type === "array"
-                ? compileObjectStructureFromSchema(
-                  obj[route].response[key] as SchemaDefinition,
-                )
-                : type === "file"
-                ? "file"
-                : type;
-              response[key] = val as "string";
             }
-            for (const key in obj[route].params) {
-              if (!params) {
-                params = {};
+            if (obj[route].response) {
+              for (const key in obj[route].response) {
+                if (!response) {
+                  response = {};
+                }
+                const type = obj[route].response[key].type;
+                let val = type === "string"
+                  ? "string"
+                  : type === "number"
+                  ? 1
+                  : type === "boolean"
+                  ? true
+                  : type === "object"
+                  ? compileObjectStructureFromSchema(
+                    obj[route].response[key] as SchemaDefinition,
+                  )
+                  : type === "array"
+                  ? compileObjectStructureFromSchema(
+                    obj[route].response[key] as SchemaDefinition,
+                  )
+                  : type === "file"
+                  ? "file"
+                  : type;
+                response[key] = val as "string";
               }
-              params[key] = "string";
             }
-            for (const key in obj[route].query) {
-              if (!query) {
-                query = {};
+            if (obj[route].params) {
+              for (const key in obj[route].params) {
+                if (!params) {
+                  params = {};
+                }
+                params[key] = "string";
               }
-              query[key] = "string";
             }
             acc.push(
               `${

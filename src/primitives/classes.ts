@@ -398,23 +398,39 @@ export class Context {
     return this.$_internal_body as Promise<Type>;
   }
   parseQuery<Type extends any = Record<string, any>>(): Promise<Type> {
-    //? validate query
     const queryIndex = this.request?.url?.indexOf("?");
     if (queryIndex && queryIndex > -1) {
       const queryParams = new URLSearchParams(
         this.request?.url?.slice(queryIndex),
       );
       this.$_internal_query = {};
-      queryParams.forEach((value, key) => {
-        this.$_internal_query![key] = decodeURIComponent(value);
-      });
+
+      for (const [key, value] of queryParams.entries()) {
+        const path = key
+          .replace(/\]/g, "")
+          .split("[")
+          .map((k) => k.trim());
+
+        let curr = this.$_internal_query;
+        for (let i = 0; i < path.length; i++) {
+          const part = path[i];
+          if (i === path.length - 1) {
+            curr[part] = decodeURIComponent(value);
+          } else {
+            curr[part] ||= {};
+            curr = curr[part];
+          }
+        }
+      }
     }
-    if (this.handler!.query && this.$_internal_query) {
+
+    if (this.handler?.query && this.$_internal_query) {
       this.$_internal_query = validator(
-        this.handler!.query,
+        this.handler.query,
         this.$_internal_query,
       );
     }
+
     return this.$_internal_query as Promise<Type>;
   }
 }
