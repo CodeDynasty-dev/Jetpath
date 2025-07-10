@@ -185,11 +185,11 @@ export class Context {
     this.plugins = abstractPluginCreator(this);
     this._7 = new ctxState();
   }
-  send(data: unknown, statusCode?: number, contentType?: string) {
+  send(data: unknown, statusCode?: number, contentType?: string, validate: boolean = true) {
     if (this._6 || this._3) {
       throw new Error("Response already set");
     }
-    if (this.handler!.response) {
+    if (this.handler!.response && validate) {
       data = validator(this.handler!.response, data || {});
       if (typeof data === "string") {
         throw new Error(data);
@@ -381,15 +381,19 @@ export class Context {
     throw new Error("Invalid upgrade headers");
   }
 
-  async parse<Type extends any = Record<string, any>>(options?: {
+  async parse<Type extends any = Record<string, any>>(options: {
     maxBodySize?: number;
     contentType?: string;
-  }): Promise<Type> {
+    validate?: boolean;
+  } = {validate: true}): Promise<Type> {
+    if (this.$_internal_body) {
+      return this.$_internal_body as Promise<Type>;
+    }
     this.$_internal_body = await parseRequest(this.request, options) as Promise<
       Type
     >;
     //? validate body
-    if (this.handler!.body) {
+    if (this.handler!.body && options.validate) {
       this.$_internal_body = validator(
         this.handler!.body,
         this.$_internal_body,
@@ -397,7 +401,12 @@ export class Context {
     }
     return this.$_internal_body as Promise<Type>;
   }
-  parseQuery<Type extends any = Record<string, any>>(): Promise<Type> {
+  parseQuery<Type extends any = Record<string, any>>(options: {
+    validate?: boolean;
+  } = {validate: true}): Promise<Type> {
+    if (this.$_internal_query) {
+      return this.$_internal_query as Promise<Type>;
+    }
     const queryIndex = this.request?.url?.indexOf("?");
     if (queryIndex && queryIndex > -1) {
       const queryParams = new URLSearchParams(
@@ -424,7 +433,7 @@ export class Context {
       }
     }
 
-    if (this.handler?.query && this.$_internal_query) {
+    if (this.handler?.query && options.validate) {
       this.$_internal_query = validator(
         this.handler.query,
         this.$_internal_query,
