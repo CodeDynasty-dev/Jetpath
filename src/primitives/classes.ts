@@ -185,7 +185,12 @@ export class Context {
     this.plugins = abstractPluginCreator(this);
     this._7 = new ctxState();
   }
-  send(data: unknown, statusCode?: number, contentType?: string, validate: boolean = true) {
+  send(
+    data: unknown,
+    statusCode?: number,
+    contentType?: string,
+    validate: boolean = true,
+  ) {
     if (this._6 || this._3) {
       throw new Error("Response already set");
     }
@@ -385,7 +390,7 @@ export class Context {
     maxBodySize?: number;
     contentType?: string;
     validate?: boolean;
-  } = {validate: true}): Promise<Type> {
+  } = { validate: true }): Promise<Type> {
     if (this.$_internal_body) {
       return this.$_internal_body as Promise<Type>;
     }
@@ -403,7 +408,7 @@ export class Context {
   }
   parseQuery<Type extends any = Record<string, any>>(options: {
     validate?: boolean;
-  } = {validate: true}): Promise<Type> {
+  } = { validate: true }): Promise<Type> {
     if (this.$_internal_query) {
       return this.$_internal_query as Promise<Type>;
     }
@@ -806,7 +811,14 @@ export class Trie {
               "warn",
             );
           }
+
           currentNode = currentNode.parameterChild;
+          // ? add parameter to same section child handlers.
+          if (!handler.params) {
+            handler.params = {};
+          }
+          // @ts-ignore
+          handler.params[paramName] = "";
         } else if (currentNode.children.has(segment)) {
           throw new Error(
             `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`,
