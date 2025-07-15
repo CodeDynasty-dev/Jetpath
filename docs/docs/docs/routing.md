@@ -43,9 +43,11 @@ The core convention lies in the names of the exported functions:
 
 ```typescript
 // GET /pets
+
 export const GET_pets: JetRoute = (ctx) => { ... }
 
-// POST /pets
+// POST /pet
+
 export const POST_pets: JetRoute = async (ctx) => { ... }
 
 // GET /pets/search
@@ -65,11 +67,18 @@ export const GET_pets_by$id: JetRoute = (ctx) => {
 }; 
 
 
+
+
  // Maps to: GET /pets/petBy/:id/:slug
+
 export const GET_pets_petBy$id$slug: JetRoute = (ctx) => {
+  
   const petId = ctx.params.id;
+
   const slug = ctx.params.slug;
+
   // ...
+  
 }; 
 ```
 

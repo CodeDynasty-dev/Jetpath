@@ -59,17 +59,21 @@ Create a file named `users.jet.ts` in the `src` directory:
 // src/users.jet.ts
 import { type JetRoute, use } from "jetpath";
 
-/**
- * Handles GET requests to the root path ('/')
- */
+
+// ? Handles GET requests to the root path ('/')
+
 export const GET_users: JetRoute = (ctx) => {
-  ctx.send({
+
+   ctx.send({
     message: "Welcome to your first Jetpath API!",
     status: "ok"
   });
+
 };
 
+// ? this appears on this API Doc
 use(GET_users).title("Returns a welcome message and API status.");
+
 ```
 
 ## Create the Server Entry Point
@@ -79,6 +83,8 @@ Create a file named `server.ts` in your project root:
 ```typescript
 // server.ts
 import { Jetpath } from "jetpath";
+
+// ? the option onject is optional
 
 const app = new Jetpath({
   source: "./src",
@@ -92,12 +98,21 @@ const app = new Jetpath({
 });
 
 app.listen();
+
 ```
 
 ## Run Your Server
 
 ```bash
-npx run dev
+bun server.ts
+
+# or
+
+node server.ts
+
+# or
+
+deno run server.ts
 ```
 
 ## Verify It Works
@@ -109,8 +124,8 @@ npx run dev
 
 ## Next Steps
 
-- Learn about [Routing](./routing.md), the [Context Object](./context.md), [Validation](./validation.md), and [Middleware](./middleware.md)
-- Build more complex features by following the practical [Guides](./guides/crud-api.md)
+- Learn about [Routing](./routing.html), the [Context Object](./context.html), [Validation](./validation.html), and [Middleware](./middleware.html)
+
 
 </docmach>
 

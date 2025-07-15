@@ -59,11 +59,10 @@ export const MIDDLEWARE_: JetMiddleware = (ctx) => {
    - Multiple middleware: Pre-handler → Pre-handler → ... → Route Handler → ... → Post-handler → Post-handler
 
 3. **Response Handling**
-   - Always handle responses in post-handler
    - Handle errors and 404s appropriately
 
 4. **Error Handling**
-   - Use `err` parameter in post-handler
+   - Use `error` parameter in post-handler
    - Set appropriate status codes
    - Send standardized error responses
    - Return after sending response

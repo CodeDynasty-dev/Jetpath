@@ -1,6 +1,6 @@
 /* Custom Typography Styles */
 :root {
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family: Verdana, -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Font Sizes */
   --font-size-xs: 0.75rem;

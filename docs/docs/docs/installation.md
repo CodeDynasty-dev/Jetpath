@@ -3,10 +3,7 @@
 
 # Installation
 
-Hello welcome to jetpath.
-
-
-Get ready to build universal JavaScript backends! Installing Jetpath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.
+Installing Jetpath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.
 
 ---
 
@@ -32,33 +29,39 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## Installing Jetpath:
+# Using Jetpath:
+
+
+## Start fresh:
+
+step one: Create your project folder
+
+step two: Run ```npm init -y```
+
+step three: Install jetpath ```npm i jetpath```
+
+
+Then create your routes and run your server check [Quick Start](./quickstart.html) for more infomation.
+
+
+## Installing Oficial Jetpath template:
+
 
 ```bash
-# Create your project folder
-mkdir my-api
+npx jetpath my-new-api
+```
+## Install Dependencies
 
-# Navigate to your project folder
+```bash
 cd my-api
+npm install # or yarn install or pnpm install or bun install
+```
 
-# Initialize a new Node.js project
-npm init -y
+## Run the template
 
-
-
-
-# Choose the installation method corresponding to your primary development runtime.
-
-# Using npm
-npm install jetpath
-
-# Using yarn
-yarn add jetpath
-
-# Using pnpm
-pnpm add jetpath
-````
-
+```bash
+npm run dev
+```
 
 -----
 
