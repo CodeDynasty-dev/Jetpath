@@ -35,6 +35,7 @@ import {
 import { networkInterfaces } from "node:os";
 import { execFile } from "node:child_process";
 import { mkdirSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 /**
  * an inbuilt CORS post middleware
@@ -500,11 +501,13 @@ const handlersPath = (path: string) => {
 };
 
 const getModule = async (src: string, name: string) => {
+  const absolutePath = resolve(src + "/" + name); //? Gets native OS path
   try {
-    const mod = await import(resolve(src + "/" + name));
+    const fileUrl = pathToFileURL(absolutePath).href; 
+    const mod = await import(fileUrl);
     return mod;
   } catch (error) {
-    LOG.log("Error at " + src + "/" + name + "  loading failed!", "info");
+    LOG.log("Error at " +absolutePath+ " loading failed!", "info");
     LOG.log(String(error), "error");
     return String(error);
   }
