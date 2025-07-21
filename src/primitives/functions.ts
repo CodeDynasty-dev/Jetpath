@@ -1504,8 +1504,12 @@ export async function codeGen(
         return acc;
       }, []).join(",\n ")
     } \n} as const;\n\n`;
-    LOG.log("Generated routes file successfully: " + ROUTE_FILE, "success");
-    await writeFile(ROUTE_FILE, outputContent, "utf-8");
+    try {
+      await writeFile(ROUTE_FILE, outputContent, "utf-8");
+      LOG.log("Generated routes file successfully: " + ROUTE_FILE, "success");
+    } catch (error) {
+      LOG.log(`Error writing routes file ${ROUTE_FILE}: ${error}`, "error");
+    }
   }
   //? Add all the generated module declarations
   outputContent += declarations.join("\n");
