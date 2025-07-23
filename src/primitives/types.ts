@@ -60,8 +60,10 @@ export interface JetContext<
    */
   sendStream(
     stream: Stream | string | BunFile,
-    folder?: string,
-    ContentType?: string,
+    config?: {
+      folder?: string,
+      ContentType?: string,
+    }
   ): void | never;
   /**
    * send a file for download
@@ -73,8 +75,10 @@ export interface JetContext<
    */
   download(
     stream: string | BunFile,
-    folder?: string,
-    ContentType?: string,
+    config?: {
+      folder?: string,
+      ContentType?: string,
+    }
   ): void;
   /**
    * send a direct response
