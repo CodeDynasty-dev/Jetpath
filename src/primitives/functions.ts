@@ -485,6 +485,7 @@ const Jetpath = async (
 };
 
 const handlersPath = (path: string) => {
+  path = path.replaceAll("__", "-");// ? convert __ to -
   let [method, ...segments] = path.split("_");
   let route = "/" + segments.join("/");
   route = route
