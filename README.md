@@ -35,7 +35,7 @@
 
 ## Why Engineers Choose Jetpath
 
-Every framework promises to be fast and easy. Jetpath got built because most of them aren't.
+Every framework promises to be fast and easy but they are not, here is Jetpath.
 
 ```ts
 // This is a complete API endpoint in Jetpath
@@ -46,12 +46,12 @@ export const GET_users_$id: JetRoute = async function (ctx) {
 };
 ```
 
-Jetpath eliminates the cognitive overhead that slows down development. No more router configuration, middleware chains, or callback hell. Just pure functions that map directly to HTTP endpoints through a clean, predictable naming convention.
+Jetpath eliminates the cognitive overhead that slows down development. No router configuration, middleware chains, or callback hell. Only pure functions that map directly to HTTP endpoints through a clean, predictable naming convention.
 
 **The tech stack you already trust, but faster:**
 - Write APIs in TypeScript/JavaScript across Node.js, Deno, or Bun
 - ~50% less code than Express with stronger type safety
-- [Benchmarks](https://github.com/CodeDynasty-dev/jetpath-benchmark) show massive throughput compared to Elysia.js.
+- [Benchmarks](https://github.com/CodeDynasty-dev/jetpath-benchmark) show massive throughput compared to Elysia.js *(JS faster Framework).
 
 ## Core Design Principles
 
@@ -74,13 +74,17 @@ I am using Jetpath in production and here are the results.
 
 ```bash
 # Create new project
+
 npx jetpath new-project
 
 # Navigate and start the dev server
-cd new-project && npm install && npm run dev
+
+cd new-project
+npm install 
+npm run dev
 ```
 
-## API Design That Gets Out of Your Way
+## API Design That makes everything simple and concise
 
 ```ts
 import { type JetRoute, Jetpath, use } from "jetpath";
@@ -110,7 +114,7 @@ use(POST_products)
     description: t.string()
   }));
 
-// Maps to ws://your-host/live
+// Maps to ws://your-host/live instantly
 export const GET_live: JetRoute = (ctx) => {
   ctx.upgrade();
   const conn = ctx.connection!;
@@ -126,9 +130,9 @@ export const GET_live: JetRoute = (ctx) => {
 - **First-class WebSocket support**
 - **Plugin system** for extending functionality
 - **Schema validation** that is part of api documentation
-- **Request parsing** that just works (JSON, forms, multipart)
+- **Request parsing** Inbuilt (JSON, forms, multipart)
 - **Performance-optimized** routing and middleware execution
-- **Security** good defaults
+- **Security** Great defaults
 
 ## Real Performance
 
