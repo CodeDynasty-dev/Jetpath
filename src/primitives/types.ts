@@ -61,9 +61,9 @@ export interface JetContext<
   sendStream(
     stream: Stream | string | BunFile,
     config?: {
-      folder?: string,
-      ContentType?: string,
-    }
+      folder?: string;
+      ContentType?: string;
+    },
   ): void | never;
   /**
    * send a file for download
@@ -76,9 +76,9 @@ export interface JetContext<
   download(
     stream: string | BunFile,
     config?: {
-      folder?: string,
-      ContentType?: string,
-    }
+      folder?: string;
+      ContentType?: string;
+    },
   ): void;
   /**
    * send a direct response
@@ -159,6 +159,19 @@ export type methods =
 export type allowedMethods = methods[];
 
 export type jetOptions = {
+  /**
+   * edge grabber helps capture defined API functions in an edge environment
+   * and avoids fs system scanning.
+   * @example
+   * ```ts
+   * edgeGrabber: [
+   *   GET_api_users,
+   *   POST_api_users,
+   *   Middleware_api_users,
+   * ]
+   * ```
+   */
+  edgeGrabber?: JetRoute[] | JetMiddleware[];
   /**
    * upgrade the request to a WebSocket connection
    */

@@ -1,5 +1,3 @@
-import { writeFile } from "node:fs/promises";
-import { sep } from "node:path";
 import {
   _jet_middleware,
   _JetPath_paths,
@@ -9,6 +7,7 @@ import {
   compileAPI,
   compileUI,
   corsMiddleware,
+  fs,
   getHandlers,
   getLocalIP,
   server,
@@ -32,8 +31,6 @@ export class Jetpath {
   };
   private plugs: JetPlugin[] = [];
   constructor(options: jetOptions = {}) {
-    Object.assign(this.options, options);
-    if (!this.options.port) this.options.port = 8080;
     // ? setting up app configs
     if (this.options.cors === true) {
       corsMiddleware({
@@ -46,6 +43,10 @@ export class Jetpath {
         ...(typeof options?.cors === "object" ? options.cors : {}),
       });
     }
+    //? setting up default values
+    Object.assign(this.options, options);
+    //?
+    if (!this.options.port) this.options.port = 8080;
   }
   derivePlugins<
     JetPluginTypes extends {
@@ -76,7 +77,7 @@ export class Jetpath {
       & Record<string, any>;
   }
   async listen(): Promise<void> {
-    if (!this.options.source) {
+    if (!this.options.source && !this.options.edgeGrabber?.length) {
       LOG.log(
         "Jetpath: Provide a source directory to avoid scanning the root directory",
         "warn",
@@ -191,7 +192,9 @@ export class Jetpath {
         }`,
         "info",
       );
-    } else if (this.options?.apiDoc?.display === "HTTP") {
+    } else if (
+      this.options?.apiDoc?.display === "HTTP" && !this.options?.edgeGrabber
+    ) {
       //? generate types
       await codeGen(
         this.options.source || ".",
@@ -199,7 +202,7 @@ export class Jetpath {
         this.options.generatedRoutesFilePath,
       );
       // ? render API in a .HTTP file
-      await writeFile("api-doc.http", compiledAPI);
+      await fs().writeFile("api-doc.http", compiledAPI);
       LOG.log(
         `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
@@ -209,7 +212,7 @@ export class Jetpath {
         "info",
       );
       LOG.log(
-        `APIs: written to ${sep}api-doc.http`,
+        `APIs: written to ${fs().sep}api-doc.http`,
         "info",
       );
     }

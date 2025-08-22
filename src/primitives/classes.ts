@@ -1,9 +1,9 @@
-import { createReadStream, realpathSync } from "node:fs";
-import { IncomingMessage } from "node:http";
+import { type IncomingMessage } from "node:http";
 import { type Stream } from "node:stream";
 import {
   _JetPath_paths,
   abstractPluginCreator,
+  fs,
   getCtx,
   isNode,
   JetSocketInstance,
@@ -24,7 +24,6 @@ import type {
   ValidationOptions,
 } from "./types.js";
 import { mime } from "../extracts/mimejs-extract.js";
-import { resolve, sep } from "node:path";
 import type { BunFile } from "bun";
 
 export class JetPlugin {
@@ -285,18 +284,18 @@ export class Context {
         let normalizedTarget: string;
         let normalizedBase: string;
         try {
-          stream = resolve(config.folder, stream);
-          normalizedTarget = realpathSync(stream);
-          normalizedBase = realpathSync(config.folder);
+          stream = fs().resolve(config.folder, stream);
+          normalizedTarget = fs().realpathSync(stream);
+          normalizedBase = fs().realpathSync(config.folder);
         } catch (error) {
           throw new Error("File not found!");
         }
         // ? prevent path traversal
-        if (!normalizedTarget.startsWith(normalizedBase + sep)) {
+        if (!normalizedTarget.startsWith(normalizedBase + fs().sep)) {
           throw new Error("Path traversal detected!");
         }
       } else {
-        stream = resolve(stream);
+        stream = fs().resolve(stream);
       }
       config.ContentType = mime.getType(stream) || config.ContentType;
       this._2["Content-Disposition"] = `inline; filename="${
@@ -309,7 +308,7 @@ export class Context {
         const file = Deno.open(stream).catch(() => {});
         stream = file;
       } else {
-        stream = createReadStream(resolve(stream) as string, {
+        stream = fs().createReadStream(fs().resolve(stream) as string, {
           autoClose: true,
         });
       }

@@ -1,8 +1,3 @@
-// compatible node imports
-import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, join, resolve, sep } from "node:path";
-import { cwd } from "node:process";
-import { createServer } from "node:http";
 // type imports
 import { type IncomingMessage, type ServerResponse } from "node:http";
 import type {
@@ -32,10 +27,6 @@ import {
   StringSchema,
   Trie,
 } from "./classes.js";
-import { networkInterfaces } from "node:os";
-import { execFile } from "node:child_process";
-import { mkdirSync } from "node:fs";
-import { pathToFileURL } from "node:url";
 
 /**
  * an inbuilt CORS post middleware
@@ -175,11 +166,16 @@ export const _jet_middleware: Record<
 > = {};
 
 export const ctxPool: Context[] = [];
-export let runtime: Record<"bun" | "deno" | "node" | "edge", boolean> = {
+export let runtime: Record<
+  "bun" | "deno" | "node" | "edge" | "cloudflare_worker" | "aws_lambda",
+  boolean
+> = {
   bun: false,
   deno: false,
   node: false,
   edge: false,
+  cloudflare_worker: false,
+  aws_lambda: false,
 };
 const plugins: Record<string, Function> = {};
 
@@ -201,10 +197,35 @@ const ae = (cb: { (): any; (): any; (): void }) => {
 };
 
 (() => {
+  //? check for bun runtime
   const bun = ae(() => Bun);
+  //? check for deno runtime
   // @ts-expect-error
   const deno = ae(() => Deno);
-  runtime = { bun, deno, node: !bun && !deno, edge: false };
+  let cloudflare_worker = false;
+  let aws_lambda = false;
+  //? check if running in Cloudflare Worker
+  if (
+    typeof (globalThis as any).WebSocketPair !== "undefined" &&
+    typeof (globalThis as any).caches !== "undefined" &&
+    typeof (globalThis as any).Response !== "undefined"
+  ) {
+    cloudflare_worker = true;
+  }
+  // AWS Lambda
+  if (
+    typeof process !== "undefined" && process.env?.["AWS_LAMBDA_FUNCTION_NAME"]
+  ) {
+    aws_lambda = true;
+  }
+  runtime = {
+    bun,
+    deno,
+    node: !bun && !deno,
+    aws_lambda,
+    cloudflare_worker,
+    edge: cloudflare_worker || aws_lambda,
+  };
 })();
 
 // ? isNode
@@ -217,7 +238,7 @@ export const server = (
   let server;
   let server_else;
   if (runtime["node"]) {
-    server = createServer({
+    server = fs().createServer({
       keepAliveTimeout: options.keepAliveTimeout || 120_000,
       keepAlive: true,
     }, (x: any, y: any) => {
@@ -231,6 +252,43 @@ export const server = (
         server_else = Deno.serve({ port: port }, Jetpath);
       },
       edge: false,
+    };
+  }
+  if (runtime["cloudflare_worker"]) {
+    server = {
+      listen() {
+        // Cloudflare Worker uses `addEventListener("fetch", ...)`
+        addEventListener("fetch", (event: FetchEvent) => {
+          // @ts-expect-error
+          event.respondWith(Jetpath(event.request));
+        });
+      },
+      edge: true,
+    };
+  }
+  if (runtime["aws_lambda"]) {
+    server = {
+      listen() {
+        // AWS Lambda requires exporting a handler function
+        // We'll wrap to Lambda-compatible handler
+        const awsHandler = async (event: any) => {
+          const req = new Request(event.rawPath || "/", {
+            method: event.requestContext?.http?.method || "GET",
+            headers: event.headers,
+            body: event.body,
+          });
+          // @ts-expect-error
+          const res = await Jetpath(req);
+          const text = await res.text();
+          return {
+            statusCode: res.status,
+            headers: Object.fromEntries(res.headers),
+            body: text,
+          };
+        };
+        (module as any).exports.handler = awsHandler;
+      },
+      edge: true,
     };
   }
   if (runtime["bun"]) {
@@ -277,7 +335,7 @@ export const server = (
     }
   }
 
-  // ? yes a plugin can bring it's own server
+  // ? yes a plugin can bring it's own server? good for edge
 
   //? compile plugins
   for (let i = 0; i < plugs.length; i++) {
@@ -316,7 +374,7 @@ export const getCtx = (
 ): Context => {
   if (ctxPool.length) {
     const ctx = ctxPool.shift()!;
-    // ? reset the COntext to default state
+    // ? reset the CContext to default state
     ctx.state["__state__"] = true;
     ctx.request = req;
     ctx.res = res;
@@ -485,7 +543,7 @@ const Jetpath = async (
 };
 
 const handlersPath = (path: string) => {
-  path = path.replaceAll("__", "-");// ? convert __ to -
+  path = path.replaceAll("__", "-"); // ? convert __ to -
   let [method, ...segments] = path.split("_");
   let route = "/" + segments.join("/");
   route = route
@@ -502,13 +560,13 @@ const handlersPath = (path: string) => {
 };
 
 const getModule = async (src: string, name: string) => {
-  const absolutePath = resolve(src + "/" + name); //? Gets native OS path
+  const absolutePath = fs().resolve(src + "/" + name); //? Gets native OS path
   try {
-    const fileUrl = pathToFileURL(absolutePath).href; 
+    const fileUrl = fs().pathToFileURL(absolutePath).href;
     const mod = await import(fileUrl);
     return mod;
   } catch (error) {
-    LOG.log("Error at " +absolutePath+ " loading failed!", "info");
+    LOG.log("Error at " + absolutePath + " loading failed!", "info");
     LOG.log(String(error), "error");
     return String(error);
   }
@@ -520,20 +578,20 @@ export async function getHandlers(
   errorsCount: { file: string; error: string }[] | undefined = undefined,
   again = false,
 ) {
-  const curr_d = cwd();
+  const curr_d = fs().cwd();
   let error_source = source;
   source = source || "";
   if (!again) {
-    source = resolve(join(curr_d, source));
+    source = fs().resolve(fs().join(curr_d, source));
     if (!source.includes(curr_d)) {
       LOG.log('source: "' + error_source + '" is invalid', "warn");
       LOG.log("Jetpath source must be within the project directory", "error");
       process.exit(1);
     }
   } else {
-    source = resolve(curr_d, source);
+    source = fs().resolve(curr_d, source);
   }
-  const dir = await opendir(source);
+  const dir = await fs().opendir(source);
   for await (const dirent of dir) {
     if (
       dirent.isFile() &&
@@ -541,7 +599,7 @@ export async function getHandlers(
     ) {
       if (print) {
         LOG.log(
-          "Loading " + source.replace(curr_d + "/", "") + sep +
+          "Loading " + source.replace(curr_d + "/", "") + fs().sep +
             dirent.name,
           "info",
         );
@@ -1276,26 +1334,26 @@ export async function codeGen(
   //? let's make sure if this line is a comments then it should not be matched!
   const METHOD_PATH_REGEX =
     /(?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$_]*$/;
-  const OUTPUT_FILE = resolve(
-    join(cwd(), "node_modules", "@jetpath", "index.ts"),
+  const OUTPUT_FILE = fs().resolve(
+    fs().join(fs().cwd(), "node_modules", "@jetpath", "index.ts"),
   );
-  const ROUTE_FILE = resolve(
+  const ROUTE_FILE = fs().resolve(
     generatedRoutesFilePath
       ? generatedRoutesFilePath
-      : join(cwd(), "definitions.ts"),
+      : fs().join(fs().cwd(), "definitions.ts"),
   );
 
-  mkdirSync(dirname(OUTPUT_FILE), { recursive: true });
+  fs().mkdirSync(fs().dirname(OUTPUT_FILE), { recursive: true });
   const declarations: string[] = [];
 
   let mIdex = 0;
   async function walkDir(currentDir: string) {
     try {
-      const entries = await readdir(currentDir, {
+      const entries = await fs().readdir(currentDir, {
         withFileTypes: true,
       });
       for (const entry of entries) {
-        const fullPath = join(currentDir, entry.name);
+        const fullPath = fs().join(currentDir, entry.name);
 
         if (entry.isDirectory()) {
           if (!entry.name.startsWith(".")) {
@@ -1303,7 +1361,7 @@ export async function codeGen(
           }
         } else if (entry.isFile() && entry.name.endsWith(".jet.ts")) {
           try {
-            const fileContent = await readFile(fullPath, "utf-8");
+            const fileContent = await fs().readFile(fullPath, "utf-8");
             const foundExports = [];
             let match;
 
@@ -1350,9 +1408,9 @@ export async function codeGen(
     }
   }
   if (mode === "ON") {
-    await walkDir(resolve(cwd(), ROUTES_DIR));
+    await walkDir(fs().resolve(fs().cwd(), ROUTES_DIR));
   } else {
-    walkDir(resolve(cwd(), ROUTES_DIR));
+    walkDir(fs().resolve(fs().cwd(), ROUTES_DIR));
   }
   const compileObjectStructureFromSchema = (schema: SchemaDefinition) => {
     const obj: Record<string, "string" | Record<string, "string">> = {};
@@ -1506,7 +1564,7 @@ export async function codeGen(
       }, []).join(",\n ")
     } \n} as const;\n\n`;
     try {
-      await writeFile(ROUTE_FILE, outputContent, "utf-8");
+      await fs().writeFile(ROUTE_FILE, outputContent, "utf-8");
       LOG.log("Generated routes file successfully: " + ROUTE_FILE, "success");
     } catch (error) {
       LOG.log(`Error writing routes file ${ROUTE_FILE}: ${error}`, "error");
@@ -1517,11 +1575,11 @@ export async function codeGen(
 
   try {
     LOG.log("⚙️  StrictMode...\nmode: " + mode, "info");
-    await writeFile(OUTPUT_FILE, outputContent, "utf-8");
+    await fs().writeFile(OUTPUT_FILE, outputContent, "utf-8");
 
     const promisifiedExecFile = () =>
       new Promise((resolve) => {
-        execFile(
+        fs().execFile(
           "tsc",
           [
             "--noEmit",
@@ -1581,7 +1639,7 @@ export async function codeGen(
 }
 
 export function getLocalIP() {
-  const interfaces: Record<string, any> = networkInterfaces() || [];
+  const interfaces: Record<string, any> = fs().networkInterfaces() || [];
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
       if ("IPv4" !== iface.family || iface.internal !== false) {
@@ -1591,3 +1649,52 @@ export function getLocalIP() {
     }
   }
 }
+
+export const fs = await (async () => {
+  try {
+    // detect edge;
+    const { opendir, readdir, readFile, writeFile } = await import(
+      "node:fs/promises"
+    );
+    // import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
+    const { dirname, join, resolve, sep } = await import("node:path");
+    // import { dirname, join, resolve, sep } from "node:path";
+    const { cwd } = await import("node:process");
+    // import { cwd } from "node:process";
+
+    const { createReadStream, realpathSync } = await import("node:fs");
+    // import { createReadStream, realpathSync } from "node:fs";
+
+    const { createServer } = await import("node:http");
+    const { networkInterfaces } = await import("node:os");
+    const { execFile } = await import("node:child_process");
+    const { mkdirSync } = await import("node:fs");
+    const { pathToFileURL } = await import("node:url");
+
+    const fils_system_apis = {
+      opendir,
+      readdir,
+      readFile,
+      writeFile,
+      dirname,
+      join,
+      resolve,
+      sep,
+      cwd,
+      createReadStream,
+      realpathSync,
+      createServer,
+      networkInterfaces,
+      execFile,
+      mkdirSync,
+      pathToFileURL,
+    };
+    return () => fils_system_apis;
+  } catch (error) {
+    return () => {
+      throw new Error(
+        "Node.js APIs are not available in this environment. Please ensure you are using edgeGrabber for edge environment, check the edge docs for more information.",
+      );
+    };
+  }
+})();
