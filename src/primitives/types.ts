@@ -171,7 +171,7 @@ export type jetOptions = {
    * ]
    * ```
    */
-  edgeGrabber?: JetRoute[] | JetMiddleware[];
+  edgeGrabber?: JetRoute[] & JetMiddleware[];
   /**
    * upgrade the request to a WebSocket connection
    */

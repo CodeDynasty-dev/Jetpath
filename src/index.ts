@@ -9,6 +9,7 @@ import {
   corsMiddleware,
   fs,
   getHandlers,
+  getHandlersEdge,
   getLocalIP,
   server,
 } from "./primitives/functions.js";
@@ -16,7 +17,10 @@ import type { jetOptions, UnionToIntersection } from "./primitives/types.js";
 import { JetPlugin, LOG } from "./primitives/classes.js";
 
 export class Jetpath {
-  public server: any;
+  public server: {
+    listen: any;
+    edge: boolean;
+  } = { listen: () => {}, edge: false };
   private listening: boolean = false;
   /**
    * an object you can set values to per request
@@ -77,7 +81,24 @@ export class Jetpath {
       & Record<string, any>;
   }
   async listen(): Promise<void> {
-    if (!this.options.source && !this.options.edgeGrabber?.length) {
+    this.server = server(this.plugs, this.options);
+    // ? add plugins to the server
+    if (this.server.edge && this.options.edgeGrabber?.length) {
+      await getHandlersEdge(this.options.edgeGrabber);
+      this.server.listen();
+      LOG.log(
+        "Jetpath: Edge is enabled",
+        "success",
+      );
+      return;
+    } else if (this.server.edge && !this.options.edgeGrabber?.length) {
+      // ? edge is enabled but no edgeGrabber provided
+      throw new Error(
+        "Jetpath: the runtime is Edge is enabled but no edgeGrabber provided. Please provide edgeGrabber in options.",
+      );
+    }
+
+    if (!this.options.source) {
       LOG.log(
         "Jetpath: Provide a source directory to avoid scanning the root directory",
         "warn",
@@ -193,7 +214,7 @@ export class Jetpath {
         "info",
       );
     } else if (
-      this.options?.apiDoc?.display === "HTTP" && !this.options?.edgeGrabber
+      this.options?.apiDoc?.display === "HTTP"
     ) {
       //? generate types
       await codeGen(
@@ -227,7 +248,6 @@ export class Jetpath {
       }
     }
 
-    this.server = server(this.plugs, this.options);
     //
     assignMiddleware(_JetPath_paths, _jet_middleware);
     // ? start server

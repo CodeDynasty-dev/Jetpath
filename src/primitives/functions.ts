@@ -5,6 +5,7 @@ import type {
   compilerType,
   FileOptions,
   HTTPBody,
+  JetMiddleware,
   jetOptions,
   JetRoute,
   methods,
@@ -234,7 +235,7 @@ export const isNode = runtime["node"];
 export const server = (
   plugs: JetPlugin[],
   options: jetOptions,
-): { listen: any; edge: boolean } | void => {
+): { listen: any; edge: boolean } => {
   let server;
   let server_else;
   if (runtime["node"]) {
@@ -664,6 +665,34 @@ export async function getHandlers(
     }
   }
   return errorsCount;
+}
+
+export async function getHandlersEdge(
+  modules: JetRoute[] & JetMiddleware[],
+) {
+  for (const p in modules) {
+    const params = handlersPath(p);
+    if (params) {
+      if (p.startsWith("MIDDLEWARE")) {
+        _jet_middleware[params[1]] = modules[p] as any;
+      } else {
+        // ! HTTP handler
+        if (typeof params !== "string") {
+          // ? set the method
+          modules[p]!.method = params[0];
+          // ? set the path
+          modules[p]!.path = params[1];
+          _JetPath_paths[params[0] as methods][params[1]] = modules[
+            p
+          ] as JetRoute;
+          _JetPath_paths_trie[params[0] as methods].insert(
+            params[1],
+            modules[p] as JetRoute,
+          );
+        }
+      }
+    }
+  }
 }
 
 export function validator<T extends Record<string, any>>(
