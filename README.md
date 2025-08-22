@@ -58,7 +58,7 @@ Jetpath eliminates the cognitive overhead that slows down development. No router
 Jetpath is built with strong opinions on what matters most:
 
 1. **Zero config by default** - Convention eliminates boilerplate
-2. **Runtime agnostic** - True support for Node.js, Deno, and Bun (not just compatibility layers)
+2. **Runtime agnostic** - True support for Node.js, Deno, and Bun, AWS Lambda and cloudflare workers.
 3. **Type safety** - Full TypeScript support that doesn't get in your way
 4. **Predictable routing** - Routes derived from function names (GET_users_$id → GET /users/:id)
 5. **Built for production** - Security, validation, and error handling baked in
@@ -125,7 +125,7 @@ export const GET_live: JetRoute = (ctx) => {
 
 ## Key Features
 
-- **Unified dev experience** across Node.js, Deno, and Bun
+- **Unified dev experience** across Node.js, Deno, Bun and the edge
 - **Auto-generated API documentation** with interactive UI
 - **First-class WebSocket support**
 - **Plugin system** for extending functionality
@@ -133,6 +133,7 @@ export const GET_live: JetRoute = (ctx) => {
 - **Request parsing** Inbuilt (JSON, forms, multipart)
 - **Performance-optimized** routing and middleware execution
 - **Security** Great defaults
+- **Cross runtime** runs everywhere.
 
 ## Real Performance
 
