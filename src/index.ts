@@ -81,10 +81,18 @@ export class Jetpath {
       & Record<string, any>;
   }
   async listen(): Promise<void> {
+    // ? {-view-} here is replaced at build time to html
+    let UI = `{{view}}`;
+    // ? check if server is already listening
     this.server = server(this.plugs, this.options);
     // ? add plugins to the server
-    if (this.server.edge && this.options.edgeGrabber?.length) {
+    if (
+      this.server.edge && typeof this.options.edgeGrabber?.length === "number"
+    ) {
       await getHandlersEdge(this.options.edgeGrabber);
+      if (this.options?.apiDoc?.display === "UI") {
+        this.api_UI_req(UI);
+      }
       this.server.listen();
       LOG.log(
         "Jetpath: Edge is enabled",
@@ -104,11 +112,8 @@ export class Jetpath {
         "warn",
       );
     }
-    // ? {-view-} here is replaced at build time to html
-    let UI = `{{view}}`;
     LOG.log("Compiling...", "info");
     const startTime = performance.now();
-
     // ? Load all jetpath functions described in user code
     const errorsCount = await getHandlers(this.options?.source!, true);
     const endTime = performance.now();
@@ -117,80 +122,7 @@ export class Jetpath {
     const [handlersCount, compiledAPI] = compileAPI(this.options);
     // ? render API in UI
     if (this.options?.apiDoc?.display === "UI") {
-      UI = compileUI(UI, this.options, compiledAPI);
-      const name = this.options?.apiDoc?.path || "/api-doc";
-      _JetPath_paths_trie["GET"].insert(name, (
-        ctx,
-      ) => {
-        if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
-          const authHeader = ctx.get("authorization");
-          if (authHeader && authHeader.startsWith("Basic ")) {
-            const [authType, encodedToken] = authHeader.trim().split(" ");
-            if (authType !== "Basic" || !encodedToken) {
-              ctx.set(
-                "WWW-Authenticate",
-                `Basic realm=Jetpath API Doc`,
-              );
-              ctx.send(
-                `<h1>Unauthorized</h1>`,
-                401,
-                "text/html",
-              );
-              return;
-            }
-            let username, password;
-            try {
-              const decodedToken = new TextDecoder().decode(
-                Uint8Array.from(atob(encodedToken), (c) => c.charCodeAt(0)),
-              );
-              [username, password] = decodedToken.split(":");
-            } catch (error) {
-              ctx.set(
-                "WWW-Authenticate",
-                `Basic realm=Jetpath API Doc`,
-              );
-              ctx.send(
-                `<h1>Unauthorized</h1>`,
-                401,
-                "text/html",
-              );
-              return;
-            }
-            if (
-              password === this.options?.apiDoc?.password &&
-              username === this.options?.apiDoc?.username
-            ) {
-              ctx.send(UI, 200, "text/html");
-              return;
-            } else {
-              ctx.set(
-                "WWW-Authenticate",
-                `Basic realm=Jetpath API Doc`,
-              );
-              ctx.send(
-                `<h1>Unauthorized</h1>`,
-                401,
-                "text/html",
-              );
-              return;
-            }
-          } else {
-            ctx.set(
-              "WWW-Authenticate",
-              `Basic realm=Jetpath API Doc`,
-            );
-            ctx.send(
-              `<h1>Unauthorized</h1>`,
-              401,
-              "text/html",
-            );
-            return;
-          }
-        } else {
-          ctx.send(UI, 200, "text/html");
-          return;
-        }
-      });
+      this.api_UI_req(UI);
       LOG.log(
         `Compiled ${handlersCount} Functions\nTime: ${
           Math.round(
@@ -259,6 +191,84 @@ export class Jetpath {
     if (localIP) {
       LOG.log(`External: http://${localIP}:${this.options.port}`, "info");
     }
+  }
+
+  api_UI_req(UI: string): void {
+    const [_, compiledAPI] = compileAPI(this.options);
+    const name = this.options?.apiDoc?.path || "/api-doc";
+    _JetPath_paths_trie["GET"].insert(name, (
+      ctx,
+    ) => {
+      UI = compileUI(UI, this.options, compiledAPI);
+      if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
+        const authHeader = ctx.get("authorization");
+        if (authHeader && authHeader.startsWith("Basic ")) {
+          const [authType, encodedToken] = authHeader.trim().split(" ");
+          if (authType !== "Basic" || !encodedToken) {
+            ctx.set(
+              "WWW-Authenticate",
+              `Basic realm=Jetpath API Doc`,
+            );
+            ctx.send(
+              `<h1>Unauthorized</h1>`,
+              401,
+              "text/html",
+            );
+            return;
+          }
+          let username, password;
+          try {
+            const decodedToken = new TextDecoder().decode(
+              Uint8Array.from(atob(encodedToken), (c) => c.charCodeAt(0)),
+            );
+            [username, password] = decodedToken.split(":");
+          } catch (error) {
+            ctx.set(
+              "WWW-Authenticate",
+              `Basic realm=Jetpath API Doc`,
+            );
+            ctx.send(
+              `<h1>Unauthorized</h1>`,
+              401,
+              "text/html",
+            );
+            return;
+          }
+          if (
+            password === this.options?.apiDoc?.password &&
+            username === this.options?.apiDoc?.username
+          ) {
+            ctx.send(UI, 200, "text/html");
+            return;
+          } else {
+            ctx.set(
+              "WWW-Authenticate",
+              `Basic realm=Jetpath API Doc`,
+            );
+            ctx.send(
+              `<h1>Unauthorized</h1>`,
+              401,
+              "text/html",
+            );
+            return;
+          }
+        } else {
+          ctx.set(
+            "WWW-Authenticate",
+            `Basic realm=Jetpath API Doc`,
+          );
+          ctx.send(
+            `<h1>Unauthorized</h1>`,
+            401,
+            "text/html",
+          );
+          return;
+        }
+      } else {
+        ctx.send(UI, 200, "text/html");
+        return;
+      }
+    });
   }
 }
 
