@@ -435,16 +435,16 @@ export class Context {
           }
         }
       }
+
+      if (this.handler?.query && options.validate) {
+        this.$_internal_query = validator(
+          this.handler.query,
+          this.$_internal_query,
+        );
+      }
     }
 
-    if (this.handler?.query && options.validate) {
-      this.$_internal_query = validator(
-        this.handler.query,
-        this.$_internal_query,
-      );
-    }
-
-    return this.$_internal_query as Promise<Type>;
+    return (this.$_internal_query || {}) as Promise<Type>;
   }
 }
 

@@ -1,6 +1,6 @@
 // src/index.ts
 
-import { Jetpath } from "../dist/index.js";
+import { type JetMiddleware, Jetpath } from "../dist/index.js";
 // Create mock plugin files in src/plugins if you don't have real ones.
 import { authPlugin } from "./plugins/auth.ts";
 import { jetLogger } from "./plugins/logging.ts";
@@ -75,3 +75,17 @@ jetLogger.config = {
 app.derivePlugins(jetLogger, authPlugin);
 
 app.listen();
+
+export const MIDDLEWARE_: JetMiddleware = function (ctx) {
+  console.log(ctx.path);
+  return (ctx, err) => {
+    if (err) {
+      const code = ctx.code < 300 ? 500 : ctx.code
+      ctx.send({
+        status: "error",
+        message: String(err),
+        code
+      }, code);
+    };
+  }
+};
