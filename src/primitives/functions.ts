@@ -163,7 +163,8 @@ export let _JetPath_paths_trie: Record<
 
 export const _jet_middleware: Record<
   string,
-  (ctx: Context, err?: unknown) => void | Promise<void>
+  | ((ctx: Context, err?: unknown) => void | Promise<void>)
+  | ((ctx: Context, err?: unknown) => void | Promise<void>)[]
 > = {};
 
 export const ctxPool: Context[] = [];
@@ -962,10 +963,13 @@ const sorted_insert = (paths: string[], path: string): number => {
 export function assignMiddleware(
   _JetPath_paths: { [method: string]: { [route: string]: any } },
   _jet_middleware: {
-    [route: string]: (
+    [route: string]: ((
       ctx: any,
       next: () => Promise<void>,
-    ) => Promise<void> | void;
+    ) => Promise<void> | void) | ((
+      ctx: any,
+      next: () => Promise<void>,
+    ) => Promise<void> | void)[];
   },
 ): void {
   // Iterate over each HTTP method's routes.
@@ -982,9 +986,13 @@ export function assignMiddleware(
       // If middleware is defined for the route, ensure it has exactly one middleware function.
       for (const key in _jet_middleware) {
         if (route.path!.startsWith(key)) {
-          const middleware: any = _jet_middleware[key];
+          const middleware = _jet_middleware[key];
           // Assign the middleware function to the route handler.
-          route.jet_middleware!.push(middleware);
+          if (Array.isArray(middleware)) {
+            route.jet_middleware!.push(...middleware as any[]);
+          } else {
+            route.jet_middleware!.push(middleware as any);
+          }
         }
       }
     }
