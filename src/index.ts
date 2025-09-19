@@ -29,14 +29,15 @@ export class Jetpath {
   private options: jetOptions = {
     port: 8080,
     apiDoc: { display: "UI" },
-    cors: false,
+    cors: true,
     strictMode: "OFF",
     source: ".",
   };
   private plugs: JetPlugin[] = [];
   constructor(options: jetOptions = {}) {
+    //? setting up default values
+    Object.assign(this.options, options);
     // ? setting up app configs
-    if (this.options.cors === true) {
       corsMiddleware({
         exposeHeaders: [],
         allowMethods: ["DELETE", "GET", "HEAD", "PATCH", "POST", "PUT"],
@@ -46,9 +47,6 @@ export class Jetpath {
         keepHeadersOnError: true,
         ...(typeof options?.cors === "object" ? options.cors : {}),
       });
-    }
-    //? setting up default values
-    Object.assign(this.options, options);
     //?
     if (!this.options.port) this.options.port = 8080;
   }
