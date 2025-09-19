@@ -38,15 +38,15 @@ export class Jetpath {
     //? setting up default values
     Object.assign(this.options, options);
     // ? setting up app configs
-      corsMiddleware({
-        exposeHeaders: [],
-        allowMethods: ["DELETE", "GET", "HEAD", "PATCH", "POST", "PUT"],
-        origin: ["*"],
-        allowHeaders: ["*"],
-        maxAge: "86400",
-        keepHeadersOnError: true,
-        ...(typeof options?.cors === "object" ? options.cors : {}),
-      });
+    corsMiddleware({
+      exposeHeaders: [],
+      allowMethods: ["DELETE", "GET", "HEAD", "PATCH", "POST", "PUT"],
+      origin: ["*"],
+      allowHeaders: ["*"],
+      maxAge: "86400",
+      keepHeadersOnError: true,
+      ...(typeof options?.cors === "object" ? options.cors : {}),
+    });
     //?
     if (!this.options.port) this.options.port = 8080;
   }

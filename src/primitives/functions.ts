@@ -508,31 +508,38 @@ const Jetpath = async (
     req,
     res,
   );
-  let returned: (Function | void)[] | undefined;
+  let returned: (Function)[] = [];
   if (ctx) {
     const r = ctx.handler!;
     try {
       //? pre-request middlewares here
-      returned = r.jet_middleware?.length
-        ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
-        : undefined;
+      if (r.jet_middleware?.length) {
+        for (let m = 0; m < r.jet_middleware.length; m++) {
+          const callback = await r.jet_middleware[m](ctx as any);
+          returned.push(callback as Function);
+        }
+      }
       //? check if the payload is already set by middleware chain;
       if (ctx.payload) return makeRes(res, ctx);
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
-      returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
+      for (let r = returned.length; r > 0; r--) {
+        await (returned[r](ctx));
+      }
       return makeRes(res, ctx);
     } catch (error) {
       try {
         //? report error to error middleware
-        if (returned) {
-          await Promise.all(returned.map((m) => m?.(ctx, error)));
+        if (returned.length) {
+          for (let r = returned.length; r > 0; r--) {
+            await (returned[r](ctx, error));
+          }
         } else {
           console.log(error);
         }
       } finally {
-        if (!returned && ctx.code < 400) {
+        if (!returned.length && ctx.code < 400) {
           ctx.code = 500;
         }
         return makeRes(res, ctx);
@@ -986,15 +993,16 @@ export function assignMiddleware(
         route.jet_middleware = [];
       }
       // If middleware is defined for the route, ensure it has exactly one middleware function.
-      for (const key in _jet_middleware) {
-        if (route.path!.startsWith(key)) {
-          const middleware = _jet_middleware[key];
-          // Assign the middleware function to the route handler.
-          if (Array.isArray(middleware)) {
-            route.jet_middleware!.push(...middleware as any[]);
-          } else {
-            route.jet_middleware!.push(middleware as any);
-          }
+      const allMiddlewaresSorted = (Object.keys(_jet_middleware).filter((m) =>
+        route.path!.startsWith(m)
+      )).sort((a, b) => a.length - b.length);
+      for (const key of allMiddlewaresSorted) {
+        const middleware = _jet_middleware[key];
+        // Assign the middleware function to the route handler.
+        if (Array.isArray(middleware)) {
+          route.jet_middleware!.push(...middleware as any[]);
+        } else {
+          route.jet_middleware!.push(middleware as any);
         }
       }
     }
