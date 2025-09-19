@@ -286,7 +286,7 @@ export type HTTPBody<Obj extends Record<string, any>> = {
   };
 };
 
-export type JetMiddleware<
+export type Middleware<
   JetData extends {
     body?: Record<string, any>;
     params?: Record<string, any>;
@@ -309,6 +309,15 @@ export type JetMiddleware<
     ) => void | Promise<void>) | undefined
   >
   | undefined;
+
+export type JetMiddleware<
+  JetData extends {
+    body?: Record<string, any>;
+    params?: Record<string, any>;
+    query?: Record<string, any>;
+  } = { body: {}; params: {}; query: {} },
+  JetPluginTypes extends Record<string, unknown>[] = [],
+> = Middleware<JetData, JetPluginTypes> | Middleware<JetData, JetPluginTypes>[];
 
 export type JetRoute<
   JetData extends {
@@ -336,7 +345,7 @@ export type JetRoute<
   description?: string;
   method?: string;
   path?: string;
-  jet_middleware?: JetMiddleware[];
+  jet_middleware?: Middleware[];
   params?: HTTPBody<JetData["params"] & Record<string, any>>;
   query?: HTTPBody<JetData["query"] & Record<string, any>>;
   response?: HTTPBody<JetData["response"] & Record<string, any>>;

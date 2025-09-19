@@ -963,13 +963,15 @@ const sorted_insert = (paths: string[], path: string): number => {
 export function assignMiddleware(
   _JetPath_paths: { [method: string]: { [route: string]: any } },
   _jet_middleware: {
-    [route: string]: ((
-      ctx: any,
-      next: () => Promise<void>,
-    ) => Promise<void> | void) | ((
-      ctx: any,
-      next: () => Promise<void>,
-    ) => Promise<void> | void)[];
+    [route: string]:
+      | ((
+        ctx: any,
+        next: () => Promise<void>,
+      ) => Promise<void> | void)
+      | ((
+        ctx: any,
+        next: () => Promise<void>,
+      ) => Promise<void> | void)[];
   },
 ): void {
   // Iterate over each HTTP method's routes.
