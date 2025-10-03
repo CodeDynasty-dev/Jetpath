@@ -1,6 +1,6 @@
 {
   "name": "jetpath",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "description": "A performance-first cross-runtime API framework without the boilerplate",
   "main": "dist/index.js",
   "type": "module",
