@@ -973,11 +973,11 @@ export function assignMiddleware(
     [route: string]:
       | ((
         ctx: any,
-        next: () => Promise<void>,
+        // next: () => Promise<void>,
       ) => Promise<void> | void)
       | ((
         ctx: any,
-        next: () => Promise<void>,
+        // next: () => Promise<void>,
       ) => Promise<void> | void)[];
   },
 ): void {
@@ -992,19 +992,23 @@ export function assignMiddleware(
       if (!Array.isArray(route.jet_middleware)) {
         route.jet_middleware = [];
       }
+
       // If middleware is defined for the route, ensure it has exactly one middleware function.
       const allMiddlewaresSorted = (Object.keys(_jet_middleware).filter((m) =>
         route.path!.startsWith(m)
       )).sort((a, b) => a.length - b.length);
+
       for (const key of allMiddlewaresSorted) {
         const middleware = _jet_middleware[key];
         // Assign the middleware function to the route handler.
         if (Array.isArray(middleware)) {
-          route.jet_middleware!.push(...middleware as any[]);
+          route.jet_middleware!.push(...middleware.flat());
         } else {
           route.jet_middleware!.push(middleware as any);
         }
       }
+
+      // 
     }
   }
 }
