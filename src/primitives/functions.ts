@@ -516,7 +516,9 @@ const Jetpath = async (
       if (r.jet_middleware?.length) {
         for (let m = 0; m < r.jet_middleware.length; m++) {
           const callback = await r.jet_middleware[m](ctx as any);
-          returned.push(callback as Function);
+          if (typeof callback === "function") {
+            returned.unshift(callback);
+          }
         }
       }
       //? check if the payload is already set by middleware chain;
@@ -524,7 +526,7 @@ const Jetpath = async (
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
-      for (let r = returned.length; r > 0; r--) {
+      for (let r = 0; r < returned.length; r++) {
         await (returned[r](ctx));
       }
       return makeRes(res, ctx);
@@ -532,12 +534,14 @@ const Jetpath = async (
       try {
         //? report error to error middleware
         if (returned.length) {
-          for (let r = returned.length; r > 0; r--) {
+          for (let r = 0; r < returned.length; r++) {
             await (returned[r](ctx, error));
           }
         } else {
           console.log(error);
         }
+      } catch (error) {
+        console.log(error);
       } finally {
         if (!returned.length && ctx.code < 400) {
           ctx.code = 500;
@@ -1008,7 +1012,7 @@ export function assignMiddleware(
         }
       }
 
-      // 
+      //
     }
   }
 }
