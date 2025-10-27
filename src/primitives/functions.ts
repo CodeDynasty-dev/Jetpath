@@ -1237,7 +1237,7 @@ export async function parseRequest(
 
   if (ct.includes("application/json")) {
     bodyText = decoder.decode(rawBody);
-    return JSON.parse(bodyText);
+    return JSON.parse(bodyText || "{}");
   } else if (ct.includes("application/x-www-form-urlencoded")) {
     bodyText = decoder.decode(rawBody);
     return parseUrlEncoded(bodyText);
