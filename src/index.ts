@@ -276,6 +276,7 @@ export type {
   JetFile,
   JetMiddleware,
   JetRoute,
+  JetPluginExecutorInitParams
 } from "./primitives/types.js";
 export { JetServer } from "./primitives/classes.js";
 export { use } from "./primitives/functions.js";

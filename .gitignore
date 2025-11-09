@@ -32,3 +32,8 @@ bench.sh
 docs/build
 definitions.jet.ts
 example/definitions.ts
+jetpath-cradova
+docs/SSR_ARCHITECTURE.md
+docs/SSR_INTEGRATION_PLAN.md
+docs/SSR_QUICKSTART.md
+docs/SSR_SUMMARY.md
