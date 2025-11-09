@@ -81,28 +81,7 @@ export class Jetpath {
   async listen(): Promise<void> {
     // ? {-view-} here is replaced at build time to html
     let UI = `{{view}}`;
-    // ? check if server is already listening
-    this.server = server(this.plugs, this.options);
-    // ? add plugins to the server
-    if (
-      this.server.edge && typeof this.options.edgeGrabber?.length === "number"
-    ) {
-      await getHandlersEdge(this.options.edgeGrabber);
-      if (this.options?.apiDoc?.display === "UI") {
-        this.api_UI_req(UI);
-      }
-      this.server.listen();
-      LOG.log(
-        "Jetpath: Edge is enabled",
-        "success",
-      );
-      return;
-    } else if (this.server.edge && !this.options.edgeGrabber?.length) {
-      // ? edge is enabled but no edgeGrabber provided
-      throw new Error(
-        "Jetpath: the runtime is Edge is enabled but no edgeGrabber provided. Please provide edgeGrabber in options.",
-      );
-    }
+ 
 
     if (!this.options.source) {
       LOG.log(
@@ -181,7 +160,30 @@ export class Jetpath {
     //
     assignMiddleware(_JetPath_paths, _jet_middleware);
     // ? start server
+       // ? check if server is already listening
+    this.server = server(this.plugs, this.options);
+    // ? add plugins to the server
+    if (
+      this.server.edge && typeof this.options.edgeGrabber?.length === "number"
+    ) {
+      await getHandlersEdge(this.options.edgeGrabber);
+      if (this.options?.apiDoc?.display === "UI") {
+        this.api_UI_req(UI);
+      }
+      this.server.listen();
+      LOG.log(
+        "Jetpath: Edge is enabled",
+        "success",
+      );
+      return;
+    } else if (this.server.edge && !this.options.edgeGrabber?.length) {
+      // ? edge is enabled but no edgeGrabber provided
+      throw new Error(
+        "Jetpath: the runtime is Edge is enabled but no edgeGrabber provided. Please provide edgeGrabber in options.",
+      );
+    }
     this.listening = true;
+
     this.server.listen(this.options.port);
     LOG.log(`Open http://localhost:${this.options.port}`, "info");
     // ? show external IP
@@ -189,6 +191,7 @@ export class Jetpath {
     if (localIP) {
       LOG.log(`External: http://${localIP}:${this.options.port}`, "info");
     }
+
   }
 
   api_UI_req(UI: string): void {
