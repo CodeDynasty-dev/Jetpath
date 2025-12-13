@@ -987,21 +987,27 @@ export function assignMiddleware(
 ): void {
   // Iterate over each HTTP method's routes.
   for (const method in _JetPath_paths) {
+
     const routes: JetRoute[] = (Object.keys(
       _JetPath_paths[method as methods],
     ).map((value) => _JetPath_paths[method as methods][value])).filter((
       value,
     ) => value.length > 0);
-    for (const route of routes) {
+
+    for (let route of routes) {
       if (!Array.isArray(route.jet_middleware)) {
         route.jet_middleware = [];
+      } else {
+        route = (...c) => route(...c);
+        route.jet_middleware = [];
       }
+    }
 
+    for (const route of routes) {
       // If middleware is defined for the route, ensure it has exactly one middleware function.
       const allMiddlewaresSorted = (Object.keys(_jet_middleware).filter((m) =>
         route.path!.startsWith(m)
       )).sort((a, b) => a.length - b.length);
-
       for (const key of allMiddlewaresSorted) {
         const middleware = _jet_middleware[key];
         // Assign the middleware function to the route handler.
@@ -1010,10 +1016,11 @@ export function assignMiddleware(
         } else {
           route.jet_middleware!.push(middleware as any);
         }
-      }
-
-      //
+      } 
     }
+    //
+    
+
   }
 }
 
