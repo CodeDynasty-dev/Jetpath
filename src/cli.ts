@@ -1,22 +1,22 @@
 #!/usr/bin/env node
-import { execSync, spawnSync } from "node:child_process";
-import { rmSync } from "node:fs";
-import { join } from "node:path";
+import { execSync, spawnSync } from 'node:child_process';
+import { rmSync } from 'node:fs';
+import { join } from 'node:path';
 
-const gitCheck = spawnSync("git", ["--version"], { stdio: "ignore" });
+const gitCheck = spawnSync('git', ['--version'], { stdio: 'ignore' });
 if (gitCheck.status !== 0) {
-  console.error("Error: Git is not installed or not found in your PATH.");
+  console.error('Error: Git is not installed or not found in your PATH.');
+  // eslint-disable-next-line n/no-process-exit
   process.exit(1);
 }
 
-const [targetDir = "new-jetpath-project", branch = "main"] = process.argv.slice(
-  2,
-);
+const [targetDir = 'new-jetpath-project', branch = 'main'] =
+  process.argv.slice(2);
 
 try {
   execSync(
     `git clone --depth 1 --branch ${branch} https://github.com/codedynasty-dev/jetpath-sample.git ${targetDir}`,
-    { stdio: "inherit" },
+    { stdio: 'inherit' }
   );
   console.log(`
     🚀 Project created successfully!
@@ -25,15 +25,15 @@ try {
     npm run dev
     `);
 } catch (err) {
-  // @ts-ignore
-  console.error("Error during git clone:", err.message);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.error('Error during git clone:', (err as any).message);
+  // eslint-disable-next-line n/no-process-exit
   process.exit(1);
 }
 
 try {
-  rmSync(join(targetDir, ".git"), { recursive: true, force: true });
+  rmSync(join(targetDir, '.git'), { recursive: true, force: true });
 } catch (err) {
-  // @ts-ignore
-
-  console.error("Warning: failed to remove .git folder:", err.message);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.error('Warning: failed to remove .git folder:', (err as any).message);
 }

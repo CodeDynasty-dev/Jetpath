@@ -1,3 +1,10 @@
 export default {
-  ...require('node_modules/gts/.prettierrc.json')
-}
+  semi: true,
+  singleQuote: true,
+  trailingComma: 'es5',
+  bracketSpacing: true,
+  arrowParens: 'always',
+  printWidth: 80,
+  tabWidth: 2,
+  useTabs: false,
+};

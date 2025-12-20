@@ -7,7 +7,8 @@ jetpath-**
 api-doc.http 
 dist
 ./dist
-.vscode
+/.vscode
+/.kiro
 official-plugins
 security-audits
 formdata-psrser.ts

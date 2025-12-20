@@ -1,0 +1,8 @@
+dist
+docs/build
+node_modules
+.git
+*.min.js
+bundle.ts
+example
+jetpath-cradova

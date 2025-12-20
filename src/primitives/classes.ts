@@ -1,5 +1,5 @@
-import { type IncomingMessage } from "node:http";
-import { type Stream } from "node:stream";
+import { type IncomingMessage } from 'node:http';
+import { type Stream } from 'node:stream';
 import {
   _JetPath_paths,
   abstractPluginCreator,
@@ -10,7 +10,7 @@ import {
   parseRequest,
   runtime,
   validator,
-} from "./functions.js";
+} from './functions.js';
 import type {
   FileOptions,
   HTTPBody,
@@ -22,9 +22,9 @@ import type {
   SchemaDefinition,
   SchemaType,
   ValidationOptions,
-} from "./types.js";
-import { mime } from "../extracts/mimejs-extract.js";
-import type { BunFile } from "bun";
+} from './types.js';
+import { mime } from '../extracts/mimejs-extract.js';
+import type { BunFile } from 'bun';
 
 export class JetPlugin {
   plugin: any;
@@ -39,45 +39,45 @@ export class JetPlugin {
 export class LOG {
   // Define ANSI escape codes for colors and styles
   static colors = {
-    reset: "\x1b[0m",
-    bright: "\x1b[1m",
-    dim: "\x1b[2m",
-    underscore: "\x1b[4m",
-    blink: "\x1b[5m",
-    reverse: "\x1b[7m",
-    hidden: "\x1b[8m",
+    reset: '\x1b[0m',
+    bright: '\x1b[1m',
+    dim: '\x1b[2m',
+    underscore: '\x1b[4m',
+    blink: '\x1b[5m',
+    reverse: '\x1b[7m',
+    hidden: '\x1b[8m',
 
-    fgBlack: "\x1b[30m",
-    fgRed: "\x1b[31m",
-    fgGreen: "\x1b[32m",
-    fgYellow: "\x1b[33m",
-    fgBlue: "\x1b[34m",
-    fgMagenta: "\x1b[35m",
-    fgCyan: "\x1b[36m",
-    fgWhite: "\x1b[37m",
+    fgBlack: '\x1b[30m',
+    fgRed: '\x1b[31m',
+    fgGreen: '\x1b[32m',
+    fgYellow: '\x1b[33m',
+    fgBlue: '\x1b[34m',
+    fgMagenta: '\x1b[35m',
+    fgCyan: '\x1b[36m',
+    fgWhite: '\x1b[37m',
 
-    bgBlack: "\x1b[40m",
-    bgRed: "\x1b[41m",
-    bgGreen: "\x1b[42m",
-    bgYellow: "\x1b[43m",
-    bgBlue: "\x1b[44m",
-    bgMagenta: "\x1b[45m",
-    bgCyan: "\x1b[46m",
-    bgWhite: "\x1b[47m",
+    bgBlack: '\x1b[40m',
+    bgRed: '\x1b[41m',
+    bgGreen: '\x1b[42m',
+    bgYellow: '\x1b[43m',
+    bgBlue: '\x1b[44m',
+    bgMagenta: '\x1b[45m',
+    bgCyan: '\x1b[46m',
+    bgWhite: '\x1b[47m',
   };
   static print(message: any, color: string) {
     console.log(`${color}%s${LOG.colors.reset}`, `${message}`);
   }
-  static log(message: string, type: "info" | "warn" | "error" | "success") {
+  static log(message: string, type: 'info' | 'warn' | 'error' | 'success') {
     LOG.print(
       message,
-      type === "info"
+      type === 'info'
         ? LOG.colors.fgBlue
-        : type === "warn"
-        ? LOG.colors.fgYellow
-        : type === "success"
-        ? LOG.colors.fgGreen
-        : LOG.colors.fgRed,
+        : type === 'warn'
+          ? LOG.colors.fgYellow
+          : type === 'success'
+            ? LOG.colors.fgGreen
+            : LOG.colors.fgRed
     );
   }
 }
@@ -87,7 +87,7 @@ export interface CookieOptions {
   domain?: string;
   secure?: boolean;
   httpOnly?: boolean;
-  sameSite?: "strict" | "lax" | "none";
+  sameSite?: 'strict' | 'lax' | 'none';
   maxAge?: number;
   expires?: Date;
 }
@@ -95,18 +95,21 @@ export interface CookieOptions {
 class Cookie {
   private static parseCookieHeader(header: string): Record<string, string> {
     return header
-      .split("; ")
-      .map((pair) => pair.split("="))
-      .reduce((acc, [key, value]) => ({
-        ...acc,
-        [key.trim()]: value ? decodeURIComponent(value) : "",
-      }), {});
+      .split('; ')
+      .map((pair) => pair.split('='))
+      .reduce(
+        (acc, [key, value]) => ({
+          ...acc,
+          [key.trim()]: value ? decodeURIComponent(value) : '',
+        }),
+        {}
+      );
   }
 
   private static serializeCookie(
     name: string,
     value: string,
-    options: CookieOptions,
+    options: CookieOptions
   ): string {
     const parts = [`${encodeURIComponent(name)}=${encodeURIComponent(value)}`];
 
@@ -114,13 +117,13 @@ class Cookie {
     if (options.domain) {
       parts.push(`Domain=${encodeURIComponent(options.domain)}`);
     }
-    if (options.secure) parts.push("Secure");
-    if (options.httpOnly) parts.push("HttpOnly");
+    if (options.secure) parts.push('Secure');
+    if (options.httpOnly) parts.push('HttpOnly');
     if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
     if (options.maxAge) parts.push(`Max-Age=${options.maxAge}`);
     if (options.expires) parts.push(`Expires=${options.expires.toUTCString()}`);
 
-    return parts.join("; ");
+    return parts.join('; ');
   }
 
   static parse(cookies: string): Record<string, string> {
@@ -130,7 +133,7 @@ class Cookie {
   static serialize(
     name: string,
     value: string,
-    options: CookieOptions = {},
+    options: CookieOptions = {}
   ): string {
     return Cookie.serializeCookie(name, value, options);
   }
@@ -161,7 +164,7 @@ export class Context {
   // ? state
   get state(): Record<string, any> {
     // ? auto clean up state object
-    if (this._7.state["__state__"] === true) {
+    if (this._7.state['__state__'] === true) {
       for (const key in this._7.state) {
         delete this._7.state[key];
       }
@@ -175,7 +178,7 @@ export class Context {
   // //? stream
   _3?: Stream = undefined;
   //? response
-  _6: boolean = false;
+  _6 = false;
   //? original response
   res?: any;
   //? state
@@ -188,27 +191,27 @@ export class Context {
     data: unknown,
     statusCode?: number,
     contentType?: string,
-    validate: boolean = true,
+    validate = true
   ) {
     if (this._6 || this._3) {
-      throw new Error("Response already set");
+      throw new Error('Response already set');
     }
     if (this.handler!.response && validate) {
       data = validator(this.handler!.response, data || {});
-      if (typeof data === "string") {
+      if (typeof data === 'string') {
         throw new Error(data);
       }
     }
     if (contentType) {
-      this._2["Content-Type"] = contentType;
+      this._2['Content-Type'] = contentType;
       this.payload = String(data);
       if (statusCode) this.code = statusCode;
     } else {
-      if (typeof data === "object") {
-        this._2["Content-Type"] = "application/json";
+      if (typeof data === 'object') {
+        this._2['Content-Type'] = 'application/json';
         this.payload = JSON.stringify(data);
       } else {
-        this.payload = data ? String(data) : "";
+        this.payload = data ? String(data) : '';
       }
       if (statusCode) this.code = statusCode;
     }
@@ -216,12 +219,12 @@ export class Context {
 
   redirect(url: string) {
     this.code = 301;
-    this._2["Location"] = url;
+    this._2['Location'] = url;
   }
 
   get(field: string) {
     if (field) {
-      if (runtime["node"]) {
+      if (runtime['node']) {
         return (this.request as IncomingMessage).headers[field] as string;
       }
       return (this.request as Request).headers.get(field) as string;
@@ -236,9 +239,9 @@ export class Context {
   }
 
   getCookie(name: string): string | undefined {
-    const cookieHeader = runtime["node"]
+    const cookieHeader = runtime['node']
       ? (this.request as IncomingMessage).headers.cookie
-      : (this.request as Request).headers.get("cookie");
+      : (this.request as Request).headers.get('cookie');
 
     if (cookieHeader) {
       const cookies = Cookie.parse(cookieHeader);
@@ -248,25 +251,25 @@ export class Context {
   }
 
   getCookies(): Record<string, string> {
-    const cookieHeader = runtime["node"]
+    const cookieHeader = runtime['node']
       ? (this.request as IncomingMessage).headers.cookie
-      : (this.request as Request).headers.get("cookie");
+      : (this.request as Request).headers.get('cookie');
 
     return cookieHeader ? Cookie.parse(cookieHeader) : {};
   }
 
   setCookie(name: string, value: string, options: CookieOptions = {}): void {
     const cookie = Cookie.serialize(name, value, options);
-    const existingCookies = this._2["set-cookie"] || "";
+    const existingCookies = this._2['set-cookie'] || '';
     const cookies = existingCookies
-      ? existingCookies.split(",").map((c) => c.trim())
+      ? existingCookies.split(',').map((c) => c.trim())
       : [];
     cookies.push(cookie);
-    this._2["set-cookie"] = cookies.join(", ");
+    this._2['set-cookie'] = cookies.join(', ');
   }
 
   clearCookie(name: string, options: CookieOptions = {}): void {
-    this.setCookie(name, "", { ...options, maxAge: 0 });
+    this.setCookie(name, '', { ...options, maxAge: 0 });
   }
 
   sendStream(
@@ -276,10 +279,10 @@ export class Context {
       ContentType: string;
     } = {
       folder: undefined,
-      ContentType: "application/octet-stream",
-    },
+      ContentType: 'application/octet-stream',
+    }
   ) {
-    if (typeof stream === "string") {
+    if (typeof stream === 'string') {
       if (config.folder) {
         let normalizedTarget: string;
         let normalizedBase: string;
@@ -288,22 +291,22 @@ export class Context {
           normalizedTarget = fs().realpathSync(stream);
           normalizedBase = fs().realpathSync(config.folder);
         } catch (error) {
-          throw new Error("File not found!");
+          throw new Error('File not found!');
         }
         // ? prevent path traversal
         if (!normalizedTarget.startsWith(normalizedBase + fs().sep)) {
-          throw new Error("Path traversal detected!");
+          throw new Error('Path traversal detected!');
         }
       } else {
         stream = fs().resolve(stream);
       }
       config.ContentType = mime.getType(stream) || config.ContentType;
-      this._2["Content-Disposition"] = `inline; filename="${
-        stream.split("/").at(-1) || "unnamed.bin"
+      this._2['Content-Disposition'] = `inline; filename="${
+        stream.split('/').at(-1) || 'unnamed.bin'
       }"`;
-      if (runtime["bun"]) {
+      if (runtime['bun']) {
         stream = Bun.file(stream);
-      } else if (runtime["deno"]) {
+      } else if (runtime['deno']) {
         // @ts-expect-error
         const file = Deno.open(stream).catch(() => {});
         stream = file;
@@ -314,7 +317,7 @@ export class Context {
       }
     }
 
-    this._2["Content-Type"] = config.ContentType;
+    this._2['Content-Type'] = config.ContentType;
     this._3 = stream as Stream;
   }
   download(
@@ -324,17 +327,17 @@ export class Context {
       ContentType: string;
     } = {
       folder: undefined,
-      ContentType: "application/octet-stream",
-    },
+      ContentType: 'application/octet-stream',
+    }
   ) {
     this.sendStream(stream, config);
-    this._2["Content-Disposition"] = `attachment; filename="${
-      (stream as string).split("/").at(-1) || "unnamed.bin"
+    this._2['Content-Disposition'] = `attachment; filename="${
+      (stream as string).split('/').at(-1) || 'unnamed.bin'
     }"`;
   }
   // Only for deno and bun
   sendResponse(Response?: Response) {
-    if (!runtime["node"]) {
+    if (!runtime['node']) {
       // @ts-ignore
       this._6 = Response;
     }
@@ -342,86 +345,91 @@ export class Context {
   // Only for deno and bun
   upgrade(): void | never {
     const req = this.request as any;
-    const conn = req.headers?.["connection"] ||
-      req.headers?.get?.("connection");
-    if (conn?.includes("Upgrade")) {
-      if (this.get("upgrade") != "websocket") {
-        throw new Error("Invalid upgrade header");
+    const conn =
+      req.headers?.['connection'] || req.headers?.get?.('connection');
+    if (conn?.includes('Upgrade')) {
+      if (this.get('upgrade') != 'websocket') {
+        throw new Error('Invalid upgrade header');
       }
-      if (runtime["deno"]) {
+      if (runtime['deno']) {
         // @ts-expect-error
         const { socket, response } = Deno.upgradeWebSocket(req);
         // @ts-expect-error
-        socket.addEventListener("open", (...p) => {
-          JetSocketInstance.__binder("open", [socket, ...p]);
+        socket.addEventListener('open', (...p) => {
+          JetSocketInstance.__binder('open', [socket, ...p]);
         });
         // @ts-expect-error
-        socket.addEventListener("message", (...p) => {
-          JetSocketInstance.__binder("message", [socket, ...p]);
+        socket.addEventListener('message', (...p) => {
+          JetSocketInstance.__binder('message', [socket, ...p]);
         });
         // @ts-expect-error
-        socket.addEventListener("drain", (...p) => {
-          JetSocketInstance.__binder("drain", [socket, ...p]);
+        socket.addEventListener('drain', (...p) => {
+          JetSocketInstance.__binder('drain', [socket, ...p]);
         });
         // @ts-expect-error
-        socket.addEventListener("close", (...p) => {
-          JetSocketInstance.__binder("close", [socket, ...p]);
+        socket.addEventListener('close', (...p) => {
+          JetSocketInstance.__binder('close', [socket, ...p]);
         });
         this.connection = JetSocketInstance;
         return this.sendResponse(response);
       }
-      if (runtime["bun"]) {
+      if (runtime['bun']) {
         if (this.res?.upgrade?.(req)) {
           this.connection = JetSocketInstance;
           return this.sendResponse(undefined);
         }
       }
-      if (runtime["node"]) {
+      if (runtime['node']) {
         throw new Error(
-          "No current websocket support for Nodejs! run with bun or deno.",
+          'No current websocket support for Nodejs! run with bun or deno.'
         );
       }
     }
-    throw new Error("Invalid upgrade headers");
+    throw new Error('Invalid upgrade headers');
   }
 
-  async parse<Type extends any = Record<string, any>>(options: {
-    maxBodySize?: number;
-    contentType?: string;
-    validate?: boolean;
-  } = { validate: true }): Promise<Type> {
+  async parse<Type extends any = Record<string, any>>(
+    options: {
+      maxBodySize?: number;
+      contentType?: string;
+      validate?: boolean;
+    } = { validate: true }
+  ): Promise<Type> {
     if (this.$_internal_body) {
       return this.$_internal_body as Promise<Type>;
     }
-    this.$_internal_body = await parseRequest(this.request, options) as Promise<
-      Type
-    >;
+    this.$_internal_body = (await parseRequest(
+      this.request,
+      options
+    )) as Promise<Type>;
     //? validate body
     if (this.handler!.body && options.validate) {
       this.$_internal_body = validator(
         this.handler!.body,
-        this.$_internal_body,
+        this.$_internal_body
       );
     }
     return this.$_internal_body as Promise<Type>;
   }
-  parseQuery<Type extends any = Record<string, any>>(options: {
-    validate?: boolean;
-  } = { validate: true }): Promise<Type> {
+  parseQuery<Type extends any = Record<string, any>>(
+    options: {
+      validate?: boolean;
+    } = { validate: true }
+  ): Promise<Type> {
     if (this.$_internal_query) {
       return this.$_internal_query as Promise<Type>;
     }
-    const queryIndex = this.request?.url?.indexOf("?");
+    const queryIndex = this.request?.url?.indexOf('?');
     if (queryIndex && queryIndex > -1) {
       const queryParams = new URLSearchParams(
-        this.request?.url?.slice(queryIndex),
+        this.request?.url?.slice(queryIndex)
       );
       this.$_internal_query = {};
 
       for (const [key, value] of queryParams.entries()) {
         const path = key
-          .replace(/\]/g, "")
-          .split("[")
+          .replace(/\]/g, '')
+          .split('[')
           .map((k) => k.trim());
 
         let curr = this.$_internal_query;
@@ -439,7 +447,7 @@ export class Context {
       if (this.handler?.query && options.validate) {
         this.$_internal_query = validator(
           this.handler.query,
-          this.$_internal_query,
+          this.$_internal_query
         );
       }
     }
@@ -450,21 +458,21 @@ export class Context {
 
 export class JetSocket {
   private listeners: Record<string, Function | null> = {
-    "message": null,
-    "close": null,
-    "drain": null,
-    "open": null,
+    message: null,
+    close: null,
+    drain: null,
+    open: null,
   };
   addEventListener(
-    event: "message" | "close" | "drain" | "open",
-    listener: (...param: any[]) => void,
+    event: 'message' | 'close' | 'drain' | 'open',
+    listener: (...param: any[]) => void
   ): void {
     this.listeners[event] = listener as never;
   }
   /**
    * @internal
    */
-  __binder(eventName: "message" | "close" | "drain" | "open", data: any) {
+  __binder(eventName: 'message' | 'close' | 'drain' | 'open', data: any) {
     if (this.listeners[eventName]) {
       this.listeners[eventName]?.(...data);
     }
@@ -517,30 +525,30 @@ export class SchemaBuilder {
 export class StringSchema extends SchemaBuilder {
   constructor(options: ValidationOptions = {}) {
     // @ts-expect-error
-    options.inputType = "string";
-    super("string", options);
+    options.inputType = 'string';
+    super('string', options);
   }
 
   email(err?: string): this {
-    return this.regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, err || "Invalid email");
+    return this.regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, err || 'Invalid email');
   }
 
   min(length: number, err?: string): this {
     return this.validate(
-      (value) => value.length >= length || err || `Minimum length is ${length}`,
+      (value) => value.length >= length || err || `Minimum length is ${length}`
     );
   }
 
   max(length: number, err?: string): this {
     return this.validate(
-      (value) => value.length <= length || err || `Maximum length is ${length}`,
+      (value) => value.length <= length || err || `Maximum length is ${length}`
     );
   }
 
   url(err?: string): this {
     return this.regex(
       /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
-      err || "Invalid URL",
+      err || 'Invalid URL'
     );
   }
 }
@@ -548,50 +556,50 @@ export class StringSchema extends SchemaBuilder {
 export class NumberSchema extends SchemaBuilder {
   constructor(options: ValidationOptions = {}) {
     // @ts-expect-error
-    options.inputType = "number";
-    super("number", options);
+    options.inputType = 'number';
+    super('number', options);
   }
 
   min(value: number, err?: string): this {
     return this.validate(
-      (val) => val >= value || err || `Minimum value is ${value}`,
+      (val) => val >= value || err || `Minimum value is ${value}`
     );
   }
 
   max(value: number, err?: string): this {
     return this.validate(
-      (val) => val <= value || err || `Maximum value is ${value}`,
+      (val) => val <= value || err || `Maximum value is ${value}`
     );
   }
 
   integer(err?: string): this {
     return this.validate(
-      (val) => Number.isInteger(val) || err || "Must be an integer",
+      (val) => Number.isInteger(val) || err || 'Must be an integer'
     );
   }
 
   positive(err?: string): this {
-    return this.validate((val) => val > 0 || err || "Must be positive");
+    return this.validate((val) => val > 0 || err || 'Must be positive');
   }
 
   negative(err?: string): this {
-    return this.validate((val) => val < 0 || err || "Must be negative");
+    return this.validate((val) => val < 0 || err || 'Must be negative');
   }
 }
 
 export class BooleanSchema extends SchemaBuilder {
   constructor() {
-    super("boolean");
+    super('boolean');
   }
 }
 
 export class ArraySchema extends SchemaBuilder {
   constructor(elementSchema?: SchemaBuilder) {
-    super("array");
+    super('array');
     if (elementSchema) {
       const elementDef = elementSchema.getDefinition();
-      if (elementDef.type === "object" && elementDef.objectSchema) {
-        this.def.arrayType = "object";
+      if (elementDef.type === 'object' && elementDef.objectSchema) {
+        this.def.arrayType = 'object';
         this.def.objectSchema = elementDef.objectSchema;
       } else {
         this.def.arrayType = elementDef.type;
@@ -604,7 +612,7 @@ export class ArraySchema extends SchemaBuilder {
       (value) =>
         (Array.isArray(value) && value.length >= length) ||
         err ||
-        `Minimum length is ${length}`,
+        `Minimum length is ${length}`
     );
   }
 
@@ -613,18 +621,18 @@ export class ArraySchema extends SchemaBuilder {
       (value) =>
         (Array.isArray(value) && value.length <= length) ||
         err ||
-        `Maximum length is ${length}`,
+        `Maximum length is ${length}`
     );
   }
 
   nonempty(err?: string): this {
-    return this.min(1, err || "Array cannot be empty");
+    return this.min(1, err || 'Array cannot be empty');
   }
 }
 
 export class ObjectSchema extends SchemaBuilder {
   constructor(shape?: Record<string, SchemaBuilder>) {
-    super("object");
+    super('object');
     if (shape) {
       this.def.objectSchema = {};
       for (const [key, builder] of Object.entries(shape)) {
@@ -644,14 +652,14 @@ export class ObjectSchema extends SchemaBuilder {
 
 export class DateSchema extends SchemaBuilder {
   constructor() {
-    super("date");
+    super('date');
   }
 
   min(date: Date | string, err?: string): this {
     const minDate = new Date(date);
     return this.validate(
       (value) =>
-        new Date(value) >= minDate || err || `Date must be after ${minDate}`,
+        new Date(value) >= minDate || err || `Date must be after ${minDate}`
     );
   }
 
@@ -659,21 +667,21 @@ export class DateSchema extends SchemaBuilder {
     const maxDate = new Date(date);
     return this.validate(
       (value) =>
-        new Date(value) <= maxDate || err || `Date must be before ${maxDate}`,
+        new Date(value) <= maxDate || err || `Date must be before ${maxDate}`
     );
   }
 
   future(err?: string): this {
     return this.validate(
       (value) =>
-        new Date(value) > new Date() || err || "Date must be in the future",
+        new Date(value) > new Date() || err || 'Date must be in the future'
     );
   }
 
   past(err?: string): this {
     return this.validate(
       (value) =>
-        new Date(value) < new Date() || err || "Date must be in the past",
+        new Date(value) < new Date() || err || 'Date must be in the past'
     );
   }
 }
@@ -681,8 +689,8 @@ export class DateSchema extends SchemaBuilder {
 export class FileSchema extends SchemaBuilder {
   constructor(options: FileOptions = {}) {
     // @ts-expect-error
-    options.inputType = "file";
-    super("file", options as ValidationOptions);
+    options.inputType = 'file';
+    super('file', options as ValidationOptions);
   }
 
   maxSize(bytes: number, err?: string): this {
@@ -690,7 +698,7 @@ export class FileSchema extends SchemaBuilder {
       (value) =>
         value.size <= bytes ||
         err ||
-        `File size must be less than ${bytes} bytes`,
+        `File size must be less than ${bytes} bytes`
     );
   }
 
@@ -700,15 +708,13 @@ export class FileSchema extends SchemaBuilder {
       (value) =>
         allowedTypes.includes(value.mimeType) ||
         err ||
-        `File type must be one of: ${allowedTypes.join(", ")}`,
+        `File type must be one of: ${allowedTypes.join(', ')}`
     );
   }
 }
 
 export class SchemaCompiler {
-  static compile(
-    schema: Record<string, SchemaBuilder>,
-  ): HTTPBody<any> {
+  static compile(schema: Record<string, SchemaBuilder>): HTTPBody<any> {
     const compiled: Record<string, SchemaDefinition> = {};
     for (const [key, builder] of Object.entries(schema)) {
       compiled[key] = builder.getDefinition();
@@ -744,15 +750,15 @@ export class Trie {
   hashmap: Record<string, JetRoute> = {};
   constructor(
     method:
-      | "GET"
-      | "POST"
-      | "PUT"
-      | "DELETE"
-      | "PATCH"
-      | "OPTIONS"
-      | "HEAD"
-      | "CONNECT"
-      | "TRACE",
+      | 'GET'
+      | 'POST'
+      | 'PUT'
+      | 'DELETE'
+      | 'PATCH'
+      | 'OPTIONS'
+      | 'HEAD'
+      | 'CONNECT'
+      | 'TRACE'
   ) {
     this.root = new TrieNode();
     this.method = method;
@@ -768,37 +774,37 @@ export class Trie {
       return;
     }
     let normalizedPath = path.trim();
-    if (normalizedPath.startsWith("/")) {
+    if (normalizedPath.startsWith('/')) {
       normalizedPath = normalizedPath.slice(1);
     }
-    if (normalizedPath.endsWith("/") && normalizedPath.length > 0) {
+    if (normalizedPath.endsWith('/') && normalizedPath.length > 0) {
       normalizedPath = normalizedPath.slice(0, -1);
     }
 
     // ? Handle the root path explicitly
-    if (normalizedPath === "") {
+    if (normalizedPath === '') {
       if (this.root.handler) {
         LOG.log(
           `Warning: Duplicate route definition for path ${this.method} ${path}`,
-          "warn",
+          'warn'
         );
       }
       this.root.handler = handler;
       return;
     }
 
-    const segments = normalizedPath.split("/");
+    const segments = normalizedPath.split('/');
     let currentNode: TrieNode = this.root;
 
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
 
       // ? Check for parameter segment (starts with :)
-      if (segment.startsWith(":")) {
+      if (segment.startsWith(':')) {
         const paramName = segment.slice(1);
         if (!paramName) {
           throw new Error(
-            `Invalid route path: Parameter segment in ${this.method} ${path} '${segment}' is missing a name.`,
+            `Invalid route path: Parameter segment in ${this.method} ${path} '${segment}' is missing a name.`
           );
         }
 
@@ -807,7 +813,7 @@ export class Trie {
           if (currentNode.parameterChild.paramName !== paramName) {
             LOG.log(
               `Warning: Route path conflict at segment '${segment}' in ${this.method} ${path}. Parameter ': ${currentNode.parameterChild.paramName}' already defined at this level.`,
-              "warn",
+              'warn'
             );
           }
 
@@ -817,45 +823,45 @@ export class Trie {
             handler.params = {};
           }
           // @ts-ignore
-          handler.params[paramName] = "";
+          handler.params[paramName] = '';
         } else if (currentNode.children.has(segment)) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`,
+            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`
           );
         } else if (currentNode.wildcardChild) {
           throw new Error(
-            `Invalid route path: Parameter segment '${segment}' cannot follow a wildcard '*' at the same level in ${this.method} ${path}.`,
+            `Invalid route path: Parameter segment '${segment}' cannot follow a wildcard '*' at the same level in ${this.method} ${path}.`
           );
         } else {
           if (!handler.params) {
             handler.params = {};
           }
-          handler.params[paramName as keyof typeof handler.params] = "" as any;
+          handler.params[paramName as keyof typeof handler.params] = '' as any;
           const newNode = new TrieNode();
           newNode.paramName = paramName;
           currentNode.parameterChild = newNode;
           currentNode = newNode;
         }
       } // ? Check for wildcard segment (*) - typically only allowed at the end
-      else if (segment === "*") {
+      else if (segment === '*') {
         if (i !== segments.length - 1) {
           throw new Error(
-            `Invalid route path: Wildcard '*' is only allowed at the end of a path pattern in ${this.method} ${path}.`,
+            `Invalid route path: Wildcard '*' is only allowed at the end of a path pattern in ${this.method} ${path}.`
           );
         }
         if (currentNode.wildcardChild) {
           LOG.log(
             `Warning: Duplicate wildcard definition at segment '${segment}' in ${this.method} ${path}.`,
-            "warn",
+            'warn'
           );
           currentNode = currentNode.wildcardChild;
         } else if (currentNode.parameterChild) {
           throw new Error(
-            `Invalid route path: Wildcard '*' cannot follow a parameter at the same level in ${this.method} ${path}.`,
+            `Invalid route path: Wildcard '*' cannot follow a parameter at the same level in ${this.method} ${path}.`
           );
         } else if (currentNode.children.has(segment)) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`,
+            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`
           );
         } else {
           const newNode = new TrieNode();
@@ -868,12 +874,12 @@ export class Trie {
       else {
         if (currentNode.parameterChild) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' conflicts with existing parameter ': ${currentNode.parameterChild.paramName}' at this level in ${this.method} ${path}.`,
+            `Route path conflict: Fixed segment '${segment}' conflicts with existing parameter ': ${currentNode.parameterChild.paramName}' at this level in ${this.method} ${path}.`
           );
         }
         if (currentNode.wildcardChild) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' conflicts with existing wildcard '*' at this level in ${this.method} ${path}.`,
+            `Route path conflict: Fixed segment '${segment}' conflicts with existing wildcard '*' at this level in ${this.method} ${path}.`
           );
         }
 
@@ -889,35 +895,27 @@ export class Trie {
     if (currentNode.handler) {
       LOG.log(
         `Warning: Duplicate route definition for path '${path}'.`,
-        "warn",
+        'warn'
       );
     }
     //? Set the handler and original path
     currentNode.handler = handler;
   }
 
-  get_responder(req: IncomingMessage | Request, res: any):
-    | Context
-    | undefined {
+  get_responder(req: IncomingMessage | Request, res: any): Context | undefined {
     let normalizedPath = req.url!;
     // ? Handle absolute paths in non-node environments
     if (!isNode) {
-      const pathStart = normalizedPath.indexOf("/", 7);
-      normalizedPath = pathStart >= 0
-        ? normalizedPath.slice(pathStart)
-        : normalizedPath;
+      const pathStart = normalizedPath.indexOf('/', 7);
+      normalizedPath =
+        pathStart >= 0 ? normalizedPath.slice(pathStart) : normalizedPath;
     }
     // ? Check if route is cached
     if (this.hashmap[normalizedPath]) {
-      return getCtx(
-        req,
-        res,
-        normalizedPath,
-        this.hashmap[normalizedPath]!,
-      );
+      return getCtx(req, res, normalizedPath, this.hashmap[normalizedPath]!);
     }
     //? Handle query parameters
-    const queryIndex = normalizedPath.indexOf("?");
+    const queryIndex = normalizedPath.indexOf('?');
     if (queryIndex > -1) {
       // ? Extract query parameters
       normalizedPath = normalizedPath.slice(0, queryIndex);
@@ -927,33 +925,27 @@ export class Trie {
           res,
           normalizedPath,
           this.hashmap[normalizedPath]!,
-          undefined,
+          undefined
         );
       }
     }
     // ? Handle leading and trailing slashes
-    if (normalizedPath.startsWith("/")) {
+    if (normalizedPath.startsWith('/')) {
       normalizedPath = normalizedPath.slice(1);
     }
     // ? Handle trailing slash
-    if (normalizedPath.endsWith("/") && normalizedPath.length > 0) {
+    if (normalizedPath.endsWith('/') && normalizedPath.length > 0) {
       normalizedPath = normalizedPath.slice(0, -1);
     }
     // ? Handle empty path
-    if (normalizedPath === "") {
+    if (normalizedPath === '') {
       if (this.root.handler) {
-        return getCtx(
-          req,
-          res,
-          normalizedPath,
-          this.root.handler,
-          undefined,
-        );
+        return getCtx(req, res, normalizedPath, this.root.handler, undefined);
       }
     }
     let currentNode = this.root;
     const params: Record<string, string> = {};
-    const segments = normalizedPath.split("/");
+    const segments = normalizedPath.split('/');
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       if (currentNode.children.has(segment)) {
@@ -966,7 +958,7 @@ export class Trie {
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
         // ? wildcard segment match
-        params["*"] = segments.slice(i).join("/");
+        params['*'] = segments.slice(i).join('/');
         currentNode = currentNode.wildcardChild;
         break;
       } else {
@@ -976,13 +968,7 @@ export class Trie {
     }
     if (currentNode.handler) {
       // ? Route found
-      return getCtx(
-        req,
-        res,
-        normalizedPath,
-        currentNode.handler,
-        params,
-      );
+      return getCtx(req, res, normalizedPath, currentNode.handler, params);
     }
   }
 }
@@ -1002,14 +988,14 @@ class MockRequest {
       url?: string;
       headers?: any;
       body?: string | null;
-    } = {},
+    } = {}
   ) {
-    this.method = options.method || "GET";
-    this.url = options.url || "/";
+    this.method = options.method || 'GET';
+    this.url = options.url || '/';
     this.headers = options.headers || new Map();
     this.body = options.body || null;
     this.statusCode = 200;
-    this.statusMessage = "OK";
+    this.statusMessage = 'OK';
     this.bodyUsed = false;
   }
 }
@@ -1027,7 +1013,7 @@ export class JetServer {
   */
   private async _run(
     func: JetRoute,
-    ctx?: JetContext<any, any>,
+    ctx?: JetContext<any, any>
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     let returned: (Function | void)[] | undefined;
     const r = func;
@@ -1042,7 +1028,7 @@ export class JetServer {
         {},
         r.path!,
         r,
-        {},
+        {}
       ) as any;
     }
     try {
@@ -1053,13 +1039,13 @@ export class JetServer {
       //? route handler call
       await r(ctx as any);
       //? post-request middlewares here
-      returned && await Promise.all(returned.map((m) => m?.(ctx, null)));
+      returned && (await Promise.all(returned.map((m) => m?.(ctx, null))));
       //
     } catch (error) {
       console.log(error);
       try {
         //? report error to error middleware
-        returned && await Promise.all(returned.map((m) => m?.(ctx, error)));
+        returned && (await Promise.all(returned.map((m) => m?.(ctx, error))));
       } finally {
         if (!returned && ctx!.code < 400) {
           ctx!.code = 500;
@@ -1069,20 +1055,21 @@ export class JetServer {
     }
     return {
       code: ctx!.code,
-      body: typeof ctx!.payload !== "string"
-        ? ctx!.payload
-        : JSON.parse(ctx!.payload),
+      body:
+        typeof ctx!.payload !== 'string'
+          ? ctx!.payload
+          : JSON.parse(ctx!.payload),
       headers: ctx!._2!,
     };
   }
   runBare(
-    func: JetRoute,
+    func: JetRoute
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func);
   }
   runWithCTX(
     func: JetRoute,
-    ctx: JetContext<any, any>,
+    ctx: JetContext<any, any>
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this._run(func, ctx);
   }
@@ -1091,7 +1078,7 @@ export class JetServer {
     res: Response,
     path: string,
     handler: JetRoute,
-    params: Record<string, any>,
+    params: Record<string, any>
   ): JetContext {
     return getCtx(req, res, path, handler, params) as any;
   }
