@@ -6,7 +6,6 @@ import { join } from 'node:path';
 const gitCheck = spawnSync('git', ['--version'], { stdio: 'ignore' });
 if (gitCheck.status !== 0) {
   console.error('Error: Git is not installed or not found in your PATH.');
-  // eslint-disable-next-line n/no-process-exit
   process.exit(1);
 }
 
@@ -27,7 +26,6 @@ try {
 } catch (err) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   console.error('Error during git clone:', (err as any).message);
-  // eslint-disable-next-line n/no-process-exit
   process.exit(1);
 }
 

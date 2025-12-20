@@ -63,7 +63,7 @@
     "@types/bun": "^1.1.8",
     "@types/node": "^22.7.5",
     "docmach": "^1.1.2",
-    "gts": "nom ",
+    "gts": "^7.0.0",
     "mitata": "^1.0.34",
     "typescript": "^5.6.3"
   },
