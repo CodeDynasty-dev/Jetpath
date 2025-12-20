@@ -555,7 +555,7 @@ export class StringSchema extends SchemaBuilder {
 
 export class NumberSchema extends SchemaBuilder {
   constructor(options: ValidationOptions = {}) {
-    // @ts-expect-error
+    // @ts-expect-error here inputType defaults to number
     options.inputType = 'number';
     super('number', options);
   }
