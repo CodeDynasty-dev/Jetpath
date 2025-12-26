@@ -69,7 +69,7 @@ export function corsMiddleware(options: {
       | 'same-origin-allow-popups';
     'Cross-Origin-Embedder-Policy': 'require-corp' | 'unsafe-none';
   };
-  privateNetworkAccess?: any;
+  privateNetworkAccess?: unknown;
   origin?: string[];
 }) {
   //
@@ -171,21 +171,21 @@ export let runtime: Record<
   cloudflare_worker: false,
   aws_lambda: false,
 };
-const plugins: Record<string, Function> = {};
+const plugins: Record<string, ()=> void> = {};
 
 export function abstractPluginCreator(ctx: Context) {
-  const abstractPlugin: Record<string, Function> = {};
+  const abstractPlugin: Record<string,  ()=> void> = {};
   for (const key in plugins) {
     abstractPlugin[key] = plugins[key].bind(ctx);
   }
   return abstractPlugin;
 }
 
-const ae = (cb: { (): any; (): any; (): void }) => {
+const ae = (cb: { (): unknown; (): unknown; (): void }) => {
   try {
     cb();
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -194,15 +194,15 @@ const ae = (cb: { (): any; (): any; (): void }) => {
   //? check for bun runtime
   const bun = ae(() => Bun);
   //? check for deno runtime
-  // @ts-expect-error
+  // @ts-expect-error to avoid the Deno keyword
   const deno = ae(() => Deno);
   let cloudflare_worker = false;
   let aws_lambda = false;
   //? check if running in Cloudflare Worker
   if (
-    typeof (globalThis as any).WebSocketPair !== 'undefined' &&
-    typeof (globalThis as any).caches !== 'undefined' &&
-    typeof (globalThis as any).Response !== 'undefined'
+    typeof (globalThis as unknown as { WebSocketPair: unknown }).WebSocketPair !== 'undefined' &&
+    typeof (globalThis as unknown as { caches: unknown }).caches !== 'undefined' &&
+    typeof (globalThis as unknown as { Response: unknown }).Response !== 'undefined'
   ) {
     cloudflare_worker = true;
   }
@@ -238,7 +238,8 @@ export const server = (
         keepAliveTimeout: options.keepAliveTimeout || 120_000,
         keepAlive: true,
       },
-      (x: any, y: any) => {
+      (x: unknown, y: unknown) => {
+        // @ts-expect-error to avoid the any error
         Jetpath(x, y);
       }
     );
@@ -246,7 +247,7 @@ export const server = (
   if (runtime['deno']) {
     server = {
       listen(port: number) {
-        // @ts-expect-error
+        // @ts-expect-error to avoid the Deno keyword
         server_else = Deno.serve({ port: port }, Jetpath);
       },
       edge: false,
@@ -257,7 +258,7 @@ export const server = (
       listen() {
         // Cloudflare Worker uses `addEventListener("fetch", ...)`
         addEventListener('fetch', (event: FetchEvent) => {
-          // @ts-expect-error
+          // @ts-expect-error to avoid the FetchEvent error
           event.respondWith(Jetpath(event.request));
         });
       },
@@ -275,7 +276,7 @@ export const server = (
             headers: event.headers,
             body: event.body,
           });
-          // @ts-expect-error
+          // @ts-expect-error to avoid the extra arguments error
           const res = await Jetpath(req);
           const text = await res.text();
           return {
@@ -295,12 +296,12 @@ export const server = (
         listen(port: number) {
           server_else = Bun.serve({
             port,
-            // @ts-expect-error
+            // @ts-expect-error to avoid the extra arguments error
             fetch: Jetpath,
             websocket: {
               message(...p) {
                 p[1] = {
-                  // @ts-expect-error
+                  // @ts-expect-error to avoid the type errorm ensuring we pass the opionated data prop.
                   data: p[1],
                 };
                 JetSocketInstance.__binder('message', p);
@@ -324,7 +325,7 @@ export const server = (
         listen(port: number) {
           server_else = Bun.serve({
             port,
-            // @ts-expect-error
+            // @ts-expect-error to avoid the extra arguments error
             fetch: Jetpath,
           });
         },
@@ -425,10 +426,10 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   // ? streaming with ctx.sendStream
   if (ctx?._3) {
     // handle deno promise.
-    // @ts-expect-error
+    // @ts-expect-error to avoid .then error on stream type
     if (runtime['deno'] && ctx._3.then) {
       ctxPool.push(ctx);
-      // @ts-expect-error
+      // @ts-expect-error same
       return ctx._3.then((stream: any) => {
         return new Response(stream?.readable, {
           status: ctx.code,
@@ -447,7 +448,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
     return ctx?._6;
   }
   // normal response
-  ctx.__jet_pool && ctxPool.push(ctx);
+  if (ctx.__jet_pool) ctxPool.push(ctx);
 
   return new Response(ctx?.payload, {
     status: ctx.code,
@@ -463,8 +464,8 @@ const makeResNode = (
   // ? prepare response
   if (ctx?._3) {
     res.writeHead(ctx?.code, ctx?._2);
-    ctx?._3.on('error', (_err) => {
-      res.statusCode;
+    ctx?._3.on('error', () => {
+      res.statusCode = 400
       res.end('File not found');
     });
     ctx._3.pipe(res);
@@ -474,7 +475,7 @@ const makeResNode = (
 
   res.writeHead(ctx.code, ctx?._2 || { 'Content-Type': 'text/plain' });
   res.end(ctx?.payload);
-  ctx.__jet_pool && ctxPool.push(ctx);
+  if (ctx.__jet_pool) ctxPool.push(ctx);
   return undefined;
 };
 
@@ -498,7 +499,7 @@ const Jetpath = async (
     req,
     res
   );
-  const returned: Function[] = [];
+  const returned: ((ctx: any, error?: unknown) => void | Promise<void>)[] = [];
   if (ctx) {
     const r = ctx.handler!;
     try {
@@ -824,7 +825,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   return UI.replace('"{ JETPATH }"', `\`${api}\``)
     .replaceAll(
       '"{ JETENVIRONMENTS }"',
-      JSON.stringify(options?.apiDoc?.environments!)
+      JSON.stringify(options?.apiDoc?.environments ||{})
     )
     .replaceAll('"{ JETPATHGH }"', `${JSON.stringify(globalHeaders)}`)
     .replaceAll('{NAME}', options?.apiDoc?.name || 'Jetpath API Doc')
@@ -1081,7 +1082,7 @@ export function parseFormData(
       } else {
         try {
           fields[fieldName] = JSON.parse(value.toString());
-        } catch (error) {
+        } catch  {
           fields[fieldName] = value;
         }
       }
@@ -1370,7 +1371,8 @@ export function use<
 export async function codeGen(
   ROUTES_DIR: string,
   mode: 'ON' | 'WARN',
-  generatedRoutesFilePath?: string
+  connectionLinks: { local: string; external: string },
+  generatedRoutesFilePath?: string,
 ) {
   //? Regex to find exported const variables
   // ? let's make sure if this line is a comments then it should not be matched!
@@ -1459,11 +1461,10 @@ export async function codeGen(
     if (schema.type === 'object') {
       for (const key in schema.objectSchema) {
         obj[key] = 'string';
-        if (schema.objectSchema[key].type === 'object') {
-          // @ts-ignore
+        if (schema.objectSchema[key].type === 'object') { 
           obj[key] = compileObjectStructureFromSchema(
             schema.objectSchema[key] as SchemaDefinition
-          );
+          ) as Record<string, 'string'>;
         }
       }
       return obj;
@@ -1490,7 +1491,11 @@ export async function codeGen(
     "// @ts-ignore\nimport { type JetRoute, JetMiddleware } from 'jetpath';\n\n";
   if (typeof generatedRoutesFilePath === 'string') {
     LOG.log('Generating routes file', 'info');
-    const outputContent = `export const routes = {\n ${Object.keys(
+    const connectionInfo = `export const connectionInfo = {
+    local: '${connectionLinks.local}',
+    external: '${connectionLinks.external}'
+};`;
+    const outputContent = `//This file is autogenerated by Jetpath\n\n${connectionInfo}\n\nexport const routes = {\n ${Object.keys(
       _JetPath_paths
     )
       .reduce((acc: string[], method) => {

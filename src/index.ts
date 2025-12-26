@@ -77,7 +77,7 @@ export class Jetpath {
   async listen(): Promise<void> {
     // ? {-view-} here is replaced at build time to html
     const UI = '{{view}}';
-
+    
     if (!this.options.source) {
       LOG.log(
         'Jetpath: Provide a source directory to avoid scanning the root directory',
@@ -86,6 +86,7 @@ export class Jetpath {
     }
     LOG.log('Compiling...', 'info');
     const startTime = performance.now();
+    const localIP = getLocalIP();
     // ? Load all jetpath functions described in user code
     const errorsCount = await getHandlers(this.options?.source!, true);
     const endTime = performance.now();
@@ -106,6 +107,7 @@ export class Jetpath {
         await codeGen(
           this.options.source || '.',
           this.options.strictMode as 'ON' | 'WARN',
+          { local: `http://localhost:${this.options.port}`, external: `http://${localIP}:${this.options.port}` },
           this.options.generatedRoutesFilePath
         );
       }
@@ -120,6 +122,7 @@ export class Jetpath {
       await codeGen(
         this.options.source || '.',
         this.options?.strictMode as 'ON' | 'WARN',
+        { local: `http://localhost:${this.options.port}`, external: `http://${localIP}:${this.options.port}` },
         this.options.generatedRoutesFilePath
       );
       // ? render API in a .HTTP file
@@ -170,8 +173,7 @@ export class Jetpath {
 
     this.server.listen(this.options.port);
     LOG.log(`Open http://localhost:${this.options.port}`, 'info');
-    // ? show external IP
-    const localIP = getLocalIP();
+    // ? show external IP 
     if (localIP) {
       LOG.log(`External: http://${localIP}:${this.options.port}`, 'info');
     }
