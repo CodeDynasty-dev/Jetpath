@@ -822,12 +822,12 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     }
   );
 
-  return UI.replace('"{ JETPATH }"', `\`${api}\``)
+  return UI.replace('{ JETPATH }', api)
     .replaceAll(
-      '"{ JETENVIRONMENTS }"',
+      '{ JETENVIRONMENTS }',
       JSON.stringify(options?.apiDoc?.environments ||{})
     )
-    .replaceAll('"{ JETPATHGH }"', `${JSON.stringify(globalHeaders)}`)
+    .replaceAll('{ JETPATHGH }', globalHeaders)
     .replaceAll('{NAME}', options?.apiDoc?.name || 'Jetpath API Doc')
     .replaceAll('JETPATHCOLOR', options?.apiDoc?.color || '#4285f4')
     .replaceAll(

@@ -17,7 +17,7 @@ const app = new Jetpath({
   // This makes it easy to visualize and test the API endpoints.
   apiDoc: {
     display: "UI", // Set to "UI" to enable the Swagger UI
-    name: "PetShop API", // Using PetShop name from original sample
+    name: "PetShop", // Using PetShop name from original sample
     // Use Markdown for a rich description in the documentation.
     // This info can be more general, as route-specific info comes from .info() calls.
     info: `
@@ -36,7 +36,7 @@ It demonstrates various Jetpath features including:
 [check our docs for more info](https://jetpath.codedynasty.dev)
 `,
 
-    color: "#7e57c2", // Using the color from the original sample
+    color: "#032b82ff", // Using the color from the original sample
     // Optional: Secure the documentation UI itself with basic authentication (example from sample).
     username: "admin", // Default username from sample
     password: "1234", // Default password from sample **WARNING:** Do not use simple passwords in production. Use environment variables.

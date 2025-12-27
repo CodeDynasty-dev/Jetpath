@@ -15,6 +15,7 @@ import {
 } from './primitives/functions.js';
 import type { jetOptions, UnionToIntersection } from './primitives/types.js';
 import { JetPlugin, LOG } from './primitives/classes.js';
+import { readFile } from 'node:fs/promises';
 
 export class Jetpath {
   public server: {
@@ -76,7 +77,9 @@ export class Jetpath {
   }
   async listen(): Promise<void> {
     // ? {-view-} here is replaced at build time to html
-    const UI = '{{view}}';
+    const UI = await readFile("dist/doc.html", {
+      encoding: "utf-8",
+    });
     
     if (!this.options.source) {
       LOG.log(
