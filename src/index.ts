@@ -16,7 +16,10 @@ import {
 import type { jetOptions, UnionToIntersection } from './primitives/types.js';
 import { JetPlugin, LOG } from './primitives/classes.js';
 import { readFile } from 'node:fs/promises';
+import { cwd } from 'node:process';
+import path from 'node:path';
 
+const html_path = path.join(cwd(),"/node_modules/jetpath/dist/jetpath-doc.html");
 export class Jetpath {
   public server: {
     listen: any;
@@ -77,7 +80,7 @@ export class Jetpath {
   }
   async listen(): Promise<void> {
     // ? {-view-} here is replaced at build time to html
-    const UI = await readFile("dist/doc.html", {
+    const UI = await readFile(html_path, {
       encoding: "utf-8",
     });
     
@@ -91,7 +94,7 @@ export class Jetpath {
     const startTime = performance.now();
     const localIP = getLocalIP();
     // ? Load all jetpath functions described in user code
-    const errorsCount = await getHandlers(this.options?.source!, true);
+    const errorsCount = await getHandlers(this.options?.source || '.', true);
     const endTime = performance.now();
     // LOG.log("Compiled!");
     //? compile API
@@ -183,6 +186,7 @@ export class Jetpath {
   }
 
   api_UI_req(UI: string): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, compiledAPI] = compileAPI(this.options);
     const name = this.options?.apiDoc?.path || '/api-doc';
     _JetPath_paths_trie['GET'].insert(name, (ctx) => {

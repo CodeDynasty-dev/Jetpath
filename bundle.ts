@@ -16,7 +16,7 @@ const view = html.replace(
   "{JETPATH-DOC-SCRIPT}",
   html_script_code,
 ) 
-await writeFile("dist/doc.html", view);
+await writeFile("dist/jetpath-doc.html", view);
 console.log("Jetpath: compiled!");
 
 // [X] npm pack will call npm run prepare which will run this file
