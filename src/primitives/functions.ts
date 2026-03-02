@@ -51,10 +51,14 @@ const optionsCtx = {
   },
   request: { method: 'OPTIONS' },
 };
-const cachedCorsHeaders: Record<string, string> = {
+// Create immutable CORS headers
+const createCorsHeaders = (): Record<string, string> => ({
   Vary: 'Origin',
   Connection: 'keep-alive',
-};
+});
+
+// Base CORS headers - will be frozen after initialization
+let baseCorsHeaders: Record<string, string> = createCorsHeaders();
 export function corsMiddleware(options: {
   exposeHeaders?: string[];
   allowMethods?: allowedMethods;
@@ -110,21 +114,27 @@ export function corsMiddleware(options: {
   if (Array.isArray(options.origin)) {
     optionsCtx.set('Access-Control-Allow-Origin', options.origin.join(','));
   }
-  // ? Pre-popular normal response headers.
+  // ? Pre-populate normal response headers.
+  // Create new base CORS headers to avoid mutation
+  baseCorsHeaders = createCorsHeaders();
+
   //? Add Vary header to indicate response varies based on the Origin header
-  cachedCorsHeaders['Vary'] = 'Origin';
+  baseCorsHeaders['Vary'] = 'Origin';
   if (options.credentials === true) {
-    cachedCorsHeaders['Access-Control-Allow-Credentials'] = 'true';
+    baseCorsHeaders['Access-Control-Allow-Credentials'] = 'true';
   }
   if (Array.isArray(options.origin)) {
-    cachedCorsHeaders['Access-Control-Allow-Origin'] = options.origin.join(',');
+    baseCorsHeaders['Access-Control-Allow-Origin'] = options.origin.join(',');
   }
   if (options.secureContext) {
-    cachedCorsHeaders['Cross-Origin-Opener-Policy'] =
+    baseCorsHeaders['Cross-Origin-Opener-Policy'] =
       options.secureContext['Cross-Origin-Embedder-Policy'];
-    cachedCorsHeaders['Cross-Origin-Embedder-Policy'] =
+    baseCorsHeaders['Cross-Origin-Embedder-Policy'] =
       options.secureContext['Cross-Origin-Embedder-Policy'];
   }
+
+  // Freeze the headers to prevent mutation
+  Object.freeze(baseCorsHeaders);
 }
 
 export const JetSocketInstance = new JetSocket();
@@ -171,13 +181,24 @@ export let runtime: Record<
   cloudflare_worker: false,
   aws_lambda: false,
 };
-const plugins: Record<string, ()=> void> = {};
+const plugins: Record<string, () => void> = {};
+// Cache for plugin bindings to avoid creating new objects per request
+const pluginBindingCache = new WeakMap<Context, Record<string, () => void>>();
 
 export function abstractPluginCreator(ctx: Context) {
-  const abstractPlugin: Record<string,  ()=> void> = {};
+  // Return cached bindings if available
+  const cached = pluginBindingCache.get(ctx);
+  if (cached) {
+    return cached;
+  }
+
+  const abstractPlugin: Record<string, () => void> = {};
   for (const key in plugins) {
     abstractPlugin[key] = plugins[key].bind(ctx);
   }
+
+  // Cache the bindings
+  pluginBindingCache.set(ctx, abstractPlugin);
   return abstractPlugin;
 }
 
@@ -200,9 +221,12 @@ const ae = (cb: { (): unknown; (): unknown; (): void }) => {
   let aws_lambda = false;
   //? check if running in Cloudflare Worker
   if (
-    typeof (globalThis as unknown as { WebSocketPair: unknown }).WebSocketPair !== 'undefined' &&
-    typeof (globalThis as unknown as { caches: unknown }).caches !== 'undefined' &&
-    typeof (globalThis as unknown as { Response: unknown }).Response !== 'undefined'
+    typeof (globalThis as unknown as { WebSocketPair: unknown })
+      .WebSocketPair !== 'undefined' &&
+    typeof (globalThis as unknown as { caches: unknown }).caches !==
+      'undefined' &&
+    typeof (globalThis as unknown as { Response: unknown }).Response !==
+      'undefined'
   ) {
     cloudflare_worker = true;
   }
@@ -373,8 +397,8 @@ export const getCtx = (
 ): Context => {
   if (ctxPool.length) {
     const ctx = ctxPool.shift()!;
-    // ? reset the CContext to default state
-    ctx.state['__state__'] = true;
+    // ? reset the Context to default state
+    ctx._7.state = {}; // Clear state completely
     ctx.request = req;
     ctx.res = res;
     ctx.method = req.method as 'GET';
@@ -384,8 +408,8 @@ export const getCtx = (
     ctx.path = path;
     //? load
     ctx.payload = undefined;
-    // ? header of response
-    ctx._2 = cachedCorsHeaders;
+    // ? header of response - create fresh copy to avoid mutation
+    ctx._2 = { ...baseCorsHeaders };
     // //? stream
     ctx._3 = undefined;
     //? the route handler
@@ -394,13 +418,15 @@ export const getCtx = (
     ctx._6 = false;
     // ? code
     ctx.code = 200;
+    // ? clear any cached validation
+    ctx.$_internal_validated_body = undefined;
     return ctx;
   }
   const ctx = new Context();
   // ? add middlewares to the plugins object
   ctx.request = req;
   ctx.res = res;
-  ctx._2 = cachedCorsHeaders;
+  ctx._2 = { ...baseCorsHeaders }; // Fresh copy
   ctx.method = req.method as 'GET';
   ctx.params = params;
   ctx.path = path;
@@ -419,7 +445,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   // ? prepare response
   // redirect
   // if (ctx?.code === 301 && ctx._2?.["Location"]) {
-  //   ctxPool.push(ctx);
+  //   returnCtx(ctx);
   //   // @ts-ignore
   //   return Response.redirect(ctx._2?.["Location"]);
   // }
@@ -428,7 +454,6 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
     // handle deno promise.
     // @ts-expect-error to avoid .then error on stream type
     if (runtime['deno'] && ctx._3.then) {
-      ctxPool.push(ctx);
       // @ts-expect-error same
       return ctx._3.then((stream: any) => {
         return new Response(stream?.readable, {
@@ -437,19 +462,24 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
         });
       });
     }
-    ctxPool.push(ctx);
+    queueMicrotask(() => {
+      ctxPool.push(ctx);
+    });
     return new Response(ctx?._3 as unknown as undefined, {
       status: ctx.code,
       headers: ctx?._2,
     });
   }
   if (ctx._6 !== false) {
-    ctxPool.push(ctx);
+    queueMicrotask(() => {
+      ctxPool.push(ctx);
+    });
     return ctx?._6;
   }
+  queueMicrotask(() => {
+    ctxPool.push(ctx);
+  });
   // normal response
-  if (ctx.__jet_pool) ctxPool.push(ctx);
-
   return new Response(ctx?.payload, {
     status: ctx.code,
     headers: ctx?._2,
@@ -464,18 +494,28 @@ const makeResNode = (
   // ? prepare response
   if (ctx?._3) {
     res.writeHead(ctx?.code, ctx?._2);
-    ctx?._3.on('error', () => {
-      res.statusCode = 400
-      res.end('File not found');
-    });
+
+    // Handle stream errors with proper cleanup
+    const errorHandler = () => {
+      res.statusCode = 400;
+      res.end('not found');
+      // Clean up stream and context
+      if (ctx._3) {
+        ctx._3.removeAllListeners();
+        // Check if stream has destroy method (Node.js streams)
+        if (typeof (ctx._3 as any).destroy === 'function') {
+          (ctx._3 as any).destroy();
+        }
+      }
+    };
+
+    ctx._3.on('error', errorHandler);
     ctx._3.pipe(res);
-    ctxPool.push(ctx);
     return undefined;
   }
 
   res.writeHead(ctx.code, ctx?._2 || { 'Content-Type': 'text/plain' });
   res.end(ctx?.payload);
-  if (ctx.__jet_pool) ctxPool.push(ctx);
   return undefined;
 };
 
@@ -495,10 +535,10 @@ const Jetpath = async (
     optionsCtx.code = 200;
     return makeRes(res, optionsCtx as unknown as Context);
   }
-  const ctx = _JetPath_paths_trie[req.method as methods]?.get_responder(
-    req,
-    res
-  );
+
+  // Validate HTTP method before casting
+  const method = req.method?.toUpperCase();
+  const ctx = _JetPath_paths_trie[method as methods]?.get_responder(req, res);
   const returned: ((ctx: any, error?: unknown) => void | Promise<void>)[] = [];
   if (ctx) {
     const r = ctx.handler!;
@@ -624,13 +664,15 @@ export async function getHandlers(
                   module[p]!.method = params[0];
                   // ? set the path
                   module[p]!.path = params[1];
-                  _JetPath_paths[params[0] as methods][params[1]] = module[
-                    p
-                  ] as JetRoute;
+                  // Insert into Trie - it will decide whether to store in hashmap or Trie
                   _JetPath_paths_trie[params[0] as methods].insert(
                     params[1],
                     module[p] as JetRoute
                   );
+                  // Also store in _JetPath_paths for backward compatibility and middleware assignment
+                  _JetPath_paths[params[0] as methods][params[1]] = module[
+                    p
+                  ] as JetRoute;
                 }
               }
             }
@@ -684,13 +726,15 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
           modules[p]!.method = params[0];
           // ? set the path
           modules[p]!.path = params[1];
-          _JetPath_paths[params[0] as methods][params[1]] = modules[
-            p
-          ] as JetRoute;
+          // Insert into Trie - it will decide whether to store in hashmap or Trie
           _JetPath_paths_trie[params[0] as methods].insert(
             params[1],
             modules[p] as JetRoute
           );
+          // Also store in _JetPath_paths for backward compatibility and middleware assignment
+          _JetPath_paths[params[0] as methods][params[1]] = modules[
+            p
+          ] as JetRoute;
         }
       }
     }
@@ -699,10 +743,17 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
 
 export function validator<T extends Record<string, any>>(
   schema: HTTPBody<T> | undefined,
-  data: any
+  data: any,
+  depth = 0,
+  maxDepth = 20
 ): T {
   if (!schema || typeof data !== 'object') {
     throw new Error('Invalid schema or data');
+  }
+
+  // Check recursion depth to prevent stack overflow
+  if (depth > maxDepth) {
+    throw new Error(`Jetpath: Maximum validation depth (${maxDepth}) exceeded`);
   }
 
   const errors: string[] = [];
@@ -743,7 +794,7 @@ export function validator<T extends Record<string, any>>(
         if (arrayType === 'object' && objectSchema) {
           try {
             const validatedArray = value.map((item) =>
-              validator(objectSchema, item)
+              validator(objectSchema, item, depth + 1, maxDepth)
             );
             out[key as keyof T] = validatedArray as T[keyof T];
             continue;
@@ -766,7 +817,12 @@ export function validator<T extends Record<string, any>>(
         // Handle objectSchema validation
         if (objectSchema) {
           try {
-            out[key as keyof T] = validator(objectSchema, value) as T[keyof T];
+            out[key as keyof T] = validator(
+              objectSchema,
+              value,
+              depth + 1,
+              maxDepth
+            ) as T[keyof T];
             continue;
           } catch (e) {
             errors.push(`${key}: ${String(e)}`);
@@ -825,7 +881,7 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   return UI.replace('{ JETPATH }', api)
     .replaceAll(
       '{ JETENVIRONMENTS }',
-      JSON.stringify(options?.apiDoc?.environments ||{})
+      JSON.stringify(options?.apiDoc?.environments || {})
     )
     .replaceAll('{ JETPATHGH }', globalHeaders)
     .replaceAll('{NAME}', options?.apiDoc?.name || 'Jetpath API Doc')
@@ -1013,9 +1069,10 @@ export function assignMiddleware(
 export function parseFormData(
   rawBody: Uint8Array,
   contentType: string,
-  options: { maxBodySize?: number } = {}
+  options: { maxBodySize?: number; maxFileSize?: number } = {}
 ) {
-  const { maxBodySize } = options;
+  const { maxBodySize, maxFileSize = 10 * 1024 * 1024 } = options; // Default 10MB max file size
+
   if (maxBodySize && rawBody.byteLength > maxBodySize) {
     throw new Error(
       `Body exceeds max size: ${rawBody.byteLength} > ${maxBodySize}`
@@ -1065,6 +1122,13 @@ export function parseFormData(
     const fileName = fileNameMatch?.[1] || null;
 
     if (fileName) {
+      // Validate file size at parse time
+      if (maxFileSize && body.length > maxFileSize) {
+        throw new Error(
+          `File '${fileName}' exceeds max size: ${body.length} > ${maxFileSize}`
+        );
+      }
+
       const mimeType = headers['content-type'] || 'application/octet-stream';
       files[fieldName] = {
         fileName,
@@ -1082,7 +1146,7 @@ export function parseFormData(
       } else {
         try {
           fields[fieldName] = JSON.parse(value.toString());
-        } catch  {
+        } catch {
           fields[fieldName] = value;
         }
       }
@@ -1198,9 +1262,14 @@ function collectRequestBody(
  */
 export async function parseRequest(
   req: any,
-  options: { maxBodySize?: number; contentType?: string } = {}
+  options: {
+    maxBodySize?: number;
+    maxFileSize?: number;
+    contentType?: string;
+  } = {}
 ): Promise<Record<string, any>> {
-  const { maxBodySize = 5 * 1024 * 1024 } = options;
+  const { maxBodySize = 5 * 1024 * 1024, maxFileSize = 10 * 1024 * 1024 } =
+    options;
   let contentType = options.contentType || '';
   let rawBody: Uint8Array;
 
@@ -1233,7 +1302,7 @@ export async function parseRequest(
     bodyText = decoder.decode(rawBody);
     return parseUrlEncoded(bodyText);
   } else if (ct.includes('multipart/form-data')) {
-    return parseFormData(rawBody, contentType, { maxBodySize });
+    return parseFormData(rawBody, contentType, { maxBodySize, maxFileSize });
   } else {
     bodyText = decoder.decode(rawBody);
     return { parsed: bodyText };
@@ -1372,7 +1441,7 @@ export async function codeGen(
   ROUTES_DIR: string,
   mode: 'ON' | 'WARN',
   connectionLinks: { local: string; external: string },
-  generatedRoutesFilePath?: string,
+  generatedRoutesFilePath?: string
 ) {
   //? Regex to find exported const variables
   // ? let's make sure if this line is a comments then it should not be matched!
@@ -1461,7 +1530,7 @@ export async function codeGen(
     if (schema.type === 'object') {
       for (const key in schema.objectSchema) {
         obj[key] = 'string';
-        if (schema.objectSchema[key].type === 'object') { 
+        if (schema.objectSchema[key].type === 'object') {
           obj[key] = compileObjectStructureFromSchema(
             schema.objectSchema[key] as SchemaDefinition
           ) as Record<string, 'string'>;
@@ -1705,9 +1774,8 @@ export function getLocalIP() {
 export const fs = await (async () => {
   try {
     // detect edge;
-    const { opendir, readdir, readFile, writeFile } = await import(
-      'node:fs/promises'
-    );
+    const { opendir, readdir, readFile, writeFile } =
+      await import('node:fs/promises');
     // import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
     const { dirname, join, resolve, sep } = await import('node:path');
     // import { dirname, join, resolve, sep } from "node:path";

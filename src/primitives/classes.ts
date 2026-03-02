@@ -155,6 +155,11 @@ export class Context {
    * @internal
    */
   $_internal_body?: Record<string, any>;
+  /**
+   * @internal
+   * Cached validated body to avoid double validation
+   */
+  $_internal_validated_body?: Record<string, any>;
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
@@ -163,12 +168,6 @@ export class Context {
   plugins: Record<string, Function>;
   // ? state
   get state(): Record<string, any> {
-    // ? auto clean up state object
-    if (this._7.state['__state__'] === true) {
-      for (const key in this._7.state) {
-        delete this._7.state[key];
-      }
-    }
     return this._7.state;
   }
   //? load
@@ -283,27 +282,37 @@ export class Context {
     }
   ) {
     if (typeof stream === 'string') {
+      const filePath = stream;
+
       if (config.folder) {
-        let normalizedTarget: string;
-        let normalizedBase: string;
-        try {
-          stream = fs().resolve(config.folder, stream);
-          normalizedTarget = fs().realpathSync(stream);
-          normalizedBase = fs().realpathSync(config.folder);
-        } catch (error) {
-          throw new Error('File not found!');
-        }
-        // ? prevent path traversal
-        if (!normalizedTarget.startsWith(normalizedBase + fs().sep)) {
+        // Resolve paths
+        const resolvedPath = fs().resolve(config.folder, filePath);
+        const resolvedBase = fs().resolve(config.folder);
+
+        // Security: Check for path traversal using path resolution
+        // This is safer than string comparison
+        const relativePath = fs().relative(resolvedBase, resolvedPath);
+
+        if (relativePath.startsWith('..') || fs().isAbsolute(relativePath)) {
           throw new Error('Path traversal detected!');
         }
+
+        stream = resolvedPath;
       } else {
-        stream = fs().resolve(stream);
+        // If no folder is specified, require absolute path for security
+        if (!fs().isAbsolute(filePath)) {
+          throw new Error(
+            'File path must be absolute when no folder is specified'
+          );
+        }
+        stream = fs().resolve(filePath);
       }
+
       config.ContentType = mime.getType(stream) || config.ContentType;
       this._2['Content-Disposition'] = `inline; filename="${
         stream.split('/').at(-1) || 'unnamed.bin'
       }"`;
+
       if (runtime['bun']) {
         stream = Bun.file(stream);
       } else if (runtime['deno']) {
@@ -311,7 +320,7 @@ export class Context {
         const file = Deno.open(stream).catch(() => {});
         stream = file;
       } else {
-        stream = fs().createReadStream(fs().resolve(stream) as string, {
+        stream = fs().createReadStream(stream as string, {
           autoClose: true,
         });
       }
@@ -391,34 +400,50 @@ export class Context {
   async parse<Type extends any = Record<string, any>>(
     options: {
       maxBodySize?: number;
+      maxFileSize?: number;
       contentType?: string;
       validate?: boolean;
     } = { validate: true }
   ): Promise<Type> {
-    if (this.$_internal_body) {
-      return this.$_internal_body as Promise<Type>;
+    // Return cached validated body if available
+    if (this.$_internal_validated_body && options.validate) {
+      return this.$_internal_validated_body as Type;
     }
-    this.$_internal_body = (await parseRequest(
-      this.request,
-      options
-    )) as Promise<Type>;
-    //? validate body
+
+    // Return cached raw body if available and no validation needed
+    if (this.$_internal_body && !options.validate) {
+      return this.$_internal_body as Type;
+    }
+
+    // Parse request if not cached
+    if (!this.$_internal_body) {
+      this.$_internal_body = (await parseRequest(
+        this.request,
+        options
+      )) as Type;
+    }
+
+    // Validate body if needed and cache the result
     if (this.handler!.body && options.validate) {
-      this.$_internal_body = validator(
+      this.$_internal_validated_body = validator(
         this.handler!.body,
         this.$_internal_body
-      );
+      ) as Type;
+      return this.$_internal_validated_body as Type;
     }
-    return this.$_internal_body as Promise<Type>;
+
+    return this.$_internal_body as Type;
   }
   parseQuery<Type extends any = Record<string, any>>(
     options: {
       validate?: boolean;
     } = { validate: true }
-  ): Promise<Type> {
+  ): Type {
+    // Return cached query if available
     if (this.$_internal_query) {
-      return this.$_internal_query as Promise<Type>;
+      return this.$_internal_query as Type;
     }
+
     const queryIndex = this.request?.url?.indexOf('?');
     if (queryIndex && queryIndex > -1) {
       const queryParams = new URLSearchParams(
@@ -766,13 +791,11 @@ export class Trie {
 
   /**
    * Inserts a route path and its associated handler into the Trie.
+   * Exact paths (no parameters or wildcards) go to hashmap for O(1) lookup.
+   * Dynamic paths (with : or *) go to Trie for pattern matching.
    */
   insert(path: string, handler: JetRoute): void {
-    // ? remove leading/trailing slashes, handle empty path
-    if (!/(\*|:)+/.test(path)) {
-      this.hashmap[path] = handler;
-      return;
-    }
+    // Normalize path first
     let normalizedPath = path.trim();
     if (normalizedPath.startsWith('/')) {
       normalizedPath = normalizedPath.slice(1);
@@ -781,7 +804,22 @@ export class Trie {
       normalizedPath = normalizedPath.slice(0, -1);
     }
 
-    // ? Handle the root path explicitly
+    // Check if it's an exact path (no parameters or wildcards)
+    const isExactPath = !/(\*|:)+/.test(normalizedPath);
+
+    if (isExactPath) {
+      // Store exact paths in hashmap for O(1) lookup
+      if (this.hashmap[normalizedPath]) {
+        LOG.log(
+          `Warning: Duplicate route definition for path ${this.method} ${path}`,
+          'warn'
+        );
+      }
+      this.hashmap[normalizedPath] = handler;
+      return;
+    }
+
+    // ? Handle the root path explicitly (dynamic root path)
     if (normalizedPath === '') {
       if (this.root.handler) {
         LOG.log(
