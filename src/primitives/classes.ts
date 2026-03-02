@@ -1,12 +1,12 @@
 import { type IncomingMessage } from 'node:http';
 import { type Stream } from 'node:stream';
 import {
-  _JetPath_paths,
   abstractPluginCreator,
   fs,
   getCtx,
   isNode,
   JetSocketInstance,
+  optionsCtx,
   parseRequest,
   runtime,
   validator,
@@ -1046,51 +1046,7 @@ export class JetServer {
   constructor(options?: jetOptions) {
     Object.assign(this.options, options || {});
   }
-  /*
-  internal method
-  */
-  private async _run(
-    func: JetRoute,
-    ctx?: JetContext<any, any>
-  ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
-    let returned: (Function | void)[] | undefined;
-    const r = func;
-    if (!ctx) {
-      ctx = getCtx(
-        new MockRequest({
-          method: r.method!,
-          url: r.path!,
-          headers: new Map(),
-          body: null,
-        }) as any,
-        {},
-        r.path!,
-        r,
-        {}
-      ) as any;
-    }
-    try {
-      //? pre-request middlewares here
-      returned = r.jet_middleware?.length
-        ? await Promise.all(r.jet_middleware.map((m) => m(ctx as any)))
-        : undefined;
-      //? route handler call
-      await r(ctx as any);
-      //? post-request middlewares here
-      returned && (await Promise.all(returned.map((m) => m?.(ctx, null))));
-      //
-    } catch (error) {
-      console.log(error);
-      try {
-        //? report error to error middleware
-        returned && (await Promise.all(returned.map((m) => m?.(ctx, error))));
-      } finally {
-        if (!returned && ctx!.code < 400) {
-          ctx!.code = 500;
-        }
-        //
-      }
-    }
+  makeRes(ctx: any) {
     return {
       code: ctx!.code,
       body:
@@ -1100,16 +1056,93 @@ export class JetServer {
       headers: ctx!._2!,
     };
   }
-  runBare(
-    func: JetRoute
+  private async run1(func: JetRoute, ctx?: JetContext<any, any>) {
+    if (func.method === 'OPTIONS') {
+      optionsCtx.code = 200;
+      return this.makeRes(optionsCtx as unknown as Context);
+    }
+
+    const returned: ((ctx: any, error?: unknown) => void | Promise<void>)[] =
+      [];
+    if (ctx) {
+      const r = func!;
+      try {
+        //? pre-request middlewares here
+        if (r.jet_middleware?.length) {
+          for (let m = 0; m < r.jet_middleware.length; m++) {
+            const callback = await r.jet_middleware[m](ctx as any);
+            if (typeof callback === 'function') {
+              returned.unshift(callback);
+            }
+          }
+        }
+        //? check if the payload is already set by middleware chain;
+        if (ctx.payload) return this.makeRes(ctx);
+        //? route handler call
+        await r(ctx as any);
+        //? post-request middlewares here
+        for (let r = 0; r < returned.length; r++) {
+          await returned[r](ctx);
+        }
+        return this.makeRes(ctx);
+      } catch (error) {
+        try {
+          //? report error to error middleware
+          if (returned.length) {
+            for (let r = 0; r < returned.length; r++) {
+              await returned[r](ctx, error);
+            }
+          } else {
+            console.log(error);
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          if (!returned.length && ctx.code < 400) {
+            ctx.code = 500;
+          }
+          return this.makeRes(ctx);
+        }
+      }
+    }
+    const ctx404 = optionsCtx;
+    ctx404.code = 404;
+    return this.makeRes(ctx404 as unknown as Context);
+  }
+  /*
+  internal method
+  */
+  private async run2(
+    func: JetRoute,
+    ctx?: JetContext<any, any>
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
-    return this._run(func);
+    if (!ctx) {
+      ctx = getCtx(
+        new MockRequest({
+          method: func.method!,
+          url: func.path!,
+          headers: new Map(),
+          body: null,
+        }) as any,
+        {},
+        func.path!,
+        func,
+        {}
+      ) as any;
+    }
+
+    return this.run1(func, ctx);
   }
   runWithCTX(
     func: JetRoute,
     ctx: JetContext<any, any>
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
-    return this._run(func, ctx);
+    return this.run1(func, ctx);
+  }
+  runBare(
+    func: JetRoute
+  ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+    return this.run2(func);
   }
   createCTX(
     req: Request,

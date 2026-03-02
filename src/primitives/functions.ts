@@ -36,7 +36,7 @@ import {
  *    @see https://wicg.github.io/private-network-access/
  */
 
-const optionsCtx = {
+export const optionsCtx = {
   payload: undefined,
   _2: {
     Vary: 'Origin',
