@@ -6,8 +6,6 @@ import {
   codeGen,
   compileAPI,
   compileUI,
-  corsMiddleware,
-  fs,
   getHandlers,
   getHandlersEdge,
   getLocalIP,
@@ -18,6 +16,8 @@ import { JetPlugin, LOG } from './primitives/classes.js';
 import { readFile } from 'node:fs/promises';
 import { cwd } from 'node:process';
 import path from 'node:path';
+import { corsMiddleware } from './primitives/cors.js';
+import { fs } from './primitives/fs.js';
 
 const html_path = path.join(cwd(),"/node_modules/jetpath/dist/jetpath-doc.html");
 export class Jetpath {

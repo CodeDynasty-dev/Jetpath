@@ -13,8 +13,8 @@ export type UnionToIntersection<U> = (
 export interface JetContext<
   JetData extends {
     body?: Record<string, any>;
-    params?: Record<string, any>;
-    query?: Record<string, any>;
+    params?: Record<string, string>;
+    query?: Record<string, string>;
   } = { body: {}; params: {}; query: {} },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > {
@@ -37,7 +37,7 @@ export interface JetContext<
   /**
    * get route params in /:thing
    */
-  params: JetData['params'];
+  params: Record<string, string>;
   /**
    * websocket socket event class
    */
@@ -112,7 +112,7 @@ export interface JetContext<
     maxBodySize?: number;
     contentType?: string;
   }): Promise<JetData['body']>;
-  parseQuery(): JetData['query'];
+  parseQuery(): Record<string, string>;
   /**
    * Upgrade the request to a WebSocket connection
    */

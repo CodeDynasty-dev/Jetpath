@@ -1,7 +1,6 @@
 // type imports
 import { type IncomingMessage, type ServerResponse } from 'node:http';
 import type {
-  allowedMethods,
   compilerType,
   FileOptions,
   HTTPBody,
@@ -19,125 +18,18 @@ import {
   DateSchema,
   FileSchema,
   JetPlugin,
-  JetSocket,
+  JetSocketInstance,
   LOG,
   NumberSchema,
   ObjectSchema,
   SchemaBuilder,
   SchemaCompiler,
   StringSchema,
-  Trie,
 } from './classes.js';
-
-/**
- * an inbuilt CORS post middleware
- *    @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer/Planned_changes
- *  - {Boolean} privateNetworkAccess handle `Access-Control-Request-Private-Network` request by return `Access-Control-Allow-Private-Network`, default to false
- *    @see https://wicg.github.io/private-network-access/
- */
-
-export const optionsCtx = {
-  payload: undefined,
-  _2: {
-    Vary: 'Origin',
-    Connection: 'keep-alive',
-  },
-  _6: false,
-  code: 204,
-  set(field: string, value: string) {
-    if (field && value) {
-      (this._2 as Record<string, string>)[field] = value;
-    }
-  },
-  request: { method: 'OPTIONS' },
-};
-// Create immutable CORS headers
-const createCorsHeaders = (): Record<string, string> => ({
-  Vary: 'Origin',
-  Connection: 'keep-alive',
-});
-
-// Base CORS headers - will be frozen after initialization
-let baseCorsHeaders: Record<string, string> = createCorsHeaders();
-export function corsMiddleware(options: {
-  exposeHeaders?: string[];
-  allowMethods?: allowedMethods;
-  allowHeaders?: string[];
-  keepHeadersOnError?: boolean;
-  maxAge?: string;
-  credentials?: boolean;
-  secureContext?: {
-    'Cross-Origin-Opener-Policy':
-      | 'same-origin'
-      | 'unsafe-none'
-      | 'same-origin-allow-popups';
-    'Cross-Origin-Embedder-Policy': 'require-corp' | 'unsafe-none';
-  };
-  privateNetworkAccess?: unknown;
-  origin?: string[];
-}) {
-  //
-  options.keepHeadersOnError =
-    options.keepHeadersOnError === undefined || !!options.keepHeadersOnError;
-  //?  pre populate context for Preflight Request
-  if (options.maxAge) {
-    optionsCtx.set('Access-Control-Max-Age', options.maxAge);
-  }
-  if (!options.privateNetworkAccess) {
-    if (options.allowMethods) {
-      optionsCtx.set(
-        'Access-Control-Allow-Methods',
-        options.allowMethods.join(',')
-      );
-    }
-    if (options.secureContext) {
-      optionsCtx.set(
-        'Cross-Origin-Opener-Policy',
-        options.secureContext['Cross-Origin-Embedder-Policy'] || 'unsafe-none'
-      );
-      optionsCtx.set(
-        'Cross-Origin-Embedder-Policy',
-        options.secureContext['Cross-Origin-Embedder-Policy'] || 'unsafe-none'
-      );
-    }
-    if (options.allowHeaders) {
-      optionsCtx.set(
-        'Access-Control-Allow-Headers',
-        options.allowHeaders.join(',')
-      );
-    }
-  }
-  optionsCtx.set('Vary', 'Origin');
-  if (options.credentials === true) {
-    optionsCtx.set('Access-Control-Allow-Credentials', 'true');
-  }
-  if (Array.isArray(options.origin)) {
-    optionsCtx.set('Access-Control-Allow-Origin', options.origin.join(','));
-  }
-  // ? Pre-populate normal response headers.
-  // Create new base CORS headers to avoid mutation
-  baseCorsHeaders = createCorsHeaders();
-
-  //? Add Vary header to indicate response varies based on the Origin header
-  baseCorsHeaders['Vary'] = 'Origin';
-  if (options.credentials === true) {
-    baseCorsHeaders['Access-Control-Allow-Credentials'] = 'true';
-  }
-  if (Array.isArray(options.origin)) {
-    baseCorsHeaders['Access-Control-Allow-Origin'] = options.origin.join(',');
-  }
-  if (options.secureContext) {
-    baseCorsHeaders['Cross-Origin-Opener-Policy'] =
-      options.secureContext['Cross-Origin-Embedder-Policy'];
-    baseCorsHeaders['Cross-Origin-Embedder-Policy'] =
-      options.secureContext['Cross-Origin-Embedder-Policy'];
-  }
-
-  // Freeze the headers to prevent mutation
-  Object.freeze(baseCorsHeaders);
-}
-
-export const JetSocketInstance = new JetSocket();
+import { ctxPool, isNode, runtime, Trie } from './trie-router.js';
+import { optionsCtx } from './cors.js';
+import { fs } from './fs.js';
+import { plugins } from './plugins.js';
 
 export const _JetPath_paths: Record<methods, Record<string, JetRoute>> = {
   GET: {},
@@ -169,86 +61,10 @@ export const _jet_middleware: Record<
   | ((ctx: Context, err?: unknown) => void | Promise<void>)[]
 > = {};
 
-export const ctxPool: Context[] = [];
-export let runtime: Record<
-  'bun' | 'deno' | 'node' | 'edge' | 'cloudflare_worker' | 'aws_lambda',
-  boolean
-> = {
-  bun: false,
-  deno: false,
-  node: false,
-  edge: false,
-  cloudflare_worker: false,
-  aws_lambda: false,
-};
-const plugins: Record<string, () => void> = {};
-// Cache for plugin bindings to avoid creating new objects per request
-const pluginBindingCache = new WeakMap<Context, Record<string, () => void>>();
 
-export function abstractPluginCreator(ctx: Context) {
-  // Return cached bindings if available
-  const cached = pluginBindingCache.get(ctx);
-  if (cached) {
-    return cached;
-  }
 
-  const abstractPlugin: Record<string, () => void> = {};
-  for (const key in plugins) {
-    abstractPlugin[key] = plugins[key].bind(ctx);
-  }
 
-  // Cache the bindings
-  pluginBindingCache.set(ctx, abstractPlugin);
-  return abstractPlugin;
-}
 
-const ae = (cb: { (): unknown; (): unknown; (): void }) => {
-  try {
-    cb();
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-(() => {
-  //? check for bun runtime
-  const bun = ae(() => Bun);
-  //? check for deno runtime
-  // @ts-expect-error to avoid the Deno keyword
-  const deno = ae(() => Deno);
-  let cloudflare_worker = false;
-  let aws_lambda = false;
-  //? check if running in Cloudflare Worker
-  if (
-    typeof (globalThis as unknown as { WebSocketPair: unknown })
-      .WebSocketPair !== 'undefined' &&
-    typeof (globalThis as unknown as { caches: unknown }).caches !==
-      'undefined' &&
-    typeof (globalThis as unknown as { Response: unknown }).Response !==
-      'undefined'
-  ) {
-    cloudflare_worker = true;
-  }
-  // AWS Lambda
-  if (
-    typeof process !== 'undefined' &&
-    process.env?.['AWS_LAMBDA_FUNCTION_NAME']
-  ) {
-    aws_lambda = true;
-  }
-  runtime = {
-    bun,
-    deno,
-    node: !bun && !deno,
-    aws_lambda,
-    cloudflare_worker,
-    edge: cloudflare_worker || aws_lambda,
-  };
-})();
-
-// ? isNode
-export const isNode = runtime['node'];
 // ? server
 export const server = (
   plugs: JetPlugin[],
@@ -388,51 +204,7 @@ export const server = (
   return server!;
 };
 
-export const getCtx = (
-  req: IncomingMessage | Request,
-  res: any,
-  path: string,
-  route: JetRoute,
-  params?: Record<string, any>
-): Context => {
-  if (ctxPool.length) {
-    const ctx = ctxPool.shift()!;
-    // ? reset the Context to default state
-    ctx._7.state = {}; // Clear state completely
-    ctx.request = req;
-    ctx.res = res;
-    ctx.method = req.method as 'GET';
-    ctx.params = params;
-    ctx.$_internal_query = undefined;
-    ctx.$_internal_body = undefined; // ? very important.
-    ctx.path = path;
-    //? load
-    ctx.payload = undefined;
-    // ? header of response - create fresh copy to avoid mutation
-    ctx._2 = { ...baseCorsHeaders };
-    // //? stream
-    ctx._3 = undefined;
-    //? the route handler
-    ctx.handler = route;
-    //? custom response
-    ctx._6 = false;
-    // ? code
-    ctx.code = 200;
-    // ? clear any cached validation
-    ctx.$_internal_validated_body = undefined;
-    return ctx;
-  }
-  const ctx = new Context();
-  // ? add middlewares to the plugins object
-  ctx.request = req;
-  ctx.res = res;
-  ctx._2 = { ...baseCorsHeaders }; // Fresh copy
-  ctx.method = req.method as 'GET';
-  ctx.params = params;
-  ctx.path = path;
-  ctx.handler = route;
-  return ctx;
-};
+
 
 let makeRes: (
   res: ServerResponse<IncomingMessage> & {
@@ -511,13 +283,28 @@ const makeResNode = (
 
     ctx._3.on('error', errorHandler);
     ctx._3.pipe(res);
+    // Return context to pool after stream ends
+    ctx._3.on('end', () => {
+      queueMicrotask(() => {
+        ctxPool.push(ctx);
+      });
+    });
+    ctx._3.on('error', () => {
+      queueMicrotask(() => {
+        ctxPool.push(ctx);
+      });
+    });
     return undefined;
   }
 
   res.writeHead(ctx.code, ctx?._2 || { 'Content-Type': 'text/plain' });
   res.end(ctx?.payload);
+  // Return context to pool for Node.js runtime
+  queueMicrotask(() => {
+    ctxPool.push(ctx);
+  });
   return undefined;
-};
+};;;
 
 if (isNode) {
   makeRes = makeResNode;
@@ -741,134 +528,6 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
   }
 }
 
-export function validator<T extends Record<string, any>>(
-  schema: HTTPBody<T> | undefined,
-  data: any,
-  depth = 0,
-  maxDepth = 20
-): T {
-  if (!schema || typeof data !== 'object') {
-    throw new Error('Invalid schema or data');
-  }
-
-  // Check recursion depth to prevent stack overflow
-  if (depth > maxDepth) {
-    throw new Error(`Jetpath: Maximum validation depth (${maxDepth}) exceeded`);
-  }
-
-  const errors: string[] = [];
-  const out: Partial<T> = {};
-
-  for (const [key, defs] of Object.entries(schema)) {
-    const {
-      RegExp,
-      arrayType,
-      err,
-      objectSchema,
-      required,
-      type,
-      validator: validate,
-    } = defs;
-    const value = data[key];
-
-    // Required check
-    // eslint-disable-next-line eqeqeq
-    if (required && value == null) {
-      errors.push(`${key} is required`);
-      continue;
-    }
-
-    // Skip if optional and undefined
-    // eslint-disable-next-line eqeqeq
-    if (!required && value == null) {
-      continue;
-    }
-
-    // Type validation
-    if (type) {
-      if (type === 'array') {
-        if (!Array.isArray(value)) {
-          errors.push(`${key} must be an array`);
-          continue;
-        }
-        if (arrayType === 'object' && objectSchema) {
-          try {
-            const validatedArray = value.map((item) =>
-              validator(objectSchema, item, depth + 1, maxDepth)
-            );
-            out[key as keyof T] = validatedArray as T[keyof T];
-            continue;
-          } catch (e) {
-            errors.push(`${key}: ${String(e)}`);
-            continue;
-          }
-        } else if (
-          arrayType &&
-          !value.every((item) => typeof item === arrayType)
-        ) {
-          errors.push(`${key} must be an array of ${arrayType}`);
-          continue;
-        }
-      } else if (type === 'object') {
-        if (typeof value !== 'object' || Array.isArray(value)) {
-          errors.push(`${key} must be an object`);
-          continue;
-        }
-        // Handle objectSchema validation
-        if (objectSchema) {
-          try {
-            out[key as keyof T] = validator(
-              objectSchema,
-              value,
-              depth + 1,
-              maxDepth
-            ) as T[keyof T];
-            continue;
-          } catch (e) {
-            errors.push(`${key}: ${String(e)}`);
-            continue;
-          }
-        }
-      } else {
-        if (typeof value !== type) {
-          if (type === 'file' && typeof value === 'object') {
-            out[key as keyof T] = value;
-            continue;
-          }
-          errors.push(`${key} must be of type ${type}`);
-          continue;
-        }
-      }
-    }
-
-    // Regex validation
-    if (RegExp && !RegExp.test(value)) {
-      errors.push(err || `${key} is incorrect`);
-      continue;
-    }
-
-    // Custom validator
-    if (validate) {
-      const result = validate(value);
-      if (result !== true) {
-        errors.push(
-          typeof result === 'string'
-            ? result
-            : err || `${key} validation failed`
-        );
-        continue;
-      }
-    }
-
-    out[key as keyof T] = value;
-  }
-
-  if (errors.length > 0) {
-    throw new Error(errors.join(', '));
-  }
-
-  return out as T;
-}
 
 export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
@@ -1066,248 +725,6 @@ export function assignMiddleware(
   }
 }
 
-export function parseFormData(
-  rawBody: Uint8Array,
-  contentType: string,
-  options: { maxBodySize?: number; maxFileSize?: number } = {}
-) {
-  const { maxBodySize, maxFileSize = 10 * 1024 * 1024 } = options; // Default 10MB max file size
-
-  if (maxBodySize && rawBody.byteLength > maxBodySize) {
-    throw new Error(
-      `Body exceeds max size: ${rawBody.byteLength} > ${maxBodySize}`
-    );
-  }
-
-  const boundaryMatch = contentType.match(/boundary="?([^";]+)"?/i);
-  if (!boundaryMatch) throw new Error('Invalid multipart boundary');
-
-  const boundary = `--${boundaryMatch[1]}`;
-  const boundaryBytes = new TextEncoder().encode(boundary);
-
-  const decoder = new TextDecoder('utf-8');
-  const fields: Record<string, string | string[]> = {};
-  const files: Record<
-    string,
-    { fileName: string; content: Uint8Array; mimeType: string; size: number }
-  > = {};
-
-  const parts = splitBuffer(rawBody, boundaryBytes).slice(1, -1); // remove preamble and epilogue
-
-  for (const part of parts) {
-    const headerEndIndex = indexOfDoubleCRLF(part);
-    if (headerEndIndex === -1) continue;
-
-    const headerBytes = part.slice(0, headerEndIndex);
-    let body = part.slice(headerEndIndex + 4); // Skip \r\n\r\n
-    // 2) Strip leading CRLF
-    if (body[0] === 13 && body[1] === 10) {
-      body = body.slice(2);
-    }
-    // 3) Strip trailing CRLF
-    if (body[body.length - 2] === 13 && body[body.length - 1] === 10) {
-      body = body.slice(0, body.length - 2);
-    }
-    const headerText = decoder.decode(headerBytes);
-    const headers = parseHeaders(headerText);
-
-    const disposition = headers['content-disposition'];
-    if (!disposition) continue;
-
-    const nameMatch = disposition.match(/name="([^"]+)"/);
-    if (!nameMatch) continue;
-
-    const fieldName = nameMatch[1];
-    const fileNameMatch = disposition.match(/filename="([^"]*)"/);
-    const fileName = fileNameMatch?.[1] || null;
-
-    if (fileName) {
-      // Validate file size at parse time
-      if (maxFileSize && body.length > maxFileSize) {
-        throw new Error(
-          `File '${fileName}' exceeds max size: ${body.length} > ${maxFileSize}`
-        );
-      }
-
-      const mimeType = headers['content-type'] || 'application/octet-stream';
-      files[fieldName] = {
-        fileName,
-        content: body,
-        mimeType,
-        size: body.length,
-      };
-    } else {
-      const value = decoder.decode(body);
-      if (fieldName in fields) {
-        const existing = fields[fieldName];
-        fields[fieldName] = Array.isArray(existing)
-          ? [...existing, value]
-          : [existing, value];
-      } else {
-        try {
-          fields[fieldName] = JSON.parse(value.toString());
-        } catch {
-          fields[fieldName] = value;
-        }
-      }
-    }
-  }
-
-  return { ...fields, ...files };
-}
-
-function parseHeaders(headerText: string): Record<string, string> {
-  const headers: Record<string, string> = {};
-  const lines = headerText.split(/\r\n/);
-  for (const line of lines) {
-    const idx = line.indexOf(':');
-    if (idx === -1) continue;
-    const key = line.slice(0, idx).trim().toLowerCase();
-    const val = line.slice(idx + 1).trim();
-    headers[key] = val;
-  }
-  return headers;
-}
-
-function indexOfDoubleCRLF(buffer: Uint8Array): number {
-  for (let i = 0; i < buffer.length - 3; i++) {
-    if (
-      buffer[i] === 13 &&
-      buffer[i + 1] === 10 &&
-      buffer[i + 2] === 13 &&
-      buffer[i + 3] === 10
-    ) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-function splitBuffer(buffer: Uint8Array, delimiter: Uint8Array): Uint8Array[] {
-  const parts: Uint8Array[] = [];
-  let start = 0;
-
-  while (start < buffer.length) {
-    const idx = indexOf(buffer, delimiter, start);
-    if (idx === -1) break;
-    parts.push(buffer.slice(start, idx));
-    start = idx + delimiter.length;
-  }
-
-  if (start <= buffer.length) {
-    parts.push(buffer.slice(start));
-  }
-
-  return parts;
-}
-
-function indexOf(buffer: Uint8Array, search: Uint8Array, from = 0): number {
-  outer: for (let i = from; i <= buffer.length - search.length; i++) {
-    for (let j = 0; j < search.length; j++) {
-      if (buffer[i + j] !== search[j]) continue outer;
-    }
-    return i;
-  }
-  return -1;
-}
-
-export function parseUrlEncoded(
-  bodyText: string
-): Record<string, string | string[]> {
-  const params = new URLSearchParams(bodyText);
-  const result: Record<string, string | string[]> = {};
-  for (const [key, value] of params.entries()) {
-    // eslint-disable-next-line no-prototype-builtins
-    if (result.hasOwnProperty(key)) {
-      if (Array.isArray(result[key])) {
-        result[key].push(value);
-      } else {
-        result[key] = [result[key], value];
-      }
-    } else {
-      result[key] = value;
-    }
-  }
-  return result;
-}
-
-/**
- * Helper for Node.js: Reads the IncomingMessage stream, collecting chunks and checking size.
- */
-function collectRequestBody(
-  req: any,
-  maxBodySize: number
-): Promise<Uint8Array> {
-  return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    let size = 0;
-    req.on('data', (chunk: Buffer) => {
-      size += chunk.length;
-      if (maxBodySize && size > maxBodySize) {
-        reject(new Error('Payload Too Large'));
-        req.destroy();
-        return;
-      }
-      chunks.push(chunk);
-    });
-    req.on('end', () => {
-      resolve(new Uint8Array(Buffer.concat(chunks)));
-    });
-    req.on('error', (err: any) => reject(err));
-  });
-}
-
-/**
- * Reads the request/stream and returns a Promise that resolves to the parsed body.
- */
-export async function parseRequest(
-  req: any,
-  options: {
-    maxBodySize?: number;
-    maxFileSize?: number;
-    contentType?: string;
-  } = {}
-): Promise<Record<string, any>> {
-  const { maxBodySize = 5 * 1024 * 1024, maxFileSize = 10 * 1024 * 1024 } =
-    options;
-  let contentType = options.contentType || '';
-  let rawBody: Uint8Array;
-
-  if (typeof req.arrayBuffer === 'function') {
-    if (!contentType && req.headers && typeof req.headers.get === 'function') {
-      contentType = req.headers.get('content-type') || '';
-    }
-    const arrayBuffer = await req.arrayBuffer();
-    rawBody = new Uint8Array(arrayBuffer);
-    if (rawBody.byteLength > maxBodySize) {
-      throw new Error('Payload Too Large');
-    }
-  } else if (typeof req.on === 'function') {
-    if (!contentType && req.headers) {
-      contentType = req.headers['content-type'] || '';
-    }
-    rawBody = await collectRequestBody(req, maxBodySize);
-  } else {
-    throw new Error('Unsupported request object type');
-  }
-
-  const ct = contentType.toLowerCase();
-  const decoder = new TextDecoder('utf-8');
-  let bodyText: string;
-
-  if (ct.includes('application/json')) {
-    bodyText = decoder.decode(rawBody);
-    return JSON.parse(bodyText || '{}');
-  } else if (ct.includes('application/x-www-form-urlencoded')) {
-    bodyText = decoder.decode(rawBody);
-    return parseUrlEncoded(bodyText);
-  } else if (ct.includes('multipart/form-data')) {
-    return parseFormData(rawBody, contentType, { maxBodySize, maxFileSize });
-  } else {
-    bodyText = decoder.decode(rawBody);
-    return { parsed: bodyText };
-  }
-}
 
 export const v = {
   string: (options?: ValidationOptions) => new StringSchema(options),
@@ -1771,50 +1188,3 @@ export function getLocalIP() {
   }
 }
 
-export const fs = await (async () => {
-  try {
-    // detect edge;
-    const { opendir, readdir, readFile, writeFile } =
-      await import('node:fs/promises');
-    // import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
-    const { dirname, join, resolve, sep } = await import('node:path');
-    // import { dirname, join, resolve, sep } from "node:path";
-    const { cwd } = await import('node:process');
-    // import { cwd } from "node:process";
-
-    const { createReadStream, realpathSync } = await import('node:fs');
-    // import { createReadStream, realpathSync } from "node:fs";
-
-    const { createServer } = await import('node:http');
-    const { networkInterfaces } = await import('node:os');
-    const { execFile } = await import('node:child_process');
-    const { mkdirSync } = await import('node:fs');
-    const { pathToFileURL } = await import('node:url');
-
-    const fils_system_apis = {
-      opendir,
-      readdir,
-      readFile,
-      writeFile,
-      dirname,
-      join,
-      resolve,
-      sep,
-      cwd,
-      createReadStream,
-      realpathSync,
-      createServer,
-      networkInterfaces,
-      execFile,
-      mkdirSync,
-      pathToFileURL,
-    };
-    return () => fils_system_apis;
-  } catch (error) {
-    return () => {
-      throw new Error(
-        'Node.js APIs are not available in this environment. Please ensure you are using edgeGrabber for edge environment, check the edge docs for more information.'
-      );
-    };
-  }
-})();
