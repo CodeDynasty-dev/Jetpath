@@ -83,9 +83,9 @@ let nextId = 1;
 
 // Get all pets
 export const GET_pets = (ctx) => {
-  // Tip: Use ctx.query to handle pagination
-  const page = ctx.query.page || 1;
-  const limit = ctx.query.limit || 10;
+  // Tip: Use ctx.parseQuery() to handle pagination
+  const page = ctx.parseQuery().page || 1;
+  const limit = ctx.parseQuery().limit || 10;
   
   const petsList = Object.values(pets);
   const startIndex = (page - 1) * limit;
@@ -104,7 +104,7 @@ export const POST_pets: JetRoute<
   { body: { name: string; species: string; age: number } }
 > = async (ctx) => {
   await ctx.parse();
-  const { name, species, age } = ctx.body;
+  const { name, species, age } = await ctx.parse();
 
   // Create the pet
   const pet = {

@@ -358,7 +358,7 @@
 //   [AuthPluginType]
 // > = async function (ctx) {
 //   await ctx.parse();
-//   const { username, password } = ctx.body;
+//   const { username, password } = await ctx.parse();
 
 //   const authResult = ctx.plugins.authenticateUser(username, password);
 
@@ -424,7 +424,7 @@
 //     available,
 //     sort = "name",
 //     search,
-//   } = ctx.query;
+//   } = ctx.parseQuery();
 
 //   // Filter pets based on query parameters
 //   let filteredPets = [...pets];
@@ -535,8 +535,8 @@
 //   query: { includeReviews?: boolean };
 // }> = async function (ctx) {
 //   const petId = ctx.params.id;
-//   const includeReviews = ctx.query.includeReviews === true ||
-//     ctx.query.includeReviews === Boolean("true");
+//   const includeReviews = ctx.parseQuery().includeReviews === true ||
+//     ctx.parseQuery().includeReviews === Boolean("true");
 
 //   // Find pet by id
 //   const pet = pets.find((p) => p.id === petId);
@@ -602,7 +602,7 @@
 //   }
 
 //   await ctx.parse();
-//   const petData = ctx.body;
+//   const petData = await ctx.parse();
 
 //   // Generate unique ID and metadata
 //   const newPet = {
@@ -674,7 +674,7 @@
 
 //   const petId = ctx.params.id;
 //   await ctx.parse();
-//   const updatedPetData = ctx.body;
+//   const updatedPetData = await ctx.parse();
 
 //   // Find pet by ID
 //   const index = pets.findIndex((p) => p.id === petId);
@@ -824,7 +824,7 @@
 //     minPrice,
 //     maxPrice,
 //     tags,
-//   } = ctx.query;
+//   } = ctx.parseQuery();
 
 //   // Create filters based on provided parameters
 //   let filteredPets = [...pets];
@@ -1055,7 +1055,7 @@
 //   query: { sort?: string };
 // }> = function (ctx) {
 //   const petId = ctx.params.id;
-//   const sort = ctx.query.sort || "-createdAt"; // Default sort by newest
+//   const sort = ctx.parseQuery().sort || "-createdAt"; // Default sort by newest
 
 //   // Find pet by ID
 //   const pet = pets.find((p) => p.id === petId);
@@ -1143,7 +1143,7 @@
 //   }
 
 //   await ctx.parse();
-//   const { rating, comment } = ctx.body;
+//   const { rating, comment } = await ctx.parse();
 
 //   // Create new review
 //   const newReview = {

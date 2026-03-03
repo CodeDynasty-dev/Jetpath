@@ -168,7 +168,7 @@ new Jetpath().listen();
 
 export const POST_auth_login: JetRoute = async function (ctx) {
   await ctx.parse();
-  const { username, password } = ctx.body;
+  const { username, password } = await ctx.parse();
   
   const authResult = ctx.plugins.authenticateUser(username, password);
   

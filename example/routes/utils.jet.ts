@@ -381,7 +381,7 @@ export const POST_upload: JetRoute<{
 
   try {
     // Parse the multipart/form-data body. Jetpath handles this via use().body() with t.file().
-    // The parsed fields (files and text) are available at ctx.body.
+    // The parsed fields (files and text) are available at await ctx.parse().
     // The sample used ctx.parse() with a maxBodySize option, which is also possible.
     // Let's stick to use().body() for consistency with other routes.
     await ctx.parse({

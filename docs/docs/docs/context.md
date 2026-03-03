@@ -18,7 +18,7 @@ The `Context` object (`ctx`) is the central interface for handling HTTP requests
 // Basic route handler
 export const GET_user = async (ctx) => {
   // Access query parameters
-  const page = ctx.query.page || '1';
+  const page = ctx.parseQuery().page || '1';
   
   // Get request headers
   const authHeader = ctx.get('Authorization');
@@ -193,17 +193,17 @@ export const POST_upload = async (ctx) => {
 ### `body: Promise<Record<string, any>>`
 
   * **Type:** Inferred from Schema (`JetData` generic)
-  * **Description:** Represents the *parsed* request body. It's crucial to understand that `ctx.body` is typically a `Promise` that will resolve to the parsed validated body,  So designed to be a parsed when you want to use it, with support for json, form-data, urlencoded.
+  * **Description:** Represents the *parsed* request body. It's crucial to understand that `await ctx.parse()` is typically a `Promise` that will resolve to the parsed validated body,  So designed to be a parsed when you want to use it, with support for json, form-data, urlencoded.
   * **Example:**
     ```typescript
     // For a POST request with JSON: { "name": "Fluffy", "age": 3 }
     // Define schema: const PetSchema = t.object({ name: t.string(), age: t.number() });
     export const POST_pets = async (ctx) => {
       // Assuming NO pre-processing:
-      console.log(await ctx.body); // undefined (initially)
+      console.log(await ctx.parse()); // undefined (initially)
       await ctx.json();      // Parse the JSON body
-      console.log(await ctx.body); // { name: "Fluffy", age: 3 }
-      const name = (await ctx.body).name; // Access data
+      console.log(await ctx.parse()); // { name: "Fluffy", age: 3 }
+      const name = (await ctx.parse()).name; // Access data
       // ... validation and logic ...
     }
     ```
@@ -216,14 +216,14 @@ export const POST_upload = async (ctx) => {
     ```typescript
     // URL: /search?term=cats&limit=20
     // In handler:
-    const searchTerm = ctx.query.term;   // "cats"
-    const limitStr = ctx.query.limit; // "20"
+    const searchTerm = ctx.parseQuery().term;   // "cats"
+    const limitStr = ctx.parseQuery().limit; // "20"
     ```
   * **Example 2: Using with Validation**
     ```typescript
     // Schema: const SearchQuerySchema = t.object({ term: t.string(), limit: t.coerce.number().positive().optional().default(10) });
     // In handler:
-    const validatedQuery = ctx.validate(SearchQuerySchema); // Validate ctx.query
+    const validatedQuery = ctx.validate(SearchQuerySchema); // Validate ctx.parseQuery()
     const limit = validatedQuery.limit; // 10 (number, default applied)
     ```
     *[cite: tests/app.jet.ts (GET\_pets example uses query params)]*
@@ -420,7 +420,7 @@ Methods returning `never` indicate they terminate the request flow.
 
 ### `parse(options?: { maxBodySize?: number; contentType?: string }): Promise<Record<string, any>>`
 
-  * **Description:** Asynchronously reads and parses the request body specifically as JSON. Populates `ctx.body` upon success. Throws if the body is not valid JSON or has already been consumed. It's often called just before `ctx.validate()` if not using eager pre-processing.
+  * **Description:** Asynchronously reads and parses the request body specifically as JSON. Populates `await ctx.parse()` upon success. Throws if the body is not valid JSON or has already been consumed. It's often called just before `ctx.validate()` if not using eager pre-processing.
   * **Example:**
     ```typescript
     // In a POST handler expecting JSON:
