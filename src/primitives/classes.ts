@@ -778,12 +778,27 @@ export class JetServer {
     Object.assign(this.options, options || {});
   }
   makeRes(ctx: any) {
+    const contentType: string = ctx!._2?.['Content-Type'] || '';
+    const isJson =
+      contentType.includes('application/json') ||
+      (!contentType &&
+        typeof ctx!.payload === 'string' &&
+        ctx!.payload?.trimStart().startsWith('{')) ||
+      ctx!.payload?.trimStart().startsWith('[');
     const result = {
       code: ctx!.code,
       body:
         typeof ctx!.payload !== 'string'
           ? ctx!.payload
-          : JSON.parse(ctx!.payload),
+          : isJson
+            ? (() => {
+                try {
+                  return JSON.parse(ctx!.payload);
+                } catch {
+                  return ctx!.payload;
+                }
+              })()
+            : ctx!.payload,
       headers: ctx!._2!,
     };
 
