@@ -65,9 +65,8 @@ export class Trie {
     if (isExactPath) {
       // Store exact paths in hashmap for O(1) lookup
       if (this.hashmap[normalizedPath]) {
-        LOG.log(
-          `Warning: Duplicate route definition for path ${this.method} ${path}`,
-          'warn'
+        throw new Error(
+          `Duplicate route: ${this.method} ${path} is already defined. Each route path must be unique per HTTP method.`
         );
       }
       this.hashmap[normalizedPath] = handler;
@@ -104,9 +103,11 @@ export class Trie {
         // ? Check if a parameter node already exists at this level
         if (currentNode.parameterChild) {
           if (currentNode.parameterChild.paramName !== paramName) {
-            LOG.log(
-              `Warning: Route path conflict at segment '${segment}' in ${this.method} ${path}. Parameter ': ${currentNode.parameterChild.paramName}' already defined at this level.`,
-              'warn'
+            throw new Error(
+              `Route path conflict: Parameter ':${paramName}' in ${this.method} ${path} conflicts with existing parameter ':${currentNode.parameterChild.paramName}' at the same level. ` +
+                `Two different parameter names cannot occupy the same path segment. ` +
+                `Tip: Use a fixed prefix to disambiguate, e.g. instead of GET_resource_$settings and GET_resource_$stats, ` +
+                `use GET_resource_settings_$id and GET_resource_stats_$id.`
             );
           }
 
@@ -167,7 +168,10 @@ export class Trie {
       else {
         if (currentNode.parameterChild) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' conflicts with existing parameter ': ${currentNode.parameterChild.paramName}' at this level in ${this.method} ${path}.`
+            `Route path conflict: Fixed segment '${segment}' in ${this.method} ${path} conflicts with existing parameter ':${currentNode.parameterChild.paramName}' at this level. ` +
+              `A path segment cannot be both a fixed string and a parameter. ` +
+              `Tip: Add a fixed prefix before the parameter, e.g. instead of GET_reviews_$userId and GET_reviews_listing_$listingId, ` +
+              `use GET_reviews_user_$userId and GET_reviews_listing_$listingId.`
           );
         }
         if (currentNode.wildcardChild) {
@@ -186,9 +190,8 @@ export class Trie {
       }
     }
     if (currentNode.handler) {
-      LOG.log(
-        `Warning: Duplicate route definition for path '${path}'.`,
-        'warn'
+      throw new Error(
+        `Duplicate route: ${this.method} ${path} is already defined. Each route path must be unique per HTTP method.`
       );
     }
     //? Set the handler and original path

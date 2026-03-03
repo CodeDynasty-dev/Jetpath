@@ -33,7 +33,7 @@
   </a>
 </div>
 
-In this new v1.11.0 we ran a 210 (passing) tests for performance, reliability and security.
+In this new v1.11.0 we ran a 217 (passing) tests for performance, reliability and security.
 
 ## Why Engineers Choose Jetpath
 

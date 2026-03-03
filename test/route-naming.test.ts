@@ -5,6 +5,7 @@ import {
   assignMiddleware,
 } from '../src/primitives/functions.ts';
 import type { JetRoute } from '../src/primitives/types.ts';
+import { Trie } from '../src/primitives/trie-router.ts';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -166,5 +167,101 @@ describe('assignMiddleware path-prefix matching', () => {
     assignMiddleware(paths, { '/api': mw });
 
     expect(routePublic.jet_middleware).toHaveLength(0);
+  });
+});
+
+describe('Route Conflict Detection', () => {
+  test('fixed segment vs existing param throws with actionable message', () => {
+    const trie = new Trie('GET');
+    const route1: JetRoute = function (_ctx) {};
+    const route2: JetRoute = function (_ctx) {};
+
+    // /reviews/:userId puts a param node at level 2
+    trie.insert('/reviews/:userId', route1);
+    // /reviews/listing/:listingId tries to put fixed 'listing' at level 2 — conflict
+    expect(() => trie.insert('/reviews/listing/:listingId', route2)).toThrow(
+      /Fixed segment 'listing'.*conflicts with existing parameter ':userId'/
+    );
+    // Verify the error includes a fix suggestion
+    expect(() => trie.insert('/reviews/listing/:listingId', route2)).toThrow(
+      /Tip:/
+    );
+  });
+
+  test('different param names at same level throws with actionable message', () => {
+    const trie = new Trie('GET');
+    const route1: JetRoute = function (_ctx) {};
+    const route2: JetRoute = function (_ctx) {};
+
+    trie.insert('/ai/reply/:settings', route1);
+
+    expect(() => trie.insert('/ai/reply/:stats', route2)).toThrow(
+      /Parameter ':stats'.*conflicts with existing parameter ':settings'/
+    );
+    expect(() => trie.insert('/ai/reply/:stats', route2)).toThrow(/Tip:/);
+  });
+
+  test('duplicate exact route throws', () => {
+    const trie = new Trie('POST');
+    const route1: JetRoute = function (_ctx) {};
+    const route2: JetRoute = function (_ctx) {};
+
+    trie.insert('/users', route1);
+
+    expect(() => trie.insert('/users', route2)).toThrow(
+      /Duplicate route.*POST.*\/users/
+    );
+  });
+
+  test('duplicate dynamic route throws', () => {
+    const trie = new Trie('GET');
+    const route1: JetRoute = function (_ctx) {};
+    const route2: JetRoute = function (_ctx) {};
+
+    trie.insert('/users/:id', route1);
+
+    expect(() => trie.insert('/users/:id', route2)).toThrow(
+      /Duplicate route.*GET.*\/users\/:id/
+    );
+  });
+
+  test('same param name at same level is allowed (shared trie node)', () => {
+    const trie = new Trie('GET');
+    const route1: JetRoute = function (_ctx) {};
+    const route2: JetRoute = function (_ctx) {};
+
+    trie.insert('/users/:id/profile', route1);
+    // Same param name, different continuation — should work fine
+    expect(() => trie.insert('/users/:id/settings', route2)).not.toThrow();
+  });
+
+  test('non-conflicting sibling fixed segments work fine', () => {
+    const trie = new Trie('GET');
+    const route1: JetRoute = function (_ctx) {};
+    const route2: JetRoute = function (_ctx) {};
+    const route3: JetRoute = function (_ctx) {};
+
+    trie.insert('/reviews/listing/:listingId', route1);
+    trie.insert('/reviews/user/:userId', route2);
+    trie.insert('/reviews/stats', route3);
+
+    // All three should coexist without conflict
+    expect(trie.hashmap['reviews/stats']).toBe(route3);
+  });
+
+  test('getHandlersEdge isolates per-route errors (good routes survive)', async () => {
+    // Register a param route, then try a conflicting fixed+param route
+    const trie = new Trie('GET');
+    const route1: JetRoute = function (_ctx) {};
+    trie.insert('/items/:id', route1);
+
+    // /items/special/:subId has fixed 'special' conflicting with param ':id' at level 2
+    const route2: JetRoute = function (_ctx) {};
+    expect(() => trie.insert('/items/special/:subId', route2)).toThrow();
+
+    // But exact paths like /items/special (no params) go to hashmap — no conflict
+    const route3: JetRoute = function (_ctx) {};
+    expect(() => trie.insert('/items/special', route3)).not.toThrow();
+    expect(trie.hashmap['items/special']).toBe(route3);
   });
 });

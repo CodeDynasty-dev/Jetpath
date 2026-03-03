@@ -447,19 +447,33 @@ export async function getHandlers(
               } else {
                 // ! HTTP handler
                 if (typeof params !== 'string') {
-                  // ? set the method
-                  module[p]!.method = params[0];
-                  // ? set the path
-                  module[p]!.path = params[1];
-                  // Insert into Trie - it will decide whether to store in hashmap or Trie
-                  _JetPath_paths_trie[params[0] as methods].insert(
-                    params[1],
-                    module[p] as JetRoute
-                  );
-                  // Also store in _JetPath_paths for backward compatibility and middleware assignment
-                  _JetPath_paths[params[0] as methods][params[1]] = module[
-                    p
-                  ] as JetRoute;
+                  try {
+                    // ? set the method
+                    module[p]!.method = params[0];
+                    // ? set the path
+                    module[p]!.path = params[1];
+                    // Insert into Trie - it will decide whether to store in hashmap or Trie
+                    _JetPath_paths_trie[params[0] as methods].insert(
+                      params[1],
+                      module[p] as JetRoute
+                    );
+                    // Also store in _JetPath_paths for backward compatibility and middleware assignment
+                    _JetPath_paths[params[0] as methods][params[1]] = module[
+                      p
+                    ] as JetRoute;
+                  } catch (routeError) {
+                    // ? Per-route error isolation: one bad route doesn't kill the whole file
+                    if (!errorsCount) {
+                      errorsCount = [];
+                    }
+                    errorsCount.push({
+                      file:
+                        source.replace(curr_d + '/', '') +
+                        fs().sep +
+                        dirent.name,
+                      error: String(routeError),
+                    });
+                  }
                 }
               }
             }
@@ -509,19 +523,26 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
       } else {
         // ! HTTP handler
         if (typeof params !== 'string') {
-          // ? set the method
-          modules[p]!.method = params[0];
-          // ? set the path
-          modules[p]!.path = params[1];
-          // Insert into Trie - it will decide whether to store in hashmap or Trie
-          _JetPath_paths_trie[params[0] as methods].insert(
-            params[1],
-            modules[p] as JetRoute
-          );
-          // Also store in _JetPath_paths for backward compatibility and middleware assignment
-          _JetPath_paths[params[0] as methods][params[1]] = modules[
-            p
-          ] as JetRoute;
+          try {
+            // ? set the method
+            modules[p]!.method = params[0];
+            // ? set the path
+            modules[p]!.path = params[1];
+            // Insert into Trie - it will decide whether to store in hashmap or Trie
+            _JetPath_paths_trie[params[0] as methods].insert(
+              params[1],
+              modules[p] as JetRoute
+            );
+            // Also store in _JetPath_paths for backward compatibility and middleware assignment
+            _JetPath_paths[params[0] as methods][params[1]] = modules[
+              p
+            ] as JetRoute;
+          } catch (routeError) {
+            LOG.log(
+              `Route ${params[0]} ${params[1]} skipped: ${String(routeError)}`,
+              'warn'
+            );
+          }
         }
       }
     }
