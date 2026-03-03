@@ -33,9 +33,11 @@
   </a>
 </div>
 
+In this new v1.11.0 we ran a 210 (passing) tests for performance, reliability and security.
+
 ## Why Engineers Choose Jetpath
 
-Every framework promises to be fast and easy but they are not, here is Jetpath.
+Every framework promises to be fast and simple but they are not.
 
 ```ts
 // This is a complete API endpoint in Jetpath
@@ -46,29 +48,23 @@ export const GET_users_$id: JetRoute = async function (ctx) {
 };
 ```
 
-Jetpath eliminates the cognitive overhead that slows down development. No router configuration, middleware chains, or callback hell. Only pure functions that map directly to HTTP endpoints through a clean, predictable naming convention.
+Jetpath eliminates the cognitive overhead that slows down development in many ways, you only write functions that map directly to HTTP endpoints through a clean, predictable naming convention.
 
 **The tech stack you already trust, but faster:**
 - Write APIs in TypeScript/JavaScript across Node.js, Deno, or Bun
-- ~50% less code than Express with stronger type safety
-- [Benchmarks](https://github.com/CodeDynasty-dev/jetpath-benchmark) show massive throughput compared to Elysia.js *(JS faster Framework).
+- ~25% less code than Express with stronger type safety
+- [Benchmarks](https://github.com/CodeDynasty-dev/jetpath-benchmark) show massive throughput compared to Elysia.js *(bunJS fastest Framework).
 
 ## Core Design Principles
 
-Jetpath is built with strong opinions on what matters most:
+Jetpath is built with strong opinions on what matters to you:
 
-1. **Zero config by default** - Convention eliminates boilerplate
+1. **Zero config by default**
 2. **Runtime agnostic** - True support for Node.js, Deno, and Bun, AWS Lambda and cloudflare workers.
-3. **Type safety** - Full TypeScript support that doesn't get in your way
-4. **Predictable routing** - Routes derived from function names (GET_users_$id → GET /users/:id)
-5. **Built for production** - Security, validation, and error handling baked in
-
-## In Production
-
-I am using Jetpath in production and here are the results.
-- 40% reduction in API codebase size
-- Simplified onboarding for new team members
-- Faster iterations on API endpoints
+3. **Type safety**
+4. **Predictable routing** - Routes derived from function names *(GET_users_$id → GET /users/:id)
+5. **Built for production**
+6. **Faster iteraction**
 
 ## Quick Start
 
@@ -123,21 +119,9 @@ export const GET_live: JetRoute = (ctx) => {
 };
 ```
 
-## Key Features
-
-- **Unified dev experience** across Node.js, Deno, Bun and the edge
-- **Auto-generated API documentation** with interactive UI
-- **First-class WebSocket support**
-- **Plugin system** for extending functionality
-- **Schema validation** that is part of api documentation
-- **Request parsing** Inbuilt (JSON, forms, multipart)
-- **Performance-optimized** routing and middleware execution
-- **Security** Great defaults
-- **Cross runtime** runs everywhere.
-
 ## Real Performance
 
-It's not just a claim how fast - measure it. In the [benchmark suite](hhttps://github.com/CodeDynasty-dev/jetpath-benchmark), Jetpath consistently perform close to raw Bunjs performance matches elysia.js on common API workloads:
+It's not just a claim how fast - measure it. In the [benchmark suite](hhttps://github.com/CodeDynasty-dev/jetpath-benchmark), Jetpath consistently perform close to raw Bunjs performance and matches elysia.js on common API workloads:
 
 | Framework | Requests/sec | Latency (avg)
 |-----------|-------------|---------------|
@@ -145,7 +129,7 @@ It's not just a claim how fast - measure it. In the [benchmark suite](hhttps://g
 | Elysia   | ~33,383       | 13.2ms         |
 | Jetpath   | ~32,339      | 13.7ms         |
 
-*4-core CPU, 1000 concurrent connections and 1,000,000 requests, simple JSON response*
+*12-core CPU, 32gb Ram, 1000 concurrent connections and 1,000,000 requests, simple JSON response*
 
 Bunjs being amongst the fastest http runtime.
 
