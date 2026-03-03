@@ -4,7 +4,8 @@ export const fs = await (async () => {
     const { opendir, readdir, readFile, writeFile } =
       await import('node:fs/promises');
     // import { opendir, readdir, readFile, writeFile } from "node:fs/promises";
-    const { dirname, join, resolve, sep } = await import('node:path');
+    const { dirname, join, resolve, sep, relative, isAbsolute } =
+      await import('node:path');
     // import { dirname, join, resolve, sep } from "node:path";
     const { cwd } = await import('node:process');
     // import { cwd } from "node:process";
@@ -27,6 +28,8 @@ export const fs = await (async () => {
       join,
       resolve,
       sep,
+      relative,
+      isAbsolute,
       cwd,
       createReadStream,
       realpathSync,
