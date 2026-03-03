@@ -19,7 +19,10 @@ import path from 'node:path';
 import { corsMiddleware } from './primitives/cors.js';
 import { fs } from './primitives/fs.js';
 
-const html_path = path.join(cwd(),"/node_modules/jetpath/dist/jetpath-doc.html");
+const html_path = path.join(
+  cwd(),
+  '/node_modules/jetpath/dist/jetpath-doc.html'
+);
 export class Jetpath {
   public server: {
     listen: any;
@@ -81,9 +84,9 @@ export class Jetpath {
   async listen(): Promise<void> {
     // ? {-view-} here is replaced at build time to html
     const UI = await readFile(html_path, {
-      encoding: "utf-8",
+      encoding: 'utf-8',
     });
-    
+
     if (!this.options.source) {
       LOG.log(
         'Jetpath: Provide a source directory to avoid scanning the root directory',
@@ -113,7 +116,10 @@ export class Jetpath {
         await codeGen(
           this.options.source || '.',
           this.options.strictMode as 'ON' | 'WARN',
-          { local: `http://localhost:${this.options.port}`, external: `http://${localIP}:${this.options.port}` },
+          {
+            local: `http://localhost:${this.options.port}`,
+            external: `http://${localIP}:${this.options.port}`,
+          },
           this.options.generatedRoutesFilePath
         );
       }
@@ -128,7 +134,10 @@ export class Jetpath {
       await codeGen(
         this.options.source || '.',
         this.options?.strictMode as 'ON' | 'WARN',
-        { local: `http://localhost:${this.options.port}`, external: `http://${localIP}:${this.options.port}` },
+        {
+          local: `http://localhost:${this.options.port}`,
+          external: `http://${localIP}:${this.options.port}`,
+        },
         this.options.generatedRoutesFilePath
       );
       // ? render API in a .HTTP file
@@ -179,7 +188,7 @@ export class Jetpath {
 
     this.server.listen(this.options.port);
     LOG.log(`Open http://localhost:${this.options.port}`, 'info');
-    // ? show external IP 
+    // ? show external IP
     if (localIP) {
       LOG.log(`External: http://${localIP}:${this.options.port}`, 'info');
     }
@@ -189,7 +198,7 @@ export class Jetpath {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, compiledAPI] = compileAPI(this.options);
     const name = this.options?.apiDoc?.path || '/api-doc';
-    _JetPath_paths_trie['GET'].insert(name, (ctx) => {
+    _JetPath_paths_trie['GET'].insert(name, (ctx: any) => {
       UI = compileUI(UI, this.options, compiledAPI);
       if (this.options.apiDoc?.username && this.options.apiDoc?.password) {
         const authHeader = ctx.get('authorization');

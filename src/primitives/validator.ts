@@ -1,4 +1,4 @@
-import type { HTTPBody } from './types';
+import type { HTTPBody } from './types.js';
 
 export function validator<T extends Record<string, any>>(
   schema: HTTPBody<T> | undefined,
@@ -18,7 +18,16 @@ export function validator<T extends Record<string, any>>(
   const errors: string[] = [];
   const out: Partial<T> = {};
 
-  for (const [key, defs] of Object.entries(schema)) {
+  for (const [key, defsRaw] of Object.entries(schema)) {
+    const defs = defsRaw as {
+      RegExp?: RegExp;
+      arrayType?: string;
+      err?: string;
+      objectSchema?: HTTPBody<any>;
+      required?: boolean;
+      type?: string;
+      validator?: (v: any) => boolean | string;
+    };
     const {
       RegExp,
       arrayType,

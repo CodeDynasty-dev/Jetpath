@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'http';
-import { Context, LOG } from './classes';
-import { baseCorsHeaders } from './cors';
-import type { JetRoute } from './types';
+import { Context, LOG } from './classes.js';
+import { baseCorsHeaders } from './cors.js';
+import type { JetRoute } from './types.js';
 
 class TrieNode {
   // ? child nodes

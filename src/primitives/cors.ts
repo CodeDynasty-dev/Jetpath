@@ -1,4 +1,4 @@
-import type { allowedMethods } from './types';
+import type { allowedMethods } from './types.js';
 
 /**
  * an inbuilt CORS post middleware

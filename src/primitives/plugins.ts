@@ -1,4 +1,4 @@
-import type { Context } from './classes';
+import type { Context } from './classes.js';
 
 export const plugins: Record<string, () => void> = {};
 
