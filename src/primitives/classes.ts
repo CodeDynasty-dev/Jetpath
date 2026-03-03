@@ -14,7 +14,7 @@ import type {
 } from './types.js';
 import { mime } from '../extracts/mimejs-extract.js';
 import type { BunFile } from 'bun';
-import { getCtx, runtime } from './trie-router.js';
+import { getCtx, runtime, ctxPool } from './trie-router.js';
 import { parseRequest } from './parser.js';
 import { optionsCtx } from './cors.js';
 import { validator } from './validator.js';
@@ -742,8 +742,6 @@ export class SchemaCompiler {
   }
 }
 
-
-
 class MockRequest {
   method: string;
   url: string;
@@ -780,7 +778,7 @@ export class JetServer {
     Object.assign(this.options, options || {});
   }
   makeRes(ctx: any) {
-    return {
+    const result = {
       code: ctx!.code,
       body:
         typeof ctx!.payload !== 'string'
@@ -788,6 +786,15 @@ export class JetServer {
           : JSON.parse(ctx!.payload),
       headers: ctx!._2!,
     };
+
+    // Return context to pool for test environments
+    if (ctx.__jet_pool) {
+      queueMicrotask(() => {
+        ctxPool.push(ctx);
+      });
+    }
+
+    return result;
   }
   private async run1(func: JetRoute, ctx?: JetContext<any, any>) {
     if (func.method === 'OPTIONS') {
