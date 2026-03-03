@@ -13,10 +13,10 @@ describe('Security Tests - Input Handling', () => {
   test('Route handles SQL injection strings in response safely', async () => {
     const GET_security_sql: JetRoute = function (ctx) {
       // Simulate receiving a query param via parseQuery
-      const query = ctx.parseQuery<{ search?: string }>();
-      const search = query.search || '';
+      const query = ctx.parseQuery();
+      const search = (query.search as string) || '';
       ctx.send({ search, safe: true });
-    };;
+    };
     GET_security_sql.method = 'GET';
     GET_security_sql.path = '/security/sql';
 
@@ -27,8 +27,8 @@ describe('Security Tests - Input Handling', () => {
 
   test('Route handles XSS strings in response safely', async () => {
     const GET_security_xss: JetRoute = function (ctx) {
-      const query = ctx.parseQuery<{ input?: string }>();
-      const userInput = query.input || '';
+      const query = ctx.parseQuery();
+      const userInput = (query.input as string) || '';
       ctx.send({ input: userInput, sanitized: true });
     };
     GET_security_xss.method = 'GET';
@@ -76,8 +76,8 @@ describe('Security Tests - Input Handling', () => {
 
   test('Path traversal strings do not crash route handler', async () => {
     const GET_path: JetRoute = function (ctx) {
-      const query = ctx.parseQuery<{ path?: string }>();
-      ctx.send({ path: query.path || '', safe: true });
+      const query = ctx.parseQuery();
+      ctx.send({ path: (query.path as string) || '', safe: true });
     };
     GET_path.method = 'GET';
     GET_path.path = '/path-test';
@@ -317,5 +317,241 @@ describe('Security Tests - Cookie Handling', () => {
     // clearCookie calls setCookie with empty value and maxAge:0
     // maxAge:0 is falsy so Max-Age is not appended (framework behavior)
     expect(result.headers['set-cookie']).toContain('session');
+  });
+});
+
+describe('Security Tests - Cookie Serialization Edge Cases', () => {
+  let jetServer: JetServer;
+
+  beforeEach(() => {
+    jetServer = new JetServer();
+  });
+
+  test('setCookie with sameSite=lax', async () => {
+    const route: JetRoute = function (ctx) {
+      ctx.setCookie('pref', 'dark', { sameSite: 'lax' });
+      ctx.send({ ok: true });
+    };
+    route.method = 'GET';
+    route.path = '/cookie-samesite';
+
+    const result = await jetServer.runBare(route);
+    expect(result.headers['set-cookie']).toContain('SameSite=lax');
+  });
+
+  test('setCookie with domain and path', async () => {
+    const route: JetRoute = function (ctx) {
+      ctx.setCookie('token', 'xyz', { domain: 'example.com', path: '/app' });
+      ctx.send({ ok: true });
+    };
+    route.method = 'GET';
+    route.path = '/cookie-domain';
+
+    const result = await jetServer.runBare(route);
+    const cookie = result.headers['set-cookie'];
+    expect(cookie).toContain('Domain=');
+    expect(cookie).toContain('Path=');
+  });
+
+  test('setCookie with expires date', async () => {
+    const route: JetRoute = function (ctx) {
+      ctx.setCookie('exp', 'val', { expires: new Date('2030-01-01') });
+      ctx.send({ ok: true });
+    };
+    route.method = 'GET';
+    route.path = '/cookie-expires';
+
+    const result = await jetServer.runBare(route);
+    expect(result.headers['set-cookie']).toContain('Expires=');
+  });
+
+  test('multiple setCookie calls accumulate cookies', async () => {
+    const route: JetRoute = function (ctx) {
+      ctx.setCookie('a', '1', {});
+      ctx.setCookie('b', '2', {});
+      ctx.send({ ok: true });
+    };
+    route.method = 'GET';
+    route.path = '/multi-cookie';
+
+    const result = await jetServer.runBare(route);
+    const cookie = result.headers['set-cookie'];
+    expect(cookie).toContain('a=');
+    expect(cookie).toContain('b=');
+  });
+
+  test('getCookie reads cookie from request header', async () => {
+    const route: JetRoute = function (ctx) {
+      const val = ctx.getCookie('session');
+      ctx.send({ val });
+    };
+    route.method = 'GET';
+    route.path = '/get-cookie';
+
+    const req = new Request('http://localhost/get-cookie', {
+      headers: { cookie: 'session=mytoken; other=val' },
+    });
+    const ctx = jetServer.createCTX(
+      req,
+      new Response(),
+      '/get-cookie',
+      route,
+      {}
+    );
+    const result = await jetServer.runWithCTX(route, ctx);
+    expect(result.body.val).toBe('mytoken');
+  });
+
+  test('getCookies returns all cookies as object', async () => {
+    const route: JetRoute = function (ctx) {
+      const cookies = ctx.getCookies();
+      ctx.send({ cookies });
+    };
+    route.method = 'GET';
+    route.path = '/get-cookies';
+
+    const req = new Request('http://localhost/get-cookies', {
+      headers: { cookie: 'a=1; b=2; c=3' },
+    });
+    const ctx = jetServer.createCTX(
+      req,
+      new Response(),
+      '/get-cookies',
+      route,
+      {}
+    );
+    const result = await jetServer.runWithCTX(route, ctx);
+    expect(result.body.cookies.a).toBe('1');
+    expect(result.body.cookies.b).toBe('2');
+    expect(result.body.cookies.c).toBe('3');
+  });
+});
+
+describe('Security Tests - ctx.get() and ctx.set()', () => {
+  let jetServer: JetServer;
+
+  beforeEach(() => {
+    jetServer = new JetServer();
+  });
+
+  test('ctx.get() reads request header', async () => {
+    const route: JetRoute = function (ctx) {
+      const ua = ctx.get('user-agent');
+      ctx.send({ ua });
+    };
+    route.method = 'GET';
+    route.path = '/headers';
+
+    const req = new Request('http://localhost/headers', {
+      headers: { 'user-agent': 'TestAgent/1.0' },
+    });
+    const ctx = jetServer.createCTX(req, new Response(), '/headers', route, {});
+    const result = await jetServer.runWithCTX(route, ctx);
+    expect(result.body.ua).toBe('TestAgent/1.0');
+  });
+
+  test('ctx.set() adds response header', async () => {
+    const route: JetRoute = function (ctx) {
+      ctx.set('X-Request-Id', 'abc-123');
+      ctx.send({ ok: true });
+    };
+    route.method = 'GET';
+    route.path = '/set-header';
+
+    const result = await jetServer.runBare(route);
+    expect(result.headers['X-Request-Id']).toBe('abc-123');
+  });
+
+  test('ctx.send() called twice — last call wins (no guard on payload)', async () => {
+    // The framework guards on _6 (sendResponse) or _3 (stream), not on payload.
+    // Calling send() twice overwrites the payload — last write wins.
+    const route: JetRoute = function (ctx) {
+      ctx.send({ first: true });
+      ctx.send({ second: true });
+    };
+    route.method = 'GET';
+    route.path = '/double-send';
+
+    const result = await jetServer.runBare(route);
+    expect(result.code).toBe(200);
+    // Second send overwrites first
+    expect(result.body.second).toBe(true);
+  });
+});
+
+describe('Security Tests - parseQuery with real query strings', () => {
+  let jetServer: JetServer;
+
+  beforeEach(() => {
+    jetServer = new JetServer();
+  });
+
+  test('parseQuery parses simple query string', async () => {
+    const route: JetRoute = function (ctx) {
+      const q = ctx.parseQuery();
+      ctx.send({ q });
+    };
+    route.method = 'GET';
+    route.path = '/search';
+
+    const req = new Request('http://localhost/search?name=Alice&age=30');
+    const ctx = jetServer.createCTX(req, new Response(), '/search', route, {});
+    const result = await jetServer.runWithCTX(route, ctx);
+    expect(result.body.q.name).toBe('Alice');
+    expect(result.body.q.age).toBe('30');
+  });
+
+  test('parseQuery parses nested bracket notation', async () => {
+    const route: JetRoute = function (ctx) {
+      const q = ctx.parseQuery();
+      ctx.send({ q });
+    };
+    route.method = 'GET';
+    route.path = '/nested';
+
+    const req = new Request(
+      'http://localhost/nested?filter[name]=Bob&filter[age]=25'
+    );
+    const ctx = jetServer.createCTX(req, new Response(), '/nested', route, {});
+    const result = await jetServer.runWithCTX(route, ctx);
+    expect(result.body.q.filter.name).toBe('Bob');
+    expect(result.body.q.filter.age).toBe('25');
+  });
+
+  test('parseQuery returns empty object when no query string', async () => {
+    const route: JetRoute = function (ctx) {
+      const q = ctx.parseQuery();
+      ctx.send({ q });
+    };
+    route.method = 'GET';
+    route.path = '/no-query';
+
+    const req = new Request('http://localhost/no-query');
+    const ctx = jetServer.createCTX(
+      req,
+      new Response(),
+      '/no-query',
+      route,
+      {}
+    );
+    const result = await jetServer.runWithCTX(route, ctx);
+    expect(result.body.q).toEqual({});
+  });
+
+  test('parseQuery decodes percent-encoded values', async () => {
+    const route: JetRoute = function (ctx) {
+      const q = ctx.parseQuery();
+      ctx.send({ q });
+    };
+    route.method = 'GET';
+    route.path = '/encoded';
+
+    const req = new Request(
+      'http://localhost/encoded?msg=hello%20world&email=user%40example.com'
+    );
+    const ctx = jetServer.createCTX(req, new Response(), '/encoded', route, {});
+    const result = await jetServer.runWithCTX(route, ctx);
+    expect(result.body.q.msg).toBe('hello world');
+    expect(result.body.q.email).toBe('user@example.com');
   });
 });
