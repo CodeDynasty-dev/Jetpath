@@ -18,6 +18,7 @@ import { cwd } from 'node:process';
 import path from 'node:path';
 import { corsMiddleware } from './primitives/cors.js';
 import { fs } from './primitives/fs.js';
+import { _rebuildCorsCloner, preSeedPool } from './primitives/trie-router.js';
 
 const html_path = path.join(
   cwd(),
@@ -54,6 +55,9 @@ export class Jetpath {
       keepHeadersOnError: true,
       ...(typeof options?.cors === 'object' ? options.cors : {}),
     });
+    _rebuildCorsCloner();
+    // ? pre-seed context pool to avoid cold-start allocations
+    preSeedPool(256);
     //?
     if (!this.options.port) this.options.port = 8080;
   }

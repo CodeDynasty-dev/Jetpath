@@ -2,22 +2,13 @@ import type { Context } from './classes.js';
 
 export const plugins: Record<string, () => void> = {};
 
-// Cache for plugin bindings to avoid creating new objects per request
-const pluginBindingCache = new WeakMap<Context, Record<string, () => void>>();
-
 export function abstractPluginCreator(ctx: Context) {
-  // Return cached bindings if available
-  const cached = pluginBindingCache.get(ctx);
-  if (cached) {
-    return cached;
-  }
-
+  // ? fast path: no plugins registered — return empty object without iteration
+  const keys = Object.keys(plugins);
+  if (keys.length === 0) return {};
   const abstractPlugin: Record<string, () => void> = {};
-  for (const key in plugins) {
-    abstractPlugin[key] = plugins[key].bind(ctx);
+  for (let i = 0; i < keys.length; i++) {
+    abstractPlugin[keys[i]] = plugins[keys[i]].bind(ctx);
   }
-
-  // Cache the bindings
-  pluginBindingCache.set(ctx, abstractPlugin);
   return abstractPlugin;
 }

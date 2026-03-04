@@ -199,63 +199,153 @@ export class Trie {
   }
 
   get_responder(req: IncomingMessage | Request, res: any): Context | undefined {
-    let normalizedPath = req.url!;
-    // ? Handle absolute paths in non-node environments
-    if (!isNode) {
-      const pathStart = normalizedPath.indexOf('/', 7);
-      normalizedPath =
-        pathStart >= 0 ? normalizedPath.slice(pathStart) : normalizedPath;
-    }
-    //? Handle query parameters first
-    const queryIndex = normalizedPath.indexOf('?');
-    if (queryIndex > -1) {
-      // ? Extract query parameters
-      normalizedPath = normalizedPath.slice(0, queryIndex);
-    }
-    // ? Handle leading and trailing slashes
-    if (normalizedPath.startsWith('/')) {
-      normalizedPath = normalizedPath.slice(1);
-    }
-    // ? Handle trailing slash
-    if (normalizedPath.endsWith('/') && normalizedPath.length > 0) {
-      normalizedPath = normalizedPath.slice(0, -1);
-    }
-    // ? Check if route is cached in hashmap (after normalization)
-    if (this.hashmap[normalizedPath]) {
-      return getCtx(req, res, normalizedPath, this.hashmap[normalizedPath]!);
-    }
-    // ? Handle empty path
-    if (normalizedPath === '') {
-      if (this.root.handler) {
-        return getCtx(req, res, normalizedPath, this.root.handler, undefined);
+    const url = req.url!;
+    let normalizedPath: string;
+
+    if (isNode) {
+      // ? Node.js: url is already a path like "/" or "/users?q=1"
+      // ? Fast path for root
+      if (url.length === 1) {
+        // url === '/'
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
+        if (this.root.handler)
+          return getCtx(req, res, '', this.root.handler, undefined);
+        return undefined;
       }
+      // ? Strip query string and normalize
+      const qIdx = url.indexOf('?');
+      const end = qIdx > -1 ? qIdx : url.length;
+      // ? strip leading '/' and trailing '/'
+      const s = 1; // always starts with '/'
+      const e = url.charCodeAt(end - 1) === 47 && end > 2 ? end - 1 : end;
+      normalizedPath = url.substring(s, e);
+    } else {
+      // ? Bun/Deno: url is absolute like "http://localhost:3000/" or "http://localhost:3000/users"
+      const pathStart = url.indexOf('/', 7); // skip "http://" or "https:/"
+      // ? Fast path: root "/" with no query
+      if (pathStart >= 0 && pathStart === url.length - 1) {
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
+        if (this.root.handler)
+          return getCtx(req, res, '', this.root.handler, undefined);
+        return undefined;
+      }
+      if (pathStart < 0) {
+        // no path found — treat as root
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
+        if (this.root.handler)
+          return getCtx(req, res, '', this.root.handler, undefined);
+        return undefined;
+      }
+      // ? Strip query string
+      const qIdx = url.indexOf('?', pathStart);
+      const end = qIdx > -1 ? qIdx : url.length;
+      // ? strip leading '/' and trailing '/'
+      const s = pathStart + 1;
+      const e = url.charCodeAt(end - 1) === 47 && end > s + 1 ? end - 1 : end;
+      if (s >= e) {
+        // root path
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
+        if (this.root.handler)
+          return getCtx(req, res, '', this.root.handler, undefined);
+        return undefined;
+      }
+      normalizedPath = url.substring(s, e);
     }
+
+    // ? O(1) hashmap lookup for exact paths (most common case)
+    const exactHandler = this.hashmap[normalizedPath];
+    if (exactHandler) {
+      return getCtx(req, res, normalizedPath, exactHandler);
+    }
+
+    // ? Trie walk for parameterized/wildcard routes
     let currentNode = this.root;
     const params: Record<string, string> = {};
     const segments = normalizedPath.split('/');
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
-      if (currentNode.children.has(segment)) {
-        // ? fixed segment match
-        currentNode = currentNode.children.get(segment)!;
+      const child = currentNode.children.get(segment);
+      if (child) {
+        currentNode = child;
       } else if (currentNode.parameterChild) {
-        // ? parameter segment match
-        const name = currentNode.parameterChild.paramName!;
-        params[name] = decodeURIComponent(segment);
+        params[currentNode.parameterChild.paramName!] =
+          decodeURIComponent(segment);
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
-        // ? wildcard segment match
         params['*'] = segments.slice(i).join('/');
         currentNode = currentNode.wildcardChild;
         break;
       } else {
-        // ? No match
         return undefined;
       }
     }
     if (currentNode.handler) {
-      // ? Route found
       return getCtx(req, res, normalizedPath, currentNode.handler, params);
+    }
+  }
+
+  // ? Bun/Deno optimized responder — uses scratch context to avoid pool overhead
+  get_responder_fast(req: Request): Context | undefined {
+    const url = req.url!;
+    const pathStart = url.indexOf('/', 7);
+    // ? Fast path: root "/" with no query
+    if (pathStart >= 0 && pathStart === url.length - 1) {
+      const h = this.hashmap[''];
+      if (h) return getScratchCtx(req, '', h);
+      if (this.root.handler)
+        return getScratchCtx(req, '', this.root.handler, undefined);
+      return undefined;
+    }
+    if (pathStart < 0) {
+      const h = this.hashmap[''];
+      if (h) return getScratchCtx(req, '', h);
+      if (this.root.handler)
+        return getScratchCtx(req, '', this.root.handler, undefined);
+      return undefined;
+    }
+    const qIdx = url.indexOf('?', pathStart);
+    const end = qIdx > -1 ? qIdx : url.length;
+    const s = pathStart + 1;
+    const e = url.charCodeAt(end - 1) === 47 && end > s + 1 ? end - 1 : end;
+    if (s >= e) {
+      const h = this.hashmap[''];
+      if (h) return getScratchCtx(req, '', h);
+      if (this.root.handler)
+        return getScratchCtx(req, '', this.root.handler, undefined);
+      return undefined;
+    }
+    const normalizedPath = url.substring(s, e);
+    const exactHandler = this.hashmap[normalizedPath];
+    if (exactHandler) {
+      return getScratchCtx(req, normalizedPath, exactHandler);
+    }
+    // ? Trie walk for parameterized/wildcard routes
+    let currentNode = this.root;
+    const params: Record<string, string> = {};
+    const segments = normalizedPath.split('/');
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      const child = currentNode.children.get(segment);
+      if (child) {
+        currentNode = child;
+      } else if (currentNode.parameterChild) {
+        params[currentNode.parameterChild.paramName!] =
+          decodeURIComponent(segment);
+        currentNode = currentNode.parameterChild;
+      } else if (currentNode.wildcardChild) {
+        params['*'] = segments.slice(i).join('/');
+        currentNode = currentNode.wildcardChild;
+        break;
+      } else {
+        return undefined;
+      }
+    }
+    if (currentNode.handler) {
+      return getScratchCtx(req, normalizedPath, currentNode.handler, params);
     }
   }
 }
@@ -268,43 +358,136 @@ export const getCtx = (
   params?: Record<string, any>
 ): Context => {
   if (ctxPool.length) {
-    const ctx = ctxPool.shift()!;
-    // ? reset the Context to default state
-    ctx._7.state = {}; // Clear state completely
+    const ctx = ctxPool.pop()!;
+    // ? clear state — only if it was used (check _dirty flag instead of Object.keys)
+    if (ctx._8) {
+      ctx._7.state = {};
+      ctx._8 = false;
+    }
     ctx.request = req;
     ctx.res = res;
-    ctx.method = req.method as 'GET';
     ctx.params = params;
-    ctx.$_internal_query = undefined;
-    ctx.$_internal_body = undefined; // ? very important.
     ctx.path = path;
-    //? load
     ctx.payload = undefined;
-    // ? header of response - create fresh copy to avoid mutation
-    ctx._2 = { ...baseCorsHeaders };
-    // //? stream
-    ctx._3 = undefined;
-    //? the route handler
+    // ? reset headers — fresh object is faster than delete-loop (avoids dictionary mode)
+    ctx._2 = _cloneCorsHeaders();
     ctx.handler = route;
-    //? custom response
-    ctx._6 = false;
-    // ? code
     ctx.code = 200;
-    // ? clear any cached validation
-    ctx.$_internal_validated_body = undefined;
+    // ? only reset these if they were actually set (avoid unnecessary writes)
+    if (ctx._3) ctx._3 = undefined;
+    if (ctx._6 !== false) ctx._6 = false;
+    if (ctx.$_internal_body) {
+      ctx.$_internal_body = undefined;
+      ctx.$_internal_validated_body = undefined;
+    }
+    if (ctx.$_internal_query) ctx.$_internal_query = undefined;
+    if (ctx._10) ctx._10 = false;
     return ctx;
   }
   const ctx = new Context();
-  // ? add middlewares to the plugins object
   ctx.request = req;
   ctx.res = res;
-  ctx._2 = { ...baseCorsHeaders }; // Fresh copy
   ctx.method = req.method as 'GET';
   ctx.params = params;
   ctx.path = path;
   ctx.handler = route;
   return ctx;
 };
+
+// ? Scratch context for sync fast path — avoids pool push/pop overhead
+// ? Safe because Bun/Deno process fetch handlers synchronously on the main thread
+let _scratchCtx: Context | null = null;
+
+export const getScratchCtx = (
+  req: Request,
+  path: string,
+  route: JetRoute,
+  params?: Record<string, any>
+): Context => {
+  const ctx = _scratchCtx;
+  if (ctx) {
+    // ? mark as in-use so async fallback knows to allocate from pool
+    _scratchCtx = null;
+    // ? minimal reset — only what the handler needs
+    if (ctx._8) {
+      ctx._7.state = {};
+      ctx._8 = false;
+    }
+    ctx.request = req;
+    ctx.params = params;
+    ctx.path = path;
+    ctx.payload = undefined;
+    ctx._10 = false;
+    ctx.handler = route;
+    ctx.code = 200;
+    if (ctx._3) ctx._3 = undefined;
+    if (ctx._6 !== false) ctx._6 = false;
+    if (ctx.$_internal_body) {
+      ctx.$_internal_body = undefined;
+      ctx.$_internal_validated_body = undefined;
+    }
+    if (ctx.$_internal_query) ctx.$_internal_query = undefined;
+    return ctx;
+  }
+  // ? scratch is in use (async handler) — fall back to pool
+  return getCtx(req, undefined, path, route, params);
+};
+
+export const returnScratchCtx = (ctx: Context) => {
+  // ? return scratch context for reuse
+  // ? if scratch slot is empty, reclaim it; otherwise push to pool
+  if (!_scratchCtx) {
+    _scratchCtx = ctx;
+  } else {
+    ctxPool.push(ctx);
+  }
+};
+
+// ? Pre-seed the context pool at module load to avoid cold-start allocations
+export function preSeedPool(count: number) {
+  // ? Initialize scratch context for sync fast path
+  if (!_scratchCtx) {
+    _scratchCtx = new Context();
+  }
+  for (let i = 0; i < count; i++) {
+    ctxPool.push(new Context());
+  }
+}
+
+// ? Pre-baked clone function — avoids spread operator overhead
+// ? Built once at startup, called per-request
+let _cloneCorsHeaders: () => Record<string, string> = () => ({
+  Vary: 'Origin',
+  Connection: 'keep-alive',
+});
+
+// ? Pre-baked JSON headers clone — includes Content-Type: application/json
+// ? Used by send() fast path to swap headers instead of mutating
+export let _cloneJsonHeaders: () => Record<string, string> = () => ({
+  Vary: 'Origin',
+  Connection: 'keep-alive',
+  'Content-Type': 'application/json',
+});
+
+export function _rebuildCorsCloner() {
+  // ? Generate a direct object-literal return function — no loop overhead per request
+  // ? This is rebuilt once after corsMiddleware() runs
+  const keys = Object.keys(baseCorsHeaders);
+  const vals = keys.map((k) => baseCorsHeaders[k]);
+  // ? Build a function body that returns an object literal directly
+  // ? e.g. () => ({ "Vary": "Origin", "Connection": "keep-alive" })
+  const pairs = keys.map(
+    (k, i) => JSON.stringify(k) + ':' + JSON.stringify(vals[i])
+  );
+  _cloneCorsHeaders = new Function(
+    'return {' + pairs.join(',') + '}'
+  ) as () => Record<string, string>;
+  // ? Also build the JSON variant with Content-Type pre-included
+  const jsonPairs = [...pairs, '"Content-Type":"application/json"'];
+  _cloneJsonHeaders = new Function(
+    'return {' + jsonPairs.join(',') + '}'
+  ) as () => Record<string, string>;
+}
 
 export const ctxPool: Context[] = [];
 

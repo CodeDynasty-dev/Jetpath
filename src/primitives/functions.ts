@@ -26,7 +26,15 @@ import {
   SchemaCompiler,
   StringSchema,
 } from './classes.js';
-import { ctxPool, isNode, runtime, Trie } from './trie-router.js';
+import {
+  ctxPool,
+  isNode,
+  runtime,
+  Trie,
+  _rebuildCorsCloner,
+  returnScratchCtx,
+  _cloneJsonHeaders,
+} from './trie-router.js';
 import { optionsCtx } from './cors.js';
 import { fs } from './fs.js';
 import { plugins } from './plugins.js';
@@ -88,7 +96,7 @@ export const server = (
     server = {
       listen(port: number) {
         // @ts-expect-error to avoid the Deno keyword
-        server_else = Deno.serve({ port: port }, Jetpath);
+        server_else = Deno.serve({ port: port }, JetpathBunDeno);
       },
       edge: false,
     };
@@ -98,8 +106,7 @@ export const server = (
       listen() {
         // Cloudflare Worker uses `addEventListener("fetch", ...)`
         addEventListener('fetch', (event: FetchEvent) => {
-          // @ts-expect-error to avoid the FetchEvent error
-          event.respondWith(Jetpath(event.request));
+          event.respondWith(JetpathBunDeno(event.request));
         });
       },
       edge: true,
@@ -116,8 +123,7 @@ export const server = (
             headers: event.headers,
             body: event.body,
           });
-          // @ts-expect-error to avoid the extra arguments error
-          const res = await Jetpath(req);
+          const res = await JetpathBunDeno(req);
           const text = await res.text();
           return {
             statusCode: res.status,
@@ -136,8 +142,7 @@ export const server = (
         listen(port: number) {
           server_else = Bun.serve({
             port,
-            // @ts-expect-error to avoid the extra arguments error
-            fetch: Jetpath,
+            fetch: JetpathBunDeno,
             websocket: {
               message(...p) {
                 p[1] = {
@@ -165,8 +170,7 @@ export const server = (
         listen(port: number) {
           server_else = Bun.serve({
             port,
-            // @ts-expect-error to avoid the extra arguments error
-            fetch: Jetpath,
+            fetch: JetpathBunDeno,
           });
         },
         edge: false,
@@ -193,7 +197,7 @@ export const server = (
       server: !runtime['node'] ? server_else! : server!,
       runtime: runtime,
       routesObject: _JetPath_paths,
-      handler: Jetpath,
+      handler: isNode ? Jetpath : JetpathBunDeno,
       router: _JetPath_paths,
     });
     if (edge_server !== undefined) {
@@ -214,15 +218,16 @@ let makeRes: (
 ) => any;
 
 const makeResBunAndDeno = (_res: any, ctx: Context) => {
-  // ? prepare response
-  // redirect
-  // if (ctx?.code === 301 && ctx._2?.["Location"]) {
-  //   returnCtx(ctx);
-  //   // @ts-ignore
-  //   return Response.redirect(ctx._2?.["Location"]);
-  // }
+  // ? fast path: normal response (most common — no stream, no custom response)
+  if (ctx.payload !== undefined) {
+    const body = ctx.payload;
+    const code = ctx.code;
+    const headers = ctx._10 ? _cloneJsonHeaders() : ctx._2;
+    ctxPool.push(ctx);
+    return new Response(body, { status: code, headers });
+  }
   // ? streaming with ctx.sendStream
-  if (ctx?._3) {
+  if (ctx._3) {
     // handle deno promise.
     // @ts-expect-error to avoid .then error on stream type
     if (runtime['deno'] && ctx._3.then) {
@@ -230,32 +235,29 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
       return ctx._3.then((stream: any) => {
         return new Response(stream?.readable, {
           status: ctx.code,
-          headers: ctx?._2,
+          headers: ctx._2,
         });
       });
     }
-    queueMicrotask(() => {
-      ctxPool.push(ctx);
-    });
-    return new Response(ctx?._3 as unknown as undefined, {
-      status: ctx.code,
-      headers: ctx?._2,
+    const stream = ctx._3;
+    const code = ctx.code;
+    const headers = ctx._2;
+    ctxPool.push(ctx);
+    return new Response(stream as unknown as undefined, {
+      status: code,
+      headers,
     });
   }
   if (ctx._6 !== false) {
-    queueMicrotask(() => {
-      ctxPool.push(ctx);
-    });
-    return ctx?._6;
-  }
-  queueMicrotask(() => {
+    const customRes = ctx._6;
     ctxPool.push(ctx);
-  });
-  // normal response
-  return new Response(ctx?.payload, {
-    status: ctx.code,
-    headers: ctx?._2,
-  });
+    return customRes;
+  }
+  // ? fallback: empty response
+  const code = ctx.code;
+  const headers = ctx._2;
+  ctxPool.push(ctx);
+  return new Response(undefined, { status: code, headers });
 };
 const makeResNode = (
   res: ServerResponse<IncomingMessage> & {
@@ -263,48 +265,40 @@ const makeResNode = (
   },
   ctx: Context
 ) => {
-  // ? prepare response
-  if (ctx?._3) {
-    res.writeHead(ctx?.code, ctx?._2);
-
-    // Handle stream errors with proper cleanup
+  if (ctx._3) {
+    if (ctx._10) ctx._2['Content-Type'] = 'application/json';
+    res.writeHead(ctx.code, ctx._2);
+    const stream = ctx._3;
     const errorHandler = () => {
       res.statusCode = 400;
       res.end('not found');
-      // Clean up stream and context
-      if (ctx._3) {
-        ctx._3.removeAllListeners();
-        // Check if stream has destroy method (Node.js streams)
-        if (typeof (ctx._3 as any).destroy === 'function') {
-          (ctx._3 as any).destroy();
+      if (stream) {
+        stream.removeAllListeners();
+        if (typeof (stream as any).destroy === 'function') {
+          (stream as any).destroy();
         }
       }
     };
-
-    ctx._3.on('error', errorHandler);
-    ctx._3.pipe(res);
-    // Return context to pool after stream ends
-    ctx._3.on('end', () => {
-      queueMicrotask(() => {
-        ctxPool.push(ctx);
-      });
+    stream.on('error', errorHandler);
+    stream.pipe(res);
+    stream.on('end', () => {
+      ctxPool.push(ctx);
     });
-    ctx._3.on('error', () => {
-      queueMicrotask(() => {
-        ctxPool.push(ctx);
-      });
+    stream.on('error', () => {
+      ctxPool.push(ctx);
     });
     return undefined;
   }
-
-  res.writeHead(ctx.code, ctx?._2 || { 'Content-Type': 'text/plain' });
-  res.end(ctx?.payload);
-  // Return context to pool for Node.js runtime
-  queueMicrotask(() => {
-    ctxPool.push(ctx);
-  });
+  const code = ctx.code;
+  // ? for Node, _10 means JSON — need to set Content-Type on _2 since writeHead uses it
+  if (ctx._10) ctx._2['Content-Type'] = 'application/json';
+  const headers = ctx._2;
+  const payload = ctx.payload;
+  ctxPool.push(ctx);
+  res.writeHead(code, headers);
+  res.end(payload);
   return undefined;
-};;;
+};;
 
 if (isNode) {
   makeRes = makeResNode;
@@ -312,7 +306,95 @@ if (isNode) {
   makeRes = makeResBunAndDeno;
 }
 
-const Jetpath = async (
+// ? Bun/Deno: fully inlined handler — no indirection through makeRes variable
+const JetpathBunDeno = (req: Request) => {
+  if (req.method === 'OPTIONS') {
+    optionsCtx.code = 200;
+    return new Response(undefined, {
+      status: 200,
+      headers: optionsCtx._2 as Record<string, string>,
+    });
+  }
+
+  const ctx =
+    _JetPath_paths_trie[req.method as methods].get_responder_fast(req);
+  if (ctx) {
+    const r = ctx.handler!;
+    // ? fast path: no middleware
+    if (!r.jet_middleware?.length) {
+      try {
+        const result = r(ctx as any);
+        // ? most routes are sync and return undefined — skip promise check
+        if (
+          result !== undefined &&
+          typeof (result as any).then === 'function'
+        ) {
+          return (result as Promise<any>).then(
+            () => {
+              const body = ctx.payload;
+              const code = ctx.code;
+              const headers = ctx._10 ? _cloneJsonHeaders() : ctx._2;
+              returnScratchCtx(ctx);
+              return new Response(body, { status: code, headers });
+            },
+            (error: unknown) => {
+              console.log(error);
+              if (ctx.code < 400) ctx.code = 500;
+              const code = ctx.code;
+              const headers = ctx._2;
+              returnScratchCtx(ctx);
+              return new Response(undefined, { status: code, headers });
+            }
+          );
+        }
+        // ? inline makeRes for sync path — hottest path in benchmarks
+        if (ctx.payload !== undefined) {
+          const body = ctx.payload;
+          const code = ctx.code;
+          // ? _10 = true means JSON response (send() skipped _2 mutation)
+          // ? use pre-baked JSON headers to avoid per-request object allocation + mutation
+          const headers = ctx._10 ? _cloneJsonHeaders() : ctx._2;
+          returnScratchCtx(ctx);
+          return new Response(body, { status: code, headers });
+        }
+        if (ctx._3) {
+          const stream = ctx._3;
+          const code = ctx.code;
+          const headers = ctx._2;
+          returnScratchCtx(ctx);
+          return new Response(stream as unknown as undefined, {
+            status: code,
+            headers,
+          });
+        }
+        if (ctx._6 !== false) {
+          const customRes = ctx._6;
+          returnScratchCtx(ctx);
+          return customRes as unknown as Response;
+        }
+        const code = ctx.code;
+        const headers = ctx._2;
+        returnScratchCtx(ctx);
+        return new Response(undefined, { status: code, headers });
+      } catch (error) {
+        console.log(error);
+        if (ctx.code < 400) ctx.code = 500;
+        const code = ctx.code;
+        const headers = ctx._2;
+        returnScratchCtx(ctx);
+        return new Response(undefined, { status: code, headers });
+      }
+    }
+    // ? slow path: has middleware
+    return _runWithMiddleware(r, ctx, undefined);
+  }
+  return new Response(undefined, {
+    status: 404,
+    headers: optionsCtx._2 as Record<string, string>,
+  });
+};
+
+const Jetpath = (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
@@ -323,54 +405,78 @@ const Jetpath = async (
     return makeRes(res, optionsCtx as unknown as Context);
   }
 
-  // Validate HTTP method before casting
-  const method = req.method?.toUpperCase();
-  const ctx = _JetPath_paths_trie[method as methods]?.get_responder(req, res);
-  const returned: ((ctx: any, error?: unknown) => void | Promise<void>)[] = [];
+  const ctx = _JetPath_paths_trie[req.method as methods].get_responder(
+    req,
+    res
+  );
   if (ctx) {
     const r = ctx.handler!;
-    try {
-      //? pre-request middlewares here
-      if (r.jet_middleware?.length) {
-        for (let m = 0; m < r.jet_middleware.length; m++) {
-          const callback = await r.jet_middleware[m](ctx as any);
-          if (typeof callback === 'function') {
-            returned.unshift(callback);
-          }
-        }
-      }
-      //? check if the payload is already set by middleware chain;
-      if (ctx.payload) return makeRes(res, ctx);
-      //? route handler call
-      await r(ctx as any);
-      //? post-request middlewares here
-      for (let r = 0; r < returned.length; r++) {
-        await returned[r](ctx);
-      }
-      return makeRes(res, ctx);
-    } catch (error) {
+    // ? fast path: no middleware
+    if (!r.jet_middleware?.length) {
       try {
-        //? report error to error middleware
-        if (returned.length) {
-          for (let r = 0; r < returned.length; r++) {
-            await returned[r](ctx, error);
-          }
-        } else {
-          console.log(error);
+        const result = r(ctx as any);
+        // ? most routes are sync and return undefined — skip promise check
+        if (
+          result !== undefined &&
+          typeof (result as any).then === 'function'
+        ) {
+          return (result as Promise<any>).then(
+            () => makeRes(res, ctx),
+            (error: unknown) => {
+              console.log(error);
+              if (ctx.code < 400) ctx.code = 500;
+              return makeRes(res, ctx);
+            }
+          );
         }
+        return makeRes(res, ctx);
       } catch (error) {
         console.log(error);
-      } finally {
-        if (!returned.length && ctx.code < 400) {
-          ctx.code = 500;
-        }
+        if (ctx.code < 400) ctx.code = 500;
         return makeRes(res, ctx);
       }
     }
+    // ? slow path: has middleware
+    return _runWithMiddleware(r, ctx, res);
   }
   const ctx404 = optionsCtx;
   ctx404.code = 404;
   return makeRes(res, ctx404 as unknown as Context);
+};
+
+const _runWithMiddleware = async (r: any, ctx: Context, res: any) => {
+  const returned: ((ctx: any, error?: unknown) => void | Promise<void>)[] = [];
+  try {
+    for (let m = 0; m < r.jet_middleware.length; m++) {
+      const callback = await r.jet_middleware[m](ctx as any);
+      if (typeof callback === 'function') {
+        returned.unshift(callback);
+      }
+    }
+    if (ctx.payload) return makeRes(res, ctx);
+    await r(ctx as any);
+    for (let i = 0; i < returned.length; i++) {
+      await returned[i](ctx);
+    }
+    return makeRes(res, ctx);
+  } catch (error) {
+    try {
+      if (returned.length) {
+        for (let i = 0; i < returned.length; i++) {
+          await returned[i](ctx, error);
+        }
+      } else {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (!returned.length && ctx.code < 400) {
+        ctx.code = 500;
+      }
+      return makeRes(res, ctx);
+    }
+  }
 };
 
 const handlersPath = (path: string) => {

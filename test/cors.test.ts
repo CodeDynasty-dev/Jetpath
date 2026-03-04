@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { JetServer } from '../src/index.ts';
 import { corsMiddleware } from '../src/primitives/cors.ts';
+import { _rebuildCorsCloner } from '../src/primitives/trie-router.ts';
 import type { JetRoute } from '../src/primitives/types.ts';
 
 describe('CORS Middleware', () => {
@@ -20,6 +21,7 @@ describe('CORS Middleware', () => {
       allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
       allowHeaders: ['Content-Type', 'Authorization'],
     });
+    _rebuildCorsCloner();
 
     const route: JetRoute = function (ctx) {
       ctx.send({ message: 'CORS test' });
@@ -57,6 +59,7 @@ describe('CORS Middleware', () => {
       origin: ['https://trusted-domain.com'],
       credentials: false,
     });
+    _rebuildCorsCloner();
 
     const route: JetRoute = function (ctx) {
       ctx.send({ message: 'Specific origin' });
@@ -78,6 +81,7 @@ describe('CORS Middleware', () => {
       origin: ['*'], // Wildcard
       credentials: false, // Credentials can't be used with wildcard
     });
+    _rebuildCorsCloner();
 
     const route: JetRoute = function (ctx) {
       ctx.send({ message: 'Wildcard origin' });

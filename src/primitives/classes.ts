@@ -16,7 +16,7 @@ import { mime } from '../extracts/mimejs-extract.js';
 import type { BunFile } from 'bun';
 import { getCtx, runtime, ctxPool } from './trie-router.js';
 import { parseRequest } from './parser.js';
-import { optionsCtx } from './cors.js';
+import { optionsCtx, baseCorsHeaders } from './cors.js';
 import { validator } from './validator.js';
 import { fs } from './fs.js';
 import { abstractPluginCreator } from './plugins.js';
@@ -161,14 +161,19 @@ export class Context {
   handler: JetRoute | null = null;
   __jet_pool = true;
   plugins: Record<string, Function>;
+  // ? state dirty flag — avoids Object.keys() check on pool reuse
+  _8 = false;
   // ? state
   get state(): Record<string, any> {
+    this._8 = true;
     return this._7.state;
   }
   //? load
   payload?: string = undefined;
   // ? header of response
   _2: Record<string, string> = {};
+  // ? true when _2 has been customized (set/send with contentType) — enables lazy clone
+  _10 = false;
   // //? stream
   _3?: Stream = undefined;
   //? response
@@ -180,6 +185,8 @@ export class Context {
   constructor() {
     this.plugins = abstractPluginCreator(this);
     this._7 = new ctxState();
+    // pre-populate headers from baseCorsHeaders
+    for (const k in baseCorsHeaders) this._2[k] = baseCorsHeaders[k];
   }
   send(
     data: unknown,
@@ -187,8 +194,20 @@ export class Context {
     contentType?: string,
     validate = true
   ) {
-    if (this._6 || this._3) {
-      throw new Error('Response already set');
+    // ? fast path: object data, no contentType override (most common benchmark case)
+    if (!contentType && typeof data === 'object') {
+      const responseSchema = this.handler!.response;
+      if (responseSchema && validate) {
+        data = validator(responseSchema, data || {});
+        if (typeof data === 'string') {
+          throw new Error(data);
+        }
+      }
+      // ? skip _2 mutation — mark as JSON, let response path use pre-baked headers
+      this._10 = true;
+      this.payload = JSON.stringify(data);
+      if (statusCode) this.code = statusCode;
+      return;
     }
     if (this.handler!.response && validate) {
       data = validator(this.handler!.response, data || {});
@@ -199,16 +218,10 @@ export class Context {
     if (contentType) {
       this._2['Content-Type'] = contentType;
       this.payload = String(data);
-      if (statusCode) this.code = statusCode;
     } else {
-      if (typeof data === 'object') {
-        this._2['Content-Type'] = 'application/json';
-        this.payload = JSON.stringify(data);
-      } else {
-        this.payload = data ? String(data) : '';
-      }
-      if (statusCode) this.code = statusCode;
+      this.payload = data ? String(data) : '';
     }
+    if (statusCode) this.code = statusCode;
   }
 
   redirect(url: string) {
@@ -778,7 +791,9 @@ export class JetServer {
     Object.assign(this.options, options || {});
   }
   makeRes(ctx: any) {
-    const contentType: string = ctx!._2?.['Content-Type'] || '';
+    const contentType: string = ctx!._10
+      ? 'application/json'
+      : ctx!._2?.['Content-Type'] || '';
     const isJson =
       contentType.includes('application/json') ||
       (!contentType &&
@@ -799,7 +814,9 @@ export class JetServer {
                 }
               })()
             : ctx!.payload,
-      headers: ctx!._2!,
+      headers: ctx!._10
+        ? { ...ctx!._2!, 'Content-Type': 'application/json' }
+        : ctx!._2!,
     };
 
     // Return context to pool for test environments
