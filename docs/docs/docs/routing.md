@@ -12,7 +12,7 @@ Routing in Jetpath is designed to be intuitive, relying on **convention over con
 When you initialize Jetpath, specify a `source` directory for your `.jet.ts` route handler files:
 
 ```typescript
-// index.jet.ts
+// server.jet.ts
 import { Jetpath } from "jetpath";
 
 const app = new Jetpath({
@@ -24,98 +24,119 @@ app.listen();
 
 ### 2. Handler Files (`.jet.ts`)
 
-Files ending with `.jet.ts` are scanned for exported functions that define route handlers. Other `.ts` or `.js` files are ignored for routing but can be imported by your handlers.
+Files ending with `.jet.ts` (or `.jet.js`) are scanned for exported functions that define route handlers. Other `.ts` or `.js` files are ignored for routing but can be imported by your handlers.
 
 ### 3. Export Naming Convention
 
 The core convention lies in the names of the exported functions:
 
-- **Format:** `METHOD_optionalPathSegment`
-- **`METHOD`:** HTTP method prefix (uppercase only):
-  - `GET_`
-  - `POST_`
-  - `PUT_`
-  - `DELETE_`
-  - `PATCH_` 
-  - `HEAD_` 
+- **Format:** `METHOD_optionalPathSegments`
+- **`METHOD`:** HTTP method prefix (uppercase):
+  - `GET_`, `POST_`, `PUT_`, `DELETE_`, `PATCH_`, `HEAD_`
 
 **Examples: In `src/pets.jet.ts`:**
 
 ```typescript
+import { type JetRoute } from "jetpath";
+
 // GET /pets
+export const GET_pets: JetRoute = (ctx) => {
+  ctx.send({ pets: [] });
+};
 
-export const GET_pets: JetRoute = (ctx) => { ... }
-
-// POST /pet
-
-export const POST_pets: JetRoute = async (ctx) => { ... }
+// POST /pets
+export const POST_pets: JetRoute = async (ctx) => {
+  const body = await ctx.parse();
+  ctx.send({ created: true }, 201);
+};
 
 // GET /pets/search
-
-export const GET_pets_search: JetRoute = (ctx) => { ... }
+export const GET_pets_search: JetRoute = (ctx) => {
+  const query = ctx.parseQuery();
+  ctx.send({ results: [], query });
+};
 ```
 
 ### 4. Path Parameters (`$paramName`)
 
-Capture dynamic segments using a `$` prefix in filenames or export names:
+Capture dynamic segments using a `$` prefix in export names:
 
-```typescript 
-// Maps to: GET /pets/by/:id
-export const GET_pets_by$id: JetRoute = (ctx) => {
+```typescript
+import { type JetRoute } from "jetpath";
+
+// Maps to: GET /pets/:id
+export const GET_pets_$id: JetRoute = (ctx) => {
   const petId = ctx.params.id;
-  // ...
-}; 
+  ctx.send({ petId });
+};
 
-
-
-
- // Maps to: GET /pets/petBy/:id/:slug
-
-export const GET_pets_petBy$id$slug: JetRoute = (ctx) => {
-  
+// Maps to: GET /pets/:id/:slug
+export const GET_pets_$id_$slug: JetRoute = (ctx) => {
   const petId = ctx.params.id;
-
   const slug = ctx.params.slug;
-
-  // ...
-  
-}; 
+  ctx.send({ petId, slug });
+};
 ```
 
 ### 5. Catch-all Routes (`$0`)
 
-Match multiple path segments using `$0
-`:
+Match multiple path segments using `$0`:
 
-```typescript 
-// Maps to GET /*
+```typescript
+import { type JetRoute } from "jetpath";
+
+// Maps to: GET /*
 export const GET_$0: JetRoute = (ctx) => {
-  const filePath = ctx.params.$0; // e.g., "file.txt" from
+  const filePath = ctx.params['*']; // e.g., "images/photo.jpg"
   ctx.sendStream(filePath, {
-      folder: "./files", 
-    });
-}; 
-
- 
-```
-
-### 6. WebSocket Routes (`WS`) via `ctx.upgrade()`
-
-```typescript 
-// Maps to ws://your-host/live
-export const GET_live: JetRoute = (ctx) => {
-  ctx.upgrade();
-  const conn = ctx.connection!;
-  conn.addEventListener("open", (socket) => { /* ... */ });
-  conn.addEventListener("message", (socket, event) => { /* ... */ });
-  // ...
+    folder: "./public",
+  });
 };
 ```
 
+### 6. WebSocket Routes via `ctx.upgrade()`
+
+WebSocket connections use a regular `GET_` route with `ctx.upgrade()`. There is no special `WS_` prefix — the upgrade happens at runtime.
+
+```typescript
+import { type JetRoute } from "jetpath";
+
+// Maps to: ws://your-host/live (via GET /live + upgrade)
+export const GET_live: JetRoute = (ctx) => {
+  ctx.upgrade();
+  const conn = ctx.connection!;
+
+  conn.addEventListener("open", (socket) => {
+    socket.send("Welcome!");
+  });
+
+  conn.addEventListener("message", (socket, event) => {
+    socket.send(`Echo: ${event.data}`);
+  });
+
+  conn.addEventListener("close", () => {
+    console.log("Client disconnected");
+  });
+};
+```
+
+Note: WebSocket support requires Bun or Deno. Node.js does not currently support WebSocket upgrades in Jetpath.
+
 ## Route Precedence
 
-Jetpath follows standard routing precedence:
-Static routes (e.g., `/pets/search`) are matched before dynamic routes (`/pets/:id`)  
+Jetpath uses a trie data structure with a hashmap fast-path for exact matches:
+
+1. Exact/static routes (e.g., `/pets/search`) are matched first via O(1) hashmap lookup
+2. Parameterized routes (`/pets/:id`) are matched via trie traversal
+3. Wildcard routes (`/files/*`) match last
+
+This means `/pets/search` will always take priority over `/pets/:id` when the request path is `/pets/search`.
+
+## Tips
+
+- Underscores in export names become `/` path separators: `GET_api_v1_users` → `GET /api/v1/users`
+- Keep route files focused — one resource per `.jet.ts` file (e.g., `users.jet.ts`, `products.jet.ts`)
+- Use `use(route).title()` and `use(route).description()` to document routes for the auto-generated API docs
 
 ## Next Steps
 

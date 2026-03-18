@@ -3,7 +3,7 @@
  
 # Quick Start Guide
 
-Let's build your first Jetpath application! This guide will walk you through creating a simple API server that returns a welcome message.
+Let's build your first Jetpath application! This guide will walk you through creating a simple API server.
 
 ## Prerequisites
 
@@ -24,17 +24,13 @@ my-api/
 ├── src/
 │   ├── app/
 │   │   ├── auth.jet.ts
-│   │   ├── carts.jet.ts
-│   │   ├── products.jet.ts
 │   │   └── users.jet.ts
 │   ├── db/
 │   │   ├── schema.ts
 │   │   ├── interfaces.ts
 │   │   └── index.ts
 │   └── site/
-│       ├── index.html
-│       ├── about.html
-│       └── contact.html
+│       └── index.html
 ├── package.json
 ├── .dockerignore
 ├── .gitignore
@@ -48,79 +44,113 @@ my-api/
 
 ```bash
 cd my-api
-npm install # or yarn install or pnpm install or bun install
+npm install # or bun install
 ```
 
 ## Create Your First Route
 
-Create a file named `users.jet.ts` in the `src` directory:
+Create a file named `users.jet.ts` in the `src/app` directory:
 
 ```typescript
-// src/users.jet.ts
+// src/app/users.jet.ts
 import { type JetRoute, use } from "jetpath";
 
-
-// ? Handles GET requests to the root path ('/')
-
+// Handles GET /users
 export const GET_users: JetRoute = (ctx) => {
-
-   ctx.send({
+  ctx.send({
     message: "Welcome to your first Jetpath API!",
     status: "ok"
   });
-
 };
 
-// ? this appears on this API Doc
-use(GET_users).title("Returns a welcome message and API status.");
-
+// Add title and description for the auto-generated API docs
+use(GET_users)
+  .title("List Users")
+  .description("Returns a welcome message and API status.");
 ```
 
 ## Create the Server Entry Point
 
-Create a file named `server.ts` in your project root:
+Create a file named `server.jet.ts` in your project root (or `src/main.jet.ts`):
 
 ```typescript
-// server.ts
 import { Jetpath } from "jetpath";
-
-// ? the option onject is optional
 
 const app = new Jetpath({
   source: "./src",
   port: 3000,
   apiDoc: {
     name: "My First Jetpath API",
-    info: "This is the documentation for the Quick Start API.",
+    info: "Documentation for the Quick Start API.",
     color: "#7e57c2",
     display: "UI"
   }
 });
 
 app.listen();
-
 ```
 
 ## Run Your Server
 
 ```bash
-bun server.ts
-
+bun server.jet.ts
 # or
-
-node server.ts
-
+node --experimental-strip-types server.jet.ts
 # or
-
-deno run server.ts
+deno run server.jet.ts
 ```
 
 ## Verify It Works
 
-1. Open your browser and navigate to `http://localhost:3000` to see the JSON response
-2. Visit `http://localhost:3000/api-docs` to explore the interactive API documentation
+1. Open your browser and navigate to `http://localhost:3000/users` to see the JSON response
+2. Visit `http://localhost:3000/api-doc` to explore the interactive API documentation
 
-**Congratulations! You've successfully created and run your first Jetpath application!**
+## Add a POST Route with Validation
+
+```typescript
+// src/app/users.jet.ts
+import { type JetRoute, use } from "jetpath";
+
+export const POST_users: JetRoute = async (ctx) => {
+  const body = await ctx.parse();
+  ctx.send({ message: `User ${body.name} created!` }, 201);
+};
+
+use(POST_users)
+  .title("Create User")
+  .description("Creates a new user account.")
+  .body((t) => ({
+    name: t.string().required(),
+    email: t.string().required().email(),
+    age: t.number().required().min(18),
+  }));
+```
+
+The validation schema is automatically enforced when `ctx.parse()` is called, and it also generates interactive API documentation.
+
+## Add Middleware
+
+Create `src/app/middleware.jet.ts`:
+
+```typescript
+import { type JetMiddleware } from "jetpath";
+
+// Global middleware — the MIDDLEWARE_ export name is the convention
+export const MIDDLEWARE_: JetMiddleware = (ctx) => {
+  const start = Date.now();
+  console.log(`→ ${ctx.request.method} ${ctx.path}`);
+
+  return (ctx, err) => {
+    const ms = Date.now() - start;
+    if (err) {
+      ctx.code = ctx.code >= 400 ? ctx.code : 500;
+      ctx.send({ error: String(err) }, ctx.code);
+      return;
+    }
+    console.log(`← ${ctx.code} (${ms}ms)`);
+  };
+};
+```
 
 ## Next Steps
 
@@ -128,6 +158,3 @@ deno run server.ts
 
 
 </docmach>
-
-
-

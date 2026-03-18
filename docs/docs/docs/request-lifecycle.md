@@ -2,49 +2,77 @@
 
 # Request Lifecycle
 
-Understanding Jetpath's request lifecycle is essential for building efficient and maintainable applications. This document outlines the complete journey of a request from request to response.
+Understanding Jetpath's request lifecycle is essential for building efficient and maintainable applications. This document outlines the complete journey of a request from arrival to response.
 
 <img src="/Request-Lifecycle.svg" alt="Request Lifecycle" style="max-width: 550px; margin: 2rem auto;" />
 
-## 1. Request 
+## 1. Route Matching
 
-When a request is received:
+When a request arrives:
 
-- The request path is matched against registered routes
-- A `Context` instance is retrieved from the pool for the request
-- Request metadata is extracted (method, headers, path)
-- Query parameters are normalized
+- The request path is normalized (leading/trailing slashes stripped, query string separated)
+- An O(1) hashmap lookup is attempted for exact static paths (fast path)
+- If no exact match, the trie is walked for parameterized and wildcard routes
+- Route parameters (`:id`, `*`) are extracted during the trie walk
 
-## 2. Pre-Handler Middleware
+## 2. Context Creation
 
-Before reaching the route handler, the request passes through pre-handler middleware:
+A `Context` object is created or reused from the context pool:
 
-- Executed before the route handler
-- Can modify the request or response
-- Used for authentication, validation, rate limiting, and logging
+- The pool avoids allocating a new object per request, reducing GC pressure
+- CORS headers are pre-populated from a cached template
+- Request metadata (method, path, params) is attached
+- State, cookies, and body caches are reset
 
-## 3. Route Handler Execution
+## 3. Pre-Handler Middleware
 
-Once the request reaches the handler:
+Before reaching the route handler, the request passes through middleware pre-handlers:
 
-- The handler executes the business logic
-- Processes request data
-- Generates the response
+- Middleware is matched by path prefix (global `MIDDLEWARE_` first, then scoped)
+- Pre-handlers run in order of specificity (broadest to most specific)
+- Any pre-handler can short-circuit by calling `ctx.send()` (e.g., auth rejection)
+- Post-handler callbacks are collected for later execution
 
-## 4. Post-Processing
+## 4. Route Handler Execution
 
-### Post-Handler Middleware
+The matched route handler runs:
 
-After the handler executes, the response passes through post-handler middleware:
+- `ctx.parse()` parses and validates the request body against the schema
+- `ctx.parseQuery()` parses and validates query parameters
+- `ctx.send()` validates the response against the response schema (if defined)
+- The handler can be sync or async
 
-- Modifies the response as needed
-- Performs final processing
-- Sends the response to the client
+## 5. Post-Handler Middleware
 
-## Error Handling
+After the handler completes (or throws), post-handlers run in reverse order:
 
-Error handling is integrated throughout the lifecycle:
-- Catches and handles errors at each stage
-- Ensures consistent error responses
-- Provides error recovery mechanisms
+- Each post-handler receives `(ctx, err)` where `err` is defined if the handler threw
+- Error handling, response logging, and header additions happen here
+- The first post-handler to call `ctx.send()` determines the error response
+
+## 6. Response
+
+The response is sent to the client:
+
+- For JSON responses, a pre-baked headers clone avoids per-request object creation
+- Set-Cookie headers are sent as separate headers (RFC 6265 compliant)
+- The context is returned to the pool for reuse
+
+## Error Flow
+
+If an error occurs at any stage:
+
+1. The error is caught by Jetpath's internal handler
+2. All collected post-handler middleware functions are called with the error
+3. If no middleware handles it, a generic 500 response is sent
+4. The context is still returned to the pool
+
+## Performance Notes
+
+- Static routes use O(1) hashmap lookup — the most common case
+- Dynamic routes use trie traversal — O(n) where n = path segments
+- Context pooling eliminates per-request allocation overhead
+- CORS headers are cloned from a frozen template via a pre-built closure
+- The pool is capped at 1024 contexts to bound memory usage
+
 </docmach>

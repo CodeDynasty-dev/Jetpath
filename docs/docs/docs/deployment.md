@@ -2,58 +2,102 @@
 
 # Deployment
 
-Deploying your Jetpath application involves packaging your code and dependencies, choosing a hosting environment, and running the application server so it's accessible to users. Jetpath's flexibility allows you to deploy it across various platforms using Node.js, Deno, or Bun as the runtime.
+Deploying your Jetpath application involves packaging your code, choosing a hosting environment, and running the server. Jetpath's cross-runtime support gives you flexibility to deploy on VMs, containers, PaaS, or edge platforms.
 
 ---
 
 ## Common Deployment Strategies
 
-Here are outlines for common deployment approaches:
+### 1. Virtual Machines / Bare Metal
 
-### 1. Virtual Machines (VMs) / Bare Metal
-
-* **Concept:** You manage the operating system, runtime installation, and application deployment manually or via configuration management tools.
-* **Steps:**
-    1. Provision a VM (e.g., AWS EC2, Google Compute Engine, DigitalOcean Droplet) or prepare a physical server.
-    2. Install your chosen runtime (Node.js, Deno, or Bun).
-    3. Install necessary tools (Git, potentially a process manager like PM2).
-    4. Clone your application repository or copy your built application code (including `node_modules` or vendor directory).
-    5. Install production dependencies if needed.
-    6. Set environment variables (e.g., using `.env` files with `dotenv` or system environment variables).
-    7. Start your application server (e.g., `node dist/server.js`, `deno run --allow-net server.ts`, `bun run server.ts`).
-    8. **(Recommended)** Use a process manager (like PM2 for Node.js/Bun, or systemd for any runtime) to automatically restart your app if it crashes and manage logs.
-    9. **(Recommended)** Set up a reverse proxy (like Nginx or Caddy) in front of your Jetpath app to handle TLS/SSL termination (HTTPS), load balancing (if running multiple instances), basic caching, and potentially serving static files directly.
+1. Provision a VM (AWS EC2, DigitalOcean Droplet, etc.)
+2. Install your chosen runtime (Node.js, Deno, or Bun)
+3. Clone your application and install dependencies
+4. Set environment variables
+5. Start your application:
+   ```bash
+   node dist/server.js
+   # or
+   bun run server.ts
+   # or
+   deno run --allow-net server.ts
+   ```
+6. Use a process manager (PM2, systemd) to auto-restart on crashes
+7. Set up a reverse proxy (Nginx, Caddy) for TLS termination and load balancing
 
 ### 2. Containers (Docker)
 
-* **Concept:** Package your application, its runtime, and dependencies into a standardized container image. Deploy this image using container orchestration platforms.
-* **Steps:**
-    1.  **Create a `Dockerfile`:**
-        * Start with a base image for your chosen runtime (e.g., `node:18-alpine`, `denoland/deno:latest`, `oven/bun:latest`).
-        * Set the working directory (e.g., `/app`).
-        * Copy `package.json`, `*.lockb`, `deno.json` etc. and install dependencies (`npm install --production`, `deno cache`, `bun install --production`). Use multi-stage builds to keep the final image small.
-        * Copy your application source code.
-        * Perform the build step if necessary (`RUN tsc` or `RUN bun build`).
-        * Expose the port your Jetpath application listens on (`EXPOSE 3000`).
-        * Set the command to run your application (`CMD ["node", "dist/server.js"]` or `CMD ["deno", "run", "--allow-net", "server.ts"]` or `CMD ["bun", "run", "server.ts"]`).
-    2.  **Build the Docker Image:** `docker build -t my-jetpath-app .`
-    3.  **Run the Container:** `docker run -p 3000:3000 -e "NODE_ENV=production" -e "DATABASE_URL=..." my-jetpath-app` (Map port, pass environment variables).
-    4.  **Deploy:** Push the image to a registry (Docker Hub, AWS ECR, Google Artifact Registry) and deploy it using platforms like Kubernetes, AWS ECS, Google Cloud Run, Docker Swarm, etc. These platforms handle scaling, networking, and health checks.
+Create a `Dockerfile` for your chosen runtime:
 
+```dockerfile
+FROM oven/bun:latest
+WORKDIR /app
+COPY package.json bun.lockb ./
+RUN bun install --production
+COPY . .
+EXPOSE 3000
+CMD ["bun", "run", "server.ts"]
+```
 
+Build and run:
+```bash
+docker build -t my-jetpath-app .
+docker run -p 3000:3000 -e "NODE_ENV=production" my-jetpath-app
+```
 
+Deploy to Kubernetes, AWS ECS, Google Cloud Run, Fly.io, etc.
 
-## Jetpath Specifics & Recommendations
+### 3. Edge / Serverless
 
-* **Cross-Runtime:** The main advantage is choosing the best platform *and* runtime combination for your needs. Docker and VMs offer the most flexibility here. PaaS support might vary depending on how well they support Deno and Bun compared to Node.js. Serverless often requires runtime-specific adapters.
-* **Configuration:** Rely heavily on environment variables for configuration across all deployment types.
-* **Build Output:** Ensure your deployment process correctly includes the compiled JavaScript output (`dist` folder or similar) if applicable for your runtime choice.
-* **Process Management:** For VM/Bare Metal, always use a process manager (PM2, systemd) to ensure your app restarts on failure. Containers and PaaS handle this automatically.
-* **Logging:** Configure structured logging (e.g., JSON format) that can be easily ingested by your chosen platform's logging service (CloudWatch, Google Cloud Logging, Datadog, etc.).
+Jetpath supports AWS Lambda and Cloudflare Workers via the `edgeGrabber` option. In edge environments, filesystem scanning isn't available, so you pass route functions directly:
+
+```typescript
+import { Jetpath } from "jetpath";
+import { GET_users, POST_users, MIDDLEWARE_ } from "./routes";
+
+const app = new Jetpath({
+  edgeGrabber: [GET_users, POST_users, MIDDLEWARE_],
+  port: 3000,
+});
+
+app.listen();
+```
+
+---
+
+## Graceful Shutdown
+
+Jetpath provides a `close()` method for graceful shutdown. This stops accepting new connections and waits for in-flight requests to complete:
+
+```typescript
+const app = new Jetpath({ source: "./src", port: 3000 });
+await app.listen();
+
+// Handle shutdown signals
+process.on('SIGTERM', async () => {
+  console.log('Shutting down...');
+  await app.close();
+  process.exit(0);
+});
+```
+
+The `close()` method works across runtimes:
+- Node.js: calls `server.close()`
+- Bun: calls `server.stop()`
+- Deno: calls `server.shutdown()`
+
+---
+
+## Jetpath-Specific Recommendations
+
+- **Cross-Runtime:** Docker and VMs offer the most flexibility for runtime choice. PaaS support for Deno and Bun varies.
+- **Configuration:** Use environment variables for all deployment-specific config (port, database URLs, secrets).
+- **Build Output:** If using Node.js, compile TypeScript first (`tsc`) and deploy the `dist` folder. Bun and Deno can run TypeScript directly.
+- **Process Management:** For VMs, always use a process manager. Containers and PaaS handle restarts automatically.
+- **Logging:** Use structured JSON logging for easy integration with CloudWatch, Datadog, etc.
+- **CORS:** In production, replace `origin: ['*']` with your specific frontend origin(s).
+- **API Doc Auth:** If using the built-in API documentation UI, set `apiDoc.username` and `apiDoc.password` to protect it in production.
 
 --- 
 
 </docmach>
-
-
-

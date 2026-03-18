@@ -3,100 +3,119 @@
 
 # Installation
 
-Installing Jetpath is straightforward and adapts to your preferred runtime environment: Node.js, Deno, or Bun.
+Installing Jetpath is straightforward and adapts to your preferred runtime environment.
 
 ---
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you begin, ensure you have one of the following installed:
 
-1.**A JavaScript Runtime:**
+1. **Node.js:** Version 18.x or later. ([Download Node.js](https://nodejs.org/))
+2. **Bun:** Version 1.0 or later. ([Install Bun](https://bun.sh/docs/installation))
+3. **Deno:** Version 1.30 or later. ([Install Deno](https://deno.land/manual/getting_started/installation))
 
-  **Node.js:** Version 18.x or later recommended. ([Download Node.js](https://nodejs.org/))
+Jetpath also supports edge runtimes (AWS Lambda, Cloudflare Workers) via the `edgeGrabber` option.
 
-  **Deno:** Version 1.30 or later recommended. ([Install Deno](https://deno.land/manual/getting_started/installation))
-
-  **Bun:** Version 1.0 or later recommended. ([Install Bun](https://bun.sh/docs/installation))
-
-2.**TypeScript:** Jetpath is built with TypeScript and provides first-class typing support. While you can use it with JavaScript,
-
- TypeScript is highly recommended for the best experience.
-
-  ```bash
-  npm install -g typescript
-  ```
+TypeScript is highly recommended for the best experience, though JavaScript works too.
 
 ---
 
-# Using Jetpath:
+## Quick Start with Template
 
-
-## Start fresh:
-
-step one: Create your project folder
-
-step two: Run ```npm init -y```
-
-step three: Install jetpath ```npm i jetpath```
-
-
-Then create your routes and run your server check [Quick Start](./quickstart.html) for more infomation.
-
-
-## Installing Oficial Jetpath template:
-
+The fastest way to get started:
 
 ```bash
 npx jetpath my-new-api
-```
-## Install Dependencies
-
-```bash
-cd my-api
-npm install # or yarn install or pnpm install or bun install
-```
-
-## Run the template
-
-```bash
+cd my-new-api
+npm install
 npm run dev
 ```
 
------
+This scaffolds a project with routes, middleware, and a ready-to-run server.
 
-## Project Setup
+---
 
-Regardless of the runtime, a basic project structure and TypeScript configuration are recommended.
+## Manual Setup
 
-**1. Folder Structure:**
+### 1. Create your project
 
-A common structure looks like this:
-
-```
-your-project/
-├── src/              # Your Jetpath route handlers (.jet.ts files)
-│   └── users.jet.ts  # where you defined functions for users
-│   └── products.jet.ts  # where you defined functions for products
-│   └── auth.jet.ts  # where you defined functions for authentication
-│   └── carts.jet.ts  # where you defined functions for carts
-│   └── users.jet.ts  # where you defined functions for users
-├── server.jet.ts         # Your main server entry point (initializes Jetpath)
-├── node_modules/     # (Node.js/Bun)
-├── package.json      # (Node.js/Bun)
-└── tsconfig.json     # TypeScript configuration
+```bash
+mkdir my-api
+cd my-api
+npm init -y
+npm install jetpath
 ```
 
+### 2. Project Structure
 
+A recommended structure:
+
+```
+my-api/
+├── src/
+│   ├── users.jet.ts      # Route handlers for /users
+│   ├── products.jet.ts   # Route handlers for /products
+│   └── auth.jet.ts       # Route handlers for /auth
+├── server.jet.ts          # Main entry point
+├── package.json
+└── tsconfig.json
+```
+
+Key conventions:
+- `.jet.ts` files are scanned for route exports
+- Regular `.ts` files can be imported but aren't scanned for routes
+- The `source` option in `Jetpath` config points to your route directory
+
+### 3. Create your server
+
+```typescript
+// server.jet.ts
+import { Jetpath } from "jetpath";
+
+const app = new Jetpath({
+  source: "./src",
+  port: 3000,
+});
+
+app.listen();
+```
+
+### 4. Create a route
+
+```typescript
+// src/users.jet.ts
+import { type JetRoute } from "jetpath";
+
+export const GET_users: JetRoute = (ctx) => {
+  ctx.send({ users: [] });
+};
+```
+
+### 5. Run
+
+```bash
+bun server.jet.ts
+# or
+node --experimental-strip-types server.jet.ts
+# or
+deno run server.jet.ts
+```
+
+---
+
+## Runtime-Specific Notes
+
+- **Bun:** Fastest startup and best WebSocket support. Recommended for development.
+- **Node.js:** Use `--experimental-strip-types` flag (Node 22+) or compile with `tsc` first.
+- **Deno:** Works out of the box with TypeScript. WebSocket support included.
+- **Edge (Lambda/Workers):** Use the `edgeGrabber` option to pass route functions directly instead of filesystem scanning.
 
 ## Next Steps
 
-  * Quick Start: Build your first simple API following the [**Quick Start**](./quickstart.html) guide.
-  * Core Concepts: Dive deeper into how Jetpath works by reading the [**Core Concepts**](./routing.html).
+- Quick Start: Build your first API following the [Quick Start](./quickstart.html) guide.
+- Core Concepts: Dive deeper into [Routing](./routing.html).
  
  
 
 </docmach>
-
-
-
