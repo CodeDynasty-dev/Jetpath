@@ -14,7 +14,7 @@ import type {
 } from './types.js';
 import { mime } from '../extracts/mimejs-extract.js';
 import type { BunFile } from 'bun';
-import { getCtx, runtime, ctxPool } from './trie-router.js';
+import { getCtx, runtime, ctxPool, MAX_POOL_SIZE } from './trie-router.js';
 import { parseRequest } from './parser.js';
 import { optionsCtx, baseCorsHeaders } from './cors.js';
 import { validator } from './validator.js';
@@ -138,6 +138,17 @@ class ctxState {
   state: Record<string, any> = {};
 }
 
+/**
+ * Internal property name mapping (short names for hot-path performance):
+ *   _2  = response headers (Record<string, string>)
+ *   _3  = response stream (Stream | undefined)
+ *   _6  = custom Response object (Response | false) — for sendResponse()
+ *   _7  = state container (ctxState)
+ *   _8  = state dirty flag — true when ctx.state was accessed
+ *   _10 = JSON fast-path flag — true when send() was called with object data
+ *   _setCookies = Set-Cookie header values (string[])
+ *   _queryValidated = whether cached query has been validated
+ */
 export class Context {
   code = 200;
   request: Request | IncomingMessage | undefined;
@@ -155,6 +166,11 @@ export class Context {
    * Cached validated body to avoid double validation
    */
   $_internal_validated_body?: any;
+  /**
+   * @internal
+   * Whether the cached query has been validated
+   */
+  _queryValidated = false;
   path: string | undefined;
   connection?: JetSocket;
   method: methods | undefined;
@@ -172,6 +188,8 @@ export class Context {
   payload?: string = undefined;
   // ? header of response
   _2: Record<string, string> = {};
+  // ? Set-Cookie headers stored separately (must not be comma-joined per RFC 6265)
+  _setCookies: string[] = [];
   // ? true when _2 has been customized (set/send with contentType) — enables lazy clone
   _10 = false;
   // //? stream
@@ -196,7 +214,7 @@ export class Context {
   ) {
     // ? fast path: object data, no contentType override (most common benchmark case)
     if (!contentType && typeof data === 'object') {
-      const responseSchema = this.handler!.response;
+      const responseSchema = this.handler?.response;
       if (responseSchema && validate) {
         data = validator(responseSchema, data || {});
         if (typeof data === 'string') {
@@ -209,8 +227,8 @@ export class Context {
       if (statusCode) this.code = statusCode;
       return;
     }
-    if (this.handler!.response && validate) {
-      data = validator(this.handler!.response, data || {});
+    if (this.handler?.response && validate) {
+      data = validator(this.handler.response, data || {});
       if (typeof data === 'string') {
         throw new Error(data);
       }
@@ -267,12 +285,7 @@ export class Context {
 
   setCookie(name: string, value: string, options: CookieOptions = {}): void {
     const cookie = Cookie.serialize(name, value, options);
-    const existingCookies = this._2['set-cookie'] || '';
-    const cookies = existingCookies
-      ? existingCookies.split(',').map((c) => c.trim())
-      : [];
-    cookies.push(cookie);
-    this._2['set-cookie'] = cookies.join(', ');
+    this._setCookies.push(cookie);
   }
 
   clearCookie(name: string, options: CookieOptions = {}): void {
@@ -293,19 +306,25 @@ export class Context {
       const filePath = stream;
 
       if (config.folder) {
-        // Resolve paths
+        // Resolve paths and follow symlinks for security
         const resolvedPath = fs().resolve(config.folder, filePath);
-        const resolvedBase = fs().resolve(config.folder);
+        const realBase = fs().realpathSync(config.folder);
+        let realPath: string;
+        try {
+          realPath = fs().realpathSync(resolvedPath);
+        } catch {
+          throw new Error('File not found or inaccessible');
+        }
 
-        // Security: Check for path traversal using path resolution
-        // This is safer than string comparison
-        const relativePath = fs().relative(resolvedBase, resolvedPath);
-
-        if (relativePath.startsWith('..') || fs().isAbsolute(relativePath)) {
+        // Security: Check for path traversal using realpath (follows symlinks)
+        if (
+          !realPath.startsWith(realBase + fs().sep) &&
+          realPath !== realBase
+        ) {
           throw new Error('Path traversal detected!');
         }
 
-        stream = resolvedPath;
+        stream = realPath;
       } else {
         // If no folder is specified, require absolute path for security
         if (!fs().isAbsolute(filePath)) {
@@ -429,7 +448,7 @@ export class Context {
     }
 
     // Validate body if needed and cache the result
-    if (this.handler!.body && options.validate) {
+    if (this.handler?.body && options.validate) {
       this.$_internal_validated_body = validator(
         this.handler!.body,
         this.$_internal_body
@@ -444,8 +463,12 @@ export class Context {
       validate?: boolean;
     } = { validate: true }
   ): Type {
-    // Return cached query if available
-    if (this.$_internal_query) {
+    // Return cached validated query if available and validation requested
+    if (this.$_internal_query && options.validate && this._queryValidated) {
+      return this.$_internal_query as Type;
+    }
+    // Return cached raw query if available and no validation needed
+    if (this.$_internal_query && !options.validate) {
       return this.$_internal_query as Type;
     }
 
@@ -479,6 +502,7 @@ export class Context {
           this.handler.query,
           this.$_internal_query
         );
+        this._queryValidated = true;
       }
     }
 
@@ -798,8 +822,17 @@ export class JetServer {
       contentType.includes('application/json') ||
       (!contentType &&
         typeof ctx!.payload === 'string' &&
-        ctx!.payload?.trimStart().startsWith('{')) ||
-      ctx!.payload?.trimStart().startsWith('[');
+        (ctx!.payload?.trimStart().startsWith('{') ||
+          ctx!.payload?.trimStart().startsWith('[')));
+    const headers = ctx!._10
+      ? { ...ctx!._2!, 'Content-Type': 'application/json' }
+      : { ...ctx!._2! };
+
+    // ? Merge Set-Cookie headers into result for test visibility
+    if (ctx!._setCookies?.length) {
+      headers['set-cookie'] = ctx!._setCookies.join(', ');
+    }
+
     const result = {
       code: ctx!.code,
       body:
@@ -814,15 +847,13 @@ export class JetServer {
                 }
               })()
             : ctx!.payload,
-      headers: ctx!._10
-        ? { ...ctx!._2!, 'Content-Type': 'application/json' }
-        : ctx!._2!,
+      headers,
     };
 
     // Return context to pool for test environments
     if (ctx.__jet_pool) {
       queueMicrotask(() => {
-        ctxPool.push(ctx);
+        if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
       });
     }
 

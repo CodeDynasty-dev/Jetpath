@@ -34,6 +34,7 @@ import {
   _rebuildCorsCloner,
   returnScratchCtx,
   _cloneJsonHeaders,
+  MAX_POOL_SIZE,
 } from './trie-router.js';
 import { optionsCtx } from './cors.js';
 import { fs } from './fs.js';
@@ -116,9 +117,10 @@ export const server = (
     server = {
       listen() {
         // AWS Lambda requires exporting a handler function
-        // We'll wrap to Lambda-compatible handler
+        // Use globalThis for ESM compatibility
         const awsHandler = async (event: any) => {
-          const req = new Request(event.rawPath || '/', {
+          const url = event.rawUrl || `https://${event.requestContext?.domainName || 'localhost'}${event.rawPath || '/'}`;
+          const req = new Request(url, {
             method: event.requestContext?.http?.method || 'GET',
             headers: event.headers,
             body: event.body,
@@ -131,7 +133,13 @@ export const server = (
             body: text,
           };
         };
-        (module as any).exports.handler = awsHandler;
+        (globalThis as any).__jetpath_handler = awsHandler;
+        // Also try module.exports for CJS compatibility
+        try {
+          (module as any).exports.handler = awsHandler;
+        } catch {
+          // ESM environment — globalThis export is sufficient
+        }
       },
       edge: true,
     };
@@ -218,12 +226,20 @@ let makeRes: (
 ) => any;
 
 const makeResBunAndDeno = (_res: any, ctx: Context) => {
+  // ? Helper: build Headers with Set-Cookie support (RFC 6265 — separate headers)
+  const buildHeaders = (base: Record<string, string>, cookies: string[]) => {
+    if (!cookies.length) return base;
+    const h = new Headers(base);
+    for (const c of cookies) h.append('Set-Cookie', c);
+    return h;
+  };
   // ? fast path: normal response (most common — no stream, no custom response)
   if (ctx.payload !== undefined) {
     const body = ctx.payload;
     const code = ctx.code;
-    const headers = ctx._10 ? _cloneJsonHeaders() : ctx._2;
-    ctxPool.push(ctx);
+    const rawHeaders = ctx._10 ? _cloneJsonHeaders() : ctx._2;
+    const headers = buildHeaders(rawHeaders, ctx._setCookies);
+    if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
     return new Response(body, { status: code, headers });
   }
   // ? streaming with ctx.sendStream
@@ -235,14 +251,14 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
       return ctx._3.then((stream: any) => {
         return new Response(stream?.readable, {
           status: ctx.code,
-          headers: ctx._2,
+          headers: buildHeaders(ctx._2, ctx._setCookies),
         });
       });
     }
     const stream = ctx._3;
     const code = ctx.code;
-    const headers = ctx._2;
-    ctxPool.push(ctx);
+    const headers = buildHeaders(ctx._2, ctx._setCookies);
+    if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
     return new Response(stream as unknown as undefined, {
       status: code,
       headers,
@@ -250,15 +266,15 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   }
   if (ctx._6 !== false) {
     const customRes = ctx._6;
-    ctxPool.push(ctx);
+    if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
     return customRes;
   }
   // ? fallback: empty response
   const code = ctx.code;
-  const headers = ctx._2;
-  ctxPool.push(ctx);
+  const headers = buildHeaders(ctx._2, ctx._setCookies);
+  if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
   return new Response(undefined, { status: code, headers });
-};
+};;;;
 const makeResNode = (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
@@ -267,8 +283,19 @@ const makeResNode = (
 ) => {
   if (ctx._3) {
     if (ctx._10) ctx._2['Content-Type'] = 'application/json';
+    // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
+    if (ctx._setCookies.length) {
+      for (const cookie of ctx._setCookies) res.setHeader('Set-Cookie', cookie);
+    }
     res.writeHead(ctx.code, ctx._2);
     const stream = ctx._3;
+    let poolReturned = false;
+    const returnToPool = () => {
+      if (!poolReturned) {
+        poolReturned = true;
+        if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+      }
+    };
     const errorHandler = () => {
       res.statusCode = 400;
       res.end('not found');
@@ -278,15 +305,11 @@ const makeResNode = (
           (stream as any).destroy();
         }
       }
+      returnToPool();
     };
     stream.on('error', errorHandler);
     stream.pipe(res);
-    stream.on('end', () => {
-      ctxPool.push(ctx);
-    });
-    stream.on('error', () => {
-      ctxPool.push(ctx);
-    });
+    stream.on('end', returnToPool);
     return undefined;
   }
   const code = ctx.code;
@@ -294,11 +317,16 @@ const makeResNode = (
   if (ctx._10) ctx._2['Content-Type'] = 'application/json';
   const headers = ctx._2;
   const payload = ctx.payload;
-  ctxPool.push(ctx);
+  const setCookies = ctx._setCookies;
+  if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+  // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
+  if (setCookies.length) {
+    for (const cookie of setCookies) res.setHeader('Set-Cookie', cookie);
+  }
   res.writeHead(code, headers);
   res.end(payload);
   return undefined;
-};;
+};
 
 if (isNode) {
   makeRes = makeResNode;
@@ -439,9 +467,8 @@ const Jetpath = (
     // ? slow path: has middleware
     return _runWithMiddleware(r, ctx, res);
   }
-  const ctx404 = optionsCtx;
-  ctx404.code = 404;
-  return makeRes(res, ctx404 as unknown as Context);
+  const notFoundCtx = { ...optionsCtx, code: 404 };
+  return makeRes(res, notFoundCtx as unknown as Context);
 };
 
 const _runWithMiddleware = async (r: any, ctx: Context, res: any) => {
@@ -1067,7 +1094,7 @@ export async function codeGen(
   if (mode === 'ON') {
     await walkDir(fs().resolve(fs().cwd(), ROUTES_DIR));
   } else {
-    walkDir(fs().resolve(fs().cwd(), ROUTES_DIR));
+    await walkDir(fs().resolve(fs().cwd(), ROUTES_DIR));
   }
   const compileObjectStructureFromSchema = (schema: SchemaDefinition) => {
     const obj: Record<string, 'string' | Record<string, 'string'>> = {};

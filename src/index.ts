@@ -16,6 +16,7 @@ import { JetPlugin, LOG } from './primitives/classes.js';
 import { readFile } from 'node:fs/promises';
 import { cwd } from 'node:process';
 import path from 'node:path';
+import { timingSafeEqual } from 'node:crypto';
 import { corsMiddleware } from './primitives/cors.js';
 import { fs } from './primitives/fs.js';
 import { _rebuildCorsCloner, preSeedPool } from './primitives/trie-router.js';
@@ -24,12 +25,28 @@ const html_path = path.join(
   cwd(),
   '/node_modules/jetpath/dist/jetpath-doc.html'
 );
+
+/** Constant-time string comparison to prevent timing attacks */
+function timingSafeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) {
+    // Compare against self to burn the same time, then return false
+    timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
+}
+
 export class Jetpath {
   public server: {
     listen: any;
+    close?: (cb?: () => void) => void;
+    stop?: () => void;
     edge: boolean;
   } = { listen: () => {}, edge: false };
   private listening = false;
+  private _nativeServer: any = null;
   /**
    * an object you can set values to per request
    */
@@ -189,13 +206,41 @@ export class Jetpath {
       );
     }
     this.listening = true;
-
+    this._nativeServer = this.server;
     this.server.listen(this.options.port);
     LOG.log(`Open http://localhost:${this.options.port}`, 'info');
     // ? show external IP
     if (localIP) {
       LOG.log(`External: http://${localIP}:${this.options.port}`, 'info');
     }
+  }
+
+  /**
+   * Gracefully shuts down the server.
+   * Stops accepting new connections and waits for in-flight requests to complete.
+   */
+  close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.listening) {
+        resolve();
+        return;
+      }
+      this.listening = false;
+      const srv = this._nativeServer;
+      if (srv?.close) {
+        // Node.js http.Server
+        srv.close((err: Error | undefined) => (err ? reject(err) : resolve()));
+      } else if (srv?.stop) {
+        // Bun server
+        srv.stop();
+        resolve();
+      } else if (srv?.shutdown) {
+        // Deno server
+        srv.shutdown().then(resolve, reject);
+      } else {
+        resolve();
+      }
+    });
   }
 
   api_UI_req(UI: string): void {
@@ -225,8 +270,8 @@ export class Jetpath {
             return;
           }
           if (
-            password === this.options?.apiDoc?.password &&
-            username === this.options?.apiDoc?.username
+            timingSafeCompare(password, this.options?.apiDoc?.password || '') &&
+            timingSafeCompare(username, this.options?.apiDoc?.username || '')
           ) {
             ctx.send(UI, 200, 'text/html');
             return;

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -12,9 +12,27 @@ if (gitCheck.status !== 0) {
 const [targetDir = 'new-jetpath-project', branch = 'main'] =
   process.argv.slice(2);
 
+// Sanitize inputs to prevent command injection
+const safeDirPattern = /^[a-zA-Z0-9._\-/]+$/;
+if (!safeDirPattern.test(targetDir) || !safeDirPattern.test(branch)) {
+  console.error(
+    'Error: Invalid characters in target directory or branch name.'
+  );
+  process.exit(1);
+}
+
 try {
-  execSync(
-    `git clone --depth 1 --branch ${branch} https://github.com/codedynasty-dev/jetpath-sample.git ${targetDir}`,
+  spawnSync(
+    'git',
+    [
+      'clone',
+      '--depth',
+      '1',
+      '--branch',
+      branch,
+      'https://github.com/codedynasty-dev/jetpath-sample.git',
+      targetDir,
+    ],
     { stdio: 'inherit' }
   );
   console.log(`

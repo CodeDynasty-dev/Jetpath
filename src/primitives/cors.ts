@@ -65,7 +65,7 @@ export function corsMiddleware(options: {
     if (options.secureContext) {
       optionsCtx.set(
         'Cross-Origin-Opener-Policy',
-        options.secureContext['Cross-Origin-Embedder-Policy'] || 'unsafe-none'
+        options.secureContext['Cross-Origin-Opener-Policy'] || 'unsafe-none'
       );
       optionsCtx.set(
         'Cross-Origin-Embedder-Policy',
@@ -100,7 +100,7 @@ export function corsMiddleware(options: {
   }
   if (options.secureContext) {
     baseCorsHeaders['Cross-Origin-Opener-Policy'] =
-      options.secureContext['Cross-Origin-Embedder-Policy'];
+      options.secureContext['Cross-Origin-Opener-Policy'];
     baseCorsHeaders['Cross-Origin-Embedder-Policy'] =
       options.secureContext['Cross-Origin-Embedder-Policy'];
   }

@@ -380,8 +380,12 @@ export const getCtx = (
       ctx.$_internal_body = undefined;
       ctx.$_internal_validated_body = undefined;
     }
-    if (ctx.$_internal_query) ctx.$_internal_query = undefined;
+    if (ctx.$_internal_query) {
+      ctx.$_internal_query = undefined;
+      ctx._queryValidated = false;
+    }
     if (ctx._10) ctx._10 = false;
+    if (ctx._setCookies.length) ctx._setCookies = [];
     return ctx;
   }
   const ctx = new Context();
@@ -395,7 +399,11 @@ export const getCtx = (
 };
 
 // ? Scratch context for sync fast path — avoids pool push/pop overhead
-// ? Safe because Bun/Deno process fetch handlers synchronously on the main thread
+// ? SAFETY: Bun/Deno process the initial fetch handler call synchronously on the main thread.
+// ? If the handler is sync, scratch is returned immediately via returnScratchCtx.
+// ? If the handler is async (contains await), _scratchCtx is set to null while in use,
+// ? so subsequent requests fall back to the pool. returnScratchCtx reclaims it after.
+// ? This is NOT safe for multi-threaded environments (Worker Threads) — pool-only there.
 let _scratchCtx: Context | null = null;
 
 export const getScratchCtx = (
@@ -420,13 +428,17 @@ export const getScratchCtx = (
     ctx._10 = false;
     ctx.handler = route;
     ctx.code = 200;
+    if (ctx._setCookies.length) ctx._setCookies = [];
     if (ctx._3) ctx._3 = undefined;
     if (ctx._6 !== false) ctx._6 = false;
     if (ctx.$_internal_body) {
       ctx.$_internal_body = undefined;
       ctx.$_internal_validated_body = undefined;
     }
-    if (ctx.$_internal_query) ctx.$_internal_query = undefined;
+    if (ctx.$_internal_query) {
+      ctx.$_internal_query = undefined;
+      ctx._queryValidated = false;
+    }
     return ctx;
   }
   // ? scratch is in use (async handler) — fall back to pool
@@ -438,7 +450,7 @@ export const returnScratchCtx = (ctx: Context) => {
   // ? if scratch slot is empty, reclaim it; otherwise push to pool
   if (!_scratchCtx) {
     _scratchCtx = ctx;
-  } else {
+  } else if (ctxPool.length < MAX_POOL_SIZE) {
     ctxPool.push(ctx);
   }
 };
@@ -470,26 +482,26 @@ export let _cloneJsonHeaders: () => Record<string, string> = () => ({
 });
 
 export function _rebuildCorsCloner() {
-  // ? Generate a direct object-literal return function — no loop overhead per request
-  // ? This is rebuilt once after corsMiddleware() runs
+  // ? Rebuild clone functions from current baseCorsHeaders
+  // ? Uses closure capture instead of new Function() for CSP compatibility and security
   const keys = Object.keys(baseCorsHeaders);
   const vals = keys.map((k) => baseCorsHeaders[k]);
-  // ? Build a function body that returns an object literal directly
-  // ? e.g. () => ({ "Vary": "Origin", "Connection": "keep-alive" })
-  const pairs = keys.map(
-    (k, i) => JSON.stringify(k) + ':' + JSON.stringify(vals[i])
-  );
-  _cloneCorsHeaders = new Function(
-    'return {' + pairs.join(',') + '}'
-  ) as () => Record<string, string>;
+  _cloneCorsHeaders = () => {
+    const h: Record<string, string> = {};
+    for (let i = 0; i < keys.length; i++) h[keys[i]] = vals[i];
+    return h;
+  };
   // ? Also build the JSON variant with Content-Type pre-included
-  const jsonPairs = [...pairs, '"Content-Type":"application/json"'];
-  _cloneJsonHeaders = new Function(
-    'return {' + jsonPairs.join(',') + '}'
-  ) as () => Record<string, string>;
+  _cloneJsonHeaders = () => {
+    const h: Record<string, string> = {};
+    for (let i = 0; i < keys.length; i++) h[keys[i]] = vals[i];
+    h['Content-Type'] = 'application/json';
+    return h;
+  };
 }
 
 export const ctxPool: Context[] = [];
+export const MAX_POOL_SIZE = 500;
 
 export let runtime: Record<
   'bun' | 'deno' | 'node' | 'edge' | 'cloudflare_worker' | 'aws_lambda',

@@ -1,5 +1,9 @@
 import type { HTTPBody } from './types.js';
 
+/**
+ * NOTE: Unknown fields (not defined in schema) are silently stripped from the output.
+ * This provides mass-assignment protection by default.
+ */
 export function validator<T extends Record<string, any>>(
   schema: HTTPBody<T> | undefined,
   data: any,
