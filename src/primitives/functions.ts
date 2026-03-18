@@ -81,6 +81,7 @@ export const server = (
 ): { listen: any; edge: boolean } => {
   let server;
   let server_else;
+  const runtimeConfig = options.runtimes;
   if (runtime['node']) {
     server = fs().createServer(
       {
@@ -150,6 +151,7 @@ export const server = (
         listen(port: number) {
           server_else = Bun.serve({
             port,
+            reusePort: runtimeConfig?.bun?.reusePort || false,
             fetch: JetpathBunDeno,
             websocket: {
               message(...p) {

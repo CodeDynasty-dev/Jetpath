@@ -195,6 +195,15 @@ export type jetOptions = {
    * @default generates nothing
    */
   generatedRoutesFilePath?: string;
+  runtimes?: {
+    bun?: {
+      reusePort?: boolean;
+    };
+    deno?: {};
+    node?: {};
+    aws_lambda?: {};
+    cloudflare_worker?: {};
+  };
   /**
    * keep alive timeout
    */
