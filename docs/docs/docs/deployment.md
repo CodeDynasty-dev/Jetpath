@@ -91,6 +91,7 @@ The `close()` method works across runtimes:
 ## Jetpath-Specific Recommendations
 
 - **Cross-Runtime:** Docker and VMs offer the most flexibility for runtime choice. PaaS support for Deno and Bun varies.
+- **Runtime Tuning:** Use the `runtimes` constructor option for runtime-specific settings. For example, `runtimes: { bun: { reusePort: true } }` enables `SO_REUSEPORT` so multiple Bun processes can share the same port — useful for multi-process clustering behind a load balancer.
 - **Configuration:** Use environment variables for all deployment-specific config (port, database URLs, secrets).
 - **Build Output:** If using Node.js, compile TypeScript first (`tsc`) and deploy the `dist` folder. Bun and Deno can run TypeScript directly.
 - **Process Management:** For VMs, always use a process manager. Containers and PaaS handle restarts automatically.

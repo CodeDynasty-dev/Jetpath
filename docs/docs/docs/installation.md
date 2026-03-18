@@ -104,9 +104,26 @@ deno run server.jet.ts
 
 ---
 
-## Runtime-Specific Notes
+## Runtime-Specific Configuration
 
-- **Bun:** Fastest startup and best WebSocket support. Recommended for development.
+You can pass runtime-specific options via the `runtimes` key in the constructor:
+
+```typescript
+const app = new Jetpath({
+  source: "./src",
+  port: 3000,
+  runtimes: {
+    bun: {
+      reusePort: true, // enable SO_REUSEPORT for multi-process clustering
+    },
+    // deno, node, aws_lambda, cloudflare_worker keys are also available
+  },
+});
+```
+
+### Runtime Notes
+
+- **Bun:** Fastest startup and best WebSocket support. Recommended for development. Set `runtimes.bun.reusePort` to `true` to allow multiple Bun processes to bind to the same port for horizontal scaling.
 - **Node.js:** Use `--experimental-strip-types` flag (Node 22+) or compile with `tsc` first.
 - **Deno:** Works out of the box with TypeScript. WebSocket support included.
 - **Edge (Lambda/Workers):** Use the `edgeGrabber` option to pass route functions directly instead of filesystem scanning.
