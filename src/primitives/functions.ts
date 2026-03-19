@@ -31,14 +31,13 @@ import {
   isNode,
   runtime,
   Trie,
-  _rebuildCorsCloner,
   returnScratchCtx,
   _cloneJsonHeaders,
   MAX_POOL_SIZE,
 } from './trie-router.js';
 import { optionsCtx } from './cors.js';
 import { fs } from './fs.js';
-import { plugins } from './plugins.js';
+import { PluginBox } from './plugins.js';
 
 export const _JetPath_paths: Record<methods, Record<string, JetRoute>> = {
   GET: {},
@@ -69,10 +68,6 @@ export const _jet_middleware: Record<
   | ((ctx: Context, err?: unknown) => void | Promise<void>)
   | ((ctx: Context, err?: unknown) => void | Promise<void>)[]
 > = {};
-
-
-
-
 
 // ? server
 export const server = (
@@ -120,7 +115,9 @@ export const server = (
         // AWS Lambda requires exporting a handler function
         // Use globalThis for ESM compatibility
         const awsHandler = async (event: any) => {
-          const url = event.rawUrl || `https://${event.requestContext?.domainName || 'localhost'}${event.rawPath || '/'}`;
+          const url =
+            event.rawUrl ||
+            `https://${event.requestContext?.domainName || 'localhost'}${event.rawPath || '/'}`;
           const req = new Request(url, {
             method: event.requestContext?.http?.method || 'GET',
             headers: event.headers,
@@ -198,9 +195,14 @@ export const server = (
       routesObject: _JetPath_paths,
       JetPath_app: Jetpath as any,
     });
-    Object.assign(plugins, decs);
+    Object.assign(PluginBox.plugins, decs);
   }
+
   const edgePlugin = plugs.find((plug) => plug.plugin.server);
+  LOG.log(
+    `${plugs.length} plugins, ${edgePlugin ? 'one' : 'no'} edge plguin`,
+    'info'
+  );
   // ? adding ctx plugin bindings
   if (edgePlugin) {
     const edge_server = edgePlugin.plugin.server({
@@ -217,8 +219,6 @@ export const server = (
   }
   return server!;
 };
-
-
 
 let makeRes: (
   res: ServerResponse<IncomingMessage> & {
@@ -276,7 +276,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   const headers = buildHeaders(ctx._2, ctx._setCookies || []);
   if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
   return new Response(undefined, { status: code, headers });
-};;;;
+};
 const makeResNode = (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
@@ -684,7 +684,6 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
   }
 }
 
-
 export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
   const globalHeaders = JSON.stringify(
@@ -796,6 +795,7 @@ ${
         }\n
 ### break ###`;
 
+        // console.log(bodyData);
         // ? combine api(s)
         const low = sorted_insert(compiledRoutes, route.path!);
         compiledRoutes.splice(low, 0, route.path!);
@@ -880,7 +880,6 @@ export function assignMiddleware(
     //
   }
 }
-
 
 export const v = {
   string: (options?: ValidationOptions) => new StringSchema(options),
@@ -1343,4 +1342,3 @@ export function getLocalIP() {
     }
   }
 }
-

@@ -73,8 +73,7 @@ export class Jetpath {
       ...(typeof options?.cors === 'object' ? options.cors : {}),
     });
     _rebuildCorsCloner();
-    // ? pre-seed context pool to avoid cold-start allocations
-    preSeedPool(256);
+
     //?
     if (!this.options.port) this.options.port = 8080;
   }
@@ -207,6 +206,8 @@ export class Jetpath {
     }
     this.listening = true;
     this._nativeServer = this.server;
+     // ? pre-seed context pool to avoid cold-start allocations
+    preSeedPool(256);
     this.server.listen(this.options.port);
     LOG.log(`Open http://localhost:${this.options.port}`, 'info');
     // ? show external IP

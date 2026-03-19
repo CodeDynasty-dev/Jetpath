@@ -19,7 +19,7 @@ import { parseRequest } from './parser.js';
 import { optionsCtx, baseCorsHeaders } from './cors.js';
 import { validator } from './validator.js';
 import { fs } from './fs.js';
-import { abstractPluginCreator } from './plugins.js';
+import { PluginBox } from './plugins.js';
 
 export class JetPlugin {
   plugin: any;
@@ -175,7 +175,6 @@ export class Context {
   connection?: JetSocket;
   method: methods | undefined;
   handler: JetRoute | null = null;
-  __jet_pool = true;
   plugins: Record<string, Function>;
   // ? state dirty flag — avoids Object.keys() check on pool reuse
   _8 = false;
@@ -201,7 +200,7 @@ export class Context {
   //? state
   _7: ctxState;
   constructor() {
-    this.plugins = abstractPluginCreator(this);
+    this.plugins = PluginBox.abstractPluginCreator(this);
     this._7 = new ctxState();
     // pre-populate headers from baseCorsHeaders
     for (const k in baseCorsHeaders) this._2[k] = baseCorsHeaders[k];
@@ -444,7 +443,7 @@ export class Context {
 
     // Parse request if not cached
     if (!this.$_internal_body) {
-      this.$_internal_body = (await parseRequest(this.request, options)) as any;
+      this.$_internal_body = await parseRequest(this.request, options);
     }
 
     // Validate body if needed and cache the result
@@ -851,11 +850,11 @@ export class JetServer {
     };
 
     // Return context to pool for test environments
-    if (ctx.__jet_pool) {
+     
       queueMicrotask(() => {
         if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
       });
-    }
+  
 
     return result;
   }
