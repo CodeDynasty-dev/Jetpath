@@ -385,7 +385,7 @@ export const getCtx = (
       ctx._queryValidated = false;
     }
     if (ctx._10) ctx._10 = false;
-    if (ctx._setCookies.length) ctx._setCookies = [];
+    if (ctx._setCookies?.length) ctx._setCookies = [];
     return ctx;
   }
   const ctx = new Context();
@@ -428,7 +428,7 @@ export const getScratchCtx = (
     ctx._10 = false;
     ctx.handler = route;
     ctx.code = 200;
-    if (ctx._setCookies.length) ctx._setCookies = [];
+    if (ctx._setCookies?.length) ctx._setCookies = [];
     if (ctx._3) ctx._3 = undefined;
     if (ctx._6 !== false) ctx._6 = false;
     if (ctx.$_internal_body) {

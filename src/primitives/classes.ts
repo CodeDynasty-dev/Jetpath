@@ -189,7 +189,7 @@ export class Context {
   // ? header of response
   _2: Record<string, string> = {};
   // ? Set-Cookie headers stored separately (must not be comma-joined per RFC 6265)
-  _setCookies: string[] = [];
+  _setCookies?: string[] = [];
   // ? true when _2 has been customized (set/send with contentType) — enables lazy clone
   _10 = false;
   // //? stream
@@ -285,7 +285,7 @@ export class Context {
 
   setCookie(name: string, value: string, options: CookieOptions = {}): void {
     const cookie = Cookie.serialize(name, value, options);
-    this._setCookies.push(cookie);
+    this._setCookies?.push(cookie);
   }
 
   clearCookie(name: string, options: CookieOptions = {}): void {

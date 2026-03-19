@@ -240,7 +240,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
     const body = ctx.payload;
     const code = ctx.code;
     const rawHeaders = ctx._10 ? _cloneJsonHeaders() : ctx._2;
-    const headers = buildHeaders(rawHeaders, ctx._setCookies);
+    const headers = buildHeaders(rawHeaders, ctx._setCookies || []);
     if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
     return new Response(body, { status: code, headers });
   }
@@ -253,13 +253,13 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
       return ctx._3.then((stream: any) => {
         return new Response(stream?.readable, {
           status: ctx.code,
-          headers: buildHeaders(ctx._2, ctx._setCookies),
+          headers: buildHeaders(ctx._2, ctx._setCookies || []),
         });
       });
     }
     const stream = ctx._3;
     const code = ctx.code;
-    const headers = buildHeaders(ctx._2, ctx._setCookies);
+    const headers = buildHeaders(ctx._2, ctx._setCookies || []);
     if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
     return new Response(stream as unknown as undefined, {
       status: code,
@@ -273,7 +273,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   }
   // ? fallback: empty response
   const code = ctx.code;
-  const headers = buildHeaders(ctx._2, ctx._setCookies);
+  const headers = buildHeaders(ctx._2, ctx._setCookies || []);
   if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
   return new Response(undefined, { status: code, headers });
 };;;;
@@ -286,7 +286,7 @@ const makeResNode = (
   if (ctx._3) {
     if (ctx._10) ctx._2['Content-Type'] = 'application/json';
     // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
-    if (ctx._setCookies.length) {
+    if (ctx._setCookies?.length) {
       for (const cookie of ctx._setCookies) res.setHeader('Set-Cookie', cookie);
     }
     res.writeHead(ctx.code, ctx._2);
@@ -322,7 +322,7 @@ const makeResNode = (
   const setCookies = ctx._setCookies;
   if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
   // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
-  if (setCookies.length) {
+  if (setCookies?.length) {
     for (const cookie of setCookies) res.setHeader('Set-Cookie', cookie);
   }
   res.writeHead(code, headers);
