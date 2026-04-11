@@ -653,7 +653,7 @@ function parseApiDocumentation(apiDocString: string) {
   return requests.map(parseRequest);
 }
 function parseRequest(requestString: string) {
-  const lines = requestString.split("\\n").map((line) => line.trim());
+  const lines = requestString.split("\n").map((line) => line.trim());
   const requestLine = lines[0].split(" ");
   const method = requestLine[0];
   const url = requestLine[1];
@@ -666,7 +666,7 @@ function parseRequest(requestString: string) {
   }
   const payloadIndex = lines.indexOf("") + 1;
   let payload = payloadIndex !== 0
-    ? lines.slice(payloadIndex).join("\\n")
+    ? lines.slice(payloadIndex).join("\n")
     : null;
   let title = "";
   let description = "";

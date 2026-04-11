@@ -1,6 +1,6 @@
 // src/routes/reviews.ts
 
-import { type JetRoute, use } from "../../dist/index.js";
+import { type JetRoute, use } from "jetpath";
 // Import AuthPluginType if authentication checks are done within route handlers
 import { type AuthPluginType } from "../plugins/auth.ts";
 // Import data models and in-memory data arrays

@@ -1,6 +1,6 @@
 // src/index.ts
 
-import { type JetMiddleware, Jetpath } from "../dist/index.js";
+import { type JetMiddleware, Jetpath } from "jetpath";
 // Create mock plugin files in src/plugins if you don't have real ones.
 import { authPlugin } from "./plugins/auth.ts";
 import { jetLogger } from "./plugins/logging.ts";
@@ -41,7 +41,7 @@ It demonstrates various Jetpath features including:
     username: "admin", // Default username from sample
     password: "1234", // Default password from sample **WARNING:** Do not use simple passwords in production. Use environment variables.
   },
-  source: "./example",
+  source: ".",
   // Configure global headers to be sent with all responses.
   globalHeaders: {
     "X-Pet-API-Version": "1.0.0", // Example custom header from sample

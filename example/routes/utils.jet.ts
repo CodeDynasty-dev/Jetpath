@@ -1,6 +1,6 @@
 // src/routes/utils.ts
 
-import { type JetFile, type JetRoute, use } from "../../dist/index.js";
+import { type JetFile, type JetRoute, use } from "jetpath";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path"; // Import join
 import { pets, reviews } from "../data/models.ts"; // Import data for stats route

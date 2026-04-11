@@ -1,0 +1,16 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "The goal is to make the codebase clearer for beginners by splitting the original monolithic file into logical modules, while preserving all the features and conventions demonstrated in the original sample.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "jetpath": "file:../../../../zips/jetpath-1.12.3.tgz"
+  }
+}

@@ -1,7 +1,7 @@
 // src/routes/pets.ts
 
 import { writeFile } from "node:fs/promises";
-import { type JetFile, type JetRoute, use } from "../../dist/index.js";
+import { type JetFile, type JetRoute, use } from "jetpath";
 // Import AuthPluginType if authentication checks are done within route handlers (besides global middleware)
 import { type AuthPluginType } from "../plugins/auth.ts";
 // Import data models and in-memory data arrays
@@ -194,7 +194,7 @@ export const GET_petBy$id: JetRoute<{
 }> = async function (ctx) {
   const petId = ctx.params.id; // Access the path parameter 'id'.
   // Access query parameter 'includeReviews' and convert to boolean.
-  const includeReviews = ctx.parseQuery().includeReviews === true ||
+  const includeReviews = ctx.parseQuery().includeReviews === "true" ||
     String(ctx.parseQuery().includeReviews).toLowerCase() === "true";
 
   // Find pet by id in the in-memory array.

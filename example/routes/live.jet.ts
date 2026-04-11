@@ -1,6 +1,6 @@
 // src/routes/live.ts
 
-import { type JetRoute, use } from "../../dist/index.js";
+import { type JetRoute, use } from "jetpath";
 // Import types if needed, e.g., for initial stats message
 import { pets } from "../data/models.ts"; // Import pets data for initial stats message
 
