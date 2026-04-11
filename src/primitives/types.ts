@@ -1,13 +1,12 @@
-import { IncomingMessage, Server, ServerResponse } from 'node:http';
-import type { _JetPath_paths, v } from './functions.js';
-import { type CookieOptions, SchemaBuilder } from './classes.js';
-import type { BunFile } from 'bun';
-import type Stream from 'node:stream';
+import { IncomingMessage, Server, ServerResponse } from "node:http";
+import type { _JetPath_paths, v } from "./functions.js";
+import { type CookieOptions, SchemaBuilder } from "./classes.js";
+import type { BunFile } from "bun";
+import type Stream from "node:stream";
 
 export type UnionToIntersection<U> = (
   U extends any ? (x: U) => void : never
-) extends (x: infer I) => void
-  ? I
+) extends (x: infer I) => void ? I
   : never;
 
 export interface JetContext<
@@ -63,7 +62,7 @@ export interface JetContext<
     config?: {
       folder?: string;
       ContentType?: string;
-    }
+    },
   ): void | never;
   /**
    * send a file for download
@@ -78,7 +77,7 @@ export interface JetContext<
     config?: {
       folder?: string;
       ContentType?: string;
-    }
+    },
   ): void;
   /**
    * send a direct response
@@ -111,7 +110,7 @@ export interface JetContext<
   parse(options?: {
     maxBodySize?: number;
     contentType?: string;
-  }): Promise<JetData['body']>;
+  }): Promise<JetData["body"]>;
   parseQuery(): Record<string, string>;
   /**
    * Upgrade the request to a WebSocket connection
@@ -141,20 +140,20 @@ export type JetPluginExecutorInitParams = {
 };
 
 export type contentType =
-  | 'application/x-www-form-urlencoded'
-  | 'multipart/form-data'
-  | 'application/json';
+  | "application/x-www-form-urlencoded"
+  | "multipart/form-data"
+  | "application/json";
 
 export type methods =
-  | 'GET'
-  | 'POST'
-  | 'OPTIONS'
-  | 'DELETE'
-  | 'HEAD'
-  | 'PUT'
-  | 'CONNECT'
-  | 'TRACE'
-  | 'PATCH';
+  | "GET"
+  | "POST"
+  | "OPTIONS"
+  | "DELETE"
+  | "HEAD"
+  | "PUT"
+  | "CONNECT"
+  | "TRACE"
+  | "PATCH";
 
 export type allowedMethods = methods[];
 
@@ -187,7 +186,7 @@ export type jetOptions = {
   /**
    * strict mode
    */
-  strictMode?: 'ON' | 'OFF' | 'WARN';
+  strictMode?: "ON" | "OFF" | "WARN";
   /**
    * generated routes file path
    * putting the file on the frontend folder will make it accessible
@@ -212,7 +211,7 @@ export type jetOptions = {
    * api documentation options
    */
   apiDoc?: {
-    display?: 'UI' | 'HTTP' | false;
+    display?: "UI" | "HTTP" | false;
     environments?: Record<string, string>;
     name?: string;
     info?: string;
@@ -238,22 +237,22 @@ export type jetOptions = {
    */
   cors?:
     | {
-        allowMethods?: allowedMethods;
-        secureContext?: {
-          'Cross-Origin-Opener-Policy':
-            | 'same-origin'
-            | 'unsafe-none'
-            | 'same-origin-allow-popups';
-          'Cross-Origin-Embedder-Policy': 'require-corp' | 'unsafe-none';
-        };
-        allowHeaders?: string[];
-        exposeHeaders?: string[];
-        keepHeadersOnError?: boolean;
-        maxAge?: string;
-        credentials?: boolean;
-        privateNetworkAccess?: any;
-        origin?: string[];
-      }
+      allowMethods?: allowedMethods;
+      secureContext?: {
+        "Cross-Origin-Opener-Policy":
+          | "same-origin"
+          | "unsafe-none"
+          | "same-origin-allow-popups";
+        "Cross-Origin-Embedder-Policy": "require-corp" | "unsafe-none";
+      };
+      allowHeaders?: string[];
+      exposeHeaders?: string[];
+      keepHeadersOnError?: boolean;
+      maxAge?: string;
+      credentials?: boolean;
+      privateNetworkAccess?: any;
+      origin?: string[];
+    }
     | boolean;
 };
 
@@ -261,33 +260,33 @@ export type HTTPBody<Obj extends Record<string, any>> = {
   [x in keyof Obj]: {
     err?: string;
     type?:
-      | 'string'
-      | 'number'
-      | 'file'
-      | 'object'
-      | 'boolean'
-      | 'array'
-      | 'date';
+      | "string"
+      | "number"
+      | "file"
+      | "object"
+      | "boolean"
+      | "array"
+      | "date";
     arrayType?:
-      | 'string'
-      | 'number'
-      | 'file'
-      | 'object'
-      | 'boolean'
-      | 'array'
-      | 'date';
+      | "string"
+      | "number"
+      | "file"
+      | "object"
+      | "boolean"
+      | "array"
+      | "date";
     RegExp?: RegExp;
     inputAccept?: string;
     inputType?:
-      | 'date'
-      | 'email'
-      | 'file'
-      | 'password'
-      | 'number'
-      | 'time'
-      | 'tel'
-      | 'datetime'
-      | 'url';
+      | "date"
+      | "email"
+      | "file"
+      | "password"
+      | "number"
+      | "time"
+      | "tel"
+      | "datetime"
+      | "url";
     inputDefaultValue?: string | number | boolean;
     required?: boolean;
     validator?: (value: any) => boolean | string;
@@ -303,21 +302,21 @@ export type Middleware<
   } = { body: {}; params: {}; query: {} },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = (
-  ctx: JetContext<JetData, JetPluginTypes>
+  ctx: JetContext<JetData, JetPluginTypes>,
 ) =>
   | void
   | Promise<void>
   | ((
-      ctx: JetContext<JetData, JetPluginTypes>,
-      error: unknown
-    ) => void | Promise<void>)
+    ctx: JetContext<JetData, JetPluginTypes>,
+    error: unknown,
+  ) => void | Promise<void>)
   | Promise<
-      | ((
-          ctx: JetContext<JetData, JetPluginTypes>,
-          error: unknown
-        ) => void | Promise<void>)
-      | undefined
-    >
+    | ((
+      ctx: JetContext<JetData, JetPluginTypes>,
+      error: unknown,
+    ) => void | Promise<void>)
+    | undefined
+  >
   | undefined;
 
 export type JetMiddleware<
@@ -340,31 +339,31 @@ export type JetRoute<
     params: {};
     query: {};
     response: {};
-    title: '';
-    description: '';
-    method: '';
-    path: '';
+    title: "";
+    description: "";
+    method: "";
+    path: "";
     jet_middleware: [];
   },
   JetPluginTypes extends Record<string, unknown>[] = [],
 > = {
   (ctx: JetContext<JetData, JetPluginTypes>): Promise<void> | void;
-  body?: HTTPBody<JetData['body'] & Record<string, any>>;
+  body?: HTTPBody<JetData["body"] & Record<string, any>>;
   headers?: Record<string, string>;
   title?: string;
   description?: string;
   method?: string;
   path?: string;
   jet_middleware?: Middleware[];
-  params?: HTTPBody<JetData['params'] & Record<string, any>>;
-  query?: HTTPBody<JetData['query'] & Record<string, any>>;
-  response?: HTTPBody<JetData['response'] & Record<string, any>>;
+  params?: HTTPBody<JetData["params"] & Record<string, any>>;
+  query?: HTTPBody<JetData["query"] & Record<string, any>>;
+  response?: HTTPBody<JetData["response"] & Record<string, any>>;
 };
 
 interface jet_socket {
   addEventListener(
-    event: 'message' | 'close' | 'drain' | 'open',
-    listener: (socket: WebSocket, ...params: any[]) => void
+    event: "message" | "close" | "drain" | "open",
+    listener: (socket: WebSocket, ...params: any[]) => void,
   ): void;
 }
 
@@ -375,13 +374,13 @@ export type JetFile = {
 };
 
 export type SchemaType =
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'array'
-  | 'object'
-  | 'date'
-  | 'file';
+  | "string"
+  | "number"
+  | "boolean"
+  | "array"
+  | "object"
+  | "date"
+  | "file";
 
 export interface ValidationOptions {
   err?: string;
@@ -397,7 +396,7 @@ export interface FileOptions {
 }
 
 export interface ArrayOptions extends ValidationOptions {
-  arrayType?: SchemaType | 'object';
+  arrayType?: SchemaType | "object";
   objectSchema?: HTTPBody<any>;
 }
 
@@ -405,11 +404,13 @@ export interface ObjectOptions extends ValidationOptions {
   objectSchema?: HTTPBody<any>;
 }
 
-export type SchemaDefinition = {
-  type: SchemaType;
-} & ValidationOptions &
-  ArrayOptions &
-  ObjectOptions;
+export type SchemaDefinition =
+  & {
+    type: SchemaType;
+  }
+  & ValidationOptions
+  & ArrayOptions
+  & ObjectOptions;
 
 export type compilerType<
   JetData extends {
@@ -426,20 +427,20 @@ export type compilerType<
    */
   body: (
     schemaFn: (
-      t: typeof v
+      t: typeof v,
     ) => Partial<
-      Record<keyof HTTPBody<NonNullable<JetData['body']>>, SchemaBuilder>
-    >
+      Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>
+    >,
   ) => compilerType<JetData, JetPluginTypes>;
   /**
    * Sets the API body validation and documentation body for the endpoint
    */
   response: (
     schemaFn: (
-      t: typeof v
+      t: typeof v,
     ) => Partial<
-      Record<keyof HTTPBody<NonNullable<JetData['response']>>, SchemaBuilder>
-    >
+      Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
+    >,
   ) => compilerType<JetData, JetPluginTypes>;
   //? docs and validation
   /**
@@ -447,10 +448,10 @@ export type compilerType<
    */
   query: (
     schemaFn: (
-      t: typeof v
+      t: typeof v,
     ) => Partial<
-      Record<keyof HTTPBody<NonNullable<JetData['query']>>, SchemaBuilder>
-    >
+      Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>
+    >,
   ) => compilerType<JetData, JetPluginTypes>;
 
   //? docs only

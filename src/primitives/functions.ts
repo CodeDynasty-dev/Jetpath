@@ -1,5 +1,5 @@
 // type imports
-import { type IncomingMessage, type ServerResponse } from 'node:http';
+import { type IncomingMessage, type ServerResponse } from "node:http";
 import type {
   compilerType,
   FileOptions,
@@ -10,7 +10,7 @@ import type {
   methods,
   SchemaDefinition,
   ValidationOptions,
-} from './types.js';
+} from "./types.js";
 import {
   ArraySchema,
   BooleanSchema,
@@ -25,19 +25,19 @@ import {
   SchemaBuilder,
   SchemaCompiler,
   StringSchema,
-} from './classes.js';
+} from "./classes.js";
 import {
+  _cloneJsonHeaders,
   ctxPool,
   isNode,
+  MAX_POOL_SIZE,
+  returnScratchCtx,
   runtime,
   Trie,
-  returnScratchCtx,
-  _cloneJsonHeaders,
-  MAX_POOL_SIZE,
-} from './trie-router.js';
-import { optionsCtx } from './cors.js';
-import { fs } from './fs.js';
-import { PluginBox } from './plugins.js';
+} from "./trie-router.js";
+import { optionsCtx } from "./cors.js";
+import { fs } from "./fs.js";
+import { PluginBox } from "./plugins.js";
 
 export const _JetPath_paths: Record<methods, Record<string, JetRoute>> = {
   GET: {},
@@ -52,15 +52,15 @@ export const _JetPath_paths: Record<methods, Record<string, JetRoute>> = {
 };
 
 export const _JetPath_paths_trie: Record<methods, Trie> = {
-  GET: new Trie('GET'),
-  POST: new Trie('POST'),
-  HEAD: new Trie('HEAD'),
-  PUT: new Trie('PUT'),
-  PATCH: new Trie('PATCH'),
-  DELETE: new Trie('DELETE'),
-  OPTIONS: new Trie('OPTIONS'),
-  TRACE: new Trie('TRACE'),
-  CONNECT: new Trie('CONNECT'),
+  GET: new Trie("GET"),
+  POST: new Trie("POST"),
+  HEAD: new Trie("HEAD"),
+  PUT: new Trie("PUT"),
+  PATCH: new Trie("PATCH"),
+  DELETE: new Trie("DELETE"),
+  OPTIONS: new Trie("OPTIONS"),
+  TRACE: new Trie("TRACE"),
+  CONNECT: new Trie("CONNECT"),
 };
 
 export const _jet_middleware: Record<
@@ -72,12 +72,12 @@ export const _jet_middleware: Record<
 // ? server
 export const server = (
   plugs: JetPlugin[],
-  options: jetOptions
+  options: jetOptions,
 ): { listen: any; edge: boolean } => {
   let server;
   let server_else;
   const runtimeConfig = options.runtimes;
-  if (runtime['node']) {
+  if (runtime["node"]) {
     server = fs().createServer(
       {
         keepAliveTimeout: options.keepAliveTimeout || 120_000,
@@ -86,10 +86,10 @@ export const server = (
       (x: unknown, y: unknown) => {
         // @ts-expect-error to avoid the any error
         Jetpath(x, y);
-      }
+      },
     );
   }
-  if (runtime['deno']) {
+  if (runtime["deno"]) {
     server = {
       listen(port: number) {
         // @ts-expect-error to avoid the Deno keyword
@@ -98,28 +98,29 @@ export const server = (
       edge: false,
     };
   }
-  if (runtime['cloudflare_worker']) {
+  if (runtime["cloudflare_worker"]) {
     server = {
       listen() {
         // Cloudflare Worker uses `addEventListener("fetch", ...)`
-        addEventListener('fetch', (event: FetchEvent) => {
+        addEventListener("fetch", (event: FetchEvent) => {
           event.respondWith(JetpathBunDeno(event.request));
         });
       },
       edge: true,
     };
   }
-  if (runtime['aws_lambda']) {
+  if (runtime["aws_lambda"]) {
     server = {
       listen() {
         // AWS Lambda requires exporting a handler function
         // Use globalThis for ESM compatibility
         const awsHandler = async (event: any) => {
-          const url =
-            event.rawUrl ||
-            `https://${event.requestContext?.domainName || 'localhost'}${event.rawPath || '/'}`;
+          const url = event.rawUrl ||
+            `https://${event.requestContext?.domainName || "localhost"}${
+              event.rawPath || "/"
+            }`;
           const req = new Request(url, {
-            method: event.requestContext?.http?.method || 'GET',
+            method: event.requestContext?.http?.method || "GET",
             headers: event.headers,
             body: event.body,
           });
@@ -142,7 +143,7 @@ export const server = (
       edge: true,
     };
   }
-  if (runtime['bun']) {
+  if (runtime["bun"]) {
     if (options.upgrade && options.upgrade === true) {
       server = {
         listen(port: number) {
@@ -156,16 +157,16 @@ export const server = (
                   // @ts-expect-error to avoid the type errorm ensuring we pass the opionated data prop.
                   data: p[1],
                 };
-                JetSocketInstance.__binder('message', p);
+                JetSocketInstance.__binder("message", p);
               },
               close(...p) {
-                JetSocketInstance.__binder('close', p);
+                JetSocketInstance.__binder("close", p);
               },
               drain(...p) {
-                JetSocketInstance.__binder('drain', p);
+                JetSocketInstance.__binder("drain", p);
               },
               open(...p) {
-                JetSocketInstance.__binder('open', p);
+                JetSocketInstance.__binder("open", p);
               },
             },
           });
@@ -190,7 +191,7 @@ export const server = (
   //? compile plugins
   for (let i = 0; i < plugs.length; i++) {
     const decs = plugs[i].setup({
-      server: !runtime['node'] ? server_else! : server!,
+      server: !runtime["node"] ? server_else! : server!,
       runtime: runtime as any,
       routesObject: _JetPath_paths,
       JetPath_app: Jetpath as any,
@@ -200,13 +201,13 @@ export const server = (
 
   const edgePlugin = plugs.find((plug) => plug.plugin.server);
   LOG.log(
-    `${plugs.length} plugins, ${edgePlugin ? 'one' : 'no'} edge plguin`,
-    'info'
+    `${plugs.length} plugins, ${edgePlugin ? "one" : "no"} edge plguin`,
+    "info",
   );
   // ? adding ctx plugin bindings
   if (edgePlugin) {
     const edge_server = edgePlugin.plugin.server({
-      server: !runtime['node'] ? server_else! : server!,
+      server: !runtime["node"] ? server_else! : server!,
       runtime: runtime,
       routesObject: _JetPath_paths,
       handler: isNode ? Jetpath : JetpathBunDeno,
@@ -224,7 +225,7 @@ let makeRes: (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
-  ctx: Context
+  ctx: Context,
 ) => any;
 
 const makeResBunAndDeno = (_res: any, ctx: Context) => {
@@ -232,7 +233,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   const buildHeaders = (base: Record<string, string>, cookies: string[]) => {
     if (!cookies.length) return base;
     const h = new Headers(base);
-    for (const c of cookies) h.append('Set-Cookie', c);
+    for (const c of cookies) h.append("Set-Cookie", c);
     return h;
   };
   // ? fast path: normal response (most common — no stream, no custom response)
@@ -248,7 +249,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   if (ctx._3) {
     // handle deno promise.
     // @ts-expect-error to avoid .then error on stream type
-    if (runtime['deno'] && ctx._3.then) {
+    if (runtime["deno"] && ctx._3.then) {
       // @ts-expect-error same
       return ctx._3.then((stream: any) => {
         return new Response(stream?.readable, {
@@ -281,13 +282,13 @@ const makeResNode = (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
-  ctx: Context
+  ctx: Context,
 ) => {
   if (ctx._3) {
-    if (ctx._10) ctx._2['Content-Type'] = 'application/json';
+    if (ctx._10) ctx._2["Content-Type"] = "application/json";
     // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
     if (ctx._setCookies?.length) {
-      for (const cookie of ctx._setCookies) res.setHeader('Set-Cookie', cookie);
+      for (const cookie of ctx._setCookies) res.setHeader("Set-Cookie", cookie);
     }
     res.writeHead(ctx.code, ctx._2);
     const stream = ctx._3;
@@ -300,30 +301,30 @@ const makeResNode = (
     };
     const errorHandler = () => {
       res.statusCode = 400;
-      res.end('not found');
+      res.end("not found");
       if (stream) {
         stream.removeAllListeners();
-        if (typeof (stream as any).destroy === 'function') {
+        if (typeof (stream as any).destroy === "function") {
           (stream as any).destroy();
         }
       }
       returnToPool();
     };
-    stream.on('error', errorHandler);
+    stream.on("error", errorHandler);
     stream.pipe(res);
-    stream.on('end', returnToPool);
+    stream.on("end", returnToPool);
     return undefined;
   }
   const code = ctx.code;
   // ? for Node, _10 means JSON — need to set Content-Type on _2 since writeHead uses it
-  if (ctx._10) ctx._2['Content-Type'] = 'application/json';
+  if (ctx._10) ctx._2["Content-Type"] = "application/json";
   const headers = ctx._2;
   const payload = ctx.payload;
   const setCookies = ctx._setCookies;
   if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
   // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
   if (setCookies?.length) {
-    for (const cookie of setCookies) res.setHeader('Set-Cookie', cookie);
+    for (const cookie of setCookies) res.setHeader("Set-Cookie", cookie);
   }
   res.writeHead(code, headers);
   res.end(payload);
@@ -338,7 +339,7 @@ if (isNode) {
 
 // ? Bun/Deno: fully inlined handler — no indirection through makeRes variable
 const JetpathBunDeno = (req: Request) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     optionsCtx.code = 200;
     return new Response(undefined, {
       status: 200,
@@ -346,8 +347,9 @@ const JetpathBunDeno = (req: Request) => {
     });
   }
 
-  const ctx =
-    _JetPath_paths_trie[req.method as methods].get_responder_fast(req);
+  const ctx = _JetPath_paths_trie[req.method as methods].get_responder_fast(
+    req,
+  );
   if (ctx) {
     const r = ctx.handler!;
     // ? fast path: no middleware
@@ -357,7 +359,7 @@ const JetpathBunDeno = (req: Request) => {
         // ? most routes are sync and return undefined — skip promise check
         if (
           result !== undefined &&
-          typeof (result as any).then === 'function'
+          typeof (result as any).then === "function"
         ) {
           return (result as Promise<any>).then(
             () => {
@@ -374,7 +376,7 @@ const JetpathBunDeno = (req: Request) => {
               const headers = ctx._2;
               returnScratchCtx(ctx);
               return new Response(undefined, { status: code, headers });
-            }
+            },
           );
         }
         // ? inline makeRes for sync path — hottest path in benchmarks
@@ -428,16 +430,16 @@ const Jetpath = (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
-  }
+  },
 ) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     optionsCtx.code = 200;
     return makeRes(res, optionsCtx as unknown as Context);
   }
 
   const ctx = _JetPath_paths_trie[req.method as methods].get_responder(
     req,
-    res
+    res,
   );
   if (ctx) {
     const r = ctx.handler!;
@@ -448,7 +450,7 @@ const Jetpath = (
         // ? most routes are sync and return undefined — skip promise check
         if (
           result !== undefined &&
-          typeof (result as any).then === 'function'
+          typeof (result as any).then === "function"
         ) {
           return (result as Promise<any>).then(
             () => makeRes(res, ctx),
@@ -456,7 +458,7 @@ const Jetpath = (
               console.log(error);
               if (ctx.code < 400) ctx.code = 500;
               return makeRes(res, ctx);
-            }
+            },
           );
         }
         return makeRes(res, ctx);
@@ -478,7 +480,7 @@ const _runWithMiddleware = async (r: any, ctx: Context, res: any) => {
   try {
     for (let m = 0; m < r.jet_middleware.length; m++) {
       const callback = await r.jet_middleware[m](ctx as any);
-      if (typeof callback === 'function') {
+      if (typeof callback === "function") {
         returned.unshift(callback);
       }
     }
@@ -509,30 +511,31 @@ const _runWithMiddleware = async (r: any, ctx: Context, res: any) => {
 };
 
 const handlersPath = (path: string) => {
-  path = path.replaceAll('__', '-'); // ? convert __ to -
-  const [method, ...segments] = path.split('_');
-  let route = '/' + segments.join('/');
+  path = path.replaceAll("__", "-"); // ? convert __ to -
+  const [method, ...segments] = path.split("_");
+  let route = "/" + segments.join("/");
   // eslint-disable-next-line no-useless-escape
   route = route
-    .replace(/\$0/g, '/*') // Convert wildcard
-    .replace(/\$/g, '/:') // Convert params
-    .replaceAll(/\/\//g, '/'); // change normalize akk extra /(s) to just /
-  return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE|HEAD|CONNECT|TRACE)$/.test(
-    method
-  )
+    .replace(/\$0/g, "/*") // Convert wildcard
+    .replace(/\$/g, "/:") // Convert params
+    .replaceAll(/\/\//g, "/"); // change normalize akk extra /(s) to just /
+  return /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|MIDDLEWARE|HEAD|CONNECT|TRACE)$/
+      .test(
+        method,
+      )
     ? ([method, route] as [string, string])
     : undefined;
 };
 
 const getModule = async (src: string, name: string) => {
-  const absolutePath = fs().resolve(src + '/' + name); //? Gets native OS path
+  const absolutePath = fs().resolve(src + "/" + name); //? Gets native OS path
   try {
     const fileUrl = fs().pathToFileURL(absolutePath).href;
     const mod = await import(fileUrl);
     return mod;
   } catch (error) {
-    LOG.log('Error at ' + absolutePath + ' loading failed!', 'info');
-    LOG.log(String(error), 'error');
+    LOG.log("Error at " + absolutePath + " loading failed!", "info");
+    LOG.log(String(error), "error");
     return String(error);
   }
 };
@@ -541,16 +544,16 @@ export async function getHandlers(
   source: string,
   print: boolean,
   errorsCount: { file: string; error: string }[] | undefined = undefined,
-  again = false
+  again = false,
 ) {
   const curr_d = fs().cwd();
   const error_source = source;
-  source = source || '';
+  source = source || "";
   if (!again) {
     source = fs().resolve(fs().join(curr_d, source));
     if (!source.includes(curr_d)) {
-      LOG.log('source: "' + error_source + '" is invalid', 'warn');
-      LOG.log('Jetpath source must be within the project directory', 'error');
+      LOG.log('source: "' + error_source + '" is invalid', "warn");
+      LOG.log("Jetpath source must be within the project directory", "error");
       process.exit(1);
     }
   } else {
@@ -560,28 +563,28 @@ export async function getHandlers(
   for await (const dirent of dir) {
     if (
       dirent.isFile() &&
-      (dirent.name.endsWith('.jet.js') || dirent.name.endsWith('.jet.ts'))
+      (dirent.name.endsWith(".jet.js") || dirent.name.endsWith(".jet.ts"))
     ) {
       if (print) {
         LOG.log(
-          'Loading ' +
-            source.replace(curr_d + '/', '') +
+          "Loading " +
+            source.replace(curr_d + "/", "") +
             fs().sep +
             dirent.name,
-          'info'
+          "info",
         );
       }
       try {
         const module = await getModule(source, dirent.name);
-        if (typeof module !== 'string') {
+        if (typeof module !== "string") {
           for (const p in module) {
             const params = handlersPath(p);
             if (params) {
-              if (p.startsWith('MIDDLEWARE')) {
+              if (p.startsWith("MIDDLEWARE")) {
                 _jet_middleware[params[1]] = module[p];
               } else {
                 // ! HTTP handler
-                if (typeof params !== 'string') {
+                if (typeof params !== "string") {
                   try {
                     // ? set the method
                     module[p]!.method = params[0];
@@ -590,7 +593,7 @@ export async function getHandlers(
                     // Insert into Trie - it will decide whether to store in hashmap or Trie
                     _JetPath_paths_trie[params[0] as methods].insert(
                       params[1],
-                      module[p] as JetRoute
+                      module[p] as JetRoute,
                     );
                     // Also store in _JetPath_paths for backward compatibility and middleware assignment
                     _JetPath_paths[params[0] as methods][params[1]] = module[
@@ -602,8 +605,7 @@ export async function getHandlers(
                       errorsCount = [];
                     }
                     errorsCount.push({
-                      file:
-                        source.replace(curr_d + '/', '') +
+                      file: source.replace(curr_d + "/", "") +
                         fs().sep +
                         dirent.name,
                       error: String(routeError),
@@ -619,7 +621,7 @@ export async function getHandlers(
             errorsCount = [];
           }
           errorsCount.push({
-            file: dirent.path + '/' + dirent.name,
+            file: dirent.path + "/" + dirent.name,
             error: module,
           });
         }
@@ -628,21 +630,21 @@ export async function getHandlers(
           errorsCount = [];
         }
         errorsCount.push({
-          file: dirent.path + '/' + dirent.name,
+          file: dirent.path + "/" + dirent.name,
           error: String(error),
         });
       }
     }
     if (
       dirent.isDirectory() &&
-      dirent.name !== 'node_modules' &&
-      dirent.name !== '.git'
+      dirent.name !== "node_modules" &&
+      dirent.name !== ".git"
     ) {
       errorsCount = await getHandlers(
-        source + '/' + dirent.name,
+        source + "/" + dirent.name,
         print,
         errorsCount,
-        true
+        true,
       );
     }
   }
@@ -653,11 +655,11 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
   for (const p in modules) {
     const params = handlersPath(p);
     if (params) {
-      if (p.startsWith('MIDDLEWARE')) {
+      if (p.startsWith("MIDDLEWARE")) {
         _jet_middleware[params[1]] = modules[p] as any;
       } else {
         // ! HTTP handler
-        if (typeof params !== 'string') {
+        if (typeof params !== "string") {
           try {
             // ? set the method
             modules[p]!.method = params[0];
@@ -666,7 +668,7 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
             // Insert into Trie - it will decide whether to store in hashmap or Trie
             _JetPath_paths_trie[params[0] as methods].insert(
               params[1],
-              modules[p] as JetRoute
+              modules[p] as JetRoute,
             );
             // Also store in _JetPath_paths for backward compatibility and middleware assignment
             _JetPath_paths[params[0] as methods][params[1]] = modules[
@@ -675,7 +677,7 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
           } catch (routeError) {
             LOG.log(
               `Route ${params[0]} ${params[1]} skipped: ${String(routeError)}`,
-              'warn'
+              "warn",
             );
           }
         }
@@ -688,27 +690,27 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
   const globalHeaders = JSON.stringify(
     options?.globalHeaders || {
-      Authorization: 'Bearer <jwt token>',
-    }
+      Authorization: "Bearer <jwt token>",
+    },
   );
 
-  return UI.replace('{ JETPATH }', api)
+  return UI.replace("{ JETPATH }", api)
     .replaceAll(
-      '{ JETENVIRONMENTS }',
-      JSON.stringify(options?.apiDoc?.environments || {})
+      "{ JETENVIRONMENTS }",
+      JSON.stringify(options?.apiDoc?.environments || {}),
     )
-    .replaceAll('{ JETPATHGH }', globalHeaders)
-    .replaceAll('{NAME}', options?.apiDoc?.name || 'Jetpath API Doc')
-    .replaceAll('JETPATHCOLOR', options?.apiDoc?.color || '#4285f4')
+    .replaceAll("{ JETPATHGH }", globalHeaders)
+    .replaceAll("{NAME}", options?.apiDoc?.name || "Jetpath API Doc")
+    .replaceAll("JETPATHCOLOR", options?.apiDoc?.color || "#4285f4")
     .replaceAll(
-      '{LOGO}',
+      "{LOGO}",
       options?.apiDoc?.logo ||
-        'https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/icon-transparent.png'
+        "https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/icon-transparent.png",
     )
     .replaceAll(
-      '{INFO}',
-      options?.apiDoc?.info?.replaceAll('\n', '<br>') ||
-        'This is a Jetpath api preview.'
+      "{INFO}",
+      options?.apiDoc?.info?.replaceAll("\n", "<br>") ||
+        "This is a Jetpath api preview.",
     );
 };
 
@@ -722,7 +724,7 @@ export const compileAPI = (options: jetOptions): [number, string] => {
   for (const method in _JetPath_paths) {
     // ? get all api paths from router for each method;
     const routesOfMethod: JetRoute[] = Object.keys(
-      _JetPath_paths[method as methods]
+      _JetPath_paths[method as methods],
     )
       .map((value) => _JetPath_paths[method as methods][value])
       .filter((value) => value.length > 0);
@@ -740,7 +742,7 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         // ? parse headers
         for (const name in initialHeader) {
           headers.push(
-            name + ':' + initialHeader[name as keyof typeof initialHeader]
+            name + ":" + initialHeader[name as keyof typeof initialHeader],
           );
         }
         // ? parse body
@@ -750,21 +752,21 @@ export const compileAPI = (options: jetOptions): [number, string] => {
           const processSchema = (schema: any, target: any) => {
             for (const key in schema) {
               const field = schema[key];
-              if (field.type === 'object' && field.objectSchema) {
+              if (field.type === "object" && field.objectSchema) {
                 target[key] = {};
                 processSchema(field.objectSchema, target[key]);
-              } else if (field.type === 'array') {
-                if (field.arrayType === 'object' && field.objectSchema) {
+              } else if (field.type === "array") {
+                if (field.arrayType === "object" && field.objectSchema) {
                   target[key] = [{}];
                   processSchema(field.objectSchema, target[key][0]);
                 } else {
                   target[key] = [
-                    field.arrayType + ':' + (field.arrayDefaultValue || ''),
+                    field.arrayType + ":" + (field.arrayDefaultValue || ""),
                   ];
                 }
               } else {
-                target[key] =
-                  field?.inputType + ':' + (field?.inputDefaultValue || '');
+                target[key] = field?.inputType + ":" +
+                  (field?.inputDefaultValue || "");
               }
             }
           };
@@ -773,25 +775,27 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         // ? combine api infos into .http format
         const api = `\n
 ${method} ${
-          options?.apiDoc?.display === 'UI'
-            ? '[--host--]'
-            : 'http://localhost:' + (options?.port || 8080)
+          options?.apiDoc?.display === "UI"
+            ? "[--host--]"
+            : "http://localhost:" + (options?.port || 8080)
         }${route.path} HTTP/1.1
-${headers.length ? headers.join('\n') : ''}\n
+${headers.length ? headers.join("\n") : ""}\n
 ${
-  (body && method !== 'GET' ? method : '') ? JSON.stringify(bodyData) : ''
-}\n\n${
-          validator?.['title']
-            ? '#-JET-TITLE ' +
-              validator?.['title'].replaceAll('\n', '\n# ') +
-              '#-JET-TITLE'
-            : ''
+          (body && method !== "GET" ? method : "")
+            ? JSON.stringify(bodyData)
+            : ""
+        }\n\n${
+          validator?.["title"]
+            ? "#-JET-TITLE " +
+              validator?.["title"].replaceAll("\n", "\n# ") +
+              "#-JET-TITLE"
+            : ""
         }\n${
-          validator?.['description']
-            ? '#-JET-DESCRIPTION\n# ' +
-              validator?.['description'].replaceAll('\n', '\n# ') +
-              '\n#-JET-DESCRIPTION'
-            : ''
+          validator?.["description"]
+            ? "#-JET-DESCRIPTION\n# " +
+              validator?.["description"].replaceAll("\n", "\n# ") +
+              "\n#-JET-DESCRIPTION"
+            : ""
         }\n
 ### break ###`;
 
@@ -807,14 +811,14 @@ ${
   }
   // sort and join here
 
-  const compileAPIString = compiledAPIArray.join('');
+  const compileAPIString = compiledAPIArray.join("");
   return [handlersCount, compileAPIString];
 };
 
 const sorted_insert = (paths: string[], path: string): number => {
   let low = 0;
   let high = paths.length - 1;
-  for (; low <= high; ) {
+  for (; low <= high;) {
     const mid = Math.floor((low + high) / 2);
     const current = paths[mid];
     if (current < path) {
@@ -838,14 +842,14 @@ export function assignMiddleware(
   _jet_middleware: {
     [route: string]:
       | ((
-          ctx: any
-          // next: () => Promise<void>,
-        ) => Promise<void> | void)
+        ctx: any,
+        // next: () => Promise<void>,
+      ) => Promise<void> | void)
       | ((
-          ctx: any
-          // next: () => Promise<void>,
-        ) => Promise<void> | void)[];
-  }
+        ctx: any,
+        // next: () => Promise<void>,
+      ) => Promise<void> | void)[];
+  },
 ): void {
   // Iterate over each HTTP method's routes.
   for (const method in _JetPath_paths) {
@@ -892,7 +896,7 @@ export const v = {
 };
 
 function createSchema<T extends Record<string, any>>(
-  schemaDefinition: (t: typeof v) => Record<string, SchemaBuilder>
+  schemaDefinition: (t: typeof v) => Record<string, SchemaBuilder>,
 ): HTTPBody<T> {
   const rawSchema = schemaDefinition(v);
   return SchemaCompiler.compile(rawSchema);
@@ -912,7 +916,7 @@ export function use<
   },
   JetPluginTypes extends Record<string, unknown>[] = [],
 >(
-  endpoint: JetRoute<JetData, JetPluginTypes>
+  endpoint: JetRoute<JetData, JetPluginTypes>,
 ): compilerType<JetData, JetPluginTypes> {
   const compiler = {
     /**
@@ -920,10 +924,10 @@ export function use<
      */
     body: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
-        Record<keyof HTTPBody<NonNullable<JetData['body']>>, SchemaBuilder>
-      >
+        Record<keyof HTTPBody<NonNullable<JetData["body"]>>, SchemaBuilder>
+      >,
     ) {
       endpoint.body = createSchema(schemaFn as any) as any;
       return compiler;
@@ -933,10 +937,10 @@ export function use<
      */
     response: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
-        Record<keyof HTTPBody<NonNullable<JetData['response']>>, SchemaBuilder>
-      >
+        Record<keyof HTTPBody<NonNullable<JetData["response"]>>, SchemaBuilder>
+      >,
     ) {
       endpoint.response = createSchema(schemaFn as any) as any;
       return compiler;
@@ -946,8 +950,8 @@ export function use<
      * @param {Object} headers - The API documentation headers
      */
     headers: function (headers: Record<string, string>) {
-      if (typeof endpoint !== 'function') {
-        throw new Error('Endpoint must be a function');
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
       }
       endpoint.headers = headers;
       return compiler;
@@ -957,8 +961,8 @@ export function use<
      * @param {string} title - The API documentation title
      */
     title: function (title: string) {
-      if (typeof endpoint !== 'function') {
-        throw new Error('Endpoint must be a function');
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
       }
       endpoint.title = title;
       return compiler;
@@ -968,8 +972,8 @@ export function use<
      * @param {string} description - The API documentation description
      */
     description: function (description: string) {
-      if (typeof endpoint !== 'function') {
-        throw new Error('Endpoint must be a function');
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
       }
       endpoint.description = description;
       return compiler;
@@ -979,13 +983,13 @@ export function use<
      */
     params: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
-        Record<keyof HTTPBody<NonNullable<JetData['params']>>, SchemaBuilder>
-      >
+        Record<keyof HTTPBody<NonNullable<JetData["params"]>>, SchemaBuilder>
+      >,
     ) {
-      if (typeof endpoint !== 'function') {
-        throw new Error('Endpoint must be a function');
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
       }
       endpoint.params = createSchema(schemaFn as any) as any;
       return compiler;
@@ -993,13 +997,13 @@ export function use<
 
     query: function (
       schemaFn: (
-        t: typeof v
+        t: typeof v,
       ) => Partial<
-        Record<keyof HTTPBody<NonNullable<JetData['query']>>, SchemaBuilder>
-      >
+        Record<keyof HTTPBody<NonNullable<JetData["query"]>>, SchemaBuilder>
+      >,
     ) {
-      if (typeof endpoint !== 'function') {
-        throw new Error('Endpoint must be a function');
+      if (typeof endpoint !== "function") {
+        throw new Error("Endpoint must be a function");
       }
       endpoint.query = createSchema(schemaFn as any) as any;
       return compiler;
@@ -1011,9 +1015,9 @@ export function use<
 //? needs to optimized, does exactly the same as the getModule function
 export async function codeGen(
   ROUTES_DIR: string,
-  mode: 'ON' | 'WARN',
+  mode: "ON" | "WARN",
   connectionLinks: { local: string; external: string },
-  generatedRoutesFilePath?: string
+  generatedRoutesFilePath?: string,
 ) {
   //? Regex to find exported const variables
   // ? let's make sure if this line is a comments then it should not be matched!
@@ -1023,12 +1027,12 @@ export async function codeGen(
   const METHOD_PATH_REGEX =
     /(?:GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|MIDDLEWARE)_[a-zA-Z0-9$_]*$/;
   const OUTPUT_FILE = fs().resolve(
-    fs().join(fs().cwd(), 'node_modules', '@jetpath', 'index.ts')
+    fs().join(fs().cwd(), "node_modules", "@jetpath", "index.ts"),
   );
   const ROUTE_FILE = fs().resolve(
     generatedRoutesFilePath
       ? generatedRoutesFilePath
-      : fs().join(fs().cwd(), 'definitions.ts')
+      : fs().join(fs().cwd(), "definitions.ts"),
   );
 
   fs().mkdirSync(fs().dirname(OUTPUT_FILE), { recursive: true });
@@ -1044,12 +1048,12 @@ export async function codeGen(
         const fullPath = fs().join(currentDir, entry.name);
 
         if (entry.isDirectory()) {
-          if (!entry.name.startsWith('.')) {
+          if (!entry.name.startsWith(".")) {
             await walkDir(fullPath);
           }
-        } else if (entry.isFile() && entry.name.endsWith('.jet.ts')) {
+        } else if (entry.isFile() && entry.name.endsWith(".jet.ts")) {
           try {
-            const fileContent = await fs().readFile(fullPath, 'utf-8');
+            const fileContent = await fs().readFile(fullPath, "utf-8");
             const foundExports = [];
             let match;
 
@@ -1060,29 +1064,32 @@ export async function codeGen(
               } else {
                 LOG.log(
                   ` ${exportName} is not a valid JetRoute export`,
-                  'error'
+                  "error",
                 );
               }
             }
 
             if (foundExports.length > 0) {
-              const moduleName = 'm' + mIdex; // only alphanumeric letters;
+              const moduleName = "m" + mIdex; // only alphanumeric letters;
               //? Generate the declare module block for this file
-              let moduleDeclaration = `import * as ${moduleName} from '${fullPath}';\n\n\n`;
+              let moduleDeclaration =
+                `import * as ${moduleName} from '${fullPath}';\n\n\n`;
               //? Add declarations for each found route export
               for (const exportName of foundExports) {
                 //? Declare the export with the basic JetRoute<any, any> type
-                if (exportName.startsWith('MIDDLEWARE_')) {
-                  moduleDeclaration += `const ${exportName} = ${moduleName}.${exportName} satisfies JetMiddleware<any, any>\n\n `;
+                if (exportName.startsWith("MIDDLEWARE_")) {
+                  moduleDeclaration +=
+                    `const ${exportName} = ${moduleName}.${exportName} satisfies JetMiddleware<any, any>\n\n `;
                 } else {
-                  moduleDeclaration += `const ${exportName} = ${moduleName}.${exportName} satisfies JetRoute<any, any>\n\n `;
+                  moduleDeclaration +=
+                    `const ${exportName} = ${moduleName}.${exportName} satisfies JetRoute<any, any>\n\n `;
                 }
               }
               declarations.push(moduleDeclaration);
             }
           } catch (error) {
             console.error(
-              `Error reading or parsing file ${fullPath}: ${error}`
+              `Error reading or parsing file ${fullPath}: ${error}`,
             );
           }
         }
@@ -1092,30 +1099,30 @@ export async function codeGen(
       console.error(`Error reading directory ${currentDir}: ${error}`);
     }
   }
-  if (mode === 'ON') {
+  if (mode === "ON") {
     await walkDir(fs().resolve(fs().cwd(), ROUTES_DIR));
   } else {
     await walkDir(fs().resolve(fs().cwd(), ROUTES_DIR));
   }
   const compileObjectStructureFromSchema = (schema: SchemaDefinition) => {
-    const obj: Record<string, 'string' | Record<string, 'string'>> = {};
-    if (schema.type === 'object') {
+    const obj: Record<string, "string" | Record<string, "string">> = {};
+    if (schema.type === "object") {
       for (const key in schema.objectSchema) {
-        obj[key] = 'string';
-        if (schema.objectSchema[key].type === 'object') {
+        obj[key] = "string";
+        if (schema.objectSchema[key].type === "object") {
           obj[key] = compileObjectStructureFromSchema(
-            schema.objectSchema[key] as SchemaDefinition
-          ) as Record<string, 'string'>;
+            schema.objectSchema[key] as SchemaDefinition,
+          ) as Record<string, "string">;
         }
       }
       return obj;
     }
     const arrayObj: any[] = [];
-    if (schema.type === 'array') {
-      if (schema.arrayType === 'object') {
-        const obj: Record<string, 'string'> = {};
+    if (schema.type === "array") {
+      if (schema.arrayType === "object") {
+        const obj: Record<string, "string"> = {};
         for (const key in schema.objectSchema) {
-          obj[key] = 'string';
+          obj[key] = "string";
         }
         arrayObj.push(obj);
       } else {
@@ -1127,207 +1134,209 @@ export async function codeGen(
   };
   //? Generate the final .d.ts file content
   let outputContent =
-    '//? This file is auto-generated by Jetpath. DO NOT MODIFY!\n\n';
+    "//? This file is auto-generated by Jetpath. DO NOT MODIFY!\n\n";
   outputContent +=
     "// @ts-ignore\nimport { type JetRoute, JetMiddleware } from 'jetpath';\n\n";
-  if (typeof generatedRoutesFilePath === 'string') {
-    LOG.log('Generating routes file', 'info');
+  if (typeof generatedRoutesFilePath === "string") {
+    LOG.log("Generating routes file", "info");
     const connectionInfo = `export const connectionInfo = {
     local: '${connectionLinks.local}',
     external: '${connectionLinks.external}'
 };`;
-    const outputContent = `//This file is autogenerated by Jetpath\n\n${connectionInfo}\n\nexport const routes = {\n ${Object.keys(
-      _JetPath_paths
-    )
-      .reduce((acc: string[], method) => {
-        const routes = Object.keys(_JetPath_paths[method as methods]);
-        const obj = _JetPath_paths[method as methods];
+    const outputContent =
+      `//This file is autogenerated by Jetpath\n\n${connectionInfo}\n\nexport const routes = {\n ${
+        Object.keys(
+          _JetPath_paths,
+        )
+          .reduce((acc: string[], method) => {
+            const routes = Object.keys(_JetPath_paths[method as methods]);
+            const obj = _JetPath_paths[method as methods];
 
-        if (routes.length > 0) {
-          for (const route of routes) {
-            let body: Record<string, 'string'> | undefined;
-            let response: Record<string, 'string'> | undefined;
-            let params: Record<string, 'string'> | undefined;
-            let query: Record<string, 'string'> | undefined;
-            if (obj[route].body) {
-              for (const key in obj[route].body) {
-                if (!body) {
-                  body = {};
-                }
-                const type = obj[route].body[key].type;
-                const val =
-                  type === 'string'
-                    ? 'string'
-                    : type === 'number'
+            if (routes.length > 0) {
+              for (const route of routes) {
+                let body: Record<string, "string"> | undefined;
+                let response: Record<string, "string"> | undefined;
+                let params: Record<string, "string"> | undefined;
+                let query: Record<string, "string"> | undefined;
+                if (obj[route].body) {
+                  for (const key in obj[route].body) {
+                    if (!body) {
+                      body = {};
+                    }
+                    const type = obj[route].body[key].type;
+                    const val = type === "string"
+                      ? "string"
+                      : type === "number"
                       ? 1
-                      : type === 'boolean'
-                        ? true
-                        : type === 'object'
-                          ? compileObjectStructureFromSchema(
-                              obj[route].body[key] as SchemaDefinition
-                            )
-                          : type === 'array'
-                            ? compileObjectStructureFromSchema(
-                                obj[route].body[key] as SchemaDefinition
-                              )
-                            : type === 'file'
-                              ? 'file'
-                              : type;
-                body[key] = val as 'string';
-              }
-            }
-            if (obj[route].query) {
-              for (const key in obj[route].query) {
-                if (!query) {
-                  query = {};
+                      : type === "boolean"
+                      ? true
+                      : type === "object"
+                      ? compileObjectStructureFromSchema(
+                        obj[route].body[key] as SchemaDefinition,
+                      )
+                      : type === "array"
+                      ? compileObjectStructureFromSchema(
+                        obj[route].body[key] as SchemaDefinition,
+                      )
+                      : type === "file"
+                      ? "file"
+                      : type;
+                    body[key] = val as "string";
+                  }
                 }
-                const type = obj[route].query[key].type;
-                const val =
-                  type === 'string'
-                    ? 'string'
-                    : type === 'number'
+                if (obj[route].query) {
+                  for (const key in obj[route].query) {
+                    if (!query) {
+                      query = {};
+                    }
+                    const type = obj[route].query[key].type;
+                    const val = type === "string"
+                      ? "string"
+                      : type === "number"
                       ? 1
-                      : type === 'boolean'
-                        ? true
-                        : type === 'object'
-                          ? compileObjectStructureFromSchema(
-                              obj[route].query[key] as SchemaDefinition
-                            )
-                          : type === 'array'
-                            ? compileObjectStructureFromSchema(
-                                obj[route].query[key] as SchemaDefinition
-                              )
-                            : type;
-                query[key] = val as 'string';
-              }
-            }
-            if (obj[route].response) {
-              for (const key in obj[route].response) {
-                if (!response) {
-                  response = {};
+                      : type === "boolean"
+                      ? true
+                      : type === "object"
+                      ? compileObjectStructureFromSchema(
+                        obj[route].query[key] as SchemaDefinition,
+                      )
+                      : type === "array"
+                      ? compileObjectStructureFromSchema(
+                        obj[route].query[key] as SchemaDefinition,
+                      )
+                      : type;
+                    query[key] = val as "string";
+                  }
                 }
-                const type = obj[route].response[key].type;
-                const val =
-                  type === 'string'
-                    ? 'string'
-                    : type === 'number'
+                if (obj[route].response) {
+                  for (const key in obj[route].response) {
+                    if (!response) {
+                      response = {};
+                    }
+                    const type = obj[route].response[key].type;
+                    const val = type === "string"
+                      ? "string"
+                      : type === "number"
                       ? 1
-                      : type === 'boolean'
-                        ? true
-                        : type === 'object'
-                          ? compileObjectStructureFromSchema(
-                              obj[route].response[key] as SchemaDefinition
-                            )
-                          : type === 'array'
-                            ? compileObjectStructureFromSchema(
-                                obj[route].response[key] as SchemaDefinition
-                              )
-                            : type === 'file'
-                              ? 'file'
-                              : type;
-                response[key] = val as 'string';
-              }
-            }
-            if (obj[route].params) {
-              for (const key in obj[route].params) {
-                if (!params) {
-                  params = {};
+                      : type === "boolean"
+                      ? true
+                      : type === "object"
+                      ? compileObjectStructureFromSchema(
+                        obj[route].response[key] as SchemaDefinition,
+                      )
+                      : type === "array"
+                      ? compileObjectStructureFromSchema(
+                        obj[route].response[key] as SchemaDefinition,
+                      )
+                      : type === "file"
+                      ? "file"
+                      : type;
+                    response[key] = val as "string";
+                  }
                 }
-                params[key] = 'string';
+                if (obj[route].params) {
+                  for (const key in obj[route].params) {
+                    if (!params) {
+                      params = {};
+                    }
+                    params[key] = "string";
+                  }
+                }
+                acc.push(
+                  `${
+                    obj[route].name
+                  }: {\n    path: "${route}",\n    method: "${method.toLowerCase()}",\n${
+                    body ? `    body: ${JSON.stringify(body || {})},\n` : ""
+                  }${
+                    response
+                      ? `    response: ${JSON.stringify(response || {})},\n`
+                      : ""
+                  }${
+                    query ? `    query: ${JSON.stringify(query || {})},\n` : ""
+                  }    title: "${obj[route].title || ""}",\n${
+                    params
+                      ? `    params: ${JSON.stringify(params || {})},\n`
+                      : ""
+                  }}`,
+                );
               }
             }
-            acc.push(
-              `${
-                obj[route].name
-              }: {\n    path: "${route}",\n    method: "${method.toLowerCase()}",\n${
-                body ? `    body: ${JSON.stringify(body || {})},\n` : ''
-              }${
-                response
-                  ? `    response: ${JSON.stringify(response || {})},\n`
-                  : ''
-              }${
-                query ? `    query: ${JSON.stringify(query || {})},\n` : ''
-              }    title: "${obj[route].title || ''}",\n${
-                params ? `    params: ${JSON.stringify(params || {})},\n` : ''
-              }}`
-            );
-          }
-        }
-        return acc;
-      }, [])
-      .join(',\n ')} \n} as const;\n\n`;
+            return acc;
+          }, [])
+          .join(",\n ")
+      } \n} as const;\n\n`;
     try {
-      await fs().writeFile(ROUTE_FILE, outputContent, 'utf-8');
-      LOG.log('Generated routes file successfully: ' + ROUTE_FILE, 'success');
+      await fs().writeFile(ROUTE_FILE, outputContent, "utf-8");
+      LOG.log("Generated routes file successfully: " + ROUTE_FILE, "success");
     } catch (error) {
-      LOG.log(`Error writing routes file ${ROUTE_FILE}: ${error}`, 'error');
+      LOG.log(`Error writing routes file ${ROUTE_FILE}: ${error}`, "error");
     }
   }
   //? Add all the generated module declarations
-  outputContent += declarations.join('\n');
+  outputContent += declarations.join("\n");
 
   try {
-    LOG.log('⚙️  StrictMode...\nmode: ' + mode, 'info');
-    await fs().writeFile(OUTPUT_FILE, outputContent, 'utf-8');
+    LOG.log("⚙️  StrictMode...\nmode: " + mode, "info");
+    await fs().writeFile(OUTPUT_FILE, outputContent, "utf-8");
 
     const promisifiedExecFile = () =>
       new Promise((resolve) => {
         fs().execFile(
-          'tsc',
+          "tsc",
           [
-            '--noEmit',
-            '--target',
-            'ESNext',
-            '--module',
-            'NodeNext',
-            '--moduleResolution',
-            'NodeNext',
-            '--lib',
-            'ESNext,DOM',
-            '--strict',
-            '--esModuleInterop',
-            '--allowImportingTsExtensions',
-            '--skipLibCheck',
+            "--noEmit",
+            "--target",
+            "ESNext",
+            "--module",
+            "NodeNext",
+            "--moduleResolution",
+            "NodeNext",
+            "--lib",
+            "ESNext,DOM",
+            "--strict",
+            "--esModuleInterop",
+            "--allowImportingTsExtensions",
+            "--skipLibCheck",
             OUTPUT_FILE,
           ],
-          { encoding: 'utf8' },
+          { encoding: "utf8" },
           (err, stdout, stderr) => {
             if (err) {
-              if (err.toString().includes('Executable not found')) {
+              if (err.toString().includes("Executable not found")) {
                 LOG.log(
                   "\n🛠️ StrictMode Can't work: Please install typescript using \n'npm install -g typescript' or \n'yarn global add typescript'\n\n",
-                  'error'
+                  "error",
                 );
               }
-              LOG.log('\n🛠️ StrictMode warnings', 'warn');
-              if (typeof stderr === 'string') {
+              LOG.log("\n🛠️ StrictMode warnings", "warn");
+              if (typeof stderr === "string") {
                 LOG.log(
-                  stderr.replaceAll('\n', '\n\n'),
-                  mode === 'WARN' ? 'warn' : 'error'
+                  stderr.replaceAll("\n", "\n\n"),
+                  mode === "WARN" ? "warn" : "error",
                 );
               }
-              if (typeof stdout === 'string') {
+              if (typeof stdout === "string") {
                 LOG.log(
-                  stdout.replaceAll('\n', '\n\n'),
-                  mode === 'WARN' ? 'warn' : 'error'
+                  stdout.replaceAll("\n", "\n\n"),
+                  mode === "WARN" ? "warn" : "error",
                 );
-                const errors = (stdout?.split('\n') || []).length - 1;
+                const errors = (stdout?.split("\n") || []).length - 1;
                 LOG.log(
                   errors +
                     ` Problem${
-                      errors === 1 ? '' : 's'
+                      errors === 1 ? "" : "s"
                     } 🐞\n\nYou are seeing these warnings because you have strict mode enabled\n`,
-                  'info'
+                  "info",
                 );
               }
             }
             resolve(undefined);
-          }
+          },
         );
       });
     await promisifiedExecFile();
   } catch (error) {
-    LOG.log(`Error writing output file apis-types.d.ts: ${error}`, 'error');
+    LOG.log(`Error writing output file apis-types.d.ts: ${error}`, "error");
   }
 }
 
@@ -1335,7 +1344,7 @@ export function getLocalIP() {
   const interfaces: Record<string, any> = fs().networkInterfaces() || [];
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
-      if ('IPv4' !== iface.family || iface.internal !== false) {
+      if ("IPv4" !== iface.family || iface.internal !== false) {
         continue;
       }
       return iface.address;

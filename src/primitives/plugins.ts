@@ -1,4 +1,4 @@
-import type { Context } from './classes.js';
+import type { Context } from "./classes.js";
 
 class PluginBoxClass {
   plugins: Record<string, () => void> = {};

@@ -1,23 +1,23 @@
 export function parseFormData(
   rawBody: Uint8Array,
   contentType: string,
-  options: { maxBodySize?: number; maxFileSize?: number } = {}
+  options: { maxBodySize?: number; maxFileSize?: number } = {},
 ) {
   const { maxBodySize, maxFileSize = 10 * 1024 * 1024 } = options; // Default 10MB max file size
 
   if (maxBodySize && rawBody.byteLength > maxBodySize) {
     throw new Error(
-      `Body exceeds max size: ${rawBody.byteLength} > ${maxBodySize}`
+      `Body exceeds max size: ${rawBody.byteLength} > ${maxBodySize}`,
     );
   }
 
   const boundaryMatch = contentType.match(/boundary="?([^";]+)"?/i);
-  if (!boundaryMatch) throw new Error('Invalid multipart boundary');
+  if (!boundaryMatch) throw new Error("Invalid multipart boundary");
 
   const boundary = `--${boundaryMatch[1]}`;
   const boundaryBytes = new TextEncoder().encode(boundary);
 
-  const decoder = new TextDecoder('utf-8');
+  const decoder = new TextDecoder("utf-8");
   const fields: Record<string, string | string[]> = {};
   const files: Record<
     string,
@@ -43,7 +43,7 @@ export function parseFormData(
     const headerText = decoder.decode(headerBytes);
     const headers = parseHeaders(headerText);
 
-    const disposition = headers['content-disposition'];
+    const disposition = headers["content-disposition"];
     if (!disposition) continue;
 
     const nameMatch = disposition.match(/name="([^"]+)"/);
@@ -57,11 +57,11 @@ export function parseFormData(
       // Validate file size at parse time
       if (maxFileSize && body.length > maxFileSize) {
         throw new Error(
-          `File '${fileName}' exceeds max size: ${body.length} > ${maxFileSize}`
+          `File '${fileName}' exceeds max size: ${body.length} > ${maxFileSize}`,
         );
       }
 
-      const mimeType = headers['content-type'] || 'application/octet-stream';
+      const mimeType = headers["content-type"] || "application/octet-stream";
       files[fieldName] = {
         fileName,
         content: body,
@@ -92,7 +92,7 @@ function parseHeaders(headerText: string): Record<string, string> {
   const headers: Record<string, string> = {};
   const lines = headerText.split(/\r\n/);
   for (const line of lines) {
-    const idx = line.indexOf(':');
+    const idx = line.indexOf(":");
     if (idx === -1) continue;
     const key = line.slice(0, idx).trim().toLowerCase();
     const val = line.slice(idx + 1).trim();
@@ -144,7 +144,7 @@ function indexOf(buffer: Uint8Array, search: Uint8Array, from = 0): number {
 }
 
 export function parseUrlEncoded(
-  bodyText: string
+  bodyText: string,
 ): Record<string, string | string[]> {
   const params = new URLSearchParams(bodyText);
   const result: Record<string, string | string[]> = {};
@@ -168,24 +168,24 @@ export function parseUrlEncoded(
  */
 function collectRequestBody(
   req: any,
-  maxBodySize: number
+  maxBodySize: number,
 ): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     let size = 0;
-    req.on('data', (chunk: Buffer) => {
+    req.on("data", (chunk: Buffer) => {
       size += chunk.length;
       if (maxBodySize && size > maxBodySize) {
-        reject(new Error('Payload Too Large'));
+        reject(new Error("Payload Too Large"));
         req.destroy();
         return;
       }
       chunks.push(chunk);
     });
-    req.on('end', () => {
+    req.on("end", () => {
       resolve(new Uint8Array(Buffer.concat(chunks)));
     });
-    req.on('error', (err: any) => reject(err));
+    req.on("error", (err: any) => reject(err));
   });
 }
 
@@ -198,42 +198,42 @@ export async function parseRequest(
     maxBodySize?: number;
     maxFileSize?: number;
     contentType?: string;
-  } = {}
+  } = {},
 ): Promise<Record<string, any>> {
   const { maxBodySize = 5 * 1024 * 1024, maxFileSize = 10 * 1024 * 1024 } =
     options;
-  let contentType = options.contentType || '';
+  let contentType = options.contentType || "";
   let rawBody: Uint8Array;
 
-  if (typeof req.arrayBuffer === 'function') {
-    if (!contentType && req.headers && typeof req.headers.get === 'function') {
-      contentType = req.headers.get('content-type') || '';
+  if (typeof req.arrayBuffer === "function") {
+    if (!contentType && req.headers && typeof req.headers.get === "function") {
+      contentType = req.headers.get("content-type") || "";
     }
     const arrayBuffer = await req.arrayBuffer();
     rawBody = new Uint8Array(arrayBuffer);
     if (rawBody.byteLength > maxBodySize) {
-      throw new Error('Payload Too Large');
+      throw new Error("Payload Too Large");
     }
-  } else if (typeof req.on === 'function') {
+  } else if (typeof req.on === "function") {
     if (!contentType && req.headers) {
-      contentType = req.headers['content-type'] || '';
+      contentType = req.headers["content-type"] || "";
     }
     rawBody = await collectRequestBody(req, maxBodySize);
   } else {
-    throw new Error('Unsupported request object type');
+    throw new Error("Unsupported request object type");
   }
 
   const ct = contentType.toLowerCase();
-  const decoder = new TextDecoder('utf-8');
+  const decoder = new TextDecoder("utf-8");
   let bodyText: string;
 
-  if (ct.includes('application/json')) {
+  if (ct.includes("application/json")) {
     bodyText = decoder.decode(rawBody);
-    return JSON.parse(bodyText || '{}');
-  } else if (ct.includes('application/x-www-form-urlencoded')) {
+    return JSON.parse(bodyText || "{}");
+  } else if (ct.includes("application/x-www-form-urlencoded")) {
     bodyText = decoder.decode(rawBody);
     return parseUrlEncoded(bodyText);
-  } else if (ct.includes('multipart/form-data')) {
+  } else if (ct.includes("multipart/form-data")) {
     return parseFormData(rawBody, contentType, { maxBodySize, maxFileSize });
   } else {
     bodyText = decoder.decode(rawBody);

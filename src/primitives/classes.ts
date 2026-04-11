@@ -1,5 +1,5 @@
-import { type IncomingMessage } from 'node:http';
-import { type Stream } from 'node:stream';
+import { type IncomingMessage } from "node:http";
+import { type Stream } from "node:stream";
 import type {
   FileOptions,
   HTTPBody,
@@ -11,15 +11,15 @@ import type {
   SchemaDefinition,
   SchemaType,
   ValidationOptions,
-} from './types.js';
-import { mime } from '../extracts/mimejs-extract.js';
-import type { BunFile } from 'bun';
-import { getCtx, runtime, ctxPool, MAX_POOL_SIZE } from './trie-router.js';
-import { parseRequest } from './parser.js';
-import { optionsCtx, baseCorsHeaders } from './cors.js';
-import { validator } from './validator.js';
-import { fs } from './fs.js';
-import { PluginBox } from './plugins.js';
+} from "./types.js";
+import { mime } from "../extracts/mimejs-extract.js";
+import type { BunFile } from "bun";
+import { ctxPool, getCtx, MAX_POOL_SIZE, runtime } from "./trie-router.js";
+import { parseRequest } from "./parser.js";
+import { baseCorsHeaders, optionsCtx } from "./cors.js";
+import { validator } from "./validator.js";
+import { fs } from "./fs.js";
+import { PluginBox } from "./plugins.js";
 
 export class JetPlugin {
   plugin: any;
@@ -34,45 +34,45 @@ export class JetPlugin {
 export class LOG {
   // Define ANSI escape codes for colors and styles
   static colors = {
-    reset: '\x1b[0m',
-    bright: '\x1b[1m',
-    dim: '\x1b[2m',
-    underscore: '\x1b[4m',
-    blink: '\x1b[5m',
-    reverse: '\x1b[7m',
-    hidden: '\x1b[8m',
+    reset: "\x1b[0m",
+    bright: "\x1b[1m",
+    dim: "\x1b[2m",
+    underscore: "\x1b[4m",
+    blink: "\x1b[5m",
+    reverse: "\x1b[7m",
+    hidden: "\x1b[8m",
 
-    fgBlack: '\x1b[30m',
-    fgRed: '\x1b[31m',
-    fgGreen: '\x1b[32m',
-    fgYellow: '\x1b[33m',
-    fgBlue: '\x1b[34m',
-    fgMagenta: '\x1b[35m',
-    fgCyan: '\x1b[36m',
-    fgWhite: '\x1b[37m',
+    fgBlack: "\x1b[30m",
+    fgRed: "\x1b[31m",
+    fgGreen: "\x1b[32m",
+    fgYellow: "\x1b[33m",
+    fgBlue: "\x1b[34m",
+    fgMagenta: "\x1b[35m",
+    fgCyan: "\x1b[36m",
+    fgWhite: "\x1b[37m",
 
-    bgBlack: '\x1b[40m',
-    bgRed: '\x1b[41m',
-    bgGreen: '\x1b[42m',
-    bgYellow: '\x1b[43m',
-    bgBlue: '\x1b[44m',
-    bgMagenta: '\x1b[45m',
-    bgCyan: '\x1b[46m',
-    bgWhite: '\x1b[47m',
+    bgBlack: "\x1b[40m",
+    bgRed: "\x1b[41m",
+    bgGreen: "\x1b[42m",
+    bgYellow: "\x1b[43m",
+    bgBlue: "\x1b[44m",
+    bgMagenta: "\x1b[45m",
+    bgCyan: "\x1b[46m",
+    bgWhite: "\x1b[47m",
   };
   static print(message: any, color: string) {
     console.log(`${color}%s${LOG.colors.reset}`, `${message}`);
   }
-  static log(message: string, type: 'info' | 'warn' | 'error' | 'success') {
+  static log(message: string, type: "info" | "warn" | "error" | "success") {
     LOG.print(
       message,
-      type === 'info'
+      type === "info"
         ? LOG.colors.fgBlue
-        : type === 'warn'
-          ? LOG.colors.fgYellow
-          : type === 'success'
-            ? LOG.colors.fgGreen
-            : LOG.colors.fgRed
+        : type === "warn"
+        ? LOG.colors.fgYellow
+        : type === "success"
+        ? LOG.colors.fgGreen
+        : LOG.colors.fgRed,
     );
   }
 }
@@ -82,7 +82,7 @@ export interface CookieOptions {
   domain?: string;
   secure?: boolean;
   httpOnly?: boolean;
-  sameSite?: 'strict' | 'lax' | 'none';
+  sameSite?: "strict" | "lax" | "none";
   maxAge?: number;
   expires?: Date;
 }
@@ -90,21 +90,21 @@ export interface CookieOptions {
 class Cookie {
   private static parseCookieHeader(header: string): Record<string, string> {
     return header
-      .split('; ')
-      .map((pair) => pair.split('='))
+      .split("; ")
+      .map((pair) => pair.split("="))
       .reduce(
         (acc, [key, value]) => ({
           ...acc,
-          [key.trim()]: value ? decodeURIComponent(value) : '',
+          [key.trim()]: value ? decodeURIComponent(value) : "",
         }),
-        {}
+        {},
       );
   }
 
   private static serializeCookie(
     name: string,
     value: string,
-    options: CookieOptions
+    options: CookieOptions,
   ): string {
     const parts = [`${encodeURIComponent(name)}=${encodeURIComponent(value)}`];
 
@@ -112,13 +112,13 @@ class Cookie {
     if (options.domain) {
       parts.push(`Domain=${encodeURIComponent(options.domain)}`);
     }
-    if (options.secure) parts.push('Secure');
-    if (options.httpOnly) parts.push('HttpOnly');
+    if (options.secure) parts.push("Secure");
+    if (options.httpOnly) parts.push("HttpOnly");
     if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
     if (options.maxAge) parts.push(`Max-Age=${options.maxAge}`);
     if (options.expires) parts.push(`Expires=${options.expires.toUTCString()}`);
 
-    return parts.join('; ');
+    return parts.join("; ");
   }
 
   static parse(cookies: string): Record<string, string> {
@@ -128,7 +128,7 @@ class Cookie {
   static serialize(
     name: string,
     value: string,
-    options: CookieOptions = {}
+    options: CookieOptions = {},
   ): string {
     return Cookie.serializeCookie(name, value, options);
   }
@@ -209,14 +209,14 @@ export class Context {
     data: unknown,
     statusCode?: number,
     contentType?: string,
-    validate = true
+    validate = true,
   ) {
     // ? fast path: object data, no contentType override (most common benchmark case)
-    if (!contentType && typeof data === 'object') {
+    if (!contentType && typeof data === "object") {
       const responseSchema = this.handler?.response;
       if (responseSchema && validate) {
         data = validator(responseSchema, data || {});
-        if (typeof data === 'string') {
+        if (typeof data === "string") {
           throw new Error(data);
         }
       }
@@ -228,27 +228,27 @@ export class Context {
     }
     if (this.handler?.response && validate) {
       data = validator(this.handler.response, data || {});
-      if (typeof data === 'string') {
+      if (typeof data === "string") {
         throw new Error(data);
       }
     }
     if (contentType) {
-      this._2['Content-Type'] = contentType;
+      this._2["Content-Type"] = contentType;
       this.payload = String(data);
     } else {
-      this.payload = data ? String(data) : '';
+      this.payload = data ? String(data) : "";
     }
     if (statusCode) this.code = statusCode;
   }
 
   redirect(url: string) {
     this.code = 301;
-    this._2['Location'] = url;
+    this._2["Location"] = url;
   }
 
   get(field: string) {
     if (field) {
-      if (runtime['node']) {
+      if (runtime["node"]) {
         return (this.request as IncomingMessage).headers[field] as string;
       }
       return (this.request as Request).headers.get(field) as string;
@@ -263,9 +263,9 @@ export class Context {
   }
 
   getCookie(name: string): string | undefined {
-    const cookieHeader = runtime['node']
+    const cookieHeader = runtime["node"]
       ? (this.request as IncomingMessage).headers.cookie
-      : (this.request as Request).headers.get('cookie');
+      : (this.request as Request).headers.get("cookie");
 
     if (cookieHeader) {
       const cookies = Cookie.parse(cookieHeader);
@@ -275,9 +275,9 @@ export class Context {
   }
 
   getCookies(): Record<string, string> {
-    const cookieHeader = runtime['node']
+    const cookieHeader = runtime["node"]
       ? (this.request as IncomingMessage).headers.cookie
-      : (this.request as Request).headers.get('cookie');
+      : (this.request as Request).headers.get("cookie");
 
     return cookieHeader ? Cookie.parse(cookieHeader) : {};
   }
@@ -288,7 +288,7 @@ export class Context {
   }
 
   clearCookie(name: string, options: CookieOptions = {}): void {
-    this.setCookie(name, '', { ...options, maxAge: 0 });
+    this.setCookie(name, "", { ...options, maxAge: 0 });
   }
 
   sendStream(
@@ -298,10 +298,10 @@ export class Context {
       ContentType: string;
     } = {
       folder: undefined,
-      ContentType: 'application/octet-stream',
-    }
+      ContentType: "application/octet-stream",
+    },
   ) {
-    if (typeof stream === 'string') {
+    if (typeof stream === "string") {
       const filePath = stream;
 
       if (config.folder) {
@@ -312,7 +312,7 @@ export class Context {
         try {
           realPath = fs().realpathSync(resolvedPath);
         } catch {
-          throw new Error('File not found or inaccessible');
+          throw new Error("File not found or inaccessible");
         }
 
         // Security: Check for path traversal using realpath (follows symlinks)
@@ -320,28 +320,32 @@ export class Context {
           !realPath.startsWith(realBase + fs().sep) &&
           realPath !== realBase
         ) {
-          throw new Error('Path traversal detected!');
+          throw new Error("Path traversal detected!");
         }
 
         stream = realPath;
       } else {
         // If no folder is specified, require absolute path for security
-        if (!fs().isAbsolute(filePath)) {
+
+        if (
+          !fs().isAbsolute(filePath) &&
+          !fs().isAbsolute(fs().resolve(fs().cwd() + filePath))
+        ) {
           throw new Error(
-            'File path must be absolute when no folder is specified'
+            "File path must be absolute when no folder is specified",
           );
         }
         stream = fs().resolve(filePath);
       }
 
       config.ContentType = mime.getType(stream) || config.ContentType;
-      this._2['Content-Disposition'] = `inline; filename="${
-        stream.split('/').at(-1) || 'unnamed.bin'
+      this._2["Content-Disposition"] = `inline; filename="${
+        stream.split("/").at(-1) || "unnamed.bin"
       }"`;
 
-      if (runtime['bun']) {
+      if (runtime["bun"]) {
         stream = Bun.file(stream);
-      } else if (runtime['deno']) {
+      } else if (runtime["deno"]) {
         // @ts-expect-error
         const file = Deno.open(stream).catch(() => {});
         stream = file;
@@ -352,7 +356,7 @@ export class Context {
       }
     }
 
-    this._2['Content-Type'] = config.ContentType;
+    this._2["Content-Type"] = config.ContentType;
     this._3 = stream as Stream;
   }
   download(
@@ -362,17 +366,17 @@ export class Context {
       ContentType: string;
     } = {
       folder: undefined,
-      ContentType: 'application/octet-stream',
-    }
+      ContentType: "application/octet-stream",
+    },
   ) {
     this.sendStream(stream, config);
-    this._2['Content-Disposition'] = `attachment; filename="${
-      (stream as string).split('/').at(-1) || 'unnamed.bin'
+    this._2["Content-Disposition"] = `attachment; filename="${
+      (stream as string).split("/").at(-1) || "unnamed.bin"
     }"`;
   }
   // Only for deno and bun
   sendResponse(Response?: Response) {
-    if (!runtime['node']) {
+    if (!runtime["node"]) {
       // @ts-ignore
       this._6 = Response;
     }
@@ -380,47 +384,47 @@ export class Context {
   // Only for deno and bun
   upgrade(): void | never {
     const req = this.request as any;
-    const conn =
-      req.headers?.['connection'] || req.headers?.get?.('connection');
-    if (conn?.includes('Upgrade')) {
-      if (this.get('upgrade') !== 'websocket') {
-        throw new Error('Invalid upgrade header');
+    const conn = req.headers?.["connection"] ||
+      req.headers?.get?.("connection");
+    if (conn?.includes("Upgrade")) {
+      if (this.get("upgrade") !== "websocket") {
+        throw new Error("Invalid upgrade header");
       }
-      if (runtime['deno']) {
+      if (runtime["deno"]) {
         // @ts-expect-error
         const { socket, response } = Deno.upgradeWebSocket(req);
         // @ts-expect-error
-        socket.addEventListener('open', (...p) => {
-          JetSocketInstance.__binder('open', [socket, ...p]);
+        socket.addEventListener("open", (...p) => {
+          JetSocketInstance.__binder("open", [socket, ...p]);
         });
         // @ts-expect-error
-        socket.addEventListener('message', (...p) => {
-          JetSocketInstance.__binder('message', [socket, ...p]);
+        socket.addEventListener("message", (...p) => {
+          JetSocketInstance.__binder("message", [socket, ...p]);
         });
         // @ts-expect-error
-        socket.addEventListener('drain', (...p) => {
-          JetSocketInstance.__binder('drain', [socket, ...p]);
+        socket.addEventListener("drain", (...p) => {
+          JetSocketInstance.__binder("drain", [socket, ...p]);
         });
         // @ts-expect-error
-        socket.addEventListener('close', (...p) => {
-          JetSocketInstance.__binder('close', [socket, ...p]);
+        socket.addEventListener("close", (...p) => {
+          JetSocketInstance.__binder("close", [socket, ...p]);
         });
         this.connection = JetSocketInstance;
         return this.sendResponse(response);
       }
-      if (runtime['bun']) {
+      if (runtime["bun"]) {
         if (this.res?.upgrade?.(req)) {
           this.connection = JetSocketInstance;
           return this.sendResponse(undefined);
         }
       }
-      if (runtime['node']) {
+      if (runtime["node"]) {
         throw new Error(
-          'No current websocket support for Nodejs! run with bun or deno.'
+          "No current websocket support for Nodejs! run with bun or deno.",
         );
       }
     }
-    throw new Error('Invalid upgrade headers');
+    throw new Error("Invalid upgrade headers");
   }
 
   async parse<Type extends any = Record<string, any>>(
@@ -429,7 +433,7 @@ export class Context {
       maxFileSize?: number;
       contentType?: string;
       validate?: boolean;
-    } = { validate: true }
+    } = { validate: true },
   ): Promise<Type> {
     // Return cached validated body if available
     if (this.$_internal_validated_body && options.validate) {
@@ -450,7 +454,7 @@ export class Context {
     if (this.handler?.body && options.validate) {
       this.$_internal_validated_body = validator(
         this.handler!.body,
-        this.$_internal_body
+        this.$_internal_body,
       ) as Type;
       return this.$_internal_validated_body as Type;
     }
@@ -460,7 +464,7 @@ export class Context {
   parseQuery<Type extends any = Record<string, any>>(
     options: {
       validate?: boolean;
-    } = { validate: true }
+    } = { validate: true },
   ): Type {
     // Return cached validated query if available and validation requested
     if (this.$_internal_query && options.validate && this._queryValidated) {
@@ -471,17 +475,17 @@ export class Context {
       return this.$_internal_query as Type;
     }
 
-    const queryIndex = this.request?.url?.indexOf('?');
+    const queryIndex = this.request?.url?.indexOf("?");
     if (queryIndex && queryIndex > -1) {
       const queryParams = new URLSearchParams(
-        this.request?.url?.slice(queryIndex)
+        this.request?.url?.slice(queryIndex),
       );
       this.$_internal_query = {};
 
       for (const [key, value] of queryParams.entries()) {
         const path = key
-          .replace(/\]/g, '')
-          .split('[')
+          .replace(/\]/g, "")
+          .split("[")
           .map((k) => k.trim());
 
         let curr = this.$_internal_query;
@@ -499,7 +503,7 @@ export class Context {
       if (this.handler?.query && options.validate) {
         this.$_internal_query = validator(
           this.handler.query,
-          this.$_internal_query
+          this.$_internal_query,
         );
         this._queryValidated = true;
       }
@@ -517,15 +521,15 @@ export class JetSocket {
     open: null,
   };
   addEventListener(
-    event: 'message' | 'close' | 'drain' | 'open',
-    listener: (...param: any[]) => void
+    event: "message" | "close" | "drain" | "open",
+    listener: (...param: any[]) => void,
   ): void {
     this.listeners[event] = listener as never;
   }
   /**
    * @internal
    */
-  __binder(eventName: 'message' | 'close' | 'drain' | 'open', data: any) {
+  __binder(eventName: "message" | "close" | "drain" | "open", data: any) {
     if (this.listeners[eventName]) {
       this.listeners[eventName]?.(...data);
     }
@@ -580,30 +584,30 @@ export class SchemaBuilder {
 export class StringSchema extends SchemaBuilder {
   constructor(options: ValidationOptions = {}) {
     // @ts-expect-error
-    options.inputType = 'string';
-    super('string', options);
+    options.inputType = "string";
+    super("string", options);
   }
 
   email(err?: string): this {
-    return this.regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, err || 'Invalid email');
+    return this.regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, err || "Invalid email");
   }
 
   min(length: number, err?: string): this {
     return this.validate(
-      (value) => value.length >= length || err || `Minimum length is ${length}`
+      (value) => value.length >= length || err || `Minimum length is ${length}`,
     );
   }
 
   max(length: number, err?: string): this {
     return this.validate(
-      (value) => value.length <= length || err || `Maximum length is ${length}`
+      (value) => value.length <= length || err || `Maximum length is ${length}`,
     );
   }
 
   url(err?: string): this {
     return this.regex(
       /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
-      err || 'Invalid URL'
+      err || "Invalid URL",
     );
   }
 }
@@ -611,50 +615,50 @@ export class StringSchema extends SchemaBuilder {
 export class NumberSchema extends SchemaBuilder {
   constructor(options: ValidationOptions = {}) {
     // @ts-expect-error here inputType defaults to number
-    options.inputType = 'number';
-    super('number', options);
+    options.inputType = "number";
+    super("number", options);
   }
 
   min(value: number, err?: string): this {
     return this.validate(
-      (val) => val >= value || err || `Minimum value is ${value}`
+      (val) => val >= value || err || `Minimum value is ${value}`,
     );
   }
 
   max(value: number, err?: string): this {
     return this.validate(
-      (val) => val <= value || err || `Maximum value is ${value}`
+      (val) => val <= value || err || `Maximum value is ${value}`,
     );
   }
 
   integer(err?: string): this {
     return this.validate(
-      (val) => Number.isInteger(val) || err || 'Must be an integer'
+      (val) => Number.isInteger(val) || err || "Must be an integer",
     );
   }
 
   positive(err?: string): this {
-    return this.validate((val) => val > 0 || err || 'Must be positive');
+    return this.validate((val) => val > 0 || err || "Must be positive");
   }
 
   negative(err?: string): this {
-    return this.validate((val) => val < 0 || err || 'Must be negative');
+    return this.validate((val) => val < 0 || err || "Must be negative");
   }
 }
 
 export class BooleanSchema extends SchemaBuilder {
   constructor() {
-    super('boolean');
+    super("boolean");
   }
 }
 
 export class ArraySchema extends SchemaBuilder {
   constructor(elementSchema?: SchemaBuilder) {
-    super('array');
+    super("array");
     if (elementSchema) {
       const elementDef = elementSchema.getDefinition();
-      if (elementDef.type === 'object' && elementDef.objectSchema) {
-        this.def.arrayType = 'object';
+      if (elementDef.type === "object" && elementDef.objectSchema) {
+        this.def.arrayType = "object";
         this.def.objectSchema = elementDef.objectSchema;
       } else {
         this.def.arrayType = elementDef.type;
@@ -667,7 +671,7 @@ export class ArraySchema extends SchemaBuilder {
       (value) =>
         (Array.isArray(value) && value.length >= length) ||
         err ||
-        `Minimum length is ${length}`
+        `Minimum length is ${length}`,
     );
   }
 
@@ -676,18 +680,18 @@ export class ArraySchema extends SchemaBuilder {
       (value) =>
         (Array.isArray(value) && value.length <= length) ||
         err ||
-        `Maximum length is ${length}`
+        `Maximum length is ${length}`,
     );
   }
 
   nonempty(err?: string): this {
-    return this.min(1, err || 'Array cannot be empty');
+    return this.min(1, err || "Array cannot be empty");
   }
 }
 
 export class ObjectSchema extends SchemaBuilder {
   constructor(shape?: Record<string, SchemaBuilder>) {
-    super('object');
+    super("object");
     if (shape) {
       this.def.objectSchema = {};
       for (const [key, builder] of Object.entries(shape)) {
@@ -707,14 +711,14 @@ export class ObjectSchema extends SchemaBuilder {
 
 export class DateSchema extends SchemaBuilder {
   constructor() {
-    super('date');
+    super("date");
   }
 
   min(date: Date | string, err?: string): this {
     const minDate = new Date(date);
     return this.validate(
       (value) =>
-        new Date(value) >= minDate || err || `Date must be after ${minDate}`
+        new Date(value) >= minDate || err || `Date must be after ${minDate}`,
     );
   }
 
@@ -722,21 +726,21 @@ export class DateSchema extends SchemaBuilder {
     const maxDate = new Date(date);
     return this.validate(
       (value) =>
-        new Date(value) <= maxDate || err || `Date must be before ${maxDate}`
+        new Date(value) <= maxDate || err || `Date must be before ${maxDate}`,
     );
   }
 
   future(err?: string): this {
     return this.validate(
       (value) =>
-        new Date(value) > new Date() || err || 'Date must be in the future'
+        new Date(value) > new Date() || err || "Date must be in the future",
     );
   }
 
   past(err?: string): this {
     return this.validate(
       (value) =>
-        new Date(value) < new Date() || err || 'Date must be in the past'
+        new Date(value) < new Date() || err || "Date must be in the past",
     );
   }
 }
@@ -744,8 +748,8 @@ export class DateSchema extends SchemaBuilder {
 export class FileSchema extends SchemaBuilder {
   constructor(options: FileOptions = {}) {
     // @ts-expect-error
-    options.inputType = 'file';
-    super('file', options as ValidationOptions);
+    options.inputType = "file";
+    super("file", options as ValidationOptions);
   }
 
   maxSize(bytes: number, err?: string): this {
@@ -753,7 +757,7 @@ export class FileSchema extends SchemaBuilder {
       (value) =>
         value.size <= bytes ||
         err ||
-        `File size must be less than ${bytes} bytes`
+        `File size must be less than ${bytes} bytes`,
     );
   }
 
@@ -763,7 +767,7 @@ export class FileSchema extends SchemaBuilder {
       (value) =>
         allowedTypes.includes(value.mimeType) ||
         err ||
-        `File type must be one of: ${allowedTypes.join(', ')}`
+        `File type must be one of: ${allowedTypes.join(", ")}`,
     );
   }
 }
@@ -793,14 +797,14 @@ class MockRequest {
       url?: string;
       headers?: any;
       body?: string | null;
-    } = {}
+    } = {},
   ) {
-    this.method = options.method || 'GET';
-    this.url = options.url || '/';
+    this.method = options.method || "GET";
+    this.url = options.url || "/";
     this.headers = options.headers || new Map();
     this.body = options.body || null;
     this.statusCode = 200;
-    this.statusMessage = 'OK';
+    this.statusMessage = "OK";
     this.bodyUsed = false;
   }
 }
@@ -815,51 +819,46 @@ export class JetServer {
   }
   makeRes(ctx: any) {
     const contentType: string = ctx!._10
-      ? 'application/json'
-      : ctx!._2?.['Content-Type'] || '';
-    const isJson =
-      contentType.includes('application/json') ||
+      ? "application/json"
+      : ctx!._2?.["Content-Type"] || "";
+    const isJson = contentType.includes("application/json") ||
       (!contentType &&
-        typeof ctx!.payload === 'string' &&
-        (ctx!.payload?.trimStart().startsWith('{') ||
-          ctx!.payload?.trimStart().startsWith('[')));
+        typeof ctx!.payload === "string" &&
+        (ctx!.payload?.trimStart().startsWith("{") ||
+          ctx!.payload?.trimStart().startsWith("[")));
     const headers = ctx!._10
-      ? { ...ctx!._2!, 'Content-Type': 'application/json' }
+      ? { ...ctx!._2!, "Content-Type": "application/json" }
       : { ...ctx!._2! };
 
     // ? Merge Set-Cookie headers into result for test visibility
     if (ctx!._setCookies?.length) {
-      headers['set-cookie'] = ctx!._setCookies.join(', ');
+      headers["set-cookie"] = ctx!._setCookies.join(", ");
     }
 
     const result = {
       code: ctx!.code,
-      body:
-        typeof ctx!.payload !== 'string'
-          ? ctx!.payload
-          : isJson
-            ? (() => {
-                try {
-                  return JSON.parse(ctx!.payload);
-                } catch {
-                  return ctx!.payload;
-                }
-              })()
-            : ctx!.payload,
+      body: typeof ctx!.payload !== "string" ? ctx!.payload : isJson
+        ? (() => {
+          try {
+            return JSON.parse(ctx!.payload);
+          } catch {
+            return ctx!.payload;
+          }
+        })()
+        : ctx!.payload,
       headers,
     };
 
     // Return context to pool for test environments
-     
-      queueMicrotask(() => {
-        if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
-      });
-  
+
+    queueMicrotask(() => {
+      if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+    });
 
     return result;
   }
   private async run1(func: JetRoute, ctx?: JetContext<any, any>) {
-    if (func.method === 'OPTIONS') {
+    if (func.method === "OPTIONS") {
       optionsCtx.code = 200;
       return this.makeRes(optionsCtx as unknown as Context);
     }
@@ -873,7 +872,7 @@ export class JetServer {
         if (r.jet_middleware?.length) {
           for (let m = 0; m < r.jet_middleware.length; m++) {
             const callback = await r.jet_middleware[m](ctx as any);
-            if (typeof callback === 'function') {
+            if (typeof callback === "function") {
               returned.unshift(callback);
             }
           }
@@ -916,7 +915,7 @@ export class JetServer {
   */
   private async run2(
     func: JetRoute,
-    ctx?: JetContext<any, any>
+    ctx?: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     if (!ctx) {
       ctx = getCtx(
@@ -929,7 +928,7 @@ export class JetServer {
         {},
         func.path!,
         func,
-        {}
+        {},
       ) as any;
     }
 
@@ -937,12 +936,12 @@ export class JetServer {
   }
   runWithCTX(
     func: JetRoute,
-    ctx: JetContext<any, any>
+    ctx: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this.run1(func, ctx);
   }
   runBare(
-    func: JetRoute
+    func: JetRoute,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
     return this.run2(func);
   }
@@ -951,7 +950,7 @@ export class JetServer {
     res: Response,
     path: string,
     handler: JetRoute,
-    params: Record<string, any>
+    params: Record<string, any>,
   ): JetContext {
     return getCtx(req, res, path, handler, params) as any;
   }

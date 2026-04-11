@@ -1,4 +1,4 @@
-import type { allowedMethods } from './types.js';
+import type { allowedMethods } from "./types.js";
 
 /**
  * an inbuilt CORS post middleware
@@ -10,8 +10,8 @@ import type { allowedMethods } from './types.js';
 export const optionsCtx = {
   payload: undefined,
   _2: {
-    Vary: 'Origin',
-    Connection: 'keep-alive',
+    Vary: "Origin",
+    Connection: "keep-alive",
   },
   _6: false,
   code: 204,
@@ -20,13 +20,13 @@ export const optionsCtx = {
       (this._2 as Record<string, string>)[field] = value;
     }
   },
-  request: { method: 'OPTIONS' },
+  request: { method: "OPTIONS" },
 };
 
 // Create immutable CORS headers
 export const createCorsHeaders = (): Record<string, string> => ({
-  Vary: 'Origin',
-  Connection: 'keep-alive',
+  Vary: "Origin",
+  Connection: "keep-alive",
 });
 
 // Base CORS headers - will be frozen after initialization
@@ -39,70 +39,70 @@ export function corsMiddleware(options: {
   maxAge?: string;
   credentials?: boolean;
   secureContext?: {
-    'Cross-Origin-Opener-Policy':
-      | 'same-origin'
-      | 'unsafe-none'
-      | 'same-origin-allow-popups';
-    'Cross-Origin-Embedder-Policy': 'require-corp' | 'unsafe-none';
+    "Cross-Origin-Opener-Policy":
+      | "same-origin"
+      | "unsafe-none"
+      | "same-origin-allow-popups";
+    "Cross-Origin-Embedder-Policy": "require-corp" | "unsafe-none";
   };
   privateNetworkAccess?: unknown;
   origin?: string[];
 }) {
   //
-  options.keepHeadersOnError =
-    options.keepHeadersOnError === undefined || !!options.keepHeadersOnError;
+  options.keepHeadersOnError = options.keepHeadersOnError === undefined ||
+    !!options.keepHeadersOnError;
   //?  pre populate context for Preflight Request
   if (options.maxAge) {
-    optionsCtx.set('Access-Control-Max-Age', options.maxAge);
+    optionsCtx.set("Access-Control-Max-Age", options.maxAge);
   }
   if (!options.privateNetworkAccess) {
     if (options.allowMethods) {
       optionsCtx.set(
-        'Access-Control-Allow-Methods',
-        options.allowMethods.join(',')
+        "Access-Control-Allow-Methods",
+        options.allowMethods.join(","),
       );
     }
     if (options.secureContext) {
       optionsCtx.set(
-        'Cross-Origin-Opener-Policy',
-        options.secureContext['Cross-Origin-Opener-Policy'] || 'unsafe-none'
+        "Cross-Origin-Opener-Policy",
+        options.secureContext["Cross-Origin-Opener-Policy"] || "unsafe-none",
       );
       optionsCtx.set(
-        'Cross-Origin-Embedder-Policy',
-        options.secureContext['Cross-Origin-Embedder-Policy'] || 'unsafe-none'
+        "Cross-Origin-Embedder-Policy",
+        options.secureContext["Cross-Origin-Embedder-Policy"] || "unsafe-none",
       );
     }
     if (options.allowHeaders) {
       optionsCtx.set(
-        'Access-Control-Allow-Headers',
-        options.allowHeaders.join(',')
+        "Access-Control-Allow-Headers",
+        options.allowHeaders.join(","),
       );
     }
   }
-  optionsCtx.set('Vary', 'Origin');
+  optionsCtx.set("Vary", "Origin");
   if (options.credentials === true) {
-    optionsCtx.set('Access-Control-Allow-Credentials', 'true');
+    optionsCtx.set("Access-Control-Allow-Credentials", "true");
   }
   if (Array.isArray(options.origin)) {
-    optionsCtx.set('Access-Control-Allow-Origin', options.origin.join(','));
+    optionsCtx.set("Access-Control-Allow-Origin", options.origin.join(","));
   }
   // ? Pre-populate normal response headers.
   // Create new base CORS headers to avoid mutation
   baseCorsHeaders = createCorsHeaders();
 
   //? Add Vary header to indicate response varies based on the Origin header
-  baseCorsHeaders['Vary'] = 'Origin';
+  baseCorsHeaders["Vary"] = "Origin";
   if (options.credentials === true) {
-    baseCorsHeaders['Access-Control-Allow-Credentials'] = 'true';
+    baseCorsHeaders["Access-Control-Allow-Credentials"] = "true";
   }
   if (Array.isArray(options.origin)) {
-    baseCorsHeaders['Access-Control-Allow-Origin'] = options.origin.join(',');
+    baseCorsHeaders["Access-Control-Allow-Origin"] = options.origin.join(",");
   }
   if (options.secureContext) {
-    baseCorsHeaders['Cross-Origin-Opener-Policy'] =
-      options.secureContext['Cross-Origin-Opener-Policy'];
-    baseCorsHeaders['Cross-Origin-Embedder-Policy'] =
-      options.secureContext['Cross-Origin-Embedder-Policy'];
+    baseCorsHeaders["Cross-Origin-Opener-Policy"] =
+      options.secureContext["Cross-Origin-Opener-Policy"];
+    baseCorsHeaders["Cross-Origin-Embedder-Policy"] =
+      options.secureContext["Cross-Origin-Embedder-Policy"];
   }
 
   // Freeze the headers to prevent mutation

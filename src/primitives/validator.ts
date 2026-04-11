@@ -1,4 +1,4 @@
-import type { HTTPBody } from './types.js';
+import type { HTTPBody } from "./types.js";
 
 /**
  * NOTE: Unknown fields (not defined in schema) are silently stripped from the output.
@@ -8,10 +8,10 @@ export function validator<T extends Record<string, any>>(
   schema: HTTPBody<T> | undefined,
   data: any,
   depth = 0,
-  maxDepth = 20
+  maxDepth = 20,
 ): T {
-  if (!schema || typeof data !== 'object') {
-    throw new Error('Invalid schema or data');
+  if (!schema || typeof data !== "object") {
+    throw new Error("Invalid schema or data");
   }
 
   // Check recursion depth to prevent stack overflow
@@ -58,12 +58,12 @@ export function validator<T extends Record<string, any>>(
 
     // Type validation
     if (type) {
-      if (type === 'array') {
+      if (type === "array") {
         if (!Array.isArray(value)) {
           errors.push(`${key} must be an array`);
           continue;
         }
-        if (arrayType === 'object' && objectSchema) {
+        if (arrayType === "object" && objectSchema) {
           try {
             const validatedArray = value.map((item) =>
               validator(objectSchema, item, depth + 1, maxDepth)
@@ -81,8 +81,8 @@ export function validator<T extends Record<string, any>>(
           errors.push(`${key} must be an array of ${arrayType}`);
           continue;
         }
-      } else if (type === 'object') {
-        if (typeof value !== 'object' || Array.isArray(value)) {
+      } else if (type === "object") {
+        if (typeof value !== "object" || Array.isArray(value)) {
           errors.push(`${key} must be an object`);
           continue;
         }
@@ -93,7 +93,7 @@ export function validator<T extends Record<string, any>>(
               objectSchema,
               value,
               depth + 1,
-              maxDepth
+              maxDepth,
             ) as T[keyof T];
             continue;
           } catch (e) {
@@ -103,7 +103,7 @@ export function validator<T extends Record<string, any>>(
         }
       } else {
         if (typeof value !== type) {
-          if (type === 'file' && typeof value === 'object') {
+          if (type === "file" && typeof value === "object") {
             out[key as keyof T] = value;
             continue;
           }
@@ -124,9 +124,9 @@ export function validator<T extends Record<string, any>>(
       const result = validate(value);
       if (result !== true) {
         errors.push(
-          typeof result === 'string'
+          typeof result === "string"
             ? result
-            : err || `${key} validation failed`
+            : err || `${key} validation failed`,
         );
         continue;
       }
@@ -136,7 +136,7 @@ export function validator<T extends Record<string, any>>(
   }
 
   if (errors.length > 0) {
-    throw new Error(errors.join(', '));
+    throw new Error(errors.join(", "));
   }
 
   return out as T;
