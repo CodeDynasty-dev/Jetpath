@@ -775,27 +775,23 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         // ? combine api infos into .http format
         const api = `\n
 ${method} ${
-          options?.apiDoc?.display === "UI"
-            ? "[--host--]"
-            : "http://localhost:" + (options?.port || 8080)
+          options?.apiDoc?.display === 'UI'
+            ? '[--host--]'
+            : 'http://localhost:' + (options?.port || 8080)
         }${route.path} HTTP/1.1
-${headers.length ? headers.join("\n") : ""}\n
-${
-          (body && method !== "GET" ? method : "")
-            ? JSON.stringify(bodyData)
-            : ""
-        }\n\n${
-          validator?.["title"]
-            ? "#-JET-TITLE " +
-              validator?.["title"].replaceAll("\n", "\n# ") +
-              "#-JET-TITLE"
-            : ""
+${headers.length ? headers.join('\n') : ''}\n
+${body ? JSON.stringify(bodyData) : ''}\n\n${
+          validator?.['title']
+            ? '#-JET-TITLE ' +
+              validator?.['title'].replaceAll('\n', '\n# ') +
+              '#-JET-TITLE'
+            : ''
         }\n${
-          validator?.["description"]
-            ? "#-JET-DESCRIPTION\n# " +
-              validator?.["description"].replaceAll("\n", "\n# ") +
-              "\n#-JET-DESCRIPTION"
-            : ""
+          validator?.['description']
+            ? '#-JET-DESCRIPTION\n# ' +
+              validator?.['description'].replaceAll('\n', '\n# ') +
+              '\n#-JET-DESCRIPTION'
+            : ''
         }\n
 ### break ###`;
 
