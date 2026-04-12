@@ -686,14 +686,14 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
   }
 }
 
-const shiftColor = (hex: string, part: "red" | "green" | "blue", inc = 90) => {
+const shiftColor = (hex: string, part: 'red' | 'green' | 'blue', inc = 60) => {
   const i = { red: 1, green: 3, blue: 5 }[part] || 3;
   const val = Math.min(
     255,
-    Math.max(0, parseInt(hex.substring(i, i + 2), 16) + inc),
+    Math.max(0, parseInt(hex.substring(i, i + 2), 16) + inc)
   )
     .toString(16)
-    .padStart(2, "0");
+    .padStart(2, '0');
   return hex.substring(0, i) + val + hex.substring(i + 2);
 };
 
