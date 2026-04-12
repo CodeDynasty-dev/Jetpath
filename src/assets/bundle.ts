@@ -137,7 +137,9 @@ function syntaxHighlight(json: any) {
   }
   // @ts-ignore
   if (typeof prettyPrintJson === "undefined") {
-    return `<pre style="background:#1e1e1e;color:#f0f0f0;padding:10px;border-radius:4px;overflow:auto;white-space:pre;">${escapeHtml(JSON.stringify(json, null, 2))}</pre>`;
+    return `<pre style="background:#1e1e1e;color:#f0f0f0;padding:10px;border-radius:4px;overflow:auto;white-space:pre;">${
+      escapeHtml(JSON.stringify(json, null, 2))
+    }</pre>`;
     // return `<pre>${escapeHtml(JSON.stringify(json, null, 2))}</pre>`;
   }
   // @ts-ignore
@@ -148,7 +150,7 @@ function syntaxHighlight(json: any) {
     linksNewTab: true,
     quoteKeys: true,
     trailingCommas: false,
-  })+   `</div>`;
+  }) + `</div>`;
 }
 
 function escapeHtml(unsafe: string) {

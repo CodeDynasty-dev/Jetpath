@@ -655,11 +655,11 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
   for (const p in modules) {
     const params = handlersPath(p);
     if (params) {
-      if (p.startsWith('MIDDLEWARE')) {
+      if (p.startsWith("MIDDLEWARE")) {
         _jet_middleware[params[1]] = modules[p] as any;
       } else {
         // ! HTTP handler
-        if (typeof params !== 'string') {
+        if (typeof params !== "string") {
           try {
             // ? set the method
             modules[p]!.method = params[0];
@@ -668,7 +668,7 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
             // Insert into Trie - it will decide whether to store in hashmap or Trie
             _JetPath_paths_trie[params[0] as methods].insert(
               params[1],
-              modules[p] as JetRoute
+              modules[p] as JetRoute,
             );
             // Also store in _JetPath_paths for backward compatibility and middleware assignment
             _JetPath_paths[params[0] as methods][params[1]] = modules[
@@ -677,26 +677,25 @@ export async function getHandlersEdge(modules: JetRoute[] & JetMiddleware[]) {
           } catch (routeError) {
             LOG.log(
               `Route ${params[0]} ${params[1]} skipped: ${String(routeError)}`,
-              'warn'
+              "warn",
             );
           }
         }
       }
     }
   }
-} 
+}
 
-const shiftColor = (hex: string, part: 'red' | 'green' | 'blue', inc = 90) => {
+const shiftColor = (hex: string, part: "red" | "green" | "blue", inc = 90) => {
   const i = { red: 1, green: 3, blue: 5 }[part] || 3;
   const val = Math.min(
     255,
-    Math.max(0, parseInt(hex.substring(i, i + 2), 16) + inc)
+    Math.max(0, parseInt(hex.substring(i, i + 2), 16) + inc),
   )
     .toString(16)
-    .padStart(2, '0');
+    .padStart(2, "0");
   return hex.substring(0, i) + val + hex.substring(i + 2);
 };
-
 
 export const compileUI = (UI: string, options: jetOptions, api: string) => {
   // ? global headers
@@ -706,27 +705,27 @@ export const compileUI = (UI: string, options: jetOptions, api: string) => {
     },
   );
   const apiCOnfig = options?.apiDoc;
-  const color = apiCOnfig?.color?.trim() || '#4285f4';
-  return UI.replace('{ JETPATH }', api)
+  const color = apiCOnfig?.color?.trim() || "#4285f4";
+  return UI.replace("{ JETPATH }", api)
     .replaceAll(
-      '{ JETENVIRONMENTS }',
-      JSON.stringify(options?.apiDoc?.environments || {})
+      "{ JETENVIRONMENTS }",
+      JSON.stringify(options?.apiDoc?.environments || {}),
     )
-    .replaceAll('{ JETPATHGH }', globalHeaders)
-    .replaceAll('{NAME}', apiCOnfig?.name?.trim() || 'Jetpath API Doc')
-    .replaceAll('JETPATHCOLORRED', shiftColor(color, 'red'))
-    .replaceAll('JETPATHCOLORGREEN', shiftColor(color, 'green'))
-    .replaceAll('JETPATHCOLORBLUE', shiftColor(color, 'blue'))
-    .replaceAll('JETPATHCOLOR', color)
+    .replaceAll("{ JETPATHGH }", globalHeaders)
+    .replaceAll("{NAME}", apiCOnfig?.name?.trim() || "Jetpath API Doc")
+    .replaceAll("JETPATHCOLORRED", shiftColor(color, "red"))
+    .replaceAll("JETPATHCOLORGREEN", shiftColor(color, "green"))
+    .replaceAll("JETPATHCOLORBLUE", shiftColor(color, "blue"))
+    .replaceAll("JETPATHCOLOR", color)
     .replaceAll(
-      '{LOGO}',
+      "{LOGO}",
       options?.apiDoc?.logo?.trim() ||
-        'https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/icon-transparent.png'
+        "https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/icon-transparent.png",
     )
     .replaceAll(
-      '{INFO}',
-      options?.apiDoc?.info?.replaceAll('\n', '<br>') ||
-        'This is a Jetpath api preview.'
+      "{INFO}",
+      options?.apiDoc?.info?.replaceAll("\n", "<br>") ||
+        "This is a Jetpath api preview.",
     );
 };
 
@@ -791,23 +790,23 @@ export const compileAPI = (options: jetOptions): [number, string] => {
         // ? combine api infos into .http format
         const api = `\n
 ${method} ${
-          options?.apiDoc?.display === 'UI'
-            ? '[--host--]'
-            : 'http://localhost:' + (options?.port || 8080)
+          options?.apiDoc?.display === "UI"
+            ? "[--host--]"
+            : "http://localhost:" + (options?.port || 8080)
         }${route.path} HTTP/1.1
-${headers.length ? headers.join('\n') : ''}\n
-${body ? JSON.stringify(bodyData) : ''}\n\n${
-          validator?.['title']
-            ? '#-JET-TITLE ' +
-              validator?.['title'].replaceAll('\n', '\n# ') +
-              '#-JET-TITLE'
-            : ''
+${headers.length ? headers.join("\n") : ""}\n
+${body ? JSON.stringify(bodyData) : ""}\n\n${
+          validator?.["title"]
+            ? "#-JET-TITLE " +
+              validator?.["title"].replaceAll("\n", "\n# ") +
+              "#-JET-TITLE"
+            : ""
         }\n${
-          validator?.['description']
-            ? '#-JET-DESCRIPTION\n# ' +
-              validator?.['description'].replaceAll('\n', '\n# ') +
-              '\n#-JET-DESCRIPTION'
-            : ''
+          validator?.["description"]
+            ? "#-JET-DESCRIPTION\n# " +
+              validator?.["description"].replaceAll("\n", "\n# ") +
+              "\n#-JET-DESCRIPTION"
+            : ""
         }\n
 ### break ###`;
 
