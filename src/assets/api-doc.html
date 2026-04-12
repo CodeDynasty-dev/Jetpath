@@ -22,6 +22,9 @@
       --primary-lighter: JETPATHCOLOR2e;
       --primary-dark: JETPATHCOLORb6;
       --primary-border: JETPATHCOLOR5e;
+      --primary-red: JETPATHCOLORRED;
+      --primary-green: JETPATHCOLORGREEN;
+      --primary-blue: JETPATHCOLORBLUE;
       --text-primary: #202124;
       --text-secondary: #5f6368;
       --surface-1: #ffffff;
@@ -309,19 +312,28 @@
       font-weight: bold;
     }
 
+    /* 
+  .code-container pre {
+    margin: 0;
+    font-size: 0.85rem;
+  } */
     .code-container {
+
       border-radius: var(--radius-sm);
       overflow: auto;
       margin-top: 8px;
       padding: 10px;
       color: #f0f0f0;
       max-height: 400px;
-    }
-
-    .code-container pre {
-      margin: 0;
-      font-size: 0.85rem;
-    }
+}
+ 
+  .code-container .json-key { color: var(--primary-blue); }
+.code-container .json-string { color: var(--primary-green); }
+.code-container .json-number { color: var(--primary-red); }
+.code-container .json-boolean { color: var(--primary-green); }
+.code-container .json-null { color: var(--primary-dark); }
+/* .code-container ol.json-lines > li:nth-child(odd) { background-color: #282c34; }
+.code-container ol.json-lines > li:nth-child(even) { background-color: #21252b; } */
 
     .assertion-result {
       margin-bottom: 5px;

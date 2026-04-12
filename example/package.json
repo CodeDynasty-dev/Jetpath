@@ -11,6 +11,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "jetpath": "file:../../../../zips/jetpath-1.12.3.tgz"
+    "jetpath": "file:../../../../zips/jetpath-1.12.4.tgz"
   }
 }

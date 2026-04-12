@@ -36,7 +36,7 @@ It demonstrates various Jetpath features including:
 [check our docs for more info](https://jetpath.codedynasty.dev)
 `,
 
-    color: "#032b82ff", // Using the color from the original sample
+    color: "#032b82", // Using the color from the original sample
     // Optional: Secure the documentation UI itself with basic authentication (example from sample).
     username: "admin", // Default username from sample
     password: "1234", // Default password from sample **WARNING:** Do not use simple passwords in production. Use environment variables.
