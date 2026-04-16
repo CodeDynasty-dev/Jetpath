@@ -103,6 +103,14 @@ export class Jetpath {
       & Record<string, any>;
   }
   async listen(): Promise<void> {
+    this.server = server(this.plugs, this.options);
+    if (this.server.isPrimary) {
+      this.server.listen(this.options.port);
+      this.listening = true;
+      this._nativeServer = this.server;
+      return;
+    }
+
     // ? {-view-} here is replaced at build time to html
     const UI = await readFile(html_path, {
       encoding: "utf-8",
@@ -188,9 +196,7 @@ export class Jetpath {
 
     //
     assignMiddleware(_JetPath_paths, _jet_middleware);
-    // ? start server
-    // ? check if server is already listening
-    this.server = server(this.plugs, this.options);
+
     // ? add plugins to the server
     if (
       this.server.edge &&
