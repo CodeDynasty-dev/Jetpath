@@ -73,7 +73,13 @@ export const _jet_middleware: Record<
 export const server = (
   plugs: JetPlugin[],
   options: jetOptions,
-): { listen: any; edge: boolean } => {
+): {
+  listen: any;
+  edge: boolean;
+  isPrimary?: boolean;
+  stop?: () => void;
+  close?: (cb?: () => void) => void;
+} => {
   let server;
   let server_else;
   const runtimeConfig = options.runtimes;
@@ -144,6 +150,40 @@ export const server = (
     };
   }
   if (runtime["bun"]) {
+    const clusterConfig = runtimeConfig?.bun?.cluster;
+    if (clusterConfig) {
+      const cluster = require("node:cluster");
+      const os = require("node:os");
+
+      if (cluster.isPrimary) {
+        const numWorkers = typeof clusterConfig === "number"
+          ? clusterConfig
+          : os.cpus().length;
+
+        server = {
+          listen(port: number) {
+            LOG.log(`Primary ${process.pid} is starting ${numWorkers} workers`, "info");
+            for (let i = 0; i < numWorkers; i++) {
+              cluster.fork();
+            }
+
+            cluster.on("exit", (worker: any) => {
+              LOG.log(`worker ${worker.process.pid} died, restarting...`, "warn");
+              cluster.fork();
+            });
+          },
+          stop() {
+            for (const id in cluster.workers) {
+              cluster.workers[id].kill();
+            }
+          },
+          edge: false,
+          isPrimary: true,
+        };
+        return server;
+      }
+    }
+
     if (options.upgrade && options.upgrade === true) {
       server = {
         listen(port: number) {

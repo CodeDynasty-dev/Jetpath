@@ -197,6 +197,7 @@ export type jetOptions = {
   runtimes?: {
     bun?: {
       reusePort?: boolean;
+      cluster?: boolean | number;
     };
     deno?: {};
     node?: {};
