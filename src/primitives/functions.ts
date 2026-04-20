@@ -103,7 +103,7 @@ export const server = (
       listen() {
         // Cloudflare Worker uses `addEventListener("fetch", ...)`
         addEventListener("fetch", (event: FetchEvent) => {
-          event.respondWith(JetpathBunDeno(event.request));
+          event.respondWith(JetpathBunDeno(event.request, undefined));
         });
       },
       edge: true,
@@ -124,7 +124,7 @@ export const server = (
             headers: event.headers,
             body: event.body,
           });
-          const res = await JetpathBunDeno(req);
+          const res = await JetpathBunDeno(req, undefined);
           const text = await res.text();
           return {
             statusCode: res.status,
