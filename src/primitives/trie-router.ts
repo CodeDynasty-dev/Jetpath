@@ -30,15 +30,15 @@ export class Trie {
   hashmap: Record<string, JetRoute> = {};
   constructor(
     method:
-      | "GET"
-      | "POST"
-      | "PUT"
-      | "DELETE"
-      | "PATCH"
-      | "OPTIONS"
-      | "HEAD"
-      | "CONNECT"
-      | "TRACE",
+      | 'GET'
+      | 'POST'
+      | 'PUT'
+      | 'DELETE'
+      | 'PATCH'
+      | 'OPTIONS'
+      | 'HEAD'
+      | 'CONNECT'
+      | 'TRACE'
   ) {
     this.root = new TrieNode();
     this.method = method;
@@ -52,10 +52,10 @@ export class Trie {
   insert(path: string, handler: JetRoute): void {
     // Normalize path first
     let normalizedPath = path.trim();
-    if (normalizedPath.startsWith("/")) {
+    if (normalizedPath.startsWith('/')) {
       normalizedPath = normalizedPath.slice(1);
     }
-    if (normalizedPath.endsWith("/") && normalizedPath.length > 0) {
+    if (normalizedPath.endsWith('/') && normalizedPath.length > 0) {
       normalizedPath = normalizedPath.slice(0, -1);
     }
 
@@ -66,7 +66,7 @@ export class Trie {
       // Store exact paths in hashmap for O(1) lookup
       if (this.hashmap[normalizedPath]) {
         throw new Error(
-          `Duplicate route: ${this.method} ${path} is already defined. Each route path must be unique per HTTP method.`,
+          `Duplicate route: ${this.method} ${path} is already defined. Each route path must be unique per HTTP method.`
         );
       }
       this.hashmap[normalizedPath] = handler;
@@ -74,29 +74,29 @@ export class Trie {
     }
 
     // ? Handle the root path explicitly (dynamic root path)
-    if (normalizedPath === "") {
+    if (normalizedPath === '') {
       if (this.root.handler) {
         LOG.log(
           `Warning: Duplicate route definition for path ${this.method} ${path}`,
-          "warn",
+          'warn'
         );
       }
       this.root.handler = handler;
       return;
     }
 
-    const segments = normalizedPath.split("/");
+    const segments = normalizedPath.split('/');
     let currentNode: TrieNode = this.root;
 
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
 
       // ? Check for parameter segment (starts with :)
-      if (segment.startsWith(":")) {
+      if (segment.startsWith(':')) {
         const paramName = segment.slice(1);
         if (!paramName) {
           throw new Error(
-            `Invalid route path: Parameter segment in ${this.method} ${path} '${segment}' is missing a name.`,
+            `Invalid route path: Parameter segment in ${this.method} ${path} '${segment}' is missing a name.`
           );
         }
 
@@ -107,7 +107,7 @@ export class Trie {
               `Route path conflict: Parameter ':${paramName}' in ${this.method} ${path} conflicts with existing parameter ':${currentNode.parameterChild.paramName}' at the same level. ` +
                 `Two different parameter names cannot occupy the same path segment. ` +
                 `Tip: Use a fixed prefix to disambiguate, e.g. instead of GET_resource_$settings and GET_resource_$stats, ` +
-                `use GET_resource_settings_$id and GET_resource_stats_$id.`,
+                `use GET_resource_settings_$id and GET_resource_stats_$id.`
             );
           }
 
@@ -117,45 +117,45 @@ export class Trie {
             handler.params = {};
           }
           // @ts-ignore
-          handler.params[paramName] = "";
+          handler.params[paramName] = '';
         } else if (currentNode.children.has(segment)) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`,
+            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`
           );
         } else if (currentNode.wildcardChild) {
           throw new Error(
-            `Invalid route path: Parameter segment '${segment}' cannot follow a wildcard '*' at the same level in ${this.method} ${path}.`,
+            `Invalid route path: Parameter segment '${segment}' cannot follow a wildcard '*' at the same level in ${this.method} ${path}.`
           );
         } else {
           if (!handler.params) {
             handler.params = {};
           }
-          handler.params[paramName as keyof typeof handler.params] = "" as any;
+          handler.params[paramName as keyof typeof handler.params] = '' as any;
           const newNode = new TrieNode();
           newNode.paramName = paramName;
           currentNode.parameterChild = newNode;
           currentNode = newNode;
         }
       } // ? Check for wildcard segment (*) - typically only allowed at the end
-      else if (segment === "*") {
+      else if (segment === '*') {
         if (i !== segments.length - 1) {
           throw new Error(
-            `Invalid route path: Wildcard '*' is only allowed at the end of a path pattern in ${this.method} ${path}.`,
+            `Invalid route path: Wildcard '*' is only allowed at the end of a path pattern in ${this.method} ${path}.`
           );
         }
         if (currentNode.wildcardChild) {
           LOG.log(
             `Warning: Duplicate wildcard definition at segment '${segment}' in ${this.method} ${path}.`,
-            "warn",
+            'warn'
           );
           currentNode = currentNode.wildcardChild;
         } else if (currentNode.parameterChild) {
           throw new Error(
-            `Invalid route path: Wildcard '*' cannot follow a parameter at the same level in ${this.method} ${path}.`,
+            `Invalid route path: Wildcard '*' cannot follow a parameter at the same level in ${this.method} ${path}.`
           );
         } else if (currentNode.children.has(segment)) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`,
+            `Route path conflict: Fixed segment '${segment}' already exists at this level in ${this.method} ${path}.`
           );
         } else {
           const newNode = new TrieNode();
@@ -171,12 +171,12 @@ export class Trie {
             `Route path conflict: Fixed segment '${segment}' in ${this.method} ${path} conflicts with existing parameter ':${currentNode.parameterChild.paramName}' at this level. ` +
               `A path segment cannot be both a fixed string and a parameter. ` +
               `Tip: Add a fixed prefix before the parameter, e.g. instead of GET_reviews_$userId and GET_reviews_listing_$listingId, ` +
-              `use GET_reviews_user_$userId and GET_reviews_listing_$listingId.`,
+              `use GET_reviews_user_$userId and GET_reviews_listing_$listingId.`
           );
         }
         if (currentNode.wildcardChild) {
           throw new Error(
-            `Route path conflict: Fixed segment '${segment}' conflicts with existing wildcard '*' at this level in ${this.method} ${path}.`,
+            `Route path conflict: Fixed segment '${segment}' conflicts with existing wildcard '*' at this level in ${this.method} ${path}.`
           );
         }
 
@@ -191,7 +191,7 @@ export class Trie {
     }
     if (currentNode.handler) {
       throw new Error(
-        `Duplicate route: ${this.method} ${path} is already defined. Each route path must be unique per HTTP method.`,
+        `Duplicate route: ${this.method} ${path} is already defined. Each route path must be unique per HTTP method.`
       );
     }
     //? Set the handler and original path
@@ -207,15 +207,15 @@ export class Trie {
       // ? Fast path for root
       if (url.length === 1) {
         // url === '/'
-        const h = this.hashmap[""];
-        if (h) return getCtx(req, res, "", h);
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
         if (this.root.handler) {
-          return getCtx(req, res, "", this.root.handler, undefined);
+          return getCtx(req, res, '', this.root.handler, undefined);
         }
         return undefined;
       }
       // ? Strip query string and normalize
-      const qIdx = url.indexOf("?");
+      const qIdx = url.indexOf('?');
       const end = qIdx > -1 ? qIdx : url.length;
       // ? strip leading '/' and trailing '/'
       const s = 1; // always starts with '/'
@@ -223,37 +223,37 @@ export class Trie {
       normalizedPath = url.substring(s, e);
     } else {
       // ? Bun/Deno: url is absolute like "http://localhost:3000/" or "http://localhost:3000/users"
-      const pathStart = url.indexOf("/", 7); // skip "http://" or "https:/"
+      const pathStart = url.indexOf('/', 7); // skip "http://" or "https:/"
       // ? Fast path: root "/" with no query
       if (pathStart >= 0 && pathStart === url.length - 1) {
-        const h = this.hashmap[""];
-        if (h) return getCtx(req, res, "", h);
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
         if (this.root.handler) {
-          return getCtx(req, res, "", this.root.handler, undefined);
+          return getCtx(req, res, '', this.root.handler, undefined);
         }
         return undefined;
       }
       if (pathStart < 0) {
         // no path found — treat as root
-        const h = this.hashmap[""];
-        if (h) return getCtx(req, res, "", h);
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
         if (this.root.handler) {
-          return getCtx(req, res, "", this.root.handler, undefined);
+          return getCtx(req, res, '', this.root.handler, undefined);
         }
         return undefined;
       }
       // ? Strip query string
-      const qIdx = url.indexOf("?", pathStart);
+      const qIdx = url.indexOf('?', pathStart);
       const end = qIdx > -1 ? qIdx : url.length;
       // ? strip leading '/' and trailing '/'
       const s = pathStart + 1;
       const e = url.charCodeAt(end - 1) === 47 && end > s + 1 ? end - 1 : end;
       if (s >= e) {
         // root path
-        const h = this.hashmap[""];
-        if (h) return getCtx(req, res, "", h);
+        const h = this.hashmap[''];
+        if (h) return getCtx(req, res, '', h);
         if (this.root.handler) {
-          return getCtx(req, res, "", this.root.handler, undefined);
+          return getCtx(req, res, '', this.root.handler, undefined);
         }
         return undefined;
       }
@@ -269,19 +269,18 @@ export class Trie {
     // ? Trie walk for parameterized/wildcard routes
     let currentNode = this.root;
     const params: Record<string, string> = {};
-    const segments = normalizedPath.split("/");
+    const segments = normalizedPath.split('/');
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       const child = currentNode.children.get(segment);
       if (child) {
         currentNode = child;
       } else if (currentNode.parameterChild) {
-        params[currentNode.parameterChild.paramName!] = decodeURIComponent(
-          segment,
-        );
+        params[currentNode.parameterChild.paramName!] =
+          decodeURIComponent(segment);
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
-        params["*"] = segments.slice(i).join("/");
+        params['*'] = segments.slice(i).join('/');
         currentNode = currentNode.wildcardChild;
         break;
       } else {
@@ -294,59 +293,58 @@ export class Trie {
   }
 
   // ? Bun/Deno optimized responder — uses scratch context to avoid pool overhead
-  get_responder_fast(req: Request): Context | undefined {
+  get_responder_fast(req: Request, res: unknown): Context | undefined {
     const url = req.url!;
-    const pathStart = url.indexOf("/", 7);
+    const pathStart = url.indexOf('/', 7);
     // ? Fast path: root "/" with no query
     if (pathStart >= 0 && pathStart === url.length - 1) {
-      const h = this.hashmap[""];
-      if (h) return getScratchCtx(req, "", h);
+      const h = this.hashmap[''];
+      if (h) return getScratchCtx(req, res, '', h);
       if (this.root.handler) {
-        return getScratchCtx(req, "", this.root.handler, undefined);
+        return getScratchCtx(req, res, '', this.root.handler, undefined);
       }
       return undefined;
     }
     if (pathStart < 0) {
-      const h = this.hashmap[""];
-      if (h) return getScratchCtx(req, "", h);
+      const h = this.hashmap[''];
+      if (h) return getScratchCtx(req, res, '', h);
       if (this.root.handler) {
-        return getScratchCtx(req, "", this.root.handler, undefined);
+        return getScratchCtx(req, res, '', this.root.handler, undefined);
       }
       return undefined;
     }
-    const qIdx = url.indexOf("?", pathStart);
+    const qIdx = url.indexOf('?', pathStart);
     const end = qIdx > -1 ? qIdx : url.length;
     const s = pathStart + 1;
     const e = url.charCodeAt(end - 1) === 47 && end > s + 1 ? end - 1 : end;
     if (s >= e) {
-      const h = this.hashmap[""];
-      if (h) return getScratchCtx(req, "", h);
+      const h = this.hashmap[''];
+      if (h) return getScratchCtx(req, res, '', h);
       if (this.root.handler) {
-        return getScratchCtx(req, "", this.root.handler, undefined);
+        return getScratchCtx(req, res, '', this.root.handler, undefined);
       }
       return undefined;
     }
     const normalizedPath = url.substring(s, e);
     const exactHandler = this.hashmap[normalizedPath];
     if (exactHandler) {
-      return getScratchCtx(req, normalizedPath, exactHandler);
+      return getScratchCtx(req, res, normalizedPath, exactHandler);
     }
     // ? Trie walk for parameterized/wildcard routes
     let currentNode = this.root;
     const params: Record<string, string> = {};
-    const segments = normalizedPath.split("/");
+    const segments = normalizedPath.split('/');
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       const child = currentNode.children.get(segment);
       if (child) {
         currentNode = child;
       } else if (currentNode.parameterChild) {
-        params[currentNode.parameterChild.paramName!] = decodeURIComponent(
-          segment,
-        );
+        params[currentNode.parameterChild.paramName!] =
+          decodeURIComponent(segment);
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
-        params["*"] = segments.slice(i).join("/");
+        params['*'] = segments.slice(i).join('/');
         currentNode = currentNode.wildcardChild;
         break;
       } else {
@@ -354,7 +352,13 @@ export class Trie {
       }
     }
     if (currentNode.handler) {
-      return getScratchCtx(req, normalizedPath, currentNode.handler, params);
+      return getScratchCtx(
+        req,
+        res,
+        normalizedPath,
+        currentNode.handler,
+        params
+      );
     }
   }
 }
@@ -408,18 +412,14 @@ export const getCtx = (
 };
 
 // ? Scratch context for sync fast path — avoids pool push/pop overhead
-// ? SAFETY: Bun/Deno process the initial fetch handler call synchronously on the main thread.
-// ? If the handler is sync, scratch is returned immediately via returnScratchCtx.
-// ? If the handler is async (contains await), _scratchCtx is set to null while in use,
-// ? so subsequent requests fall back to the pool. returnScratchCtx reclaims it after.
-// ? This is NOT safe for multi-threaded environments (Worker Threads) — pool-only there.
 let _scratchCtx: Context | null = null;
 
 export const getScratchCtx = (
   req: Request,
+  res: unknown,
   path: string,
   route: JetRoute,
-  params?: Record<string, any>,
+  params?: Record<string, any>
 ): Context => {
   const ctx = _scratchCtx;
   if (ctx) {
@@ -431,6 +431,7 @@ export const getScratchCtx = (
       ctx._8 = false;
     }
     ctx.request = req;
+    ctx.res = res;
     ctx.params = params;
     ctx.path = path;
     ctx.payload = undefined;

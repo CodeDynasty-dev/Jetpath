@@ -144,12 +144,14 @@ export const server = (
     };
   }
   if (runtime["bun"]) {
+    const clusterEnabled = options.cluster?.enabled === true;
+    const reusePort = clusterEnabled || runtimeConfig?.bun?.reusePort === true;
     if (options.upgrade && options.upgrade === true) {
       server = {
         listen(port: number) {
           server_else = Bun.serve({
             port,
-            reusePort: runtimeConfig?.bun?.reusePort || false,
+            reusePort,
             fetch: JetpathBunDeno,
             websocket: {
               message(...p) {
@@ -178,6 +180,7 @@ export const server = (
         listen(port: number) {
           server_else = Bun.serve({
             port,
+            reusePort,
             fetch: JetpathBunDeno,
           });
         },
@@ -338,8 +341,8 @@ if (isNode) {
 }
 
 // ? Bun/Deno: fully inlined handler — no indirection through makeRes variable
-const JetpathBunDeno = (req: Request) => {
-  if (req.method === "OPTIONS") {
+const JetpathBunDeno = (req: Request, res: unknown) => {
+  if (req.method === 'OPTIONS') {
     optionsCtx.code = 200;
     return new Response(undefined, {
       status: 200,
@@ -349,6 +352,7 @@ const JetpathBunDeno = (req: Request) => {
 
   const ctx = _JetPath_paths_trie[req.method as methods].get_responder_fast(
     req,
+    res
   );
   if (ctx) {
     const r = ctx.handler!;
@@ -359,7 +363,7 @@ const JetpathBunDeno = (req: Request) => {
         // ? most routes are sync and return undefined — skip promise check
         if (
           result !== undefined &&
-          typeof (result as any).then === "function"
+          typeof (result as any).then === 'function'
         ) {
           return (result as Promise<any>).then(
             () => {
@@ -376,7 +380,7 @@ const JetpathBunDeno = (req: Request) => {
               const headers = ctx._2;
               returnScratchCtx(ctx);
               return new Response(undefined, { status: code, headers });
-            },
+            }
           );
         }
         // ? inline makeRes for sync path — hottest path in benchmarks
@@ -1280,7 +1284,10 @@ export async function codeGen(
       await fs().writeFile(ROUTE_FILE, outputContent, "utf-8");
       LOG.log("Generated routes file successfully: " + ROUTE_FILE, "success");
     } catch (error) {
-      LOG.log(`Error writing routes file ${ROUTE_FILE}: ${error}`, "error");
+      LOG.log(
+        `Error writing routes file ${generatedRoutesFilePath} ${String(error).split(',')[0]}`,
+        'warn'
+      );
     }
   }
   //? Add all the generated module declarations

@@ -61,9 +61,13 @@ export class LOG {
     bgWhite: "\x1b[47m",
   };
   static print(message: any, color: string) {
+    if (process.env['JETWORKER_ID'] && process.env['JET_SILENT'] === 'true')
+      return;
     console.log(`${color}%s${LOG.colors.reset}`, `${message}`);
   }
   static log(message: string, type: "info" | "warn" | "error" | "success") {
+    if (process.env['JETWORKER_ID'] && process.env['JET_SILENT'] === 'true')
+      return;
     LOG.print(
       message,
       type === "info"

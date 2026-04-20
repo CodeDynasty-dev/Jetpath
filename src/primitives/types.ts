@@ -157,6 +157,12 @@ export type methods =
 
 export type allowedMethods = methods[];
 
+export interface BunClusterOptions {
+  enabled?: boolean;
+  workers?: number | "auto";
+  silent?: boolean;
+}
+
 export type jetOptions = {
   /**
    * edge grabber helps capture defined API functions in an edge environment
@@ -254,6 +260,11 @@ export type jetOptions = {
       origin?: string[];
     }
     | boolean;
+  /**
+   * Bun cluster options for multi-core utilization
+   * Uses SO_REUSEPORT for load balancing (Linux only)
+   */
+  cluster?: BunClusterOptions;
 };
 
 export type HTTPBody<Obj extends Record<string, any>> = {
