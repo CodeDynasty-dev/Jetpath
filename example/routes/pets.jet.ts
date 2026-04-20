@@ -115,7 +115,7 @@ export const GET_pets: JetRoute<{
   const totalPages = Math.ceil(filteredPets.length / effectiveLimit);
 
   // Create next and previous page URLs for pagination metadata
-  const baseUrl = new URL(ctx.get("host")!).origin + "/pets"; // Construct base URL for pagination links
+  const baseUrl =  (ctx.get("host")!)  + "/pets"; // Construct base URL for pagination links
   let nextPage: string | null = null;
   let prevPage: string | null = null;
 

@@ -59,3 +59,5 @@ use(POST_auth_login).body((t) => {
   .description(`
     ### ok here
  `);
+
+export const GET_hello: JetRoute = (ctx) => ctx.send( "Hello, world!" );

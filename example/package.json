@@ -4,13 +4,13 @@
   "description": "The goal is to make the codebase clearer for beginners by splitting the original monolithic file into logical modules, while preserving all the features and conventions demonstrated in the original sample.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "bun run index.jet.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
-    "jetpath": "file:../../../../zips/jetpath-1.12.4.tgz"
+    "jetpath": "file:./jetpath-1.12.6.tgz"
   }
 }
