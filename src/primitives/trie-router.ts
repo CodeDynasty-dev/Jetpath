@@ -452,7 +452,7 @@ export const getScratchCtx = (
     return ctx;
   }
   // ? scratch is in use (async handler) — fall back to pool
-  return getCtx(req, undefined, path, route, params);
+  return getCtx(req, res, path, route, params);
 };
 
 export const returnScratchCtx = (ctx: Context) => {
