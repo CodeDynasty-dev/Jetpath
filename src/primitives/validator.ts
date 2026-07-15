@@ -76,6 +76,7 @@ export function validator<T extends Record<string, any>>(
           }
         } else if (
           arrayType &&
+          arrayType !== "file" &&
           !value.every((item) => typeof item === arrayType)
         ) {
           errors.push(`${key} must be an array of ${arrayType}`);

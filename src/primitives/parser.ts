@@ -21,7 +21,8 @@ export function parseFormData(
   const fields: Record<string, string | string[]> = {};
   const files: Record<
     string,
-    { fileName: string; content: Uint8Array; mimeType: string; size: number }
+    | { fileName: string; content: Uint8Array; mimeType: string; size: number }
+    | Array<{ fileName: string; content: Uint8Array; mimeType: string; size: number }>
   > = {};
 
   const parts = splitBuffer(rawBody, boundaryBytes).slice(1, -1); // remove preamble and epilogue
@@ -62,12 +63,20 @@ export function parseFormData(
       }
 
       const mimeType = headers["content-type"] || "application/octet-stream";
-      files[fieldName] = {
+      const fileObj = {
         fileName,
         content: body,
         mimeType,
         size: body.length,
       };
+      if (fieldName in files) {
+        const existing = files[fieldName];
+        files[fieldName] = Array.isArray(existing)
+          ? [...existing, fileObj]
+          : [existing, fileObj];
+      } else {
+        files[fieldName] = fileObj;
+      }
     } else {
       const value = decoder.decode(body);
       if (fieldName in fields) {
