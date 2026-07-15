@@ -1,6 +1,6 @@
 {
   "name": "jetpath",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "description": "A performance-first cross-runtime API framework without the boilerplate",
   "main": "dist/index.js",
   "type": "module",
@@ -21,7 +21,7 @@
   "keywords": [
     "web",
     "framework",
-    "fast", 
+    "fast",
     "simple",
     "bunjs",
     "nodejs",
