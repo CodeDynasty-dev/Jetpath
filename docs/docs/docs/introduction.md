@@ -52,7 +52,18 @@ export const GET_users: JetRoute = (ctx) => {
 
 - Quick Start: Follow our [Quick Start](./quickstart.html) guide to build your first API in minutes
 - Core Concepts: Explore [Routing](./routing.html) to understand how everything works together
+- AI Assistants: Using an LLM? Install the [Jetpath Skill](#claude-code-integration) to superpower your AI workflow.
 
 Join the [Discord community](https://discord.codedynasty.dev).
+
+## LLM IDE Integration
+
+If you use LLM IDEs like [Claude Code](https://github.com/anthropics/claude-code), you can give it expert-level knowledge of Jetpath by installing the official Jetpath Framework Skill. This teaches the LLM about Jetpath's file-based routing, validation schemas, context object, and production patterns.
+
+Run this command in your project directory:
+
+```bash
+claude config add skills https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/jetpath-backend-framework-skill/SKILL.md
+```
 
 </docmach>

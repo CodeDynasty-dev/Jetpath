@@ -141,6 +141,19 @@ For existing projects:
 npm install jetpath --save
 ```
 
+## AI Coding Assistants
+
+If you use [Claude Code](https://github.com/anthropics/claude-code), you can install the Jetpath framework skill to give Claude deep, production-ready knowledge of Jetpath's conventions, routing, context, validation, and real-world patterns.
+
+To install the Jetpath skill in your project:
+
+```bash
+claude config add skills https://raw.githubusercontent.com/codedynasty-dev/jetpath/main/jetpath-backend-framework-skill/SKILL.md
+```
+
+With this skill installed, Claude/llms will automatically understand how to scaffold endpoints, use the `ctx` object, set up validation, and follow Jetpath's performance-first patterns.
+
+
 ## Community & Support
 
 - [Documentation](https://jetpath.codedynasty.dev) - In-depth guides and API reference
