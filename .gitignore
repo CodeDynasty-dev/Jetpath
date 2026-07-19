@@ -1,8 +1,7 @@
 /node_modules
 ./lib
 **.tgz
-jetpath-**.tgz
-jetpath-**
+jetpath-**.tgz 
 .history
 api-doc.http 
 dist
