@@ -370,8 +370,21 @@ export const getCtx = (
   route: JetRoute,
   params?: Record<string, any>,
 ): Context => {
-  if (ctxPool.length) {
-    const ctx = ctxPool.pop()!;
+  let pooled: Context | undefined;
+  // ? sanitize the pool: entries must be real per-request Context instances.
+  // ? Shared/global response objects (e.g. the CORS optionsCtx) must never be
+  // ? handed out as a request context — they carry no plugins/state/method and
+  // ? are concurrently mutated by other code paths.
+  while (ctxPool.length) {
+    const candidate = ctxPool.pop()!;
+    if (candidate instanceof Context) {
+      pooled = candidate;
+      break;
+    }
+  }
+  if (pooled) {
+    const ctx = pooled;
+    ctx._9 = false;
     // ? clear state — only if it was used (check _dirty flag instead of Object.keys)
     if (ctx._8) {
       ctx._7.state = {};
@@ -379,6 +392,10 @@ export const getCtx = (
     }
     ctx.request = req;
     ctx.res = res;
+    // ? always bind the CURRENT request's method — a pooled ctx must never
+    // ? carry the method of a previous request
+    ctx.method = req.method as "GET";
+    ctx.connection = undefined;
     ctx.params = params;
     ctx.path = path;
     ctx.payload = undefined;
@@ -425,6 +442,7 @@ export const getScratchCtx = (
   if (ctx) {
     // ? mark as in-use so async fallback knows to allocate from pool
     _scratchCtx = null;
+    ctx._9 = false;
     // ? minimal reset — only what the handler needs
     if (ctx._8) {
       ctx._7.state = {};
@@ -432,6 +450,8 @@ export const getScratchCtx = (
     }
     ctx.request = req;
     ctx.res = res;
+    ctx.method = req.method as "GET";
+    ctx.connection = undefined;
     ctx.params = params;
     ctx.path = path;
     ctx.payload = undefined;
@@ -457,10 +477,36 @@ export const getScratchCtx = (
 
 export const returnScratchCtx = (ctx: Context) => {
   // ? return scratch context for reuse
+  // ? a context that is already stored (pool/scratch) must never be stored
+  // ? again — duplicate entries hand the same mutable context to two
+  // ? concurrent requests
+  if (ctx._9) return;
   // ? if scratch slot is empty, reclaim it; otherwise push to pool
   if (!_scratchCtx) {
+    ctx._9 = true;
     _scratchCtx = ctx;
   } else if (ctxPool.length < MAX_POOL_SIZE) {
+    ctx._9 = true;
+    ctxPool.push(ctx);
+  }
+};
+
+// ? Release a request context back into the pool — the ONLY sanctioned way to
+// ? recycle contexts. Guards enforce request isolation:
+// ?   1. only real per-request Context instances may be recycled — shared
+// ?      module-level objects (e.g. the global CORS optionsCtx used for every
+// ?      preflight, or 404 spread copies) must never enter the pool;
+// ?   2. a context may only be stored once — duplicate pool entries put two
+// ?      concurrent requests on the same mutable context, swapping
+// ?      ctx.request / ctx.state / headers underneath a suspended middleware
+// ?      chain (observed cross-request "Invalid token" auth failures).
+export const releaseCtx = (ctx: unknown): void => {
+  if (
+    ctx instanceof Context &&
+    !ctx._9 &&
+    ctxPool.length < MAX_POOL_SIZE
+  ) {
+    ctx._9 = true;
     ctxPool.push(ctx);
   }
 };
@@ -471,8 +517,12 @@ export function preSeedPool(count: number) {
   if (!_scratchCtx) {
     _scratchCtx = new Context();
   }
-  for (let i = 0; i < count; i++) {
-    ctxPool.push(new Context());
+  // ? respect the pool cap — an oversized seed pool would block all recycling
+  const total = Math.min(count, MAX_POOL_SIZE);
+  for (let i = 0; i < total; i++) {
+    const ctx = new Context();
+    ctx._9 = true;
+    ctxPool.push(ctx);
   }
 }
 

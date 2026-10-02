@@ -14,7 +14,7 @@ import type {
 } from "./types.js";
 import { mime } from "../extracts/mimejs-extract.js";
 import type { BunFile } from "bun";
-import { ctxPool, getCtx, MAX_POOL_SIZE, runtime } from "./trie-router.js";
+import { getCtx, releaseCtx, runtime } from "./trie-router.js";
 import { parseRequest } from "./parser.js";
 import { baseCorsHeaders, optionsCtx } from "./cors.js";
 import { validator } from "./validator.js";
@@ -149,6 +149,9 @@ class ctxState {
  *   _6  = custom Response object (Response | false) — for sendResponse()
  *   _7  = state container (ctxState)
  *   _8  = state dirty flag — true when ctx.state was accessed
+ *   _9  = pool-ownership flag — true while the context is stored in the
+ *         context pool / scratch slot (prevents double-storage, which would
+ *         hand one mutable context to two concurrent requests)
  *   _10 = JSON fast-path flag — true when send() was called with object data
  *   _setCookies = Set-Cookie header values (string[])
  *   _queryValidated = whether cached query has been validated
@@ -182,6 +185,8 @@ export class Context {
   plugins: Record<string, Function>;
   // ? state dirty flag — avoids Object.keys() check on pool reuse
   _8 = false;
+  // ? pool-ownership flag — true only while stored in ctxPool/scratch
+  _9 = false;
   // ? state
   get state(): Record<string, any> {
     this._8 = true;
@@ -853,18 +858,20 @@ export class JetServer {
       headers,
     };
 
-    // Return context to pool for test environments
-
+    // Return context to pool for test environments — guarded so that only
+    // real per-request Context instances are recycled, exactly once
     queueMicrotask(() => {
-      if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+      releaseCtx(ctx);
     });
 
     return result;
   }
   private async run1(func: JetRoute, ctx?: JetContext<any, any>) {
     if (func.method === "OPTIONS") {
-      optionsCtx.code = 200;
-      return this.makeRes(optionsCtx as unknown as Context);
+      // ? per-request object — the shared global optionsCtx must never be
+      // ? used as a response context nor recycled into the context pool
+      const preflightCtx = { ...optionsCtx, code: 200 };
+      return this.makeRes(preflightCtx as unknown as Context);
     }
 
     const returned: ((ctx: any, error?: unknown) => void | Promise<void>)[] =
@@ -910,8 +917,7 @@ export class JetServer {
         }
       }
     }
-    const ctx404 = optionsCtx;
-    ctx404.code = 404;
+    const ctx404 = { ...optionsCtx, code: 404 };
     return this.makeRes(ctx404 as unknown as Context);
   }
   /*

@@ -28,9 +28,8 @@ import {
 } from "./classes.js";
 import {
   _cloneJsonHeaders,
-  ctxPool,
   isNode,
-  MAX_POOL_SIZE,
+  releaseCtx,
   returnScratchCtx,
   runtime,
   Trie,
@@ -245,7 +244,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
     const code = ctx.code;
     const rawHeaders = ctx._10 ? _cloneJsonHeaders() : ctx._2;
     const headers = buildHeaders(rawHeaders, ctx._setCookies || []);
-    if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+    releaseCtx(ctx);
     return new Response(body, { status: code, headers });
   }
   // ? streaming with ctx.sendStream
@@ -264,7 +263,7 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
     const stream = ctx._3;
     const code = ctx.code;
     const headers = buildHeaders(ctx._2, ctx._setCookies || []);
-    if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+    releaseCtx(ctx);
     return new Response(stream as unknown as undefined, {
       status: code,
       headers,
@@ -272,13 +271,13 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   }
   if (ctx._6 !== false) {
     const customRes = ctx._6;
-    if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+    releaseCtx(ctx);
     return customRes;
   }
   // ? fallback: empty response
   const code = ctx.code;
   const headers = buildHeaders(ctx._2, ctx._setCookies || []);
-  if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+  releaseCtx(ctx);
   return new Response(undefined, { status: code, headers });
 };
 const makeResNode = (
@@ -299,7 +298,7 @@ const makeResNode = (
     const returnToPool = () => {
       if (!poolReturned) {
         poolReturned = true;
-        if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
+        releaseCtx(ctx);
       }
     };
     const errorHandler = () => {
@@ -324,13 +323,15 @@ const makeResNode = (
   const headers = ctx._2;
   const payload = ctx.payload;
   const setCookies = ctx._setCookies;
-  if (ctxPool.length < MAX_POOL_SIZE) ctxPool.push(ctx);
   // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
   if (setCookies?.length) {
     for (const cookie of setCookies) res.setHeader("Set-Cookie", cookie);
   }
   res.writeHead(code, headers);
   res.end(payload);
+  // ? recycle only AFTER the response has been fully handed to the socket —
+  // ? never while the context is still needed to produce the response
+  releaseCtx(ctx);
   return undefined;
 };
 
@@ -341,12 +342,14 @@ if (isNode) {
 }
 
 // ? Bun/Deno: fully inlined handler — no indirection through makeRes variable
-const JetpathBunDeno = (req: Request, res: unknown) => {
+// ? Exported for testing — the Bun/Deno request adapter
+export const JetpathBunDeno = (req: Request, res: unknown) => {
   if (req.method === 'OPTIONS') {
-    optionsCtx.code = 200;
+    // ? per-request headers object — the shared global optionsCtx must never
+    // ? be handed to a Response (or pooled) while other preflights may run
     return new Response(undefined, {
       status: 200,
-      headers: optionsCtx._2 as Record<string, string>,
+      headers: { ...optionsCtx._2 } as Record<string, string>,
     });
   }
 
@@ -426,19 +429,23 @@ const JetpathBunDeno = (req: Request, res: unknown) => {
   }
   return new Response(undefined, {
     status: 404,
-    headers: optionsCtx._2 as Record<string, string>,
+    headers: { ...optionsCtx._2 } as Record<string, string>,
   });
 };
 
-const Jetpath = (
+// ? Exported for testing — the Node.js request adapter
+export const Jetpath = (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
   },
 ) => {
   if (req.method === "OPTIONS") {
-    optionsCtx.code = 200;
-    return makeRes(res, optionsCtx as unknown as Context);
+    // ? per-request object — the shared global optionsCtx must never be used
+    // ? as a response context nor recycled into the context pool: it is
+    // ? concurrently mutated by every preflight
+    const preflightCtx = { ...optionsCtx, code: 200, request: req };
+    return makeRes(res, preflightCtx as unknown as Context);
   }
 
   const ctx = _JetPath_paths_trie[req.method as methods].get_responder(
@@ -475,7 +482,14 @@ const Jetpath = (
     // ? slow path: has middleware
     return _runWithMiddleware(r, ctx, res);
   }
-  const notFoundCtx = { ...optionsCtx, code: 404 };
+  const notFoundCtx = {
+    ...optionsCtx,
+    code: 404,
+    // ? clone the headers too — the spread would otherwise alias the shared
+    // ? global optionsCtx._2 object into a pooled response context
+    _2: { ...optionsCtx._2 },
+    request: req,
+  };
   return makeRes(res, notFoundCtx as unknown as Context);
 };
 
