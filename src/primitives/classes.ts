@@ -14,7 +14,7 @@ import type {
 } from "./types.js";
 import { mime } from "../extracts/mimejs-extract.js";
 import type { BunFile } from "bun";
-import { getCtx, releaseCtx, runtime } from "./trie-router.js";
+import { getCtx, reclaimCtx, releaseCtx, runtime } from "./trie-router.js";
 import { parseRequest } from "./parser.js";
 import { baseCorsHeaders, optionsCtx } from "./cors.js";
 import { validator } from "./validator.js";
@@ -948,6 +948,10 @@ export class JetServer {
     func: JetRoute,
     ctx: JetContext<any, any>,
   ): Promise<{ code: number; body: any; headers: Record<string, string> }> {
+    // ? if the caller re-uses a context that was already released back into
+    // ? storage, reclaim it first — executing on a stored context would let
+    // ? getCtx hand the same mutable object to another concurrent request
+    reclaimCtx(ctx);
     return this.run1(func, ctx);
   }
   runBare(

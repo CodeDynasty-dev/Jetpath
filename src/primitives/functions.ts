@@ -302,8 +302,15 @@ const makeResNode = (
       }
     };
     const errorHandler = () => {
-      res.statusCode = 400;
-      res.end("not found");
+      // ? headers may already be on the wire (writeHead ran before piping) —
+      // ? mutating statusCode after that throws ERR_HTTP_HEADERS_SENT and
+      // ? crashes the process from inside this listener
+      if (res.headersSent) {
+        res.destroy();
+      } else {
+        res.statusCode = 400;
+        res.end("not found");
+      }
       if (stream) {
         stream.removeAllListeners();
         if (typeof (stream as any).destroy === "function") {

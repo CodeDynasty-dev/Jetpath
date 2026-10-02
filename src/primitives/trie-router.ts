@@ -511,11 +511,28 @@ export const releaseCtx = (ctx: unknown): void => {
   }
 };
 
+// ? Reclaim a context out of storage (pool or scratch slot) before it is
+// ? executed on again — e.g. a caller re-using a context with runWithCTX after
+// ? it was released. Without this, the context would be in use by one request
+// ? while still acquirable by another via getCtx: two consumers on one
+// ? mutable context.
+export const reclaimCtx = (ctx: unknown): void => {
+  if (!(ctx instanceof Context) || !ctx._9) return;
+  const i = ctxPool.indexOf(ctx);
+  if (i !== -1) {
+    ctxPool.splice(i, 1);
+  } else if (_scratchCtx === ctx) {
+    _scratchCtx = null;
+  }
+  ctx._9 = false;
+};
+
 // ? Pre-seed the context pool at module load to avoid cold-start allocations
 export function preSeedPool(count: number) {
   // ? Initialize scratch context for sync fast path
   if (!_scratchCtx) {
     _scratchCtx = new Context();
+    _scratchCtx._9 = true; // ? stored — same invariant as pool entries
   }
   // ? respect the pool cap — an oversized seed pool would block all recycling
   const total = Math.min(count, MAX_POOL_SIZE);

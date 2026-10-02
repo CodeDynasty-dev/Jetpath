@@ -266,6 +266,35 @@ describe('Request context isolation (pool ownership)', () => {
     expect(observed[0]).toBe('POST');
     expect(observed[1]).toBe('GET');
   });
+
+  test('re-using a released context via runWithCTX is safe (reclaimed from storage)', async () => {
+    ctxPool.length = 0;
+    const inFlight = new Map<unknown, string>();
+    const route = makeEchoRoute(inFlight);
+    const token = 'zk_live_reuse';
+    const req = new Request('http://localhost/zk/balance', {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const ctx = jetServer.createCTX(req, {} as any, '/zk/balance', route, {});
+
+    const first = await jetServer.runWithCTX(route, ctx as any);
+    await flush(); // ? context is now stored in the pool
+
+    // ? caller re-uses the SAME context object — it must be reclaimed out of
+    // ? the pool before executing, never shared with another request
+    const second = jetServer.runWithCTX(route, ctx as any);
+    expect(ctxPool.includes(ctx as any)).toBe(false);
+    const secondResult = await second;
+    await flush();
+
+    expect(first.code).toBe(200);
+    expect(first.body.token).toBe(token);
+    expect(secondResult.code).toBe(200);
+    expect(secondResult.body.token).toBe(token);
+    // ? stored at most once — duplicate pool entries are forbidden
+    const occurrences = ctxPool.filter((c) => c === (ctx as any)).length;
+    expect(occurrences).toBe(1);
+  });
 });
 
 describe('Live server isolation (real Bun HTTP)', () => {
