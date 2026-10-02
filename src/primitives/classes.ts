@@ -334,12 +334,11 @@ export class Context {
 
         stream = realPath;
       } else {
-        // If no folder is specified, require absolute path for security
-
-        if (
-          !fs().isAbsolute(filePath) &&
-          !fs().isAbsolute(fs().resolve(fs().cwd() + filePath))
-        ) {
+        // ? If no folder is specified, require absolute path for security.
+        // ? NOTE: the previous condition could never be true — resolving any
+        // ? path against the cwd always yields an absolute path, which
+        // ? silently allowed relative paths and defeated this guard.
+        if (!fs().isAbsolute(filePath)) {
           throw new Error(
             "File path must be absolute when no folder is specified",
           );
