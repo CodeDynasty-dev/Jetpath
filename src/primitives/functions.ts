@@ -280,6 +280,32 @@ const makeResBunAndDeno = (_res: any, ctx: Context) => {
   releaseCtx(ctx);
   return new Response(undefined, { status: code, headers });
 };
+// ? Writes status + headers; if Node rejects a header (e.g. CR/LF or
+// ? non-latin1 chars from user input) it responds 500 with no custom headers
+// ? instead of throwing — a throw here escapes every catch and kills the process.
+const writeHeadSafe = (
+  res: ServerResponse<IncomingMessage>,
+  code: number,
+  headers: Record<string, string>,
+  setCookies: string[] | undefined,
+): boolean => {
+  try {
+    // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
+    if (setCookies?.length) {
+      for (const cookie of setCookies) res.setHeader("Set-Cookie", cookie);
+    }
+    res.writeHead(code, headers);
+    return true;
+  } catch (error) {
+    console.log(error);
+    if (!res.headersSent) {
+      for (const name of res.getHeaderNames()) res.removeHeader(name);
+      res.writeHead(500);
+    }
+    return false;
+  }
+};
+
 const makeResNode = (
   res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
@@ -288,12 +314,15 @@ const makeResNode = (
 ) => {
   if (ctx._3) {
     if (ctx._10) ctx._2["Content-Type"] = "application/json";
-    // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
-    if (ctx._setCookies?.length) {
-      for (const cookie of ctx._setCookies) res.setHeader("Set-Cookie", cookie);
-    }
-    res.writeHead(ctx.code, ctx._2);
     const stream = ctx._3;
+    if (!writeHeadSafe(res, ctx.code, ctx._2, ctx._setCookies)) {
+      if (typeof (stream as any).destroy === "function") {
+        (stream as any).destroy();
+      }
+      res.end();
+      releaseCtx(ctx);
+      return undefined;
+    }
     let poolReturned = false;
     const returnToPool = () => {
       if (!poolReturned) {
@@ -330,12 +359,11 @@ const makeResNode = (
   const headers = ctx._2;
   const payload = ctx.payload;
   const setCookies = ctx._setCookies;
-  // ? Write Set-Cookie headers individually (RFC 6265 — must not be comma-joined)
-  if (setCookies?.length) {
-    for (const cookie of setCookies) res.setHeader("Set-Cookie", cookie);
+  if (writeHeadSafe(res, code, headers, setCookies)) {
+    res.end(payload);
+  } else {
+    res.end();
   }
-  res.writeHead(code, headers);
-  res.end(payload);
   // ? recycle only AFTER the response has been fully handed to the socket —
   // ? never while the context is still needed to produce the response
   releaseCtx(ctx);
@@ -360,10 +388,10 @@ export const JetpathBunDeno = (req: Request, res: unknown) => {
     });
   }
 
-  const ctx = _JetPath_paths_trie[req.method as methods].get_responder_fast(
-    req,
-    res
-  );
+  // ? methods without a route table (e.g. PURGE, PROPFIND) fall through to 404
+  const ctx = Object.hasOwn(_JetPath_paths_trie, req.method)
+    ? _JetPath_paths_trie[req.method as methods].get_responder_fast(req, res)
+    : undefined;
   if (ctx) {
     const r = ctx.handler!;
     // ? fast path: no middleware
@@ -455,10 +483,11 @@ export const Jetpath = (
     return makeRes(res, preflightCtx as unknown as Context);
   }
 
-  const ctx = _JetPath_paths_trie[req.method as methods].get_responder(
-    req,
-    res,
-  );
+  // ? methods without a route table (e.g. PURGE, PROPFIND) fall through to 404
+  // ? — an unguarded lookup throws inside the request listener and kills Node
+  const ctx = Object.hasOwn(_JetPath_paths_trie, req.method!)
+    ? _JetPath_paths_trie[req.method as methods].get_responder(req, res)
+    : undefined;
   if (ctx) {
     const r = ctx.handler!;
     // ? fast path: no middleware
@@ -889,9 +918,14 @@ export function assignMiddleware(
 ): void {
   // Iterate over each HTTP method's routes.
   for (const method in _JetPath_paths) {
-    const routes: JetRoute[] = Object.keys(_JetPath_paths[method as methods])
-      .map((value) => _JetPath_paths[method as methods][value])
-      .filter((value) => value.length > 0);
+    // ? select by type, not arity — `.length` is the declared parameter count,
+    // ? so `(...args) =>` / `() =>` handlers were silently left without middleware
+    const routePaths = Object.keys(_JetPath_paths[method as methods]).filter(
+      (p) => typeof _JetPath_paths[method as methods][p] === "function",
+    );
+    const routes: JetRoute[] = routePaths.map(
+      (p) => _JetPath_paths[method as methods][p],
+    );
 
     for (let route of routes) {
       if (!Array.isArray(route.jet_middleware)) {
@@ -902,18 +936,23 @@ export function assignMiddleware(
       }
     }
 
-    for (const route of routes) {
-      // If middleware is defined for the route, ensure it has exactly one middleware function.
+    for (const routePath of routePaths) {
+      // ? match on the registered path, not route.path — one function exported
+      // ? under several routes only keeps the last path, which dropped the
+      // ? middleware of the others (shared functions get the union, deduped)
+      const route = _JetPath_paths[method as methods][routePath];
       const allMiddlewaresSorted = Object.keys(_jet_middleware)
-        .filter((m) => route.path!.startsWith(m))
+        .filter((m) => routePath.startsWith(m))
         .sort((a, b) => a.length - b.length);
       for (const key of allMiddlewaresSorted) {
         const middleware = _jet_middleware[key];
-        // Assign the middleware function to the route handler.
-        if (Array.isArray(middleware)) {
-          route.jet_middleware!.push(...middleware.flat());
-        } else {
-          route.jet_middleware!.push(middleware as any);
+        const list = Array.isArray(middleware)
+          ? middleware.flat()
+          : [middleware];
+        for (const m of list) {
+          if (!route.jet_middleware!.includes(m as any)) {
+            route.jet_middleware!.push(m as any);
+          }
         }
       }
     }

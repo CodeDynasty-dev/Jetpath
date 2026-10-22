@@ -13,6 +13,11 @@ export function parseFormData(
 
   const boundaryMatch = contentType.match(/boundary="?([^";]+)"?/i);
   if (!boundaryMatch) throw new Error("Invalid multipart boundary");
+  // ? RFC 2046: boundary is 1-70 chars. Unbounded boundaries make the
+  // ? search cost O(body * boundary) — an attacker-controlled CPU DoS.
+  if (boundaryMatch[1].length > 70) {
+    throw new Error("Invalid multipart boundary");
+  }
 
   const boundary = `--${boundaryMatch[1]}`;
   const boundaryBytes = new TextEncoder().encode(boundary);
@@ -143,6 +148,11 @@ function splitBuffer(buffer: Uint8Array, delimiter: Uint8Array): Uint8Array[] {
 }
 
 function indexOf(buffer: Uint8Array, search: Uint8Array, from = 0): number {
+  // ? native search where available (Node/Bun) — no copy, view over the same memory
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength)
+      .indexOf(search, from);
+  }
   outer: for (let i = from; i <= buffer.length - search.length; i++) {
     for (let j = 0; j < search.length; j++) {
       if (buffer[i + j] !== search[j]) continue outer;

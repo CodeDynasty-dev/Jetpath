@@ -496,13 +496,28 @@ export class Context {
           .split("[")
           .map((k) => k.trim());
 
+        // ? reject keys that would reach Object.prototype (prototype pollution)
+        if (
+          path.some(
+            (k) => k === "__proto__" || k === "constructor" || k === "prototype",
+          )
+        ) {
+          continue;
+        }
         let curr = this.$_internal_query;
         for (let i = 0; i < path.length; i++) {
           const part = path[i];
           if (i === path.length - 1) {
             curr[part] = decodeURIComponent(value);
           } else {
-            curr[part] ||= {};
+            // ? only descend into own plain objects — never inherited values
+            if (
+              !Object.hasOwn(curr, part) ||
+              typeof curr[part] !== "object" ||
+              curr[part] === null
+            ) {
+              curr[part] = {};
+            }
             curr = curr[part];
           }
         }

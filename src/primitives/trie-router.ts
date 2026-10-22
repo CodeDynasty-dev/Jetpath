@@ -3,6 +3,14 @@ import { Context, LOG } from "./classes.js";
 import { baseCorsHeaders } from "./cors.js";
 import type { JetRoute } from "./types.js";
 
+const safeDecode = (segment: string): string | undefined => {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return undefined;
+  }
+};
+
 class TrieNode {
   // ? child nodes
   children: Map<any, any> = new Map();
@@ -276,8 +284,10 @@ export class Trie {
       if (child) {
         currentNode = child;
       } else if (currentNode.parameterChild) {
-        params[currentNode.parameterChild.paramName!] =
-          decodeURIComponent(segment);
+        const decoded = safeDecode(segment);
+        // ? malformed percent-encoding — treat as no match instead of throwing
+        if (decoded === undefined) return undefined;
+        params[currentNode.parameterChild.paramName!] = decoded;
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
         params['*'] = segments.slice(i).join('/');
@@ -340,8 +350,10 @@ export class Trie {
       if (child) {
         currentNode = child;
       } else if (currentNode.parameterChild) {
-        params[currentNode.parameterChild.paramName!] =
-          decodeURIComponent(segment);
+        const decoded = safeDecode(segment);
+        // ? malformed percent-encoding — treat as no match instead of throwing
+        if (decoded === undefined) return undefined;
+        params[currentNode.parameterChild.paramName!] = decoded;
         currentNode = currentNode.parameterChild;
       } else if (currentNode.wildcardChild) {
         params['*'] = segments.slice(i).join('/');
