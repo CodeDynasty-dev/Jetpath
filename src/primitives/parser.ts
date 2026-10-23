@@ -209,6 +209,51 @@ function collectRequestBody(
 }
 
 /**
+ * Helper for Bun/Deno (Web Request): enforces maxBodySize while streaming,
+ * instead of buffering the whole body first (memory exhaustion).
+ */
+async function collectWebRequestBody(
+  req: any,
+  maxBodySize: number,
+): Promise<Uint8Array> {
+  // ? reject early on a declared oversize body — nothing is read
+  const declared = Number(req.headers?.get?.("content-length"));
+  if (declared > maxBodySize) {
+    throw new Error("Payload Too Large");
+  }
+  const body = req.body;
+  if (!body || typeof body.getReader !== "function") {
+    // ? no stream available (e.g. mock requests) — buffered fallback
+    const buffered = new Uint8Array(await req.arrayBuffer());
+    if (buffered.byteLength > maxBodySize) {
+      throw new Error("Payload Too Large");
+    }
+    return buffered;
+  }
+  // ? chunked / lying Content-Length — count bytes as they arrive
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > maxBodySize) {
+      reader.cancel().catch(() => {});
+      throw new Error("Payload Too Large");
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
+}
+
+/**
  * Reads the request/stream and returns a Promise that resolves to the parsed body.
  */
 export async function parseRequest(
@@ -228,11 +273,7 @@ export async function parseRequest(
     if (!contentType && req.headers && typeof req.headers.get === "function") {
       contentType = req.headers.get("content-type") || "";
     }
-    const arrayBuffer = await req.arrayBuffer();
-    rawBody = new Uint8Array(arrayBuffer);
-    if (rawBody.byteLength > maxBodySize) {
-      throw new Error("Payload Too Large");
-    }
+    rawBody = await collectWebRequestBody(req, maxBodySize);
   } else if (typeof req.on === "function") {
     if (!contentType && req.headers) {
       contentType = req.headers["content-type"] || "";
